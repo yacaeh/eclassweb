@@ -1,0 +1,49 @@
+# Insurance in case a gem needed by one of our releases gets yanked from
+# rubygems.org in the future.
+cache gems:
+  extends:
+    - .default-retry
+    - .rails-cache
+    - .default-before_script
+    - .setup:rules:cache-gems
+  stage: test
+  needs: ["setup-test-env"]
+  variables:
+    SETUP_DB: "false"
+  script:
+    - bundle package --all --all-platforms
+  artifacts:
+    paths:
+      - vendor/cache
+    expire_in: 31d
+
+.minimal-job:
+  extends:
+    - .default-retry
+  needs: []
+
+dont-interrupt-me:
+  extends: .setup:rules:dont-interrupt-me
+  stage: sync
+  image: alpine:edge
+  interruptible: false
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "This jobs makes sure this pipeline won't be interrupted! See https://docs.gitlab.com/ee/ci/yaml/#interruptible."
+
+gitlab_git_test:
+  extends:
+    - .minimal-job
+    - .setup:rules:gitlab_git_test
+  stage: test
+  script:
+    - spec/support/prepare-gitlab-git-test-for-commit --check-for-changes
+
+no_ee_check:
+  extends:
+    - .minimal-job
+    - .setup:rules:no_ee_check
+  stage: test
+  script:
+    - scripts/no-ee-check

@@ -1,0 +1,188 @@
+# include:
+#   - template: Jobs/Code-Quality.gitlab-ci.yml
+#   - template: Security/SAST.gitlab-ci.yml
+#   - template: Security/Dependency-Scanning.gitlab-ci.yml
+#   - template: Security/DAST.gitlab-ci.yml
+
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
+code_quality:
+  extends:
+    - .default-retry
+    - .reports:rules:code_quality
+    - .use-docker-in-docker
+  stage: test
+  needs: []
+  variables:
+    CODE_QUALITY_IMAGE: "registry.gitlab.com/gitlab-org/ci-cd/codequality:0.85.9"
+  script:
+    - |
+      if ! docker info &>/dev/null; then
+        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+          export DOCKER_HOST='tcp://localhost:2375'
+        fi
+      fi
+    - docker pull --quiet "$CODE_QUALITY_IMAGE"
+    - docker run
+        --env SOURCE_CODE="$PWD"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        "$CODE_QUALITY_IMAGE" /code
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json  # GitLab-specific
+    expire_in: 1 week  # GitLab-specific
+
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
+.sast:
+  extends:
+    - .default-retry
+    - .reports:rules:sast
+  stage: test
+  # `needs: []` starts the job immediately in the pipeline
+  # https://docs.gitlab.com/ee/ci/yaml/README.html#needs
+  needs: []
+  artifacts:
+    paths:
+      - gl-sast-report.json  # GitLab-specific
+    reports:
+      sast: gl-sast-report.json
+    expire_in: 1 week  # GitLab-specific
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    SAST_ANALYZER_IMAGE_PREFIX: "registry.gitlab.com/gitlab-org/security-products/analyzers"
+    SAST_ANALYZER_IMAGE_TAG: 2
+    SAST_BRAKEMAN_LEVEL: 2  # GitLab-specific
+    SAST_EXCLUDED_PATHS: qa,spec,doc,ee/spec  # GitLab-specific
+  script:
+    - /analyzer run
+
+brakeman-sast:
+  extends: .sast
+  image:
+    name: "$SAST_ANALYZER_IMAGE_PREFIX/brakeman:$SAST_ANALYZER_IMAGE_TAG"
+
+eslint-sast:
+  extends: .sast
+  image:
+    name: "$SAST_ANALYZER_IMAGE_PREFIX/eslint:$SAST_ANALYZER_IMAGE_TAG"
+
+# Temporary disabled as it's constantly failing. See https://gitlab.com/gitlab-org/gitlab/-/issues/213769.
+# nodejs-scan-sast:
+#   extends: .sast
+#   image:
+#     name: "$SAST_ANALYZER_IMAGE_PREFIX/nodejs-scan:$SAST_ANALYZER_IMAGE_TAG"
+
+secrets-sast:
+  extends: .sast
+  image:
+    name: "$SAST_ANALYZER_IMAGE_PREFIX/secrets:$SAST_ANALYZER_IMAGE_TAG"
+
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
+dependency_scanning:
+  extends:
+    - .default-retry
+    - .reports:rules:dependency_scanning
+    - .use-docker-in-docker
+  stage: test
+  needs: []
+  variables:
+    DS_MAJOR_VERSION: 2
+    DS_EXCLUDED_PATHS: "qa/qa/ee/fixtures/secure_premade_reports,spec,ee/spec"  # GitLab-specific
+  script:
+    - |
+      if ! docker info &>/dev/null; then
+        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+          export DOCKER_HOST='tcp://localhost:2375'
+        fi
+      fi
+    - | # this is required to avoid undesirable reset of Docker image ENV variables being set on build stage
+      function propagate_env_vars() {
+        CURRENT_ENV=$(printenv)
+
+        for VAR_NAME; do
+          echo $CURRENT_ENV | grep "${VAR_NAME}=" > /dev/null && echo "--env $VAR_NAME "
+        done
+      }
+    - |
+      docker run \
+        $(propagate_env_vars \
+          DS_ANALYZER_IMAGES \
+          DS_ANALYZER_IMAGE_PREFIX \
+          DS_ANALYZER_IMAGE_TAG \
+          DS_DEFAULT_ANALYZERS \
+          DS_EXCLUDED_PATHS \
+          DS_DOCKER_CLIENT_NEGOTIATION_TIMEOUT \
+          DS_PULL_ANALYZER_IMAGE_TIMEOUT \
+          DS_RUN_ANALYZER_TIMEOUT \
+          DS_PYTHON_VERSION \
+          DS_PIP_VERSION \
+          DS_PIP_DEPENDENCY_PATH \
+          GEMNASIUM_DB_LOCAL_PATH \
+          GEMNASIUM_DB_REMOTE_URL \
+          GEMNASIUM_DB_REF_NAME \
+          PIP_INDEX_URL \
+          PIP_EXTRA_INDEX_URL \
+          PIP_REQUIREMENTS_FILE \
+          MAVEN_CLI_OPTS \
+          BUNDLER_AUDIT_UPDATE_DISABLED \
+          BUNDLER_AUDIT_ADVISORY_DB_URL \
+          BUNDLER_AUDIT_ADVISORY_DB_REF_NAME \
+        ) \
+        --volume "$PWD:/code" \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        "registry.gitlab.com/gitlab-org/security-products/dependency-scanning:$DS_MAJOR_VERSION" /code
+  artifacts:
+    paths:
+      - gl-dependency-scanning-report.json  # GitLab-specific
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+    expire_in: 1 week  # GitLab-specific
+
+# Temporarily disabling review apps
+## We need to duplicate this job's definition because it seems it's impossible to
+## override an included `only.refs`.
+## See https://gitlab.com/gitlab-org/gitlab/issues/31371.
+#dast:
+#  extends:
+#    - .default-retry
+#    - .reports:rules:dast
+#  # This is needed so that manual jobs with needs don't block the pipeline.
+#  # See https://gitlab.com/gitlab-org/gitlab/-/issues/199979.
+#  dependencies: ["review-deploy"]
+#  stage: qa  # GitLab-specific
+#  image:
+#    name: "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION"
+#  variables:
+#    # To be done in a later iteration
+#    # DAST_USERNAME: "root"
+#    # DAST_USERNAME_FIELD: "user[login]"
+#    # DAST_PASSWORD_FIELD: "user[passowrd]"
+#    DAST_VERSION: 1
+#  script:
+#    - 'export DAST_WEBSITE="${DAST_WEBSITE:-$(cat environment_url.txt)}"'
+#    # To be done in a later iteration
+#    # - 'export DAST_AUTH_URL="${DAST_WEBSITE}/users/sign_in"'
+#    # - 'export DAST_PASSWORD="${REVIEW_APPS_ROOT_PASSWORD}"'
+#    - /analyze -t $DAST_WEBSITE
+#  artifacts:
+#    paths:
+#      - gl-dast-report.json  # GitLab-specific
+#    reports:
+#      dast: gl-dast-report.json
+#    expire_in: 1 week  # GitLab-specific
+
+# To be done in a later iteration: https://gitlab.com/gitlab-org/gitlab/issues/31160#note_278188255
+# schedule:dast:
+#   extends:
+#     - dast
+#     - .reports:schedule-dast
+#   variables:
+#     DAST_FULL_SCAN_ENABLED: "true"
