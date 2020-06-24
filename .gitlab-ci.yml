@@ -5,9 +5,6 @@ stages:
   
 image: node:latest
 
-variables:
-  CI_PROJECT_URL: "http://git.ycs.com/ycs/ai/eclassweb/"
-
 cache:
   paths:
     - node_modules/
