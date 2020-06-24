@@ -207,6 +207,7 @@ function serverHandler(request, response) {
         response.write('404 Not Found: Unexpected error.\n' + e.message + '\n\n' + e.stack);
         response.end();
     }
+    response.status(200).send("Server Successfully started!");
 }
 
 var httpApp;
