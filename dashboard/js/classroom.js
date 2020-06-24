@@ -610,3 +610,5 @@ $('#btn-share-screen').click(function() {
         alert('getDisplayMedia API is not available in this browser.');
     }
 });
+
+console.log("success");
