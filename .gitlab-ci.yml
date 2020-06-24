@@ -20,7 +20,7 @@ test:
     stage: test
     script:
       - npm install
-      - node server.js
+      - npm test
     artifacts:
         paths:
         - node_modules/
