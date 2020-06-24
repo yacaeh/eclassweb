@@ -1,4 +1,4 @@
-(function () {
+(function() {
     var params = {},
         r = /([^&=]+)=?([^&]*)/g;
 
@@ -38,7 +38,7 @@ var designer = new CanvasDesigner();
 designer.widgetHtmlURL = '/node_modules/canvas-designer/widget.html';
 designer.widgetJsURL = '/node_modules/canvas-designer/widget.min.js'
 
-designer.addSyncListener(function (data) {
+designer.addSyncListener(function(data) {
     connection.send(data);
 });
 
@@ -76,32 +76,17 @@ connection.session = {
     audio: true,
     video: true,
     data: true,
-    screen: true
+    screen:false
 };
 connection.sdpConstraints.mandatory = {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true
 };
 
-// https://www.rtcmulticonnection.org/docs/iceServers/
-// use your own TURN-server here!
-// Ice 서버 사용 유무 판단 필요
-connection.iceServers = [{
-    'urls': [
-        'stun:stun.l.google.com:19302',
-        'stun:stun1.l.google.com:19302',
-        'stun:stun2.l.google.com:19302',
-        'stun:stun.l.google.com:19302?transport=udp',
-    ]
-}];
-
-// 화면 공유
-connection.videosContainer = document.getElementById('videos-container');
-
-connection.onUserStatusChanged = function (event) {
+connection.onUserStatusChanged = function(event) {
     var infoBar = document.getElementById('onUserStatusChanged');
     var names = [];
-    connection.getAllParticipants().forEach(function (pid) {
+    connection.getAllParticipants().forEach(function(pid) {
         names.push(getFullName(pid));
     });
 
@@ -114,12 +99,12 @@ connection.onUserStatusChanged = function (event) {
     infoBar.innerHTML = '<b>Active users:</b> ' + names.join(', ');
 };
 
-connection.onopen = function (event) {
+connection.onopen = function(event) {
     connection.onUserStatusChanged(event);
 
     if (designer.pointsLength <= 0) {
         // make sure that remote user gets all drawings synced.
-        setTimeout(function () {
+        setTimeout(function() {
             connection.send('plz-sync-points');
         }, 1000);
     }
@@ -129,12 +114,12 @@ connection.onopen = function (event) {
     document.getElementById('btn-share-screen').style.display = 'inline-block';
 };
 
-connection.onclose = connection.onerror = connection.onleave = function (event) {
+connection.onclose = connection.onerror = connection.onleave = function(event) {
     connection.onUserStatusChanged(event);
 };
 
-connection.onmessage = function (event) {
-    if (event.data.showMainVideo) {
+connection.onmessage = function(event) {
+    if(event.data.showMainVideo) {
         // $('#main-video').show();
         $('#screen-viewer').css({
             top: $('#widget-container').offset().top,
@@ -146,18 +131,18 @@ connection.onmessage = function (event) {
         return;
     }
 
-    if (event.data.hideMainVideo) {
+    if(event.data.hideMainVideo) {
         // $('#main-video').hide();
         $('#screen-viewer').hide();
         return;
     }
 
-    if (event.data.typing === true) {
+    if(event.data.typing === true) {
         $('#key-press').show().find('span').html(event.extra.userFullName + ' is typing');
         return;
     }
 
-    if (event.data.typing === false) {
+    if(event.data.typing === false) {
         $('#key-press').hide().find('span').html('');
         return;
     }
@@ -185,15 +170,16 @@ connection.onmessage = function (event) {
 
 // extra code
 
-connection.onstream = function (event) {
+connection.onstream = function(event) {
     if (event.stream.isScreen && !event.stream.canvasStream) {
         $('#screen-viewer').get(0).srcObject = event.stream;
         $('#screen-viewer').hide();
-    } else if (event.extra.roomOwner === true) {
+    }
+    else if (event.extra.roomOwner === true) {
         var video = document.getElementById('main-video');
         video.setAttribute('data-streamid', event.streamid);
         // video.style.display = 'none';
-        if (event.type === 'local') {
+        if(event.type === 'local') {
             video.muted = true;
             video.volume = 0;
         }
@@ -209,7 +195,7 @@ connection.onstream = function (event) {
     connection.onUserStatusChanged(event);
 };
 
-connection.onstreamended = function (event) {
+connection.onstreamended = function(event) {
     var video = document.querySelector('video[data-streamid="' + event.streamid + '"]');
     if (!video) {
         video = document.getElementById(event.streamid);
@@ -241,8 +227,7 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b>You:</b> <img class="checkmark" id="' + checkmark_id +
-            '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
+        div.innerHTML = '<b>You:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
         div.style.background = '#cbffcb';
     }
 
@@ -262,12 +247,12 @@ $('#txt-chat-message').emojioneArea({
     inline: true,
     hidePickerOnBlur: true,
     events: {
-        focus: function () {
-            $('.emojionearea-category').unbind('click').bind('click', function () {
+        focus: function() {
+            $('.emojionearea-category').unbind('click').bind('click', function() {
                 $('.emojionearea-button-close').click();
             });
         },
-        keyup: function (e) {
+        keyup: function(e) {
             var chatMessage = $('.emojionearea-editor').html();
             if (!chatMessage || !chatMessage.replace(/ /g, '').length) {
                 connection.send({
@@ -285,13 +270,13 @@ $('#txt-chat-message').emojioneArea({
                 });
             }
 
-            keyPressTimer = setTimeout(function () {
+            keyPressTimer = setTimeout(function() {
                 connection.send({
                     typing: false
                 });
             }, 1200);
         },
-        blur: function () {
+        blur: function() {
             // $('#btn-chat-message').click();
             connection.send({
                 typing: false
@@ -300,14 +285,14 @@ $('#txt-chat-message').emojioneArea({
     }
 });
 
-window.onkeyup = function (e) {
+window.onkeyup = function(e) {
     var code = e.keyCode || e.which;
     if (code == 13) {
         $('#btn-chat-message').click();
     }
 };
 
-document.getElementById('btn-chat-message').onclick = function () {
+document.getElementById('btn-chat-message').onclick = function() {
     var chatMessage = $('.emojionearea-editor').html();
     $('.emojionearea-editor').html('');
 
@@ -328,12 +313,12 @@ document.getElementById('btn-chat-message').onclick = function () {
 };
 
 var recentFile;
-document.getElementById('btn-attach-file').onclick = function () {
+document.getElementById('btn-attach-file').onclick = function() {
     var file = new FileSelector();
-    file.selectSingleFile(function (file) {
+    file.selectSingleFile(function(file) {
         recentFile = file;
 
-        if (connection.getAllParticipants().length >= 1) {
+        if(connection.getAllParticipants().length >= 1) {
             recentFile.userIndex = 0;
             connection.send(file, connection.getAllParticipants()[recentFile.userIndex]);
         }
@@ -342,8 +327,7 @@ document.getElementById('btn-attach-file').onclick = function () {
 
 function getFileHTML(file) {
     var url = file.url || URL.createObjectURL(file);
-    var attachment = '<a href="' + url + '" target="_blank" download="' + file.name + '">Download: <b>' + file
-        .name + '</b></a>';
+    var attachment = '<a href="' + url + '" target="_blank" download="' + file.name + '">Download: <b>' + file.name + '</b></a>';
     if (file.name.match(/\.jpg|\.png|\.jpeg|\.gif/gi)) {
         attachment += '<br><img crossOrigin="anonymous" src="' + url + '">';
     } else if (file.name.match(/\.wav|\.mp3/gi)) {
@@ -362,7 +346,7 @@ function getFullName(userid) {
     return _userFullName;
 }
 
-connection.onFileEnd = function (file) {
+connection.onFileEnd = function(file) {
     var html = getFileHTML(file);
     var div = progressHelper[file.uuid].div;
 
@@ -370,15 +354,17 @@ connection.onFileEnd = function (file) {
         div.innerHTML = '<b>You:</b><br>' + html;
         div.style.background = '#cbffcb';
 
-        if (recentFile) {
+        if(recentFile) {
             recentFile.userIndex++;
             var nextUserId = connection.getAllParticipants()[recentFile.userIndex];
-            if (nextUserId) {
+            if(nextUserId) {
                 connection.send(recentFile, nextUserId);
-            } else {
+            }
+            else {
                 recentFile = null;
             }
-        } else {
+        }
+        else {
             recentFile = null;
         }
     } else {
@@ -391,19 +377,19 @@ connection.autoSaveToDisk = false;
 
 var progressHelper = {};
 
-connection.onFileProgress = function (chunk, uuid) {
+connection.onFileProgress = function(chunk, uuid) {
     var helper = progressHelper[chunk.uuid];
     helper.progress.value = chunk.currentPosition || chunk.maxChunks || helper.progress.max;
     updateLabel(helper.progress, helper.label);
 };
 
-connection.onFileStart = function (file) {
+connection.onFileStart = function(file) {
     var div = document.createElement('div');
     div.className = 'message';
 
     if (file.userid === connection.userid) {
         var userFullName = file.remoteUserId;
-        if (connection.peersBackup[file.remoteUserId]) {
+        if(connection.peersBackup[file.remoteUserId]) {
             userFullName = connection.peersBackup[file.remoteUserId].extra.userFullName;
         }
 
@@ -432,43 +418,39 @@ function updateLabel(progress, label) {
     label.innerHTML = position + '%';
 }
 
-if (!!params.password) {
+if(!!params.password) {
     connection.password = params.password;
 }
 
-designer.appendTo(document.getElementById('widget-container'), function () {
+designer.appendTo(document.getElementById('widget-container'), function() {
     if (params.open === true || params.open === 'true') {
-        var tempStreamCanvas = document.getElementById('temp-stream-canvas');
-        var tempStream = tempStreamCanvas.captureStream();
-        tempStream.isScreen = true;
-        tempStream.streamid = tempStream.id;
-        tempStream.type = 'local';
-        connection.attachStreams.push(tempStream);
-        window.tempStream = tempStream;
+            var tempStreamCanvas = document.getElementById('temp-stream-canvas');
+            var tempStream = tempStreamCanvas.captureStream();
+            tempStream.isScreen = true;
+            tempStream.streamid = tempStream.id;
+            tempStream.type = 'local';
+            connection.attachStreams.push(tempStream);
+            window.tempStream = tempStream;
 
-        connection.extra.roomOwner = true;
-        connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-            if (error) {
-                if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                    alert(
-                        'Someone already created this room. Please either join or create a separate room.'
-                        );
-                    return;
+            connection.extra.roomOwner = true;
+            connection.open(params.sessionid, function(isRoomOpened, roomid, error) {
+                if (error) {
+                    if (error === connection.errors.ROOM_NOT_AVAILABLE) {
+                        alert('Someone already created this room. Please either join or create a separate room.');
+                        return;
+                    }
+                    alert(error);
                 }
-                alert(error);
-            }
 
-            connection.socket.on('disconnect', function () {
-                location.reload();
+                connection.socket.on('disconnect', function() {
+                    location.reload();
+                });
             });
-        });
     } else {
-        connection.join(params.sessionid, function (isRoomJoined, roomid, error) {
+        connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
             if (error) {
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                    alert(
-                        'This room does not exist. Please either create it or wait for moderator to enter in the room.'
-                        );
+                    alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
@@ -477,12 +459,12 @@ designer.appendTo(document.getElementById('widget-container'), function () {
                 }
                 if (error === connection.errors.INVALID_PASSWORD) {
                     connection.password = prompt('Please enter room password.') || '';
-                    if (!connection.password.length) {
+                    if(!connection.password.length) {
                         alert('Invalid password.');
                         return;
                     }
-                    connection.join(params.sessionid, function (isRoomJoined, roomid, error) {
-                        if (error) {
+                    connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
+                        if(error) {
                             alert(error);
                         }
                     });
@@ -491,7 +473,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
                 alert(error);
             }
 
-            connection.socket.on('disconnect', function () {
+            connection.socket.on('disconnect', function() {
                 location.reload();
             });
         });
@@ -499,25 +481,25 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 });
 
 function addStreamStopListener(stream, callback) {
-    stream.addEventListener('ended', function () {
+    stream.addEventListener('ended', function() {
         callback();
-        callback = function () {};
+        callback = function() {};
     }, false);
 
-    stream.addEventListener('inactive', function () {
+    stream.addEventListener('inactive', function() {
         callback();
-        callback = function () {};
+        callback = function() {};
     }, false);
 
-    stream.getTracks().forEach(function (track) {
-        track.addEventListener('ended', function () {
+    stream.getTracks().forEach(function(track) {
+        track.addEventListener('ended', function() {
             callback();
-            callback = function () {};
+            callback = function() {};
         }, false);
 
-        track.addEventListener('inactive', function () {
+        track.addEventListener('inactive', function() {
             callback();
-            callback = function () {};
+            callback = function() {};
         }, false);
     });
 }
@@ -528,21 +510,21 @@ function replaceTrack(videoTrack, screenTrackId) {
         alert('Can not replace an "ended" track. track.readyState: ' + videoTrack.readyState);
         return;
     }
-    connection.getAllParticipants().forEach(function (pid) {
+    connection.getAllParticipants().forEach(function(pid) {
         var peer = connection.peers[pid].peer;
         if (!peer.getSenders) return;
         var trackToReplace = videoTrack;
-        peer.getSenders().forEach(function (sender) {
+        peer.getSenders().forEach(function(sender) {
             if (!sender || !sender.track) return;
-            if (screenTrackId) {
-                if (trackToReplace && sender.track.id === screenTrackId) {
+            if(screenTrackId) {
+                if(trackToReplace && sender.track.id === screenTrackId) {
                     sender.replaceTrack(trackToReplace);
                     trackToReplace = null;
                 }
                 return;
             }
 
-            if (sender.track.id !== tempStream.getTracks()[0].id) return;
+            if(sender.track.id !== tempStream.getTracks()[0].id) return;
             if (sender.track.kind === 'video' && trackToReplace) {
                 sender.replaceTrack(trackToReplace);
                 trackToReplace = null;
@@ -565,7 +547,7 @@ function replaceScreenTrack(stream) {
     });
 
     var screenTrackId = stream.getTracks()[0].id;
-    addStreamStopListener(stream, function () {
+    addStreamStopListener(stream, function() {
         connection.send({
             hideMainVideo: true
         });
@@ -576,8 +558,8 @@ function replaceScreenTrack(stream) {
         replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
 
-    stream.getTracks().forEach(function (track) {
-        if (track.kind === 'video' && track.readyState === 'live') {
+    stream.getTracks().forEach(function(track) {
+        if(track.kind === 'video' && track.readyState === 'live') {
             replaceTrack(track);
         }
     });
@@ -588,35 +570,40 @@ function replaceScreenTrack(stream) {
 
     // $('#main-video').show();
     $('#screen-viewer').css({
-        top: $('#widget-container').offset().top,
-        left: $('#widget-container').offset().left,
-        width: $('#widget-container').width(),
-        height: $('#widget-container').height()
-    });
+            top: $('#widget-container').offset().top,
+            left: $('#widget-container').offset().left,
+            width: $('#widget-container').width(),
+            height: $('#widget-container').height()
+        });
     $('#screen-viewer').show();
 }
 
-$('#btn-share-screen').click(function () {
-    if (!window.tempStream) {
+$('#btn-share-screen').click(function() {
+    if(!window.tempStream) {
         alert('Screen sharing is not enabled.');
         return;
     }
-
+    screen_constraints = {
+        screen: true,
+        oneway: true
+        };
     //$('#btn-share-screen').hide();
 
-    if (navigator.mediaDevices.getDisplayMedia) {
+    if(navigator.mediaDevices.getDisplayMedia) {
         navigator.mediaDevices.getDisplayMedia(screen_constraints).then(stream => {
             replaceScreenTrack(stream);
         }, error => {
             alert('Please make sure to use Edge 17 or higher.');
         });
-    } else if (navigator.getDisplayMedia) {
+    }
+    else if(navigator.getDisplayMedia) {
         navigator.getDisplayMedia(screen_constraints).then(stream => {
             replaceScreenTrack(stream);
         }, error => {
             alert('Please make sure to use Edge 17 or higher.');
         });
-    } else {
+    }
+    else {
         alert('getDisplayMedia API is not available in this browser.');
     }
 });
