@@ -171,6 +171,7 @@ connection.onmessage = function(event) {
 // extra code
 
 connection.onstream = function(event) {
+    console.log("onstream!");
     if (event.stream.isScreen && !event.stream.canvasStream) {
         $('#screen-viewer').get(0).srcObject = event.stream;
         $('#screen-viewer').hide();
@@ -186,16 +187,18 @@ connection.onstream = function(event) {
         video.srcObject = event.stream;
         $('#main-video').show();
     } else {
-        event.mediaElement.controls = false;
+        // 타 사용자 캠 표시 막기
+        // event.mediaElement.controls = false;
 
-        var otherVideos = document.querySelector('#other-videos');
-        otherVideos.appendChild(event.mediaElement);
+        // var otherVideos = document.querySelector('#other-videos');
+        // otherVideos.appendChild(event.mediaElement);
     }
 
     connection.onUserStatusChanged(event);
 };
 
 connection.onstreamended = function(event) {
+    console.log("onstreameneded!");
     var video = document.querySelector('video[data-streamid="' + event.streamid + '"]');
     if (!video) {
         video = document.getElementById(event.streamid);
