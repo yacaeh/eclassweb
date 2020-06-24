@@ -1,7 +1,7 @@
 {
   "socketURL": "/",
   "dirPath": "",
-  "homePage": "/demos/dashboard/index.html",
+  "homePage": "/dashboard/index.html",
   "socketMessageEvent": "RTCMultiConnection-Message",
   "socketCustomEvent": "RTCMultiConnection-Custom-Message",
   "port": "9001",
