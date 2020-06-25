@@ -11,7 +11,7 @@ connection.publicRoomIdentifier = publicRoomIdentifier;
 connection.socketMessageEvent = publicRoomIdentifier;
 
 // keep room opened even if owner leaves
-connection.autoCloseEntireSession = true;
+connection.autoCloseEntireSession = false;
 
 connection.connectSocket(function(socket) {
     looper();
@@ -20,6 +20,37 @@ connection.connectSocket(function(socket) {
         location.reload();
     });
 });
+console.log(connection);
+connection.sdpConstraints.mandatory = {
+    OfferToReceiveAudio: false,
+    OfferToReceiveVideo: false
+};
+
+function checkCamAndMicExist(){
+    connection.DetectRTC.load(function() {
+        if (!connection.DetectRTC.hasMicrophone) {
+            connection.mediaConstraints.audio = false;
+            connection.session.audio = false;
+            console.log("user has no mic!");
+            alert("마이크가 없습니다!");
+        }
+    
+        if (!connection.DetectRTC.hasWebcam) {
+            connection.mediaConstraints.video = false;
+            connection.session.video = false;
+            console.log("user has no cam!");
+            alert("캠이 없습니다!");
+        }
+    });
+}
+
+// connection.join({
+//     sessionid: connection.channel,
+//     userid: connection.channel,
+//     extra: {},
+//     session: connection.session
+// });
+
 
 function looper() {
     if (!$('#rooms-list').length) return;
@@ -98,8 +129,12 @@ function updateListOfRooms(rooms) {
         });
     });
 }
+$('#btn-open-create-room-modal').click(function(e) {
+    checkCamAndMicExist();
+});
 
 $('#btn-show-join-hidden-room').click(function(e) {
+  checkCamAndMicExist();
   e.preventDefault();
   $('#txt-room-password-hidden').parent().hide();
   $('#joinRoomModel').modal('show');
@@ -156,6 +191,7 @@ function joinAHiddenRoom(roomid) {
 
         connection.sessionid = roomid;
         connection.isInitiator = false;
+        connection.session.oneway = true;
         $('#joinRoomModel').modal('hide');
         openCanvasDesigner();
 
@@ -164,6 +200,7 @@ function joinAHiddenRoom(roomid) {
 }
 
 function openCanvasDesigner() {
+    
     $('#startRoomModel').modal('hide');
     var href = location.href + 'classroom.html?open=' + connection.isInitiator + '&sessionid=' + connection.sessionid + '&publicRoomIdentifier=' + connection.publicRoomIdentifier + '&userFullName=' + connection.extra.userFullName;
     
@@ -281,6 +318,7 @@ $('#btn-create-room').click(function() {
 
         connection.sessionid = roomid;
         connection.isInitiator = true;
+        connection.session.oneway = true;
         openCanvasDesigner();
         $('#btn-create-room').html(initialHTML).prop('disabled', false);
     });

@@ -19,7 +19,7 @@
   <script src="/dashboard/js/popper.min.js"></script>
   <script src="/dashboard/js/bootstrap.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/dist/RTCMultiConnection.min.js"></script>
+  <script src="/dist/RTCMultiConnection.js"></script>
 </head>
 
 <body>
@@ -27,7 +27,7 @@
     <img class="logo" src="/dashboard/logo.png" alt="RTCMultiConnection" />
     <span class="logo-text">YouCanStar</span>
     <div id="header-left-box">
-      <button class="btn btn-primary" data-toggle="modal" data-target="#startRoomModel">방 만들기</button>
+      <button id="btn-open-create-room-modal" class="btn btn-primary" data-toggle="modal" data-target="#startRoomModel">방 만들기</button>
       <button id="btn-show-join-hidden-room" class="top-span btn btn-secondary" data-toggle="modal"
         data-target="#joinRoomModel">방 참가하기</button>
       <span class="top-span">Active rooms: <span id="active-rooms">0</span></span>

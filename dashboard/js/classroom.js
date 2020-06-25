@@ -10,8 +10,9 @@
         params[d(match[1])] = d(match[2]);
     window.params = params;
 })();
-
 var connection = new RTCMultiConnection();
+console.log("Connection!");
+console.log(connection);
 
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -24,15 +25,17 @@ connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
 
 // keep room opened even if owner leaves
-connection.autoCloseEntireSession = true;
+connection.autoCloseEntireSession = false;
 
 // https://www.rtcmulticonnection.org/docs/maxParticipantsAllowed/
 connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
+console.log(connection);
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
+console.log("designer!");
 
 // you can place widget.html anywhere
 designer.widgetHtmlURL = '/node_modules/canvas-designer/widget.html';
@@ -443,7 +446,9 @@ if(!!params.password) {
 }
 
 designer.appendTo(document.getElementById('widget-container'), function() {
+    console.log("designer append");
     if (params.open === true || params.open === 'true') {
+        console.log("Opening Class!");
             var tempStreamCanvas = document.getElementById('temp-stream-canvas');
             var tempStream = tempStreamCanvas.captureStream();
             tempStream.isScreen = true;
@@ -467,7 +472,34 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                 });
             });
     } else {
-        connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
+        console.log("try joining!");
+        connection.DetectRTC.load(function() { 
+                                   
+            if (!connection.DetectRTC.hasMicrophone) {
+                connection.mediaConstraints.audio = false;
+                connection.session.audio = false;
+                console.log("user has no mic!");
+                alert("마이크가 없습니다!");
+            }
+        
+            if (!connection.DetectRTC.hasWebcam) {
+                connection.mediaConstraints.video = false;
+                connection.session.video = false;
+                console.log("user has no cam!");
+                alert("캠이 없습니다!");
+                connection.session.oneway = true;
+                connection.sdpConstraints.mandatory = {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                };
+    
+            }
+        });
+    
+        connection.join({sessionid:params.sessionid,
+                         userid: connection.channel,
+                         session: connection.session}, function(isRoomJoined, roomid, error) {
+            console.log("Joing Class!");
             if (error) {
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
@@ -494,8 +526,10 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             }
 
             connection.socket.on('disconnect', function() {
+                console.log("disconnect Class!");
                 location.reload();
             });
+            console.log("isRoomJoined",isRoomJoined);
         });
     }
 });
