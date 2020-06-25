@@ -84,6 +84,7 @@ connection.sdpConstraints.mandatory = {
 };
 
 connection.onUserStatusChanged = function(event) {
+    console.log("onUserStatusChanged!");
     var infoBar = document.getElementById('onUserStatusChanged');
     var names = [];
     connection.getAllParticipants().forEach(function(pid) {
@@ -100,6 +101,7 @@ connection.onUserStatusChanged = function(event) {
 };
 
 connection.onopen = function(event) {
+    console.log("onopen!");
     connection.onUserStatusChanged(event);
 
     if (designer.pointsLength <= 0) {
@@ -115,6 +117,7 @@ connection.onopen = function(event) {
 };
 
 connection.onclose = connection.onerror = connection.onleave = function(event) {
+    console.log("on close!");
     connection.onUserStatusChanged(event);
 };
 
@@ -195,6 +198,20 @@ connection.onstream = function(event) {
     }
 
     connection.onUserStatusChanged(event);
+};
+
+connection.setUserPreferences = function(userPreferences) {
+    if (connection.dontAttachStream) {
+    	// current user's streams will NEVER be shared with any other user
+        userPreferences.dontAttachLocalStream = true;
+    }
+
+    if (connection.dontGetRemoteStream) {
+    	// current user will NEVER receive any stream from any other user
+        userPreferences.dontGetRemoteStream = true;
+    }
+
+    return userPreferences;
 };
 
 connection.onstreamended = function(event) {
