@@ -8,6 +8,7 @@ var httpServer = require('http');
 
 const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
+const eclassSignalingServer = require('./ESignaling-Servers.js');
 
 var PORT = 9001;
 var isUseHTTPs = false;
@@ -265,7 +266,8 @@ httpApp = httpApp.listen(process.env.PORT || PORT, process.env.IP || "0.0.0.0", 
 // socket.io codes goes below
 
 ioServer(httpApp).on('connection', function(socket) {
-    RTCMultiConnectionServer.addSocket(socket, config);
+    // RTCMultiConnectionServer.addSocket(socket, config);
+    eclassSignalingServer(socket, config);
 
     // ----------------------
     // below code is optional
