@@ -44,7 +44,7 @@ deploy-test:
     - export SSHPASS=$DGX_PASS 
   
   script:
-    - sshpass -e rsync -avz --exclude='.git' --exclude='.gitlab-ci.yml' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
+    - sshpass -e rsync -avzO --exclude='.git' --exclude='.gitlab-ci.yml' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
   only:
     - develop
   
@@ -67,7 +67,7 @@ deploy-production:
     - echo "StrictHostKeyChecking no" >> ~/.ssh/config  
     - export SSHPASS=$DGX_PASS 
   script:
-    - sshpass -e rsync -avz --exclude='.git' --exclude='.gitlab-ci.yml' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_HOST_DIR
+    - sshpass -e rsync -avzO --exclude='.git' --exclude='.gitlab-ci.yml' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_HOST_DIR
     - npm install
   only:
     - master
