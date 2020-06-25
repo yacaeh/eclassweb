@@ -132,3 +132,71 @@ hr {
   z-index: 9999999999999;
   display: none;
 }
+
+#screen-container{
+  margin: 20px;
+}
+
+.header{
+  margin-bottom: 20px;
+}
+
+.header > .icons {
+  float: right;
+  margin-top: 15px;
+}
+
+#widget-container{
+  position: fixed;
+  top: 5%;
+  bottom: 0;
+  right: 0;
+  left: 20%;
+  height: 100%;
+  border: 1px solid black;
+  border-top: 0px;
+  border-bottom: 0px;
+}
+
+#temp-stream-canvas{
+  display: none;
+}
+
+#key-press{
+  text-align: right;
+  display: none;
+  font-size: 11px;
+}
+
+#key-press-image{
+  height: 12px;
+  vertical-align: middle;
+}
+
+#key-press-span{
+  vertical-align: middle;
+}
+
+#article{
+  top: 20px;
+}
+
+.lwindow{
+  width: 20%;
+  height: 100%;
+  position: fixed;
+  left: 0px;
+}
+
+.onUserStatusChanged{
+  padding: 5px 10px;
+}
+
+.conversation-panel{
+  margin-top: 20px;
+  position: absolute;
+  bottom: 0px;
+  background-color: white;
+  padding-bottom: 20px;
+  width: 94%;
+}

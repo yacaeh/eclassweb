@@ -27,10 +27,10 @@
     <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
 
 <body>
-    <header style="margin-bottom: 20px;">
+    <header class="header">
         <img class="logo" src="/dashboard/logo.png" alt="RTCMultiConnection" /> <span class="logo-text">Dashboard
             Example</span>
-        <div style="float: right;margin-top: 15px;">
+        <div class="icons">
             <img id="btn-attach-file" src="https://www.webrtc-experiment.com/images/attach-file.png"
                 title="Attach a File">
             <img id="btn-share-screen" src="https://www.webrtc-experiment.com/images/share-screen.png"
@@ -43,35 +43,36 @@
             <span class="top-span">Active rooms: <span id="active-rooms">0</span></span>
         </div>
     </header>
-    <article style="top: 20px;">
-        <div id="widget-container"
-            style="position: fixed; top:5%;bottom: 0;right: 0;left: 20%;height: 100%;border: 1px solid black; border-top:0; border-bottom: 0;">
+
+    <article id="article">
+        <div id="widget-container">
         </div>
         <video id="screen-viewer" controls playsinline autoplay></video>
-        <div style="width: 20%; height: 100%; position: fixed;left:0;">
+
+        <div class="lwindow">
             <video id="main-video" controls playsinline autoplay></video>
             <div id="other-videos"></div>
-            <div id="screen-container" style="margin: 20px 0;"></div>
+            <div id="screen-container"></div>
             <hr>
-            <div style="padding: 5px 10px;">
+            <div class="onUserStatusChanged">
                 <div id="onUserStatusChanged"></div>
             </div>
 
-            <div
-                style="margin-top: 20px;position: absolute;bottom: 0;background: white; padding-bottom: 20px; width: 94%">
+            <div class="conversation-panel" >
                 <div id="conversation-panel"></div>
-                <div id="key-press" style="text-align: right; display: none; font-size: 11px;">
-                    <span style="vertical-align: middle;"></span>
-                    <img src="https://www.webrtc-experiment.com/images/key-press.gif"
-                        style="height: 12px; vertical-align: middle;">
+                <div id="key-press">
+                    <span id="key-press-span"></span>
+                    <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
                 </div>
                 <textarea id="txt-chat-message"></textarea>
                 <button class="btn btn-primary" id="btn-chat-message">Send</button>
             </div>
-
-            <canvas id="temp-stream-canvas" style="display: none;"></canvas>
+            <canvas id="temp-stream-canvas"></canvas>
         </div>
+
     </article>
+
+
 </body>
 <script src="/dashboard/js/classroom.js">
 </script>
