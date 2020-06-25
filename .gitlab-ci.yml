@@ -31,6 +31,6 @@ deploy-test:
     name: staging
     url: 192.168.124.100
   script:
-    - ssh dgx1@$url "cd /raid/Dataset/eclass && git checkout develop && git pull origin develop && npm install && node server.js && exit"
+    - ssh dgx1@192.168.124.100 "cd /raid/Dataset/eclass && git checkout develop && git pull origin develop && npm install && node server.js && exit"
   only:
     - develop
