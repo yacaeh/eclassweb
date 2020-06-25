@@ -31,7 +31,9 @@ deploy-test:
   stage: deploy
   environment:
     name: staging
-
+  artifacts:
+    paths:
+      - node_modules/
   before_script:
     - apt-get update -qq
     - apt-get install -y -qq ssh
@@ -42,11 +44,7 @@ deploy-test:
     - export SSHPASS=$DGX_PASS 
   
   script:
-    - sshpass -e
-    - cd $DGX_HOST_DIR
-    - git checkout develop
-    - git pull origin develop
-    - npm install
+    - sshpass -e rsync -avz --exclude='.git' --exclude='.gitlab-ci.yml' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
   only:
     - develop
   
@@ -56,7 +54,10 @@ deploy-production:
     
   environment:
     name: deploying
-
+  artifacts:
+    paths:
+      - node_modules/
+  
   before_script:
     - apt-get update -qq
     - apt-get install -y -qq ssh
