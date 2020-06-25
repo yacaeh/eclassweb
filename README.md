@@ -20,8 +20,8 @@ node server --port=9001
 # pm2 설치
 npm install pm2 -g 
 
-# pm2 서버 등록 및 시작
-pm2 start --name 서버명 server.js
+# pm2 서버 등록 및 시작 (watch option) 주면 자동 리프레시 기능 활성화
+pm2 start --name 서버명 server.js --watch 
 
 # 서버 로그 보기
 pm2 log 서버명
