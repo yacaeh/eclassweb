@@ -22,20 +22,24 @@
   <script src="/dist/RTCMultiConnection.js"></script>
 </head>
 
-<body>
+<body background="/dashboard/login_bg.png">
   <header>
-    <img class="logo" src="/dashboard/logo.png" alt="RTCMultiConnection" />
-    <span class="logo-text">YouCanStar</span>
+    <img class="logo" src="/dashboard/ai_icon.png" alt="RTCMultiConnection" />
     <div id="header-left-box">
+<<<<<<< HEAD
       <button id="btn-open-create-room-modal" class="btn btn-primary" data-toggle="modal" data-target="#startRoomModel">방 만들기</button>
       <button id="btn-show-join-hidden-room" class="top-span btn btn-secondary" data-toggle="modal"
         data-target="#joinRoomModel">방 참가하기</button>
       <span class="top-span">Active rooms: <span id="active-rooms">0</span></span>
+=======
+      <span class="display-none" class="top-span">Active rooms: <span id="active-rooms">0</span></span>
+>>>>>>> f3e5eef6d4b63cb4d9b2ec9444f339dca129a496
     </div>
   </header>
 
 
-  <div class="modal fade" id="startRoomModel" tabindex="-1" role="dialog" aria-labelledby="startRoomModelLabel"
+  <!-- Create -->
+  <!--div class="modal fade" id="startRoomModel" tabindex="-1" role="dialog" aria-labelledby="startRoomModelLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -63,7 +67,8 @@
                 <input type="text" class="form-control" id="txt-room-password">
               </p>
 
-              <a id="more-options-button" href="" onclick="event.preventDefault();$('.more-options').show();$(this).hide();">Show More Options</a>
+              <a id="more-options-button" href=""
+                onclick="event.preventDefault();$('.more-options').show();$(this).hide();">Show More Options</a>
 
               <p class="more-options">
                 <label class="col-form-label"><input type="checkbox" id="chk-room-password"> Set Room Password?</label>
@@ -82,9 +87,11 @@
         </div>
       </div>
     </div>
-  </div>
+  </div-->
 
-  <div class="modal fade" id="joinRoomModel" tabindex="-1" role="dialog" aria-labelledby="joinRoomModelLabel"
+
+  <!-- Join -->
+  <!--div class="modal fade" id="joinRoomModel" tabindex="-1" role="dialog" aria-labelledby="joinRoomModelLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -116,19 +123,20 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="btn-join-hidden-room">Join</button>
+          <--button type="button" class="btn btn-primary" id="btn-join-hidden-room">Join</button->
         </div>
       </div>
     </div>
-  </div>
+  </div-->
 
   <div id="confirm-box-topper">
   </div>
+
   <div id="alert-box" class="modal fade">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="alert-title">Alert</h5>
+          <h4 class="modal-title" id="alert-title">Alert</h4>
           <button type="button" class="close btn-alert-close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -139,7 +147,7 @@
 
         <div class="modal-footer">
           <p id="alert-special"></p>
-          <button class="btn btn-primary btn-alert-close">Close</button>
+          <button class="btn btn-info btn-alert-close">Yes</button>
         </div>
       </div>
     </div>
@@ -164,13 +172,32 @@
     </div>
   </div>
 
+  <!-- Section -->
   <section>
-    <div id="select-identity-box">
-      <button id="btn-show-join-hidden-room" class="top-span btn btn-secondary" data-toggle="modal"
-        data-target="#joinRoomModel">Student</button>
-      <button class="btn btn-primary" data-toggle="modal" data-target="#startRoomModel">Teacher</button>
+
+    <!-- Login Form -->
+    <div class="modal-dialog">
+      <div class="modal-content" style="margin-top: 25vh;">
+        <h4 class="modal-header">Login</h4>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <p><input type="text" class="form-control" id="txt-roomid" placeholder="Room Code"></p>
+              <p><input type="text" class="form-control" id="txt-user-name" placeholder="Name"></p>
+              <p><input type="text" class="form-control" id="txt-room-password" placeholder="Room Password"></p>
+            </div>
+          </form>
+          <div>
+            <p><button type="button" class="btn btn-primary" id="btn-join-hidden-room">Student</button></p>
+            <p><button type="button" class="btn btn-success" id="btn-create-room">Teacher</button></p>
+            <!--button id="btn-show-join-hidden-room" class="top-span btn btn-secondary" data-toggle="modal"
+            data-target="#joinRoomModel">Student</button-->
+          </div>
+        </div>
+      </div>
     </div>
-    <table class="table">
+
+    <!--table class="table">
       <thead>
         <tr>
           <th>#</th>
@@ -187,11 +214,8 @@
           <td colspan=9>No active room found for this demo.</td>
         </tr>
       </tbody>
-    </table>
+    </table-->
   </section>
-
-  <footer>Dashboard + Video Conferencing + Chat + File Sharing</footer>
-
   <script src="/dashboard/js/index.js"></script>
 </body>
 
