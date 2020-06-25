@@ -501,6 +501,7 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                          session: connection.session}, function(isRoomJoined, roomid, error) {
             console.log("Joing Class!");
             if (error) {
+                console.log("Joing Error!");
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
                     return;
