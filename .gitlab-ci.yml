@@ -46,7 +46,6 @@ deploy-test:
     - git checkout develop
     - git pull origin develop
     - npm install
-    - node server.js && exit
   only:
     - develop
   
@@ -68,6 +67,5 @@ deploy-production:
   script:
     - sshpass -e rsync -avz --exclude='.git' --exclude='.gitlab-ci.yml' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_HOST_DIR
     - npm install
-    - node server.js && exit
   only:
     - master
