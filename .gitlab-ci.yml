@@ -43,6 +43,7 @@ deploy-test:
   
   script:
     - sshpass -e
+    - cd $DGX_HOST_DIR
     - git checkout develop
     - git pull origin develop
     - npm install
