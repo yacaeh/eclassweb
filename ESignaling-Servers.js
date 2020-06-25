@@ -454,7 +454,7 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('check-presence', function(roomid, callback) {
+        socket.on('check-presence', function(roomid, callback) {           
             try {
                 if (!listOfRooms[roomid] || !listOfRooms[roomid].participants.length) {
                     callback(false, roomid, {
@@ -1015,5 +1015,52 @@ module.exports = exports = function(socket, config) {
 
             sendToAdmin();
         });
+
+        socket.on ('teacherToStudents', (arg, callback) => {            
+            broadcastInRoom('teacherToStudents', arg);
+            callback('success call');
+        });
+
+
+        function getRoom () {
+            var user = getUser ();
+            if(user.error)            
+                return user.error;
+                                
+            var room = listOfRooms[user.roomid];
+            if(!room) return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };
+            if(room.owner !== user.userid) return { error : CONST_STRINGS.ROOM_PERMISSION_DENIED };
+
+            return room;
+        };
+
+        function getUser () {                     
+            var user = listOfUsers[socket.userid];
+            if(!user) return { error : CONST_STRINGS.USERID_NOT_AVAILABLE };
+            if(!user.roomid) return { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };
+            if(!socket.admininfo) return { error : CONST_STRINGS.INVALID_SOCKET };
+            return user;
+        }       
+
+
+        function getRoomNumber () {
+            return socket.admininfo.sessionid;
+        }
+
+        function isOwner () {                                    
+            return socket.userid == getRoomNumber ();
+        };
+
+        function broadcastInRoom (socketEvent, message) {                        
+
+            var room = getRoom ();
+            if(room.error)
+            {
+                console.log(room.error);
+                return;
+            }            
+            socket.broadcast.to(room).emit(socketEvent, message);
+        };
+
     }
 };
