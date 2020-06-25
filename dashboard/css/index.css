@@ -16,12 +16,13 @@ body {
 
 header {
   border-bottom: 1px solid #95d4e7;
-  height: 70px;
+  height: 50px;
   margin-bottom: 20px;
+  background-color: white;
 }
 
 section {
-  min-height: 400px;
+  vertical-align: middle;
 }
 
 footer {
@@ -43,8 +44,9 @@ a:hover {
 .logo {
     float: left;
     margin-left: 20px;
+    margin-top: 5px;
     display: block;
-    height: 55px;
+    height: 35px;
 }
 
 .logo-text {
@@ -54,11 +56,6 @@ a:hover {
     margin-left: 9px;
     font-weight: bold;
     color: #0194ff;
-}
-
-section {
-  border-bottom: 1px solid #95d4e7;
-  padding: 5px 20px;
 }
 
 .table {
@@ -241,8 +238,6 @@ section {
   width: 20px;
 }
 
-.modal-body
-
 header div .top-span, header div button {
   display: inline-block!important;
   margin-right: 25px;
@@ -312,7 +307,7 @@ input[disabled], button[disabled] {
   display:none;z-index:999999999999999;
 }
 
-#startRoomModel .modal-body {
+#startRoomModel {
   padding-bottom: 0;
 }
 
@@ -332,4 +327,8 @@ input[disabled], button[disabled] {
 
 .display-none {
   display: none;
+}
+
+#btn-join-hidden-room, #btn-create-room {
+  width: 100%;
 }
