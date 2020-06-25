@@ -42,7 +42,9 @@ deploy-test:
     - export SSHPASS=$DGX_PASS 
   
   script:
-    - sshpass -e rsync -avz --exclude='.git' --exclude='.gitlab-ci.yml' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
+    - sshpass -e
+    - git checkout develop
+    - git pull origin develop
     - npm install
     - node server.js && exit
   only:
