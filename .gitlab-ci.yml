@@ -1,0 +1,73 @@
+stages:
+  - build
+  - test
+  - deploy
+  - production
+  
+image: node:latest
+
+cache:
+  paths:
+    - node_modules/
+
+build:
+    stage: build
+    script:
+      - npm install
+    artifacts:
+      paths:
+        - node_modules/
+test:
+    stage: test
+    script:
+      - npm install
+      - npm test
+    artifacts:
+        paths:
+        - node_modules/
+
+      
+deploy-test:
+  stage: deploy
+  environment:
+    name: staging
+  artifacts:
+    paths:
+      - node_modules/
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq ssh
+    - apt-get install -y -qq rsync
+    - apt-get install -y -qq sshpass
+    - mkdir ~/.ssh
+    - echo "StrictHostKeyChecking no" >> ~/.ssh/config  
+    - export SSHPASS=$DGX_PASS 
+  
+  script:
+    - sshpass -e rsync -avzOr --exclude='.git' --exclude='.gitlab-ci.yml' --exclude='node_modules/' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
+  only:
+    - develop
+  
+
+deploy-production:
+  stage: production
+    
+  environment:
+    name: deploying
+  artifacts:
+    paths:
+      - node_modules/
+  
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq ssh
+    - apt-get install -y -qq rsync
+    - apt-get install -y -qq sshpass
+    - mkdir ~/.ssh
+    - echo "StrictHostKeyChecking no" >> ~/.ssh/config  
+    - export SSHPASS=$DGX_PASS 
+  script:
+    - sshpass -e rsync -avzO --exclude='.git' --exclude='.gitlab-ci.yml' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_HOST_DIR
+    - npm install
+  only:
+    - master

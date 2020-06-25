@@ -10,13 +10,15 @@
         params[d(match[1])] = d(match[2]);
     window.params = params;
 })();
-
 var connection = new RTCMultiConnection();
+console.log("Connection!");
+console.log(connection);
 
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
 
 connection.extra.userFullName = params.userFullName;
+
 
 /// make this room public
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
@@ -24,15 +26,17 @@ connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
 
 // keep room opened even if owner leaves
-connection.autoCloseEntireSession = true;
+connection.autoCloseEntireSession = false;
 
 // https://www.rtcmulticonnection.org/docs/maxParticipantsAllowed/
 connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
+console.log(connection);
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
+console.log("designer!");
 
 // you can place widget.html anywhere
 designer.widgetHtmlURL = '/node_modules/canvas-designer/widget.html';
@@ -84,26 +88,28 @@ connection.sdpConstraints.mandatory = {
 };
 
 connection.onUserStatusChanged = function(event) {
+    console.log("onUserStatusChanged!");
     var infoBar = document.getElementById('onUserStatusChanged');
     var names = [];
+
     connection.getAllParticipants().forEach(function(pid) {
         names.push(getFullName(pid));
     });
 
     if (!names.length) {
-        names = ['Only You'];
+        $("#nos").text("0");
     } else {
-        names = [connection.extra.userFullName || 'You'].concat(names);
+        $("#nos").text(names.length);
     }
 
-    infoBar.innerHTML = '<b>Active users:</b> ' + names.join(', ');
+    SetStudentList();
 };
 
 connection.onopen = function(event) {
+    console.log("onopen!");
     connection.onUserStatusChanged(event);
 
     if (designer.pointsLength <= 0) {
-        // make sure that remote user gets all drawings synced.
         setTimeout(function() {
             connection.send('plz-sync-points');
         }, 1000);
@@ -111,10 +117,11 @@ connection.onopen = function(event) {
 
     document.getElementById('btn-chat-message').disabled = false;
     document.getElementById('btn-attach-file').style.display = 'inline-block';
-    document.getElementById('btn-share-screen').style.display = 'inline-block';
+    document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
 connection.onclose = connection.onerror = connection.onleave = function(event) {
+    console.log("on close!");
     connection.onUserStatusChanged(event);
 };
 
@@ -137,10 +144,6 @@ connection.onmessage = function(event) {
         return;
     }
 
-    if(event.data.typing === true) {
-        $('#key-press').show().find('span').html(event.extra.userFullName + ' is typing');
-        return;
-    }
 
     if(event.data.typing === false) {
         $('#key-press').hide().find('span').html('');
@@ -189,12 +192,25 @@ connection.onstream = function(event) {
     } else {
         // 타 사용자 캠 표시 막기
         // event.mediaElement.controls = false;
-
         // var otherVideos = document.querySelector('#other-videos');
         // otherVideos.appendChild(event.mediaElement);
     }
 
     connection.onUserStatusChanged(event);
+};
+
+connection.setUserPreferences = function(userPreferences) {
+    if (connection.dontAttachStream) {
+    	// current user's streams will NEVER be shared with any other user
+        userPreferences.dontAttachLocalStream = true;
+    }
+
+    if (connection.dontGetRemoteStream) {
+    	// current user will NEVER receive any stream from any other user
+        userPreferences.dontGetRemoteStream = true;
+    }
+
+    return userPreferences;
 };
 
 connection.onstreamended = function(event) {
@@ -211,6 +227,8 @@ connection.onstreamended = function(event) {
         video.srcObject = null;
         video.style.display = 'none';
     }
+
+    SetStudentList();
 };
 
 var conversationPanel = document.getElementById('conversation-panel');
@@ -230,7 +248,7 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b>You:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
+        div.innerHTML = '<b>나:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
         div.style.background = '#cbffcb';
     }
 
@@ -242,6 +260,7 @@ function appendChatMessage(event, checkmark_id) {
 
 var keyPressTimer;
 var numberOfKeys = 0;
+
 $('#txt-chat-message').emojioneArea({
     pickerPosition: "top",
     filtersPosition: "bottom",
@@ -255,6 +274,7 @@ $('#txt-chat-message').emojioneArea({
                 $('.emojionearea-button-close').click();
             });
         },
+
         keyup: function(e) {
             var chatMessage = $('.emojionearea-editor').html();
             if (!chatMessage || !chatMessage.replace(/ /g, '').length) {
@@ -262,8 +282,6 @@ $('#txt-chat-message').emojioneArea({
                     typing: false
                 });
             }
-
-
             clearTimeout(keyPressTimer);
             numberOfKeys++;
 
@@ -272,19 +290,7 @@ $('#txt-chat-message').emojioneArea({
                     typing: true
                 });
             }
-
-            keyPressTimer = setTimeout(function() {
-                connection.send({
-                    typing: false
-                });
-            }, 1200);
         },
-        blur: function() {
-            // $('#btn-chat-message').click();
-            connection.send({
-                typing: false
-            });
-        }
     }
 });
 
@@ -310,9 +316,7 @@ document.getElementById('btn-chat-message').onclick = function() {
         checkmark_id: checkmark_id
     });
 
-    connection.send({
-        typing: false
-    });
+    connection.send({ typing: false });
 };
 
 var recentFile;
@@ -426,7 +430,9 @@ if(!!params.password) {
 }
 
 designer.appendTo(document.getElementById('widget-container'), function() {
+    console.log("designer append");
     if (params.open === true || params.open === 'true') {
+        console.log("Opening Class!");
             var tempStreamCanvas = document.getElementById('temp-stream-canvas');
             var tempStream = tempStreamCanvas.captureStream();
             tempStream.isScreen = true;
@@ -435,11 +441,13 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             connection.attachStreams.push(tempStream);
             window.tempStream = tempStream;
 
+            SetTeacher();
+
             connection.extra.roomOwner = true;
             connection.open(params.sessionid, function(isRoomOpened, roomid, error) {
                 if (error) {
                     if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                        alert('Someone already created this room. Please either join or create a separate room.');
+                        alert('이미 존재하는 방 번호입니다.');
                         return;
                     }
                     alert(error);
@@ -450,8 +458,36 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                 });
             });
     } else {
-        connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
+        console.log("try joining!");
+        connection.DetectRTC.load(function() { 
+                                   
+            if (!connection.DetectRTC.hasMicrophone) {
+                connection.mediaConstraints.audio = false;
+                connection.session.audio = false;
+                console.log("user has no mic!");
+                alert("마이크가 없습니다!");
+            }
+        
+            if (!connection.DetectRTC.hasWebcam) {
+                connection.mediaConstraints.video = false;
+                connection.session.video = false;
+                console.log("user has no cam!");
+                alert("캠이 없습니다!");
+                connection.session.oneway = true;
+                connection.sdpConstraints.mandatory = {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                };
+    
+            }
+        });
+    
+        connection.join({sessionid:params.sessionid,
+                         userid: connection.channel,
+                         session: connection.session}, function(isRoomJoined, roomid, error) {
+            console.log("Joing Class!");
             if (error) {
+                console.log("Joing Error!");
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
                     return;
@@ -477,8 +513,10 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             }
 
             connection.socket.on('disconnect', function() {
+                console.log("disconnect Class!");
                 location.reload();
             });
+            console.log("isRoomJoined",isRoomJoined);
         });
     }
 });
@@ -557,7 +595,7 @@ function replaceScreenTrack(stream) {
 
         // $('#main-video').hide();
         $('#screen-viewer').hide();
-        $('#btn-share-screen').show();
+        $('#top_share_screen').show();
         replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
 
@@ -581,7 +619,7 @@ function replaceScreenTrack(stream) {
     $('#screen-viewer').show();
 }
 
-$('#btn-share-screen').click(function() {
+$('#top_share_screen').click(function() {
     if(!window.tempStream) {
         alert('Screen sharing is not enabled.');
         return;
@@ -590,7 +628,7 @@ $('#btn-share-screen').click(function() {
         screen: true,
         oneway: true
         };
-    //$('#btn-share-screen').hide();
+    //$('#top_share_screen').hide();
 
     if(navigator.mediaDevices.getDisplayMedia) {
         navigator.mediaDevices.getDisplayMedia(screen_constraints).then(stream => {
@@ -610,3 +648,88 @@ $('#btn-share-screen').click(function() {
         alert('getDisplayMedia API is not available in this browser.');
     }
 });
+
+console.log("success");
+
+function TimeUpdate(){
+    var date = new Date;
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = date.getHours();
+    var min = date.getMinutes();
+    var sec = date.getSeconds();
+
+    month += 1;
+    if(month < 10)
+        month = "0" + month;
+    if(day < 10)
+        day = "0" + day;
+    if(hours < 10)
+        hours = "0" + hours;
+    if(min < 10)
+        min = "0" + min;
+    if(sec < 10)
+        sec = "0" + sec;
+
+
+    $("#current-day").text(year+'-'+month+'-'+day);
+    $("#current-time").text(hours+':'+min+':'+sec);
+}
+
+setInterval(TimeUpdate,1000);
+
+
+
+function SetTeacher(){
+    $("#who-am-i").text("선생님");
+    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $("#my-name").remove();
+    $(".for_teacher").show();
+}
+
+function SetStudent(){
+    $("#who-am-i").text("학생");
+    console.log(connection.extra)
+    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
+    $(".for_teacher").hide();
+}
+
+SelectViewType();
+
+function SetStudentList(){
+    $("#student_list").empty();
+    connection.getAllParticipants().forEach(function(pid) {
+        $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
+    });
+}
+
+function SelectViewType(){
+    $(".view_type").click(function(){
+        $(".view_type").css({
+            color: 'rgb(129,129,129)',
+            backgroundColor : '',
+        })
+
+        $(this).css({
+            color : 'white',
+            backgroundColor : 'rgb(129,129,129)'
+        })
+ 
+        switch(this.id){
+            case "view_student" :
+                $("#main-video").hide();
+                $("#student_list").show();
+                break;
+            case "vidw_cam" :
+                $("#main-video").show();
+                $("#student_list").hide();
+                break;
+            case "view_result" :
+                $("#student_list").hide();
+                $("#main-video").hide();
+                break;
+        }
+    })
+}
