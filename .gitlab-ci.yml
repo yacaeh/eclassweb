@@ -44,7 +44,7 @@ deploy-test:
     - export SSHPASS=$DGX_PASS 
   
   script:
-    - sshpass -e rsync -avzO --exclude='.git' --exclude='.gitlab-ci.yml' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
+    - sshpass -e rsync -avzOr --exclude='.git' --exclude='.gitlab-ci.yml' --exclude='node_modules/' . $DGX_USER@$DGX_HOST:$DGX_HOST_DIR
   only:
     - develop
   
