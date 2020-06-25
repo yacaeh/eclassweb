@@ -2,6 +2,7 @@ stages:
   - build
   - test
   - deploy
+  - production
   
 image: node:latest
 
@@ -24,3 +25,12 @@ test:
     artifacts:
         paths:
         - node_modules/
+deploy-test:
+  stage: deploy
+  environment:
+    name: staging
+    url: 192.168.124.100
+  script:
+    - ssh dgx1@$url "cd /raid/Dataset/eclass && git checkout develop && git pull origin develop && npm install && node server.js && exit"
+  only:
+    - develop
