@@ -1,0 +1,82 @@
+﻿<!-- Demo version: 2018.12.11 -->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title id="class-title">E클래스 000 반 00 수업</title>
+    <meta name="description"
+        content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
+
+    <link rel="shortcut icon" href="/dashboard/logo.png">
+    <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
+    <link rel="stylesheet" href="/dashboard/css/classroom.css">
+
+    <script src="/dashboard/js/jquery.min.js"></script>
+    <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
+    <script src="/dist/RTCMultiConnection.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/node_modules/fbr/FileBufferReader.js"></script>
+
+    <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
+    <script src="/node_modules/canvas-designer/canvas-designer-widget.js"></script>
+    <script src="/dashboard/js/emojionearea.min.js"></script>
+    <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
+
+<body>
+    <header class="header">
+        <img class="logo" src="/dashboard/logo.png" alt="RTCMultiConnection" /> <span class="logo-text">Dashboard
+            Example</span>
+        <div class="icons">
+            <img id="btn-attach-file" src="https://www.webrtc-experiment.com/images/attach-file.png"
+                title="Attach a File">
+            <img id="btn-share-screen" src="https://www.webrtc-experiment.com/images/share-screen.png"
+                title="Share Your Screen">
+
+
+            <button class="btn btn-primary" data-toggle="modal" data-target="#startRoomModel">Create A New Room</button>
+            <button id="btn-show-join-hidden-room" class="top-span btn btn-secondary" data-toggle="modal"
+                data-target="#joinRoomModel">Join A Room</button>
+            <span class="top-span">Active rooms: <span id="active-rooms">0</span></span>
+        </div>
+    </header>
+
+    <article id="article">
+        <div id="widget-container">
+        </div>
+        <video id="screen-viewer" controls playsinline autoplay></video>
+
+        <div class="lwindow">
+            <video id="main-video" controls playsinline autoplay></video>
+            <div id="other-videos"></div>
+            <div id="screen-container"></div>
+            
+            <hr>
+
+            <div class="onUserStatusChanged">
+                <div id="onUserStatusChanged"></div>
+            </div>
+
+            <div class="conversation-panel" >
+                <div id="conversation-panel"></div>
+                <div id="key-press">
+                    <span id="key-press-span"></span>
+                    <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
+                </div>
+                <textarea id="txt-chat-message"></textarea>
+                <button class="btn btn-primary" id="btn-chat-message">Send</button>
+            </div>
+            <canvas id="temp-stream-canvas"></canvas>
+        </div>
+
+    </article>
+
+
+</body>
+<script src="/dashboard/js/classroom.js">
+</script>
+
+</html>
