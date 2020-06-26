@@ -757,3 +757,7 @@ connection.onstream = function(event) {
     listOfRecorders[event.streamid] = recorder;
     console.log("STARASD")
 };
+
+$(window).on("beforeunload", function () {
+    return 1;
+});
