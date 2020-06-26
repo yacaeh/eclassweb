@@ -77,12 +77,12 @@ button[disabled] {
 }
 
 #conversation-panel {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: left;
-  max-height: 750px;
+  max-height: 550px;
   overflow: auto;
   border-top: 1px solid #e5e5e5;
-  width: 106%;
+  width: 100%;
 }
 
 #conversation-panel .message {
@@ -199,7 +199,7 @@ hr {
 }
 
 .conversation-panel{
-  left: 20px;
+  left: 12px;
   margin-top: 20px;
   position: absolute;
   bottom: 0px;
@@ -263,10 +263,11 @@ hr {
 }
 
 #top_logo{
-  content: url(/dashboard/img/logo.png);
+  content: url(/dashboard/ai_icon.png);
   left: 60px;
   position: absolute;
-  top: 20px;
+  top: 10px;
+  width: 120px;
 }
 
 #my-name{
@@ -283,20 +284,24 @@ hr {
 #who-am-i{
   position: absolute;
   left: 220px;
-  top: 10px;
+  top: 7px;
   font-size: 25px;
   font-weight: bold;
   color: rgb(135,152,156);
 }
 
 .time{
-  width: 200px;
+  width: 90px;
   color: rgb(129, 129,129);
+  float: right;
+  font-weight: bold;
+  text-align: end;
+  margin-right: 5px;
+  margin-left: 290px;
 }
 
 .icons{
   float: right;
-  margin-top: 15px;
 }
 
 .view_type{
@@ -311,6 +316,11 @@ hr {
   color: rgb(129,129,129);
 }
 
+.view_type-on{
+  background-color: rgb(129,129,129);
+  color: white;
+}
+
 .nos{
   float: right;
   margin-right: 10px;
@@ -321,6 +331,8 @@ hr {
   float: left;
   margin-left: 5px;
   margin-top: 5px;
+  width: 370px;
+  height: 290px;
 }
 
 .student{
@@ -335,4 +347,18 @@ hr {
   background-color:black;
   border: 1px solid black;
   direction: ltr;
+}
+.no_student{
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+  display: inline-grid;
+  align-content: center;
+  font-weight: bold;
+}
+
+.top_icon{
+  cursor: pointer;
+  margin-top: 10px;
 }
