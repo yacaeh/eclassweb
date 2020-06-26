@@ -733,3 +733,8 @@ function SelectViewType(){
         }
     })
 }
+
+
+$(window).on("beforeunload", function () {
+    return 1;
+});
