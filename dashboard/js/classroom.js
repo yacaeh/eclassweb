@@ -772,7 +772,7 @@ function loadPDF(){
     const pdfCanvas = window.frames[1].document.getElementById('the-canvas');
         // If absolute URL from the remote server is provided, configure the CORS
         // header on that server.
-        var url = 'test.pdf';
+        var url = 'test2.pdf';
         
         // Loaded via <script> tag, create shortcut to access PDF.js exports.
         var pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -815,6 +815,7 @@ function loadPDF(){
                 renderPage(pageNumPending);
                 pageNumPending = null;
               }
+              pdfCanvas.style.zIndex = +1;
             //   document.getElementById('the-canvas').style.zIndex = +1;
             });
           });
