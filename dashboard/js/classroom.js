@@ -745,19 +745,6 @@ $("#icon_exit").click(function(){
     history.back();
 })
 
-
-var listOfRecorders = {};
-
-connection.onstream = function(event) {
-    var recorder = RecordRTC(event.stream, {
-        type: 'video',
-        recorderType: MediaStreamRecorder
-    });
-    recorder.startRecording();
-    listOfRecorders[event.streamid] = recorder;
-    console.log("STARASD")
-};
-
 $(window).on("beforeunload", function () {
     return 1;
 });
