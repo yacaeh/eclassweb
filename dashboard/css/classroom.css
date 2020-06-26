@@ -236,6 +236,9 @@ hr {
 #top_record_video{
   content: url(/dashboard/img/top_record_video_off.png);
 }
+#top_pdf{
+  content: url(/dashboard/img/pdf.png);
+}
 
 
 #session-id{
