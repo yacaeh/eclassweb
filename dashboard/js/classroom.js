@@ -39,14 +39,30 @@ var designer = new CanvasDesigner();
 console.log("designer!");
 
 // you can place widget.html anywhere
-designer.widgetHtmlURL = '/node_modules/canvas-designer/widget.html';
-designer.widgetJsURL = '/node_modules/canvas-designer/widget.min.js'
+designer.widgetHtmlURL = './canvas/widget.html';
+designer.widgetJsURL = './widget.js';
+
+// setInterval(designer.clearCanvas, 1000)
+
+designer.appendTo(document.body || document.documentElement, function() {
+});
+
+designer.addSyncListener(function(data){
+    console.log(data);
+    console.log(data);
+
+})
+console.log(designer)
+
+designer.icons.pencil = '/dashboard/img/pen.png'
+designer.icons.marker = '/dashboard/img/pen2.png'
+designer.icons.eraser = '/dashboard/img/eraser.png'
+designer.icons.clearCanvas = '/dashboard/img/refresh.png'
 
 designer.addSyncListener(function(data) {
     connection.send(data);
 });
 
-designer.setSelected('pencil');
 
 designer.setTools({
     pencil: true,
@@ -54,21 +70,21 @@ designer.setTools({
     image: true,
     pdf: true,
     eraser: true,
-    line: true,
-    arrow: true,
-    dragSingle: true,
-    dragMultiple: true,
-    arc: true,
-    rectangle: true,
+    line: false,
+    arrow: false,
+    dragSingle: false,
+    dragMultiple: false,
+    arc: false,
+    rectangle: false,
     quadratic: false,
-    bezier: true,
+    bezier: false,
     marker: true,
     zoom: false,
     lineWidth: false,
     colorsPicker: false,
-    extraOptions: false,
+    clearCanvas: true,
     code: false,
-    undo: true
+    undo: true,
 });
 
 // here goes RTCMultiConnection
@@ -98,6 +114,7 @@ connection.onUserStatusChanged = function(event) {
 
     if (!names.length) {
         $("#nos").text("0");
+
     } else {
         $("#nos").text(names.length);
     }
@@ -115,7 +132,6 @@ connection.onopen = function(event) {
         }, 1000);
     }
 
-    document.getElementById('btn-chat-message').disabled = false;
     document.getElementById('btn-attach-file').style.display = 'inline-block';
     document.getElementById('top_share_screen').style.display = 'inline-block';
 };
@@ -188,7 +204,7 @@ connection.onstream = function(event) {
             video.volume = 0;
         }
         video.srcObject = event.stream;
-        $('#main-video').show();
+        // $('#main-video').show();
     } else {
         // 타 사용자 캠 표시 막기
         // event.mediaElement.controls = false;
@@ -297,26 +313,17 @@ $('#txt-chat-message').emojioneArea({
 window.onkeyup = function(e) {
     var code = e.keyCode || e.which;
     if (code == 13) {
-        $('#btn-chat-message').click();
+        var chatMessage = $('.emojionearea-editor').html();
+        $('.emojionearea-editor').html('');
+        if (!chatMessage || !chatMessage.replace(/ /g, '').length) return;
+        var checkmark_id = connection.userid + connection.token();
+        appendChatMessage(chatMessage, checkmark_id);
+        connection.send({
+            chatMessage: chatMessage,
+            checkmark_id: checkmark_id
+        });
+        connection.send({ typing: false });
     }
-};
-
-document.getElementById('btn-chat-message').onclick = function() {
-    var chatMessage = $('.emojionearea-editor').html();
-    $('.emojionearea-editor').html('');
-
-    if (!chatMessage || !chatMessage.replace(/ /g, '').length) return;
-
-    var checkmark_id = connection.userid + connection.token();
-
-    appendChatMessage(chatMessage, checkmark_id);
-
-    connection.send({
-        chatMessage: chatMessage,
-        checkmark_id: checkmark_id
-    });
-
-    connection.send({ typing: false });
 };
 
 var recentFile;
@@ -460,7 +467,8 @@ designer.appendTo(document.getElementById('widget-container'), function() {
     } else {
         console.log("try joining!");
         connection.DetectRTC.load(function() { 
-                                   
+            SetStudent();
+
             if (!connection.DetectRTC.hasMicrophone) {
                 connection.mediaConstraints.audio = false;
                 connection.session.audio = false;
@@ -651,6 +659,8 @@ $('#top_share_screen').click(function() {
 
 console.log("success");
 
+
+
 function TimeUpdate(){
     var date = new Date;
     var year = date.getFullYear();
@@ -679,8 +689,6 @@ function TimeUpdate(){
 
 setInterval(TimeUpdate,1000);
 
-
-
 function SetTeacher(){
     $("#who-am-i").text("선생님");
     $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
@@ -690,33 +698,32 @@ function SetTeacher(){
 
 function SetStudent(){
     $("#who-am-i").text("학생");
-    console.log(connection.extra)
     $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
     $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
     $(".for_teacher").hide();
+    $("#main-video").show();
+    $("#top_all_controll").hide();
 }
 
 SelectViewType();
 
 function SetStudentList(){
     $("#student_list").empty();
-    connection.getAllParticipants().forEach(function(pid) {
-        $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
-    });
+
+    if(connection.getAllParticipants().length == 0){
+        $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
+    }
+    else {
+        connection.getAllParticipants().forEach(function(pid) {
+            $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
+        });
+    }
 }
 
 function SelectViewType(){
     $(".view_type").click(function(){
-        $(".view_type").css({
-            color: 'rgb(129,129,129)',
-            backgroundColor : '',
-        })
-
-        $(this).css({
-            color : 'white',
-            backgroundColor : 'rgb(129,129,129)'
-        })
- 
+        $(".view_type").removeClass("view_type-on");
+        $(this).addClass("view_type-on");
         switch(this.id){
             case "view_student" :
                 $("#main-video").hide();
@@ -734,7 +741,10 @@ function SelectViewType(){
     })
 }
 
+$("#icon_exit").click(function(){
+    history.back();
+})
 
 $(window).on("beforeunload", function () {
-    return 1;
+    // return 1;
 });

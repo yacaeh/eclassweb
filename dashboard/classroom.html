@@ -37,17 +37,17 @@
         <span id="session-id"></span>
 
         <div class="icons">
-            <img id="btn-attach-file" src="https://www.webrtc-experiment.com/images/share-screen.png" title="Share Your Screen">
-            <img id="top_all_controll">
-            <img id="top_load_book">
-            <img id="top_test">
-            <img id="top_alert">
-            <img id="top_share_screen"> 
-            <img id="top_3d">
-            <img id="top_share_video">
-            <img id="top_record_video">
+            <img class="top_icon" id="btn-attach-file" src="https://www.webrtc-experiment.com/images/share-screen.png" title="Share Your Screen">
+            <img class="top_icon" id="top_all_controll">
+            <img class="top_icon" id="top_load_book">
+            <img class="top_icon" id="top_test">
+            <img class="top_icon" id="top_alert">
+            <img class="top_icon" id="top_share_screen"> 
+            <img class="top_icon" id="top_3d">
+            <img class="top_icon" id="top_share_video">
+            <img class="top_icon" id="top_record_video">
             <span class="time">
-                <span id="current-day">0000-00-00</span>
+                <span id="current-day">0000-00-00</span></br>
                 <span id="current-time">00:00:00</span>
             </span>
         </div>
@@ -60,25 +60,22 @@
         <div class="lwindow">
 
             <div class="for_teacher" style="display: none;">
-                <span id="view_student" class='view_type'>Student</span>
-                <span id="vidw_cam" class='view_type'>Cam & File</span>
+                <span id="view_student" class='view_type view_type-on'>Student</span>
+                <span id="vidw_cam" class='view_type'>Camera</span>
                 <span id="view_result" class='view_type'>Result</span>
                 <span class="nos">
                     <span id="nos"></span>
                     <img src="/dashboard/img/man_icon.png">
                 </span>
-
-
-                <div id="student_list"></div>
+                <div id="student_list">
+                </div>
             </div>
-
-
 
             <!-- View Student  -->
 
 
             <!-- View Cam -->
-            <video id="main-video" controls playsinline autoplay></video>
+            <video style="display: none;" id="main-video" controls playsinline autoplay></video>
 
             <!-- View Result -->
 
@@ -89,7 +86,6 @@
                     <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
                 </div>
                 <textarea id="txt-chat-message"></textarea>
-                <button class="btn btn-primary" id="btn-chat-message">SEND MESSAGE</button>
             </div>
 
             <canvas id="temp-stream-canvas"></canvas>
