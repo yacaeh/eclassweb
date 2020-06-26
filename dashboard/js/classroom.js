@@ -755,13 +755,19 @@ $(window).on("beforeunload", function () {
 // 모달로 만들어서 pdf 선택 해야함
 // 로드시 글자깨짐 현상 해결 해야함
 // 소켓통신으로 제어 필요
+$("#canvas-controller").hide();
 
 $("#top_pdf").click(function(){
+    $("#canvas-controller").show();
     loadPDF();
 })
 
+
 function loadPDF(){
-    var oriPdfCanvas = document.getElementById('the-canvas');
+    var oriPdfCanvas= document.createElement('canvas');
+        oriPdfCanvas.setAttribute("id", "the-canvas");
+        oriPdfCanvas.style.cssText = 'border: 1px solid black;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
+
     window.frames[1].document.getElementsByClassName("design-surface")[0].appendChild(oriPdfCanvas);
     const pdfCanvas = window.frames[1].document.getElementById('the-canvas');
         // If absolute URL from the remote server is provided, configure the CORS
@@ -856,8 +862,8 @@ function loadPDF(){
         function closePDF() {
           console.log("close!");
           console.log(pdfDoc);
-          pdfjsLib.destroy();
-          document.removeAttribute.getElementById('the-canvas')
+          $("#canvas-controller").hide();
+          pdfCanvas.remove();
         }
         document.getElementById('close-pdf').addEventListener('click', closePDF);
     
