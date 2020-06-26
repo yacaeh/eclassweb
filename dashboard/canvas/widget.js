@@ -9,6 +9,8 @@
 
 (function() {
 
+    var pointHistory = [];
+
     var is = {
         isLine: false,
         isArrow: false,
@@ -1678,6 +1680,8 @@
             t.prevY = y;
         },
         mouseup: function(e) {
+            console.log("Marker up");
+            pointHistory.push(points.length);
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -2124,321 +2128,321 @@
 
     arcHandler.init();
 
-    var lineHandler = {
-        ismousedown: false,
-        prevX: 0,
-        prevY: 0,
-        mousedown: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-
-            t.prevX = x;
-            t.prevY = y;
-
-            t.ismousedown = true;
-        },
-        mouseup: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-            if (t.ismousedown) {
-                points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
-                t.ismousedown = false;
-            }
-        },
-        mousemove: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-
-            if (t.ismousedown) {
-                tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-                drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-            }
-        }
-    };
-
-    var arrowHandler = {
-        ismousedown: false,
-        prevX: 0,
-        prevY: 0,
-        arrowSize: 10,
-        mousedown: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-
-            t.prevX = x;
-            t.prevY = y;
-
-            t.ismousedown = true;
-        },
-        mouseup: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-            if (t.ismousedown) {
-                points[points.length] = ['arrow', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
-                t.ismousedown = false;
-            }
-        },
-        mousemove: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-
-            if (t.ismousedown) {
-                tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-                drawHelper.arrow(tempContext, [t.prevX, t.prevY, x, y]);
-            }
-        }
-    };
-
-    var rectHandler = {
-        ismousedown: false,
-        prevX: 0,
-        prevY: 0,
-        mousedown: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-
-            t.prevX = x;
-            t.prevY = y;
-
-            t.ismousedown = true;
-        },
-        mouseup: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-            if (t.ismousedown) {
-                points[points.length] = ['rect', [t.prevX, t.prevY, x - t.prevX, y - t.prevY], drawHelper.getOptions()];
-
-                t.ismousedown = false;
-            }
-
-        },
-        mousemove: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var t = this;
-            if (t.ismousedown) {
-                tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-                drawHelper.rect(tempContext, [t.prevX, t.prevY, x - t.prevX, y - t.prevY]);
-            }
-        }
-    };
-
-    var quadraticHandler = {
-        global: {
-            ismousedown: false,
-            prevX: 0,
-            prevY: 0,
-            controlPointX: 0,
-            controlPointY: 0,
-            isFirstStep: true,
-            isLastStep: false
-        },
-        mousedown: function(e) {
-            var g = this.global;
-
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            if (!g.isLastStep) {
-                g.prevX = x;
-                g.prevY = y;
-            }
-
-            g.ismousedown = true;
-
-            if (g.isLastStep && g.ismousedown) {
-                this.end(x, y);
-            }
-        },
-        mouseup: function(e) {
-            var g = this.global;
-
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            if (g.ismousedown && g.isFirstStep) {
-                g.controlPointX = x;
-                g.controlPointY = y;
-
-                g.isFirstStep = false;
-                g.isLastStep = true;
-            }
-        },
-        mousemove: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var g = this.global;
-
-            tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-            if (g.ismousedown && g.isFirstStep) {
-                drawHelper.quadratic(tempContext, [g.prevX, g.prevY, x, y, x, y]);
-            }
-
-            if (g.isLastStep) {
-                drawHelper.quadratic(tempContext, [g.prevX, g.prevY, g.controlPointX, g.controlPointY, x, y]);
-            }
-        },
-        end: function(x, y) {
-            var g = this.global;
-
-            if (!g.ismousedown) return;
-
-            g.isLastStep = false;
-
-            g.isFirstStep = true;
-            g.ismousedown = false;
-
-            x = x || g.controlPointX || g.prevX;
-            y = y || g.controlPointY || g.prevY;
-
-            points[points.length] = ['quadratic', [g.prevX, g.prevY, g.controlPointX, g.controlPointY, x, y], drawHelper.getOptions()];
-        }
-    };
-
-    var bezierHandler = {
-        global: {
-            ismousedown: false,
-            prevX: 0,
-            prevY: 0,
-
-            firstControlPointX: 0,
-            firstControlPointY: 0,
-            secondControlPointX: 0,
-            secondControlPointY: 0,
-
-            isFirstStep: true,
-            isSecondStep: false,
-            isLastStep: false
-        },
-        mousedown: function(e) {
-            var g = this.global;
-
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            if (!g.isLastStep && !g.isSecondStep) {
-                g.prevX = x;
-                g.prevY = y;
-            }
-
-            g.ismousedown = true;
-
-            if (g.isLastStep && g.ismousedown) {
-                this.end(x, y);
-            }
-
-            if (g.ismousedown && g.isSecondStep) {
-                g.secondControlPointX = x;
-                g.secondControlPointY = y;
-
-                g.isSecondStep = false;
-                g.isLastStep = true;
-            }
-        },
-        mouseup: function(e) {
-            var g = this.global;
-
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            if (g.ismousedown && g.isFirstStep) {
-                g.firstControlPointX = x;
-                g.firstControlPointY = y;
-
-                g.isFirstStep = false;
-                g.isSecondStep = true;
-            }
-        },
-        mousemove: function(e) {
-            var x = e.pageX - canvas.offsetLeft,
-                y = e.pageY - canvas.offsetTop;
-
-            var g = this.global;
-
-            tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-            if (g.ismousedown && g.isFirstStep) {
-                drawHelper.bezier(tempContext, [g.prevX, g.prevY, x, y, x, y, x, y]);
-            }
-
-            if (g.ismousedown && g.isSecondStep) {
-                drawHelper.bezier(tempContext, [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, x, y, x, y]);
-            }
-
-            if (g.isLastStep) {
-                drawHelper.bezier(tempContext, [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, g.secondControlPointX, g.secondControlPointY, x, y]);
-            }
-        },
-        end: function(x, y) {
-            var g = this.global;
-
-            if (!g.ismousedown) return;
-
-            g.isLastStep = g.isSecondStep = false;
-
-            g.isFirstStep = true;
-            g.ismousedown = false;
-
-            g.secondControlPointX = g.secondControlPointX || g.firstControlPointX;
-            g.secondControlPointY = g.secondControlPointY || g.firstControlPointY;
-
-            x = x || g.secondControlPointX;
-            y = y || g.secondControlPointY;
-
-            points[points.length] = ['bezier', [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, g.secondControlPointX, g.secondControlPointY, x, y], drawHelper.getOptions()];
-        }
-    };
-
-    var zoomHandler = {
-        scale: 1.0,
-        up: function(e) {
-            this.scale += .01;
-            this.apply();
-        },
-        down: function(e) {
-            this.scale -= .01;
-            this.apply();
-        },
-        apply: function() {
-            tempContext.scale(this.scale, this.scale);
-            context.scale(this.scale, this.scale);
-            drawHelper.redraw();
-        },
-        icons: {
-            up: function(ctx) {
-                ctx.font = '22px Verdana';
-                ctx.strokeText('+', 10, 30);
-            },
-            down: function(ctx) {
-                ctx.font = '22px Verdana';
-                ctx.strokeText('-', 15, 30);
-            }
-        }
-    };
+    // var lineHandler = {
+    //     ismousedown: false,
+    //     prevX: 0,
+    //     prevY: 0,
+    //     mousedown: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+
+    //         t.prevX = x;
+    //         t.prevY = y;
+
+    //         t.ismousedown = true;
+    //     },
+    //     mouseup: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+    //         if (t.ismousedown) {
+    //             points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
+
+    //             t.ismousedown = false;
+    //         }
+    //     },
+    //     mousemove: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+
+    //         if (t.ismousedown) {
+    //             tempContext.clearRect(0, 0, innerWidth, innerHeight);
+
+    //             drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+    //         }
+    //     }
+    // };
+
+    // var arrowHandler = {
+    //     ismousedown: false,
+    //     prevX: 0,
+    //     prevY: 0,
+    //     arrowSize: 10,
+    //     mousedown: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+
+    //         t.prevX = x;
+    //         t.prevY = y;
+
+    //         t.ismousedown = true;
+    //     },
+    //     mouseup: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+    //         if (t.ismousedown) {
+    //             points[points.length] = ['arrow', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
+
+    //             t.ismousedown = false;
+    //         }
+    //     },
+    //     mousemove: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+
+    //         if (t.ismousedown) {
+    //             tempContext.clearRect(0, 0, innerWidth, innerHeight);
+
+    //             drawHelper.arrow(tempContext, [t.prevX, t.prevY, x, y]);
+    //         }
+    //     }
+    // };
+
+    // var rectHandler = {
+    //     ismousedown: false,
+    //     prevX: 0,
+    //     prevY: 0,
+    //     mousedown: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+
+    //         t.prevX = x;
+    //         t.prevY = y;
+
+    //         t.ismousedown = true;
+    //     },
+    //     mouseup: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+    //         if (t.ismousedown) {
+    //             points[points.length] = ['rect', [t.prevX, t.prevY, x - t.prevX, y - t.prevY], drawHelper.getOptions()];
+
+    //             t.ismousedown = false;
+    //         }
+
+    //     },
+    //     mousemove: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var t = this;
+    //         if (t.ismousedown) {
+    //             tempContext.clearRect(0, 0, innerWidth, innerHeight);
+
+    //             drawHelper.rect(tempContext, [t.prevX, t.prevY, x - t.prevX, y - t.prevY]);
+    //         }
+    //     }
+    // };
+
+    // var quadraticHandler = {
+    //     global: {
+    //         ismousedown: false,
+    //         prevX: 0,
+    //         prevY: 0,
+    //         controlPointX: 0,
+    //         controlPointY: 0,
+    //         isFirstStep: true,
+    //         isLastStep: false
+    //     },
+    //     mousedown: function(e) {
+    //         var g = this.global;
+
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         if (!g.isLastStep) {
+    //             g.prevX = x;
+    //             g.prevY = y;
+    //         }
+
+    //         g.ismousedown = true;
+
+    //         if (g.isLastStep && g.ismousedown) {
+    //             this.end(x, y);
+    //         }
+    //     },
+    //     mouseup: function(e) {
+    //         var g = this.global;
+
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         if (g.ismousedown && g.isFirstStep) {
+    //             g.controlPointX = x;
+    //             g.controlPointY = y;
+
+    //             g.isFirstStep = false;
+    //             g.isLastStep = true;
+    //         }
+    //     },
+    //     mousemove: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var g = this.global;
+
+    //         tempContext.clearRect(0, 0, innerWidth, innerHeight);
+
+    //         if (g.ismousedown && g.isFirstStep) {
+    //             drawHelper.quadratic(tempContext, [g.prevX, g.prevY, x, y, x, y]);
+    //         }
+
+    //         if (g.isLastStep) {
+    //             drawHelper.quadratic(tempContext, [g.prevX, g.prevY, g.controlPointX, g.controlPointY, x, y]);
+    //         }
+    //     },
+    //     end: function(x, y) {
+    //         var g = this.global;
+
+    //         if (!g.ismousedown) return;
+
+    //         g.isLastStep = false;
+
+    //         g.isFirstStep = true;
+    //         g.ismousedown = false;
+
+    //         x = x || g.controlPointX || g.prevX;
+    //         y = y || g.controlPointY || g.prevY;
+
+    //         points[points.length] = ['quadratic', [g.prevX, g.prevY, g.controlPointX, g.controlPointY, x, y], drawHelper.getOptions()];
+    //     }
+    // };
+
+    // var bezierHandler = {
+    //     global: {
+    //         ismousedown: false,
+    //         prevX: 0,
+    //         prevY: 0,
+
+    //         firstControlPointX: 0,
+    //         firstControlPointY: 0,
+    //         secondControlPointX: 0,
+    //         secondControlPointY: 0,
+
+    //         isFirstStep: true,
+    //         isSecondStep: false,
+    //         isLastStep: false
+    //     },
+    //     mousedown: function(e) {
+    //         var g = this.global;
+
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         if (!g.isLastStep && !g.isSecondStep) {
+    //             g.prevX = x;
+    //             g.prevY = y;
+    //         }
+
+    //         g.ismousedown = true;
+
+    //         if (g.isLastStep && g.ismousedown) {
+    //             this.end(x, y);
+    //         }
+
+    //         if (g.ismousedown && g.isSecondStep) {
+    //             g.secondControlPointX = x;
+    //             g.secondControlPointY = y;
+
+    //             g.isSecondStep = false;
+    //             g.isLastStep = true;
+    //         }
+    //     },
+    //     mouseup: function(e) {
+    //         var g = this.global;
+
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         if (g.ismousedown && g.isFirstStep) {
+    //             g.firstControlPointX = x;
+    //             g.firstControlPointY = y;
+
+    //             g.isFirstStep = false;
+    //             g.isSecondStep = true;
+    //         }
+    //     },
+    //     mousemove: function(e) {
+    //         var x = e.pageX - canvas.offsetLeft,
+    //             y = e.pageY - canvas.offsetTop;
+
+    //         var g = this.global;
+
+    //         tempContext.clearRect(0, 0, innerWidth, innerHeight);
+
+    //         if (g.ismousedown && g.isFirstStep) {
+    //             drawHelper.bezier(tempContext, [g.prevX, g.prevY, x, y, x, y, x, y]);
+    //         }
+
+    //         if (g.ismousedown && g.isSecondStep) {
+    //             drawHelper.bezier(tempContext, [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, x, y, x, y]);
+    //         }
+
+    //         if (g.isLastStep) {
+    //             drawHelper.bezier(tempContext, [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, g.secondControlPointX, g.secondControlPointY, x, y]);
+    //         }
+    //     },
+    //     end: function(x, y) {
+    //         var g = this.global;
+
+    //         if (!g.ismousedown) return;
+
+    //         g.isLastStep = g.isSecondStep = false;
+
+    //         g.isFirstStep = true;
+    //         g.ismousedown = false;
+
+    //         g.secondControlPointX = g.secondControlPointX || g.firstControlPointX;
+    //         g.secondControlPointY = g.secondControlPointY || g.firstControlPointY;
+
+    //         x = x || g.secondControlPointX;
+    //         y = y || g.secondControlPointY;
+
+    //         points[points.length] = ['bezier', [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, g.secondControlPointX, g.secondControlPointY, x, y], drawHelper.getOptions()];
+    //     }
+    // };
+
+    // var zoomHandler = {
+    //     scale: 1.0,
+    //     up: function(e) {
+    //         this.scale += .01;
+    //         this.apply();
+    //     },
+    //     down: function(e) {
+    //         this.scale -= .01;
+    //         this.apply();
+    //     },
+    //     apply: function() {
+    //         tempContext.scale(this.scale, this.scale);
+    //         context.scale(this.scale, this.scale);
+    //         drawHelper.redraw();
+    //     },
+    //     icons: {
+    //         up: function(ctx) {
+    //             ctx.font = '22px Verdana';
+    //             ctx.strokeText('+', 10, 30);
+    //         },
+    //         down: function(ctx) {
+    //             ctx.font = '22px Verdana';
+    //             ctx.strokeText('-', 15, 30);
+    //         }
+    //     }
+    // };
 
     var FileSelector = function() {
         var selector = this;
@@ -2947,7 +2951,7 @@
 
                     strokeStyle = 'White';
                     fillStyle = 'White';
-                    lineWidth = 10;
+                    lineWidth = 20;
                 } else if (cache.strokeStyle && cache.fillStyle && typeof cache.lineWidth !== 'undefined') {
                     strokeStyle = cache.strokeStyle;
                     fillStyle = cache.fillStyle;
@@ -2959,55 +2963,55 @@
         var toolBox = find('tool-box');
         toolBox.style.height = (innerHeight) + 'px'; // -toolBox.offsetTop - 77
 
-        function decorateDragLastPath() {
-            var context = getContext('drag-last-path');
+        // function decorateDragLastPath() {
+        //     var context = getContext('drag-last-path');
 
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'DragLastPath');
-            };
-            image.src = data_uris.dragSingle;
-        }
+        //     var image = new Image();
+        //     image.onload = function() {
+        //         context.drawImage(image, 4, 4, 32, 32);
+        //         bindEvent(context, 'DragLastPath');
+        //     };
+        //     image.src = data_uris.dragSingle;
+        // }
 
-        decorateDragLastPath();
+        // decorateDragLastPath();
 
-        if (tools.dragSingle === true) {
-            document.getElementById('drag-last-path').style.display = 'block';
-        }
+        // if (tools.dragSingle === true) {
+        //     document.getElementById('drag-last-path').style.display = 'block';
+        // }
 
-        function decorateDragAllPaths() {
-            var context = getContext('drag-all-paths');
+        // function decorateDragAllPaths() {
+        //     var context = getContext('drag-all-paths');
 
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'DragAllPaths');
-            };
-            image.src = data_uris.dragMultiple;
-        }
+        //     var image = new Image();
+        //     image.onload = function() {
+        //         context.drawImage(image, 4, 4, 32, 32);
+        //         bindEvent(context, 'DragAllPaths');
+        //     };
+        //     image.src = data_uris.dragMultiple;
+        // }
 
-        decorateDragAllPaths();
+        // decorateDragAllPaths();
 
-        if (tools.dragMultiple === true) {
-            document.getElementById('drag-all-paths').style.display = 'block';
-        }
+        // if (tools.dragMultiple === true) {
+        //     document.getElementById('drag-all-paths').style.display = 'block';
+        // }
 
-        function decorateLine() {
-            var context = getContext('line');
+        // function decorateLine() {
+        //     var context = getContext('line');
 
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Line');
-            };
-            image.src = data_uris.line;
-        }
+        //     var image = new Image();
+        //     image.onload = function() {
+        //         context.drawImage(image, 4, 4, 32, 32);
+        //         bindEvent(context, 'Line');
+        //     };
+        //     image.src = data_uris.line;
+        // }
 
-        if (tools.line === true) {
-            decorateLine();
-            document.getElementById('line').style.display = 'block';
-        }
+        // if (tools.line === true) {
+        //     decorateLine();
+        //     document.getElementById('line').style.display = 'block';
+        // }
 
         function decorateUndo() {
             var context = getContext('undo');
@@ -3017,6 +3021,7 @@
                 context.drawImage(image, 4, 4, 32, 32);
 
                 document.querySelector('#undo').onclick = function() {
+                    console.log(points)
                     if (points.length) {
                         points.length = points.length - 1;
                         drawHelper.redraw();
@@ -3034,57 +3039,57 @@
             document.getElementById('undo').style.display = 'block';
         }
 
-        function decorateArrow() {
-            var context = getContext('arrow');
+        // function decorateArrow() {
+        //     var context = getContext('arrow');
 
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Arrow');
-            };
-            image.src = data_uris.arrow;
-        }
+        //     var image = new Image();
+        //     image.onload = function() {
+        //         context.drawImage(image, 4, 4, 32, 32);
+        //         bindEvent(context, 'Arrow');
+        //     };
+        //     image.src = data_uris.arrow;
+        // }
 
-        if (tools.arrow === true) {
-            decorateArrow();
-            document.getElementById('arrow').style.display = 'block';
-        }
+        // if (tools.arrow === true) {
+        //     decorateArrow();
+        //     document.getElementById('arrow').style.display = 'block';
+        // }
 
-        function decoreZoomUp() {
-            var context = getContext('zoom-up');
-            // zoomHandler.icons.up(context);
-            addEvent(context.canvas, 'click', function() {
-                zoomHandler.up();
-            });
+        // function decoreZoomUp() {
+        //     var context = getContext('zoom-up');
+        //     // zoomHandler.icons.up(context);
+        //     addEvent(context.canvas, 'click', function() {
+        //         zoomHandler.up();
+        //     });
 
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-            };
-            image.src = data_uris.zoom_in;
-        }
+        //     var image = new Image();
+        //     image.onload = function() {
+        //         context.drawImage(image, 4, 4, 32, 32);
+        //     };
+        //     image.src = data_uris.zoom_in;
+        // }
 
-        function decoreZoomDown() {
-            var context = getContext('zoom-down');
-            // zoomHandler.icons.down(context);
-            addEvent(context.canvas, 'click', function() {
-                zoomHandler.down();
-            });
+        // function decoreZoomDown() {
+        //     var context = getContext('zoom-down');
+        //     // zoomHandler.icons.down(context);
+        //     addEvent(context.canvas, 'click', function() {
+        //         zoomHandler.down();
+        //     });
 
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-            };
-            image.src = data_uris.zoom_out;
-        }
+        //     var image = new Image();
+        //     image.onload = function() {
+        //         context.drawImage(image, 4, 4, 32, 32);
+        //     };
+        //     image.src = data_uris.zoom_out;
+        // }
 
-        if (tools.zoom === true) {
-            decoreZoomUp();
-            decoreZoomDown();
+        // if (tools.zoom === true) {
+        //     decoreZoomUp();
+        //     decoreZoomDown();
 
-            document.getElementById('zoom-up').style.display = 'block';
-            document.getElementById('zoom-down').style.display = 'block';
-        }
+        //     document.getElementById('zoom-up').style.display = 'block';
+        //     document.getElementById('zoom-down').style.display = 'block';
+        // }
 
         function decoratePencil() {
 
@@ -3121,11 +3126,13 @@
                 alpha = 0.2;
 
             // START INIT PENCIL
-
-
+            strokeStyleText.addEventListener('change', function(){
+                pencilContainer.style.display = 'none';
+                pencilColorContainer.style.display = 'none';
+                document.getElementById("pencil-done").click();
+            })
 
             pencilStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
-
             pencilSelectedColor.style.backgroundColor =
                 pencilSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
 
@@ -3150,12 +3157,11 @@
                 addEvent(td, 'click', function() {
                     var elColor = td.getAttribute('data-color');
                     pencilSelectedColor.style.backgroundColor =
-                        pencilSelectedColor2.style.backgroundColor = '#' + elColor;
-
+                    pencilSelectedColor2.style.backgroundColor = '#' + elColor;
                     fillStyleText.value = elColor;
-
-
+                    pencilContainer.style.display = 'none';
                     pencilColorContainer.style.display = 'none';
+                    document.getElementById("pencil-done").click();
                 });
             })
 
@@ -3223,7 +3229,11 @@
                 alpha = 0.2;
 
             // START INIT MARKER
-
+            strokeStyleText.addEventListener('change', function(){
+                markerContainer.style.display = 'none';
+                markerColorContainer.style.display = 'none';
+                document.getElementById("marker-done").click();
+            })
 
 
             markerStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
@@ -3253,9 +3263,11 @@
                     var elColor = td.getAttribute('data-color');
                     markerSelectedColor.style.backgroundColor =
                         markerSelectedColor2.style.backgroundColor = '#' + elColor;
-
                     fillStyleText.value = elColor;
-                    markerColorContainer.style.display = 'block';
+
+                    markerContainer.style.display = 'none';
+                    markerColorContainer.style.display = 'none';
+                    document.getElementById("marker-done").click();
                 });
             })
 
@@ -3301,12 +3313,18 @@
             };
             image.src = data_uris.eraser;
         }
-
         if (tools.eraser === true) {
             decorateEraser();
             document.getElementById('eraser-icon').style.display = 'block';
         }
 
+
+
+
+
+
+
+        
         function decorateText() {
             var context = getContext('text-icon');
 

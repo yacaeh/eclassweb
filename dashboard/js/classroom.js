@@ -84,7 +84,7 @@ designer.setTools({
     colorsPicker: false,
     clearCanvas: true,
     code: false,
-    undo: false,
+    undo: true,
 });
 
 // here goes RTCMultiConnection
@@ -746,5 +746,5 @@ $("#icon_exit").click(function(){
 })
 
 $(window).on("beforeunload", function () {
-    return 1;
+    // return 1;
 });
