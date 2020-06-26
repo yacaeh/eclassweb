@@ -343,11 +343,24 @@ hr {
   margin-bottom: 5px;
 }
 
-#pdf {
-  background-color:black;
-  border: 1px solid black;
-  direction: ltr;
+#canvas-controller{
+  margin-left:20%;
+  position:relative; 
+  z-index: 0;
+
 }
+
+#the-canvas {
+  border: 1px solid black;
+  max-height:900px;
+  direction: ltr;
+  margin-left:20%;
+  width: 40%;
+  position: relative; 
+  z-index:0;
+  background:transparent;
+}
+
 .no_student{
   width: 100%;
   text-align: center;
