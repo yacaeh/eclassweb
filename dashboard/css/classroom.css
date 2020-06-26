@@ -164,6 +164,7 @@ hr {
 
 #temp-stream-canvas{
   display: none;
+  opacity:0.1;
 }
 
 #key-press{
@@ -328,4 +329,10 @@ hr {
   background-color: #dcd7d7;
   display: inline-block;
   margin-bottom: 5px;
+}
+
+#pdf {
+  background-color:black;
+  border: 1px solid black;
+  direction: ltr;
 }
