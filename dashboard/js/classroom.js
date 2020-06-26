@@ -18,6 +18,7 @@ connection.socketURL = '/';
 
 connection.extra.userFullName = params.userFullName;
 
+
 /// make this room public
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 
@@ -84,26 +85,25 @@ connection.sdpConstraints.mandatory = {
 };
 
 connection.onUserStatusChanged = function(event) {
-    var infoBar = document.getElementById('onUserStatusChanged');
     var names = [];
+
     connection.getAllParticipants().forEach(function(pid) {
         names.push(getFullName(pid));
     });
 
     if (!names.length) {
-        names = ['Only You'];
+        $("#nos").text("0");
     } else {
-        names = [connection.extra.userFullName || 'You'].concat(names);
+        $("#nos").text(names.length);
     }
 
-    infoBar.innerHTML = '<b>Active users:</b> ' + names.join(', ');
+    SetStudentList();
 };
 
 connection.onopen = function(event) {
     connection.onUserStatusChanged(event);
 
     if (designer.pointsLength <= 0) {
-        // make sure that remote user gets all drawings synced.
         setTimeout(function() {
             connection.send('plz-sync-points');
         }, 1000);
@@ -111,7 +111,7 @@ connection.onopen = function(event) {
 
     document.getElementById('btn-chat-message').disabled = false;
     document.getElementById('btn-attach-file').style.display = 'inline-block';
-    document.getElementById('btn-share-screen').style.display = 'inline-block';
+    document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
 connection.onclose = connection.onerror = connection.onleave = function(event) {
@@ -137,10 +137,6 @@ connection.onmessage = function(event) {
         return;
     }
 
-    if(event.data.typing === true) {
-        $('#key-press').show().find('span').html(event.extra.userFullName + ' is typing');
-        return;
-    }
 
     if(event.data.typing === false) {
         $('#key-press').hide().find('span').html('');
@@ -189,7 +185,6 @@ connection.onstream = function(event) {
     } else {
         // 타 사용자 캠 표시 막기
         // event.mediaElement.controls = false;
-
         // var otherVideos = document.querySelector('#other-videos');
         // otherVideos.appendChild(event.mediaElement);
     }
@@ -211,6 +206,8 @@ connection.onstreamended = function(event) {
         video.srcObject = null;
         video.style.display = 'none';
     }
+
+    SetStudentList();
 };
 
 var conversationPanel = document.getElementById('conversation-panel');
@@ -230,7 +227,7 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b>You:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
+        div.innerHTML = '<b>나:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
         div.style.background = '#cbffcb';
     }
 
@@ -242,6 +239,7 @@ function appendChatMessage(event, checkmark_id) {
 
 var keyPressTimer;
 var numberOfKeys = 0;
+
 $('#txt-chat-message').emojioneArea({
     pickerPosition: "top",
     filtersPosition: "bottom",
@@ -255,6 +253,7 @@ $('#txt-chat-message').emojioneArea({
                 $('.emojionearea-button-close').click();
             });
         },
+
         keyup: function(e) {
             var chatMessage = $('.emojionearea-editor').html();
             if (!chatMessage || !chatMessage.replace(/ /g, '').length) {
@@ -262,8 +261,6 @@ $('#txt-chat-message').emojioneArea({
                     typing: false
                 });
             }
-
-
             clearTimeout(keyPressTimer);
             numberOfKeys++;
 
@@ -272,19 +269,7 @@ $('#txt-chat-message').emojioneArea({
                     typing: true
                 });
             }
-
-            keyPressTimer = setTimeout(function() {
-                connection.send({
-                    typing: false
-                });
-            }, 1200);
         },
-        blur: function() {
-            // $('#btn-chat-message').click();
-            connection.send({
-                typing: false
-            });
-        }
     }
 });
 
@@ -310,9 +295,7 @@ document.getElementById('btn-chat-message').onclick = function() {
         checkmark_id: checkmark_id
     });
 
-    connection.send({
-        typing: false
-    });
+    connection.send({ typing: false });
 };
 
 var recentFile;
@@ -435,11 +418,13 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             connection.attachStreams.push(tempStream);
             window.tempStream = tempStream;
 
+            SetTeacher();
+
             connection.extra.roomOwner = true;
             connection.open(params.sessionid, function(isRoomOpened, roomid, error) {
                 if (error) {
                     if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                        alert('Someone already created this room. Please either join or create a separate room.');
+                        alert('이미 존재하는 방 번호입니다.');
                         return;
                     }
                     alert(error);
@@ -451,6 +436,10 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             });
     } else {
         connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
+
+            SetStudent();
+
+            
             if (error) {
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
@@ -557,7 +546,7 @@ function replaceScreenTrack(stream) {
 
         // $('#main-video').hide();
         $('#screen-viewer').hide();
-        $('#btn-share-screen').show();
+        $('#top_share_screen').show();
         replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
 
@@ -581,7 +570,7 @@ function replaceScreenTrack(stream) {
     $('#screen-viewer').show();
 }
 
-$('#btn-share-screen').click(function() {
+$('#top_share_screen').click(function() {
     if(!window.tempStream) {
         alert('Screen sharing is not enabled.');
         return;
@@ -590,7 +579,7 @@ $('#btn-share-screen').click(function() {
         screen: true,
         oneway: true
         };
-    //$('#btn-share-screen').hide();
+    //$('#top_share_screen').hide();
 
     if(navigator.mediaDevices.getDisplayMedia) {
         navigator.mediaDevices.getDisplayMedia(screen_constraints).then(stream => {
@@ -612,3 +601,86 @@ $('#btn-share-screen').click(function() {
 });
 
 console.log("success");
+
+function TimeUpdate(){
+    var date = new Date;
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+    var hours = date.getHours();
+    var min = date.getMinutes();
+    var sec = date.getSeconds();
+
+    month += 1;
+    if(month < 10)
+        month = "0" + month;
+    if(day < 10)
+        day = "0" + day;
+    if(hours < 10)
+        hours = "0" + hours;
+    if(min < 10)
+        min = "0" + min;
+    if(sec < 10)
+        sec = "0" + sec;
+
+
+    $("#current-day").text(year+'-'+month+'-'+day);
+    $("#current-time").text(hours+':'+min+':'+sec);
+}
+
+setInterval(TimeUpdate,1000);
+
+
+
+function SetTeacher(){
+    $("#who-am-i").text("선생님");
+    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $("#my-name").remove();
+    $(".for_teacher").show();
+}
+
+function SetStudent(){
+    $("#who-am-i").text("학생");
+    console.log(connection.extra)
+    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
+    $(".for_teacher").hide();
+}
+
+SelectViewType();
+
+function SetStudentList(){
+    $("#student_list").empty();
+    connection.getAllParticipants().forEach(function(pid) {
+        $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
+    });
+}
+
+function SelectViewType(){
+    $(".view_type").click(function(){
+        $(".view_type").css({
+            color: 'rgb(129,129,129)',
+            backgroundColor : '',
+        })
+
+        $(this).css({
+            color : 'white',
+            backgroundColor : 'rgb(129,129,129)'
+        })
+ 
+        switch(this.id){
+            case "view_student" :
+                $("#main-video").hide();
+                $("#student_list").show();
+                break;
+            case "vidw_cam" :
+                $("#main-video").show();
+                $("#student_list").hide();
+                break;
+            case "view_result" :
+                $("#student_list").hide();
+                $("#main-video").hide();
+                break;
+        }
+    })
+}

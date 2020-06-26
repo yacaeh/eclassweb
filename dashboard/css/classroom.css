@@ -69,7 +69,11 @@ button[disabled] {
 }
 
 #btn-chat-message {
-  margin: 5px;
+  width: 300px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  background-color: rgb(24,219,190);
+  border-color: aquamarine;
 }
 
 #conversation-panel {
@@ -94,7 +98,7 @@ button[disabled] {
 
 #main-video {
   width: 100%;
-  margin-top: -9px;
+  margin-top: 10px;
   border-bottom: 1px solid #121010;
   padding-bottom: 1px;
 }
@@ -151,7 +155,7 @@ hr {
   top: 5%;
   bottom: 0;
   right: 0;
-  left: 20%;
+  left: 0%;
   height: 100%;
   border: 1px solid black;
   border-top: 0px;
@@ -182,10 +186,11 @@ hr {
 }
 
 .lwindow{
-  width: 20%;
-  height: 100%;
   position: fixed;
-  left: 0px;
+  width: 20%;
+  height: 95%;
+  right: 5px;
+  background-image: url(/dashboard/img/base.png);
 }
 
 .onUserStatusChanged{
@@ -193,10 +198,134 @@ hr {
 }
 
 .conversation-panel{
+  left: 20px;
   margin-top: 20px;
   position: absolute;
   bottom: 0px;
-  background-color: white;
   padding-bottom: 20px;
   width: 94%;
+}
+
+#top_all_controll{
+  content: url(/dashboard/img/top_unlock_off.png);
+}
+
+#top_load_book{
+  content: url(/dashboard/img/top_load_book_off.png);
+}
+
+#top_test{
+  content: url(/dashboard/img/top_test_off.png);
+}
+
+#top_alert{
+  content: url(/dashboard/img/top_alert_off.png);
+}
+
+#top_share_screen{
+  content: url(/dashboard/img/top_share_screen_off.png);
+}
+
+#top_3d{
+  content: url(/dashboard/img/top_3d_off.png);
+}
+#top_share_video{
+  content: url(/dashboard/img/top_share_video_off.png);
+}
+#top_record_video{
+  content: url(/dashboard/img/top_record_video_off.png);
+}
+
+
+#session-id{
+  position: absolute;
+  color: rgb(129,129,129);
+  width: 300px;
+  left: calc(50% - 300px / 2);
+  top: 7px;
+  font-style: italic;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+#icon_exit{
+  content: url(/dashboard/img/exit.png);
+  cursor: pointer;
+  left: 5px;
+  top: 5px;
+  position: absolute;
+}
+
+#header{
+  height: 53px;
+  border: 1px gray solid;
+}
+
+#top_logo{
+  content: url(/dashboard/img/logo.png);
+  left: 60px;
+  position: absolute;
+  top: 20px;
+}
+
+#my-name{
+  left: 400px;
+  position: absolute;
+  font-size: 20px;
+  font-style: italic;
+  text-decoration: underline;
+  color: slateblue;
+  top: 10px;
+  font-weight: bold;
+}
+
+#who-am-i{
+  position: absolute;
+  left: 220px;
+  top: 10px;
+  font-size: 25px;
+  font-weight: bold;
+  color: rgb(135,152,156);
+}
+
+.time{
+  width: 200px;
+  color: rgb(129, 129,129);
+}
+
+.icons{
+  float: right;
+  margin-top: 15px;
+}
+
+.view_type{
+  display: inline-block;
+  margin-left: 5px;
+  margin-top: 5px;
+  width: 90px;
+  height: 26px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+  color: rgb(129,129,129);
+}
+
+.nos{
+  float: right;
+  margin-right: 10px;
+  margin-top: 3px;
+}
+
+#student_list {
+  float: left;
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+.student{
+  width: 70px;
+  height: 90px;
+  background-color: #dcd7d7;
+  display: inline-block;
+  margin-bottom: 5px;
 }
