@@ -121,7 +121,7 @@
       <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
       <button id="close-pdf">close</button>
     </div>
-        
+        <canvas id="the-canvas"></canvas>
     <script>
     // If absolute URL from the remote server is provided, configure the CORS
     // header on that server.
@@ -138,7 +138,7 @@
         pageRendering = false,
         pageNumPending = null,
         scale = 0.8,
-        canvas = document.getElementById('main-canvas'),
+        canvas = document.getElementById('the-canvas'),
         ctx = canvas.getContext('2d');
     
     /**
@@ -168,7 +168,7 @@
             renderPage(pageNumPending);
             pageNumPending = null;
           }
-          document.getElementById('main-canvas').style.zIndex = +1;
+          document.getElementById('the-canvas').style.zIndex = +1;
 
         });
       });
