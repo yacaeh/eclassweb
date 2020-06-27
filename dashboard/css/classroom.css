@@ -15,13 +15,13 @@ h2 {
   border-radius: 0;
   text-decoration: none;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial,
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   font-size: 17px;
   line-height: 1.5em;
+  overflow: hidden;
 }
 
 input[disabled],
@@ -152,7 +152,7 @@ hr {
 
 #widget-container{
   position: fixed;
-  top: 53px;
+  top: 54px;
   bottom: 0;
   right: 0;
   left: 0%;
@@ -190,7 +190,8 @@ hr {
   position: fixed;
   width: 20%;
   height: 95%;
-  right: 5px;
+  right: 0px;
+  top: 53px;
   background-image: url(/dashboard/img/base.png);
 }
 
@@ -227,9 +228,13 @@ hr {
   content: url(/dashboard/img/top_share_screen_off.png);
 }
 
-#top_3d{
+.top_3d_off{
   content: url(/dashboard/img/top_3d_off.png);
 }
+.top_3d_on{
+  content: url(/dashboard/img/top_3d_on.png);
+}
+
 #top_share_video{
   content: url(/dashboard/img/top_share_video_off.png);
 }
@@ -368,4 +373,9 @@ hr {
   width: 30px;
   cursor: pointer;
   margin-top: 10px;
+}
+
+#renderCanvas{
+  position: absolute;
+  left: 45px;
 }

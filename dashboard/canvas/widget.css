@@ -1,6 +1,16 @@
 /* Muaz Khan (@muazkh/@WebRTCWeb) */
 
-textarea::::-webkit-scrollbar {
+.pen{
+    cursor: url('/dashboard/img/pen.png') 6 38,pointer;
+}
+.marker{
+    cursor: url('/dashboard/img/pen2.png') 6 38,pointer;
+}
+.eraser{
+    cursor: url('/dashboard/img/eraser.png') 6 38,pointer;
+}
+
+textarea::-webkit-scrollbar {
     width: 0;
     height: 0;
 }
@@ -42,6 +52,7 @@ input,
 textarea,
 h1,
 h2 {
+
     margin: 0;
     padding: 0;
     word-wrap: break-word;

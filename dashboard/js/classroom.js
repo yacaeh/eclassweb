@@ -5,7 +5,7 @@
     function d(s) {
         return decodeURIComponent(s.replace(/\+/g, ' '));
     }
-    var match, search = window.location.search;
+    var match, search = window.location.search;    
     while (match = r.exec(search.substring(1)))
         params[d(match[1])] = d(match[2]);
     window.params = params;
@@ -43,9 +43,6 @@ designer.widgetHtmlURL = './canvas/widget.html';
 designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
-
-designer.appendTo(document.body || document.documentElement, function() {
-});
 
 designer.addSyncListener(function(data){
     console.log(data);
@@ -142,6 +139,9 @@ connection.onclose = connection.onerror = connection.onleave = function(event) {
     connection.onUserStatusChanged(event);
 };
 
+
+
+
 connection.onmessage = function(event) {
     if(event.data.showMainVideo) {
         // $('#main-video').show();
@@ -185,8 +185,124 @@ connection.onmessage = function(event) {
         return;
     }
 
+
+    if(null != event.data.allControl)  {
+        if(!checkRoomOwner()) {                   
+            connection.extra.classRoom.allControl = event.data.allControl;            
+            if(event.data.allControl)
+            {
+                // 제어 하기                
+            }
+            else
+            {
+                // 제어 풀기
+            }
+        }
+        return;
+    }
+
+    if(event.data.alert) {
+        alert('receive alert');         
+        timeHandler = setTimeout (alertConfirm, 1000);
+        return;    
+    }
+
+    if(event.data.alertConfirm) {        
+        if(checkRoomOwner())
+        {                  
+            console.log(connection.getAllParticipants());
+            // 체크 알림...
+            //console.log(event.data.alertConfirm);            
+        }
+        return;
+    };
+
+    if(event.data.exam) {
+        // 시험치기..        
+
+        return;
+    }
+
+    if(event.data.examAnswer) {
+
+    }
+
     designer.syncData(event.data);
 };
+
+
+connection.extra.classRoom = {
+    allControl : false,
+    shareScreen : false,
+    share3D : false,
+    exam : {
+        // 문항수
+        // 시간
+    }
+};
+
+
+
+var timeHandler;    // 임시...
+
+function alertConfirm () {           
+    connection.send({
+        alertConfirm : connection.userid
+    }); 
+    clearTimeout(timeHandler);    
+};
+
+
+function checkRoomOwner () {
+
+    return connection.extra.roomOwner;
+};
+
+
+$('#top_all_controll').click ( () =>  {
+    if(checkRoomOwner()) {      
+        var currentAllControlState = !connection.extra.classRoom.allControl;
+        connection.extra.classRoom.allControl = currentAllControlState;
+        connection.send({
+            allControl : currentAllControlState
+        });
+    }
+});
+
+$('#top_load_book').click ( () =>  {
+    console.log('top_load_book');  
+});
+
+$('#top_test').click ( () => {
+        console.log('top_test');  
+});
+
+$('#top_alert').click ( () => {
+    if(checkRoomOwner())    {        
+        // get students numbers        
+        connection.send ({
+            alert : true
+        });
+    }
+    else
+    {
+        console.log('not room owner');
+    }
+});
+
+$('#top_3d').click ( () => {
+    console.log('top_3d');  
+});
+
+$('#top_share_video').click ( () => {
+    console.log('top_share_video');  
+});
+
+$('#top_record_video').click ( () => {
+    console.log('top_record_video');  
+});
+
+
 
 // extra code
 
@@ -489,8 +605,8 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                 };
     
             }
-        });
-    
+        });    
+     
         connection.join({sessionid:params.sessionid,
                          userid: connection.channel,
                          session: connection.session}, function(isRoomJoined, roomid, error) {
@@ -768,9 +884,11 @@ function loadPDF(){
     var oriPdfCanvas= document.createElement('canvas');
         oriPdfCanvas.setAttribute("id", "the-canvas");
         oriPdfCanvas.style.cssText = 'border: 1px solid black;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
+    var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
 
-    window.frames[1].document.getElementsByClassName("design-surface")[0].appendChild(oriPdfCanvas);
-    const pdfCanvas = window.frames[1].document.getElementById('the-canvas');
+
+    frame.document.getElementsByClassName("design-surface")[0].appendChild(oriPdfCanvas);
+    const pdfCanvas = frame.document.getElementById('the-canvas');
         // If absolute URL from the remote server is provided, configure the CORS
         // header on that server.
         var url = 'test2.pdf';
@@ -884,3 +1002,57 @@ function loadPDF(){
         });
     
 }
+
+
+_3DCanvasFunc();
+
+function _3DCanvasFunc(){
+    var _3dcanvas =  $("#renderCanvas");
+    var rtime;
+    var timeout = false;
+    var delta = 400;
+    
+    $("#top_3d").click(function(){
+        _3dcanvas.toggle();
+        var visible = _3dcanvas.is(':visible');
+        var jthis = $(this);
+    
+        if(visible){
+            CanvasResize();
+            jthis.addClass('top_3d_on');
+            jthis.removeClass('top_3d_off')
+        }
+        else{
+            jthis.addClass('top_3d_off');
+            jthis.removeClass('top_3d_on')
+        }
+    })
+
+    function CanvasResize(){
+        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+        var canvas =  frame.document.getElementById("main-canvas")
+        var r = document.getElementsByClassName("lwindow")[0];
+        var rwidth = $(r).width();
+        _3dcanvas.attr("width", canvas.width - rwidth - 50 );
+        _3dcanvas.attr("height", canvas.height- 60);
+    }
+
+    window.addEventListener("resize", function() {
+        rtime = new Date();
+        if (timeout === false) {
+            timeout = true;
+            setTimeout(resizeend, delta);
+        }
+    });
+    
+    function resizeend() {
+        if (new Date() - rtime < delta) {
+            setTimeout(resizeend, delta);
+        } else {
+            timeout = false;
+            CanvasResize();
+        }               
+    }
+
+}
+

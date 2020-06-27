@@ -49,7 +49,7 @@
             <img class="top_icon" id="top_test">
             <img class="top_icon" id="top_alert">
             <img class="top_icon" id="top_share_screen"> 
-            <img class="top_icon" id="top_3d">
+            <img class="top_icon top_3d_off" id="top_3d">
             <img class="top_icon" id="top_pdf">
             <img class="top_icon" id="top_share_video">
             <img class="top_icon" id="top_record_video">
@@ -63,9 +63,11 @@
 
     <article id="article">
         <div id="widget-container"></div>
-        <video id="screen-viewer" controls playsinline autoplay></video>
-        <div class="lwindow">
+        <canvas id="renderCanvas" style="display: none;"></canvas>
 
+        <video id="screen-viewer" controls playsinline autoplay></video>
+        
+        <div class="lwindow">
             <div class="for_teacher" style="display: none;">
                 <span id="view_student" class='view_type view_type-on'>Student</span>
                 <span id="vidw_cam" class='view_type'>Camera</span>
@@ -77,15 +79,10 @@
                 <div id="student_list">
                 </div>
             </div>
-
             <!-- View Student  -->
-
-
             <!-- View Cam -->
             <video style="display: none;" id="main-video" controls playsinline autoplay></video>
-
             <!-- View Result -->
-
             <div class="conversation-panel" >
                 <div id="conversation-panel"></div>
                 <div id="key-press">
