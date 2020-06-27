@@ -769,6 +769,7 @@ $('#exam-start').toggle(function () {
     }, 1000);
     // TODO : 학생들에게 시험 시작을 알려줌
 
+    showExamStateForm();
 }, function () {
     $('#exam-start').attr('class', 'btn btn-primary');
     $('#exam-start').html('시작');
@@ -777,6 +778,22 @@ $('#exam-start').toggle(function () {
     $('#exam-time').val(parseInt(m_ExamTime / 60))
     // TODO : 학생들에게 시험 종료 알려줌
 });
+
+// 시험 문제 상태(응답률) 폼 표시
+function showExamStateForm(){
+    $('#exam-state').show();
+    var stateHtmlStr = "";
+    for (var i = 1; i <= m_QuesCount; i++) {
+        stateHtmlStr += `<span>${i}번</span><progress id="exam-state-progress-${i}" value="0" max="100"></progress><span id="exam-state-percent-${i}" >0%</span><br>`;
+    }
+    $('#exam-state').html(stateHtmlStr);
+}
+
+// 시험 문제 하나의 상태(응답률) 변경 / 형식 -> (문제번호, 문제응답률/학생수)
+function setExamState(num, percent){
+    $(`#exam-state-progress-${num}`).val(percent);
+    $(`#exam-state-percent-${num}`).html(percent+"%");
+}
 
 // 문제 html에 하나 추가 (apeend)
 function apeendQuestion(i) {
@@ -973,7 +990,7 @@ function setStudentOMR(quesCount, examTime) {
 
     m_QuesCount = quesCount;
     for (var i = 1; i <= m_QuesCount; i++) {
-        question += `<div id='exam-question-${i}' onchange='omrChange()'>`
+        question += `<div id='exam-question-${i}' onchange='omrChange(${i})'>`
 
         question += `<span id='exam-question-text-${i}'>${i}: </span>`;
 
@@ -1010,9 +1027,8 @@ function submitOMR() {
 }
 
 // 학생 OMR이 변경됨
-function omrChange(){
-    var studentOMR = getQuestionAnswerList();
-    console.log(studentOMR);
+function omrChange(num){
+    console.log(num + "번이 변경됨");
     
     // TODO: 서버로 학생 시험 정보 전송
 }
