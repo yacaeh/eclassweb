@@ -754,7 +754,7 @@ $('#exam-start').toggle(function () {
     $('#exam-start').html('종료');
 
     examObj.examAnswer = answerList;
-    examObj.sendExamStart (m_ExamTime);
+    examObj.sendExamStart (parseInt(m_ExamTime / 60));
 
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
