@@ -1781,13 +1781,33 @@ function canvasresize(id){
 
             points.forEach(function(point,idx){
                 var near = isNear(x,y,point[1]);
-                if(near)
-                    console.log(idx);
+                if(near){
+                    for(var i = 0 ; i < pointHistory.length; i++){
+                        if(idx < pointHistory[i]){
+                            var pre;
+
+                            if(i == 0)
+                                pre = 0;
+                            else 
+                                pre = pointHistory[i-1];
+                            
+                            var numofpoint = pointHistory[i] - pre
+                            points.splice(pre, numofpoint);
+                            pointHistory.splice(i,1);
+                            for(var z = i ; z < pointHistory.length; z++){
+                                pointHistory[z] -= numofpoint;
+                            }
+                            
+                            drawHelper.redraw();
+                            syncPoints(true);
+                            break;
+                        }
+                    }
+                }
             });
         },
         mouseup: function(e) {
             console.log("Eraser Up")
-            pointHistory.push(points.length);
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1821,7 +1841,6 @@ function canvasresize(id){
                                 break;
                             }
                         }
-
                     }
                 });
             }
