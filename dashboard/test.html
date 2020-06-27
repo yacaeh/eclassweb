@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    
+    <p>
+        <input type="text" id="room">
+        <button onclick="sendCreateRoom()">Create Room</button>      
+    </p>
+    <button onclick="sendCreateRoom()">Join Room</button>  
+    <button onclick="sendTeacherToStudents()">teacherToStudents</button>
+    
+    
+
+    <script>
+
+        var socket = io ();
+       
+        function sendTeacherToStudents () {
+            console.log('send button');
+            socket.emit ('teacherToStudents', 'send', function(message) {                
+                console.log('callback message : ' + message);
+            });
+        };
+
+        function sendCreateRoom () {
+            var text = document.getElementById('room');      
+            socket.emit("check-presence", text.value, function(result, roomId, room) {
+                console.log('callback success : ' + result + ", id " + roomId);
+                console.log(room);
+            });
+        };
+
+        function sendJoinRoom () {
+
+        };
+    </script>    
+</body>
+</html>
