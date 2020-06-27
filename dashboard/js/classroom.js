@@ -1,4 +1,4 @@
-(function() {
+(function () {
     var params = {},
         r = /([^&=]+)=?([^&]*)/g;
 
@@ -39,7 +39,7 @@ var designer = new CanvasDesigner();
 designer.widgetHtmlURL = '/node_modules/canvas-designer/widget.html';
 designer.widgetJsURL = '/node_modules/canvas-designer/widget.min.js'
 
-designer.addSyncListener(function(data) {
+designer.addSyncListener(function (data) {
     connection.send(data);
 });
 
@@ -77,17 +77,17 @@ connection.session = {
     audio: true,
     video: true,
     data: true,
-    screen:false
+    screen: false
 };
 connection.sdpConstraints.mandatory = {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true
 };
 
-connection.onUserStatusChanged = function(event) {
+connection.onUserStatusChanged = function (event) {
     var names = [];
 
-    connection.getAllParticipants().forEach(function(pid) {
+    connection.getAllParticipants().forEach(function (pid) {
         names.push(getFullName(pid));
     });
 
@@ -100,11 +100,11 @@ connection.onUserStatusChanged = function(event) {
     SetStudentList();
 };
 
-connection.onopen = function(event) {
+connection.onopen = function (event) {
     connection.onUserStatusChanged(event);
 
     if (designer.pointsLength <= 0) {
-        setTimeout(function() {
+        setTimeout(function () {
             connection.send('plz-sync-points');
         }, 1000);
     }
@@ -114,12 +114,12 @@ connection.onopen = function(event) {
     document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
-connection.onclose = connection.onerror = connection.onleave = function(event) {
+connection.onclose = connection.onerror = connection.onleave = function (event) {
     connection.onUserStatusChanged(event);
 };
 
-connection.onmessage = function(event) {
-    if(event.data.showMainVideo) {
+connection.onmessage = function (event) {
+    if (event.data.showMainVideo) {
         // $('#main-video').show();
         $('#screen-viewer').css({
             top: $('#widget-container').offset().top,
@@ -131,14 +131,14 @@ connection.onmessage = function(event) {
         return;
     }
 
-    if(event.data.hideMainVideo) {
+    if (event.data.hideMainVideo) {
         // $('#main-video').hide();
         $('#screen-viewer').hide();
         return;
     }
 
 
-    if(event.data.typing === false) {
+    if (event.data.typing === false) {
         $('#key-press').hide().find('span').html('');
         return;
     }
@@ -166,7 +166,7 @@ connection.onmessage = function(event) {
 
 // extra code
 
-connection.onstream = function(event) {
+connection.onstream = function (event) {
     console.log("onstream!");
     if (event.stream.isScreen && !event.stream.canvasStream) {
         $('#screen-viewer').get(0).srcObject = event.stream;
@@ -176,7 +176,7 @@ connection.onstream = function(event) {
         var video = document.getElementById('main-video');
         video.setAttribute('data-streamid', event.streamid);
         // video.style.display = 'none';
-        if(event.type === 'local') {
+        if (event.type === 'local') {
             video.muted = true;
             video.volume = 0;
         }
@@ -192,7 +192,7 @@ connection.onstream = function(event) {
     connection.onUserStatusChanged(event);
 };
 
-connection.onstreamended = function(event) {
+connection.onstreamended = function (event) {
     console.log("onstreameneded!");
     var video = document.querySelector('video[data-streamid="' + event.streamid + '"]');
     if (!video) {
@@ -248,13 +248,13 @@ $('#txt-chat-message').emojioneArea({
     inline: true,
     hidePickerOnBlur: true,
     events: {
-        focus: function() {
-            $('.emojionearea-category').unbind('click').bind('click', function() {
+        focus: function () {
+            $('.emojionearea-category').unbind('click').bind('click', function () {
                 $('.emojionearea-button-close').click();
             });
         },
 
-        keyup: function(e) {
+        keyup: function (e) {
             var chatMessage = $('.emojionearea-editor').html();
             if (!chatMessage || !chatMessage.replace(/ /g, '').length) {
                 connection.send({
@@ -273,14 +273,14 @@ $('#txt-chat-message').emojioneArea({
     }
 });
 
-window.onkeyup = function(e) {
+window.onkeyup = function (e) {
     var code = e.keyCode || e.which;
     if (code == 13) {
         $('#btn-chat-message').click();
     }
 };
 
-document.getElementById('btn-chat-message').onclick = function() {
+document.getElementById('btn-chat-message').onclick = function () {
     var chatMessage = $('.emojionearea-editor').html();
     $('.emojionearea-editor').html('');
 
@@ -299,12 +299,12 @@ document.getElementById('btn-chat-message').onclick = function() {
 };
 
 var recentFile;
-document.getElementById('btn-attach-file').onclick = function() {
+document.getElementById('btn-attach-file').onclick = function () {
     var file = new FileSelector();
-    file.selectSingleFile(function(file) {
+    file.selectSingleFile(function (file) {
         recentFile = file;
 
-        if(connection.getAllParticipants().length >= 1) {
+        if (connection.getAllParticipants().length >= 1) {
             recentFile.userIndex = 0;
             connection.send(file, connection.getAllParticipants()[recentFile.userIndex]);
         }
@@ -332,7 +332,7 @@ function getFullName(userid) {
     return _userFullName;
 }
 
-connection.onFileEnd = function(file) {
+connection.onFileEnd = function (file) {
     var html = getFileHTML(file);
     var div = progressHelper[file.uuid].div;
 
@@ -340,10 +340,10 @@ connection.onFileEnd = function(file) {
         div.innerHTML = '<b>You:</b><br>' + html;
         div.style.background = '#cbffcb';
 
-        if(recentFile) {
+        if (recentFile) {
             recentFile.userIndex++;
             var nextUserId = connection.getAllParticipants()[recentFile.userIndex];
-            if(nextUserId) {
+            if (nextUserId) {
                 connection.send(recentFile, nextUserId);
             }
             else {
@@ -363,19 +363,19 @@ connection.autoSaveToDisk = false;
 
 var progressHelper = {};
 
-connection.onFileProgress = function(chunk, uuid) {
+connection.onFileProgress = function (chunk, uuid) {
     var helper = progressHelper[chunk.uuid];
     helper.progress.value = chunk.currentPosition || chunk.maxChunks || helper.progress.max;
     updateLabel(helper.progress, helper.label);
 };
 
-connection.onFileStart = function(file) {
+connection.onFileStart = function (file) {
     var div = document.createElement('div');
     div.className = 'message';
 
     if (file.userid === connection.userid) {
         var userFullName = file.remoteUserId;
-        if(connection.peersBackup[file.remoteUserId]) {
+        if (connection.peersBackup[file.remoteUserId]) {
             userFullName = connection.peersBackup[file.remoteUserId].extra.userFullName;
         }
 
@@ -404,42 +404,42 @@ function updateLabel(progress, label) {
     label.innerHTML = position + '%';
 }
 
-if(!!params.password) {
+if (!!params.password) {
     connection.password = params.password;
 }
 
-designer.appendTo(document.getElementById('widget-container'), function() {
+designer.appendTo(document.getElementById('widget-container'), function () {
     if (params.open === true || params.open === 'true') {
-            var tempStreamCanvas = document.getElementById('temp-stream-canvas');
-            var tempStream = tempStreamCanvas.captureStream();
-            tempStream.isScreen = true;
-            tempStream.streamid = tempStream.id;
-            tempStream.type = 'local';
-            connection.attachStreams.push(tempStream);
-            window.tempStream = tempStream;
+        var tempStreamCanvas = document.getElementById('temp-stream-canvas');
+        var tempStream = tempStreamCanvas.captureStream();
+        tempStream.isScreen = true;
+        tempStream.streamid = tempStream.id;
+        tempStream.type = 'local';
+        connection.attachStreams.push(tempStream);
+        window.tempStream = tempStream;
 
-            SetTeacher();
+        SetTeacher();
 
-            connection.extra.roomOwner = true;
-            connection.open(params.sessionid, function(isRoomOpened, roomid, error) {
-                if (error) {
-                    if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                        alert('이미 존재하는 방 번호입니다.');
-                        return;
-                    }
-                    alert(error);
+        connection.extra.roomOwner = true;
+        connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+            if (error) {
+                if (error === connection.errors.ROOM_NOT_AVAILABLE) {
+                    alert('이미 존재하는 방 번호입니다.');
+                    return;
                 }
+                alert(error);
+            }
 
-                connection.socket.on('disconnect', function() {
-                    location.reload();
-                });
+            connection.socket.on('disconnect', function () {
+                location.reload();
             });
+        });
     } else {
-        connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
+        connection.join(params.sessionid, function (isRoomJoined, roomid, error) {
 
             SetStudent();
 
-            
+
             if (error) {
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert('This room does not exist. Please either create it or wait for moderator to enter in the room.');
@@ -451,12 +451,12 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                 }
                 if (error === connection.errors.INVALID_PASSWORD) {
                     connection.password = prompt('Please enter room password.') || '';
-                    if(!connection.password.length) {
+                    if (!connection.password.length) {
                         alert('Invalid password.');
                         return;
                     }
-                    connection.join(params.sessionid, function(isRoomJoined, roomid, error) {
-                        if(error) {
+                    connection.join(params.sessionid, function (isRoomJoined, roomid, error) {
+                        if (error) {
                             alert(error);
                         }
                     });
@@ -465,7 +465,7 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                 alert(error);
             }
 
-            connection.socket.on('disconnect', function() {
+            connection.socket.on('disconnect', function () {
                 location.reload();
             });
         });
@@ -473,25 +473,25 @@ designer.appendTo(document.getElementById('widget-container'), function() {
 });
 
 function addStreamStopListener(stream, callback) {
-    stream.addEventListener('ended', function() {
+    stream.addEventListener('ended', function () {
         callback();
-        callback = function() {};
+        callback = function () { };
     }, false);
 
-    stream.addEventListener('inactive', function() {
+    stream.addEventListener('inactive', function () {
         callback();
-        callback = function() {};
+        callback = function () { };
     }, false);
 
-    stream.getTracks().forEach(function(track) {
-        track.addEventListener('ended', function() {
+    stream.getTracks().forEach(function (track) {
+        track.addEventListener('ended', function () {
             callback();
-            callback = function() {};
+            callback = function () { };
         }, false);
 
-        track.addEventListener('inactive', function() {
+        track.addEventListener('inactive', function () {
             callback();
-            callback = function() {};
+            callback = function () { };
         }, false);
     });
 }
@@ -502,21 +502,21 @@ function replaceTrack(videoTrack, screenTrackId) {
         alert('Can not replace an "ended" track. track.readyState: ' + videoTrack.readyState);
         return;
     }
-    connection.getAllParticipants().forEach(function(pid) {
+    connection.getAllParticipants().forEach(function (pid) {
         var peer = connection.peers[pid].peer;
         if (!peer.getSenders) return;
         var trackToReplace = videoTrack;
-        peer.getSenders().forEach(function(sender) {
+        peer.getSenders().forEach(function (sender) {
             if (!sender || !sender.track) return;
-            if(screenTrackId) {
-                if(trackToReplace && sender.track.id === screenTrackId) {
+            if (screenTrackId) {
+                if (trackToReplace && sender.track.id === screenTrackId) {
                     sender.replaceTrack(trackToReplace);
                     trackToReplace = null;
                 }
                 return;
             }
 
-            if(sender.track.id !== tempStream.getTracks()[0].id) return;
+            if (sender.track.id !== tempStream.getTracks()[0].id) return;
             if (sender.track.kind === 'video' && trackToReplace) {
                 sender.replaceTrack(trackToReplace);
                 trackToReplace = null;
@@ -539,7 +539,7 @@ function replaceScreenTrack(stream) {
     });
 
     var screenTrackId = stream.getTracks()[0].id;
-    addStreamStopListener(stream, function() {
+    addStreamStopListener(stream, function () {
         connection.send({
             hideMainVideo: true
         });
@@ -550,8 +550,8 @@ function replaceScreenTrack(stream) {
         replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
 
-    stream.getTracks().forEach(function(track) {
-        if(track.kind === 'video' && track.readyState === 'live') {
+    stream.getTracks().forEach(function (track) {
+        if (track.kind === 'video' && track.readyState === 'live') {
             replaceTrack(track);
         }
     });
@@ -562,33 +562,33 @@ function replaceScreenTrack(stream) {
 
     // $('#main-video').show();
     $('#screen-viewer').css({
-            top: $('#widget-container').offset().top,
-            left: $('#widget-container').offset().left,
-            width: $('#widget-container').width(),
-            height: $('#widget-container').height()
-        });
+        top: $('#widget-container').offset().top,
+        left: $('#widget-container').offset().left,
+        width: $('#widget-container').width(),
+        height: $('#widget-container').height()
+    });
     $('#screen-viewer').show();
 }
 
-$('#top_share_screen').click(function() {
-    if(!window.tempStream) {
+$('#top_share_screen').click(function () {
+    if (!window.tempStream) {
         alert('Screen sharing is not enabled.');
         return;
     }
     screen_constraints = {
         screen: true,
         oneway: true
-        };
+    };
     //$('#top_share_screen').hide();
 
-    if(navigator.mediaDevices.getDisplayMedia) {
+    if (navigator.mediaDevices.getDisplayMedia) {
         navigator.mediaDevices.getDisplayMedia(screen_constraints).then(stream => {
             replaceScreenTrack(stream);
         }, error => {
             alert('Please make sure to use Edge 17 or higher.');
         });
     }
-    else if(navigator.getDisplayMedia) {
+    else if (navigator.getDisplayMedia) {
         navigator.getDisplayMedia(screen_constraints).then(stream => {
             replaceScreenTrack(stream);
         }, error => {
@@ -602,7 +602,7 @@ $('#top_share_screen').click(function() {
 
 console.log("success");
 
-function TimeUpdate(){
+function TimeUpdate() {
     var date = new Date;
     var year = date.getFullYear();
     var month = date.getMonth();
@@ -612,75 +612,187 @@ function TimeUpdate(){
     var sec = date.getSeconds();
 
     month += 1;
-    if(month < 10)
+    if (month < 10)
         month = "0" + month;
-    if(day < 10)
+    if (day < 10)
         day = "0" + day;
-    if(hours < 10)
+    if (hours < 10)
         hours = "0" + hours;
-    if(min < 10)
+    if (min < 10)
         min = "0" + min;
-    if(sec < 10)
+    if (sec < 10)
         sec = "0" + sec;
 
 
-    $("#current-day").text(year+'-'+month+'-'+day);
-    $("#current-time").text(hours+':'+min+':'+sec);
+    $("#current-day").text(year + '-' + month + '-' + day);
+    $("#current-time").text(hours + ':' + min + ':' + sec);
 }
 
-setInterval(TimeUpdate,1000);
+setInterval(TimeUpdate, 1000);
 
 
 
-function SetTeacher(){
+function SetTeacher() {
     $("#who-am-i").text("선생님");
-    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $('#session-id').text(connection.extra.userFullName + "(" + params.sessionid + ")");
     $("#my-name").remove();
     $(".for_teacher").show();
 }
 
-function SetStudent(){
+function SetStudent() {
     $("#who-am-i").text("학생");
     console.log(connection.extra)
-    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
-    $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
+    $('#session-id').text(connection.extra.userFullName + "(" + params.sessionid + ")");
+    $("#my-name").text("학생 이름 : " + connection.extra.userFullName);
     $(".for_teacher").hide();
 }
 
 SelectViewType();
 
-function SetStudentList(){
+function SetStudentList() {
     $("#student_list").empty();
-    connection.getAllParticipants().forEach(function(pid) {
-        $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
+    connection.getAllParticipants().forEach(function (pid) {
+        $("#student_list").append('<span class="student">' + getFullName(pid) + '</span>')
     });
 }
 
-function SelectViewType(){
-    $(".view_type").click(function(){
+function SelectViewType() {
+    $(".view_type").click(function () {
         $(".view_type").css({
             color: 'rgb(129,129,129)',
-            backgroundColor : '',
+            backgroundColor: '',
         })
 
         $(this).css({
-            color : 'white',
-            backgroundColor : 'rgb(129,129,129)'
+            color: 'white',
+            backgroundColor: 'rgb(129,129,129)'
         })
- 
-        switch(this.id){
-            case "view_student" :
+
+        switch (this.id) {
+            case "view_student":
                 $("#main-video").hide();
                 $("#student_list").show();
+                $("#exam-result").hide();
                 break;
-            case "vidw_cam" :
+            case "vidw_cam":
                 $("#main-video").show();
                 $("#student_list").hide();
+                $("#exam-result").hide();
                 break;
-            case "view_result" :
+            case "view_result":
                 $("#student_list").hide();
                 $("#main-video").hide();
+                $("#exam-result").show();
                 break;
         }
     })
+}
+
+$('#top_test').click(function () {
+    if ($('#exam-setting-bar').is(':visible')) {
+        $('#exam-setting-bar').hide();
+    }
+    else {
+        $('#exam-setting-bar').show();
+    }
+});
+
+
+var m_QuesCount = 0;    // 현재 문제수
+var m_ExamTimerInterval;    // 시험 타이머 인터벌
+var m_ExamTime; // 
+
+// 문제수 적용 (문제 n개 만들기)
+$('#exam-setting-apply').click(function () {
+    m_QuesCount = $('#exam-question-count').val();
+    var answerList = getQuestionAnswerList();
+    $('#exam-qustion-list').html("");
+    for (var i = 1; i <= m_QuesCount; i++) {
+        apeendQuestion(i);
+    }
+    setQuestionAnswer(answerList);
+});
+
+// 문제 1개 추가
+$('#exam-add-question').click(function () {
+    apeendQuestion(++m_QuesCount);
+    $('#exam-question-count').val(m_QuesCount);
+});
+
+// 시험 시작, 종료
+$('#exam-start').toggle(function () {
+    if (isNaN($('#exam-time').val())) {
+        // TODO : 시간 설정하라고 알림
+        $('#exam-start').click();
+        return;
+    } else {
+        m_ExamTime = parseInt($('#exam-time').val() * 60);
+    }
+
+    var answerList = getQuestionAnswerList();
+
+    $('#exam-start').attr('class', 'btn btn-danger');
+    $('#exam-start').html('종료');
+
+
+    m_ExamTimerInterval = setInterval(function () {
+        m_ExamTime--;
+        $('#exam-time').val(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+        if (m_ExamTime <= 0)
+            $('#exam-start').click();
+    }, 1000);
+    // TODO : 학생들에게 시험 시작을 알려줌
+
+}, function () {
+    $('#exam-start').attr('class', 'btn btn-primary');
+    $('#exam-start').html('시작');
+    clearInterval(m_ExamTimerInterval);
+    $('#exam-time').val(parseInt(m_ExamTime / 60))
+    // TODO : 학생들에게 시험 종료 알려줌
+});
+
+// 문제 html에 하나 추가 (apeend)
+function apeendQuestion(i) {
+    question = `<div id='exam-question-${i}'>`
+
+    question += `<span id='exam-question-text-${i}'>${i}: </span>`;
+
+    for (var j = 1; j <= 5; j++) {
+        question += `<label for='exam-question-${i}_${j}'>${j}번</label>`;
+        question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
+    }
+
+    question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-primary'>-</button>`;
+
+    question += `</div>`;
+    $('#exam-qustion-list').append(question);
+}
+
+// 문제 하나 제거
+function deleteQuestion(num) {
+    var answerList = getQuestionAnswerList();
+    m_QuesCount--;
+    answerList.splice(num - 1, 1);
+    $('#exam-qustion-list').html("");
+    for (var i = 1; i <= m_QuesCount; i++) {
+        apeendQuestion(i);
+    }
+    setQuestionAnswer(answerList);
+    $('#exam-question-count').val(m_QuesCount);
+}
+
+// 문제 정답 불러오기
+function getQuestionAnswerList() {
+    var checkList = new Array();
+    for (var i = 1; i <= m_QuesCount; i++) {
+        checkList.push($(`input:radio[name='exam-question-${i}']:checked`).val());
+    }
+    return checkList;
+}
+
+// 문제 정답 세팅
+function setQuestionAnswer(answerList) {
+    for (let i = 1; i <= m_QuesCount; i++) {
+        $(`input:radio[name='exam-question-${i}'][value=${answerList[i - 1]}]`).prop('checked', true);
+    }
 }
