@@ -688,13 +688,10 @@ function SelectViewType() {
     })
 }
 
-$('#top_test').click(function () {
-    if ($('#exam-setting-bar').is(':visible')) {
-        $('#exam-setting-bar').hide();
-    }
-    else {
-        $('#exam-setting-bar').show();
-    }
+$('#top_test').toggle(function () {
+    $('#exam-board').show();
+},function(){
+    $('#exam-board').hide();
 });
 
 
