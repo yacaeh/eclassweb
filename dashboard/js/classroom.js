@@ -1052,3 +1052,34 @@ function _3DCanvasFunc(){
     }
 
 }
+
+// 알림 박스 생성
+function alertBox(message, title, callback_yes, callback_no) {
+    callback_yes = callback_yes || function () { };
+    callback_no = callback_no || function () { };
+
+    var clickCount = 0;
+
+    $('.btn-alert-yes').unbind('click').bind('click', function (e) {
+        if (clickCount++ == 0) {
+            e.preventDefault();
+            $('#alert-box').fadeOut(300);
+            callback_yes();
+        }
+    });
+    $('.btn-alert-no').unbind('click').bind('click', function (e) {
+        if (clickCount++ == 0) {
+            e.preventDefault();
+            $('#alert-box').fadeOut(300);
+            callback_no();
+        }
+    });
+
+    $('#alert-title').html(title || '알림');
+    $('#alert-message').html(message);
+    $('#alert-box').fadeIn(300);
+}
+
+$('#top_alert').click(function () {
+    alertBox("학생들에게 알림을 보내겠습니까?", "알림", null, null);
+});
