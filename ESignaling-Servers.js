@@ -1016,6 +1016,10 @@ module.exports = exports = function(socket, config) {
             sendToAdmin();
         });
 
+
+    /*
+        socket.join을 사용하지 않기 때문에, room 브로드캐스트를 사용할 수 없음.            
+
         socket.on ('teacherToStudents', (arg, callback) => {            
             broadcastInRoom('teacherToStudents', arg);
             callback('success call');
@@ -1061,6 +1065,6 @@ module.exports = exports = function(socket, config) {
             }            
             socket.broadcast.to(room).emit(socketEvent, message);
         };
-
+        */
     }
 };

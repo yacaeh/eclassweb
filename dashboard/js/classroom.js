@@ -5,7 +5,7 @@
     function d(s) {
         return decodeURIComponent(s.replace(/\+/g, ' '));
     }
-    var match, search = window.location.search;
+    var match, search = window.location.search;    
     while (match = r.exec(search.substring(1)))
         params[d(match[1])] = d(match[2]);
     window.params = params;
@@ -141,6 +141,9 @@ connection.onclose = connection.onerror = connection.onleave = function(event) {
     connection.onUserStatusChanged(event);
 };
 
+
+
+
 connection.onmessage = function(event) {
     if(event.data.showMainVideo) {
         // $('#main-video').show();
@@ -184,8 +187,124 @@ connection.onmessage = function(event) {
         return;
     }
 
+
+    if(null != event.data.allControl)  {
+        if(!checkRoomOwner()) {                   
+            connection.extra.classRoom.allControl = event.data.allControl;            
+            if(event.data.allControl)
+            {
+                // 제어 하기                
+            }
+            else
+            {
+                // 제어 풀기
+            }
+        }
+        return;
+    }
+
+    if(event.data.alert) {
+        alert('receive alert');         
+        timeHandler = setTimeout (alertConfirm, 1000);
+        return;    
+    }
+
+    if(event.data.alertConfirm) {        
+        if(checkRoomOwner())
+        {                  
+            console.log(connection.getAllParticipants());
+            // 체크 알림...
+            //console.log(event.data.alertConfirm);            
+        }
+        return;
+    };
+
+    if(event.data.exam) {
+        // 시험치기..        
+
+        return;
+    }
+
+    if(event.data.examAnswer) {
+
+    }
+
     designer.syncData(event.data);
 };
+
+
+connection.extra.classRoom = {
+    allControl : false,
+    shareScreen : false,
+    share3D : false,
+    exam : {
+        // 문항수
+        // 시간
+    }
+};
+
+
+
+var timeHandler;    // 임시...
+
+function alertConfirm () {           
+    connection.send({
+        alertConfirm : connection.userid
+    }); 
+    clearTimeout(timeHandler);    
+};
+
+
+function checkRoomOwner () {
+
+    return connection.extra.roomOwner;
+};
+
+
+$('#top_all_controll').click ( () =>  {
+    if(checkRoomOwner()) {      
+        var currentAllControlState = !connection.extra.classRoom.allControl;
+        connection.extra.classRoom.allControl = currentAllControlState;
+        connection.send({
+            allControl : currentAllControlState
+        });
+    }
+});
+
+$('#top_load_book').click ( () =>  {
+    console.log('top_load_book');  
+});
+
+$('#top_test').click ( () => {
+        console.log('top_test');  
+});
+
+$('#top_alert').click ( () => {
+    if(checkRoomOwner())    {        
+        // get students numbers        
+        connection.send ({
+            alert : true
+        });
+    }
+    else
+    {
+        console.log('not room owner');
+    }
+});
+
+$('#top_3d').click ( () => {
+    console.log('top_3d');  
+});
+
+$('#top_share_video').click ( () => {
+    console.log('top_share_video');  
+});
+
+$('#top_record_video').click ( () => {
+    console.log('top_record_video');  
+});
+
+
 
 // extra code
 
@@ -488,8 +607,8 @@ designer.appendTo(document.getElementById('widget-container'), function() {
                 };
     
             }
-        });
-    
+        });    
+     
         connection.join({sessionid:params.sessionid,
                          userid: connection.channel,
                          session: connection.session}, function(isRoomJoined, roomid, error) {
