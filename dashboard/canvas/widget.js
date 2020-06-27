@@ -85,6 +85,37 @@
         return ctx;
     }
 
+var rtime;
+var timeout = false;
+var delta = 200;
+
+
+window.addEventListener("resize", function() {
+    rtime = new Date();
+    if (timeout === false) {
+        timeout = true;
+        setTimeout(resizeend, delta);
+    }
+});
+
+function resizeend() {
+    if (new Date() - rtime < delta) {
+        setTimeout(resizeend, delta);
+    } else {
+        timeout = false;
+        canvasresize('main-canvas');
+        canvasresize('temp-canvas');
+
+    }               
+}
+
+function canvasresize(id){
+    var canv = find(id),
+    ctx = canv.getContext('2d');
+    canv.setAttribute('width', innerWidth);
+    canv.setAttribute('height', innerHeight);
+}
+
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
 
