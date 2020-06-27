@@ -9,6 +9,10 @@
 
 (function() {
 
+    document.addEventListener("click", function(){
+        window.focus();
+    });
+
     var pointHistory = [];
 
     var is = {
@@ -1661,9 +1665,7 @@ function canvasresize(id){
         },
         mouseup: function(e) {        
             pointHistory.push(points.length);
-            console.log(points);
-            console.log('mouse up')
-            
+            console.log('pen up')
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1772,10 +1774,6 @@ function canvasresize(id){
             var t = this;
             t.ismousedown = true;
 
-            // tempContext.lineCap = 'round';
-            // drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-            // points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
             t.prevX = x;
             t.prevY = y;
 
@@ -1791,13 +1789,20 @@ function canvasresize(id){
                             else 
                                 pre = pointHistory[i-1];
                             
-                            var numofpoint = pointHistory[i] - pre
+                            var numofpoint = pointHistory[i] - pre;
+                            var sliced = points.slice(pre,numofpoint);
+                            
                             points.splice(pre, numofpoint);
+                            console.log(sliced);
+                            console.log(pointHistory)
+
                             pointHistory.splice(i,1);
                             for(var z = i ; z < pointHistory.length; z++){
                                 pointHistory[z] -= numofpoint;
                             }
                             
+
+
                             drawHelper.redraw();
                             syncPoints(true);
                             break;
@@ -3614,6 +3619,8 @@ function canvasresize(id){
     var keyCode;
 
     function onkeydown(e) {
+        console.log(e);
+
         keyCode = e.which || e.keyCode || 0;
 
         if (keyCode == 8 || keyCode == 46) {
@@ -3660,6 +3667,7 @@ function canvasresize(id){
 
     addEvent(document, 'keydown', onkeydown);
 
+
     function onkeyup(e) {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
@@ -3685,14 +3693,23 @@ function canvasresize(id){
             return;
         }
 
-        // Ctrl + z
-        if (isControlKeyPressed && keyCode === 90) {
+        if (keyCode === 90 && e.ctrlKey) {
+            console.log('zxczxc')
             if (points.length) {
-                points.length = points.length - 1;
-                drawHelper.redraw();
+                var idx = pointHistory.length - 2;
 
-                syncPoints(is.isDragAllPaths || is.isDragLastPath ? true : false);
+                if(idx == -1 ){
+                    var temp = points[0];
+                    temp[1] = [0,0,0,0];
+                    points = [temp];
+                }
+                else{
+                    points.length = pointHistory[idx];
+                    pointHistory.pop();
+                }
+                drawHelper.redraw();
             }
+            syncPoints(true);
         }
 
         // Ctrl + a
@@ -3716,15 +3733,15 @@ function canvasresize(id){
             syncPoints(is.isDragAllPaths || is.isDragLastPath ? true : false);
         }
 
-        // Ending the Control Key
-        if (typeof e.metaKey !== 'undefined' && e.metaKey === false) {
-            isControlKeyPressed = false;
-            keyCode = 17;
-        }
+        // // Ending the Control Key
+        // if (typeof e.metaKey !== 'undefined' && e.metaKey === false) {
+        //     isControlKeyPressed = false;
+        //     keyCode = 17;
+        // }
 
-        if (keyCode === 17) {
-            isControlKeyPressed = false;
-        }
+        // if (keyCode === 17) {
+        //     isControlKeyPressed = false;
+        // }
     }
 
     addEvent(document, 'keyup', onkeyup);
