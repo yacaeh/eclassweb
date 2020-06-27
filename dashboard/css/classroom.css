@@ -227,9 +227,13 @@ hr {
   content: url(/dashboard/img/top_share_screen_off.png);
 }
 
-#top_3d{
+.top_3d_off{
   content: url(/dashboard/img/top_3d_off.png);
 }
+.top_3d_on{
+  content: url(/dashboard/img/top_3d_on.png);
+}
+
 #top_share_video{
   content: url(/dashboard/img/top_share_video_off.png);
 }
@@ -366,4 +370,9 @@ hr {
 .top_icon{
   cursor: pointer;
   margin-top: 10px;
+}
+
+#renderCanvas{
+  position: absolute;
+  left: 45px;
 }
