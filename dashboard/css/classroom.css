@@ -279,6 +279,11 @@ hr {
   width: 120px;
 }
 
+
+#top_attach-file{
+  content: url(/dashboard/img/iconfinder_File.png);
+}
+
 #my-name{
   left: 400px;
   position: absolute;
@@ -371,9 +376,11 @@ hr {
 
 .top_icon{
   width: 30px;
+  height: 30px;
   cursor: pointer;
   margin-top: 10px;
 }
+
 
 #renderCanvas{
   position: absolute;

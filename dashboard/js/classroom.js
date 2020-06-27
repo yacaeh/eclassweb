@@ -36,20 +36,12 @@ console.log(connection);
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
-console.log("designer!");
 
 // you can place widget.html anywhere
 designer.widgetHtmlURL = './canvas/widget.html';
 designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
-
-designer.addSyncListener(function(data){
-    console.log(data);
-    console.log(data);
-
-})
-console.log(designer)
 
 designer.icons.pencil = '/dashboard/img/pen.png'
 designer.icons.marker = '/dashboard/img/pen2.png'
@@ -130,7 +122,7 @@ connection.onopen = function(event) {
         }, 1000);
     }
 
-    document.getElementById('btn-attach-file').style.display = 'inline-block';
+    document.getElementById('top_attach-file').style.display = 'inline-block';
     document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
@@ -444,7 +436,7 @@ window.onkeyup = function(e) {
 };
 
 var recentFile;
-document.getElementById('btn-attach-file').onclick = function() {
+document.getElementById('top_attach-file').onclick = function() {
     var file = new FileSelector();
     file.selectSingleFile(function(file) {
         recentFile = file;
@@ -1055,4 +1047,3 @@ function _3DCanvasFunc(){
     }
 
 }
-

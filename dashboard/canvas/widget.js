@@ -105,7 +105,8 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-
+        drawHelper.redraw();
+        syncPoints(true);
     }               
 }
 
@@ -1701,7 +1702,6 @@ function canvasresize(id){
                 y = e.pageY - canvas.offsetTop;
 
             var t = this;
-
             t.prevX = x;
             t.prevY = y;
 
@@ -1752,6 +1752,16 @@ function canvasresize(id){
         return [markerLineWidth, markerStrokeStyle, fillStyle, markerGlobalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
     }
 
+    function isNear(x,y, point){
+        var px = point[0]
+        var py = point[1]
+
+        var dist = Math.pow(x - px,2) + Math.pow(y - py,2);
+        if(dist < 250)
+            return true;
+        else return false;
+    }
+
     var eraserHandler = {
         ismousedown: false,
         prevX: 0,
@@ -1759,23 +1769,24 @@ function canvasresize(id){
         mousedown: function(e) {
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
-
             var t = this;
-
-            t.prevX = x;
-            t.prevY = y;
-
             t.ismousedown = true;
 
-            tempContext.lineCap = 'round';
-            drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-
-            points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
+            // tempContext.lineCap = 'round';
+            // drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+            // points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
 
             t.prevX = x;
             t.prevY = y;
+
+            points.forEach(function(point,idx){
+                var near = isNear(x,y,point[1]);
+                if(near)
+                    console.log(idx);
+            });
         },
         mouseup: function(e) {
+            console.log("Eraser Up")
             pointHistory.push(points.length);
             this.ismousedown = false;
         },
@@ -1786,13 +1797,33 @@ function canvasresize(id){
             var t = this;
 
             if (t.ismousedown) {
-                tempContext.lineCap = 'round';
-                drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+                points.forEach(function(point,idx){
+                    var near = isNear(x,y,point[1]);
+                    if(near){
+                        for(var i = 0 ; i < pointHistory.length; i++){
+                            if(idx < pointHistory[i]){
+                                var pre;
 
-                points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
+                                if(i == 0)
+                                    pre = 0;
+                                else 
+                                    pre = pointHistory[i-1];
+                                
+                                var numofpoint = pointHistory[i] - pre
+                                points.splice(pre, numofpoint);
+                                pointHistory.splice(i,1);
+                                for(var z = i ; z < pointHistory.length; z++){
+                                    pointHistory[z] -= numofpoint;
+                                }
+                                
+                                drawHelper.redraw();
+                                syncPoints(true);
+                                break;
+                            }
+                        }
 
-                t.prevX = x;
-                t.prevY = y;
+                    }
+                });
             }
         }
     };
@@ -3925,4 +3956,8 @@ function canvasresize(id){
         }
     };
 
+
+
 })();
+
+
