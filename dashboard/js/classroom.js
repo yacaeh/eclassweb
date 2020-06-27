@@ -883,9 +883,11 @@ function loadPDF(){
     var oriPdfCanvas= document.createElement('canvas');
         oriPdfCanvas.setAttribute("id", "the-canvas");
         oriPdfCanvas.style.cssText = 'border: 1px solid black;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
+    var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
 
-    window.frames[1].document.getElementsByClassName("design-surface")[0].appendChild(oriPdfCanvas);
-    const pdfCanvas = window.frames[1].document.getElementById('the-canvas');
+
+    frame.document.getElementsByClassName("design-surface")[0].appendChild(oriPdfCanvas);
+    const pdfCanvas = frame.document.getElementById('the-canvas');
         // If absolute URL from the remote server is provided, configure the CORS
         // header on that server.
         var url = 'test2.pdf';
