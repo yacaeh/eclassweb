@@ -15,7 +15,6 @@ h2 {
   border-radius: 0;
   text-decoration: none;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial,
@@ -261,9 +260,10 @@ hr {
 #icon_exit{
   content: url(/dashboard/img/exit.png);
   cursor: pointer;
-  left: 5px;
-  top: 5px;
+  left: 10px;
+  top: 10px;
   position: absolute;
+  width: 35px;
 }
 
 #header{
@@ -277,6 +277,11 @@ hr {
   position: absolute;
   top: 10px;
   width: 120px;
+}
+
+
+#top_attach-file{
+  content: url(/dashboard/img/iconfinder_File.png);
 }
 
 #my-name{
@@ -370,9 +375,12 @@ hr {
 }
 
 .top_icon{
+  width: 30px;
+  height: 30px;
   cursor: pointer;
   margin-top: 10px;
 }
+
 
 #renderCanvas{
   position: absolute;

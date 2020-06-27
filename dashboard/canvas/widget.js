@@ -9,6 +9,10 @@
 
 (function() {
 
+    document.addEventListener("click", function(){
+        window.focus();
+    });
+
     var pointHistory = [];
 
     var is = {
@@ -105,7 +109,8 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-
+        drawHelper.redraw();
+        syncPoints(true);
     }               
 }
 
@@ -1635,6 +1640,7 @@ function canvasresize(id){
         prevX: 0,
         prevY: 0,
         mousedown: function(e) {
+            console.log("pen down")
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -1654,8 +1660,12 @@ function canvasresize(id){
 
             t.prevX = x;
             t.prevY = y;
+            
+            document.getElementById("pencil-container").style.display = 'none';
         },
-        mouseup: function(e) {
+        mouseup: function(e) {        
+            pointHistory.push(points.length);
+            console.log('pen up')
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1694,7 +1704,6 @@ function canvasresize(id){
                 y = e.pageY - canvas.offsetTop;
 
             var t = this;
-
             t.prevX = x;
             t.prevY = y;
 
@@ -1709,6 +1718,8 @@ function canvasresize(id){
 
             t.prevX = x;
             t.prevY = y;
+
+            document.getElementById("marker-container").style.display = 'none';
         },
         mouseup: function(e) {
             console.log("Marker up");
@@ -1743,6 +1754,16 @@ function canvasresize(id){
         return [markerLineWidth, markerStrokeStyle, fillStyle, markerGlobalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
     }
 
+    function isNear(x,y, point){
+        var px = point[0]
+        var py = point[1]
+
+        var dist = Math.pow(x - px,2) + Math.pow(y - py,2);
+        if(dist < 250)
+            return true;
+        else return false;
+    }
+
     var eraserHandler = {
         ismousedown: false,
         prevX: 0,
@@ -1750,23 +1771,48 @@ function canvasresize(id){
         mousedown: function(e) {
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
-
             var t = this;
-
-            t.prevX = x;
-            t.prevY = y;
-
             t.ismousedown = true;
 
-            tempContext.lineCap = 'round';
-            drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-
-            points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
             t.prevX = x;
             t.prevY = y;
+
+            points.forEach(function(point,idx){
+                var near = isNear(x,y,point[1]);
+                if(near){
+                    for(var i = 0 ; i < pointHistory.length; i++){
+                        if(idx < pointHistory[i]){
+                            var pre;
+
+                            if(i == 0)
+                                pre = 0;
+                            else 
+                                pre = pointHistory[i-1];
+                            
+                            var numofpoint = pointHistory[i] - pre;
+                            var sliced = points.slice(pre,numofpoint);
+                            
+                            points.splice(pre, numofpoint);
+                            console.log(sliced);
+                            console.log(pointHistory)
+
+                            pointHistory.splice(i,1);
+                            for(var z = i ; z < pointHistory.length; z++){
+                                pointHistory[z] -= numofpoint;
+                            }
+                            
+
+
+                            drawHelper.redraw();
+                            syncPoints(true);
+                            break;
+                        }
+                    }
+                }
+            });
         },
         mouseup: function(e) {
+            console.log("Eraser Up")
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1776,13 +1822,32 @@ function canvasresize(id){
             var t = this;
 
             if (t.ismousedown) {
-                tempContext.lineCap = 'round';
-                drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+                points.forEach(function(point,idx){
+                    var near = isNear(x,y,point[1]);
+                    if(near){
+                        for(var i = 0 ; i < pointHistory.length; i++){
+                            if(idx < pointHistory[i]){
+                                var pre;
 
-                points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
-                t.prevX = x;
-                t.prevY = y;
+                                if(i == 0)
+                                    pre = 0;
+                                else 
+                                    pre = pointHistory[i-1];
+                                
+                                var numofpoint = pointHistory[i] - pre
+                                points.splice(pre, numofpoint);
+                                pointHistory.splice(i,1);
+                                for(var z = i ; z < pointHistory.length; z++){
+                                    pointHistory[z] -= numofpoint;
+                                }
+                                
+                                drawHelper.redraw();
+                                syncPoints(true);
+                                break;
+                            }
+                        }
+                    }
+                });
             }
         }
     };
@@ -1800,7 +1865,7 @@ function canvasresize(id){
         onShapeUnSelected: function() {
             this.text = '';
             this.showOrHideTextTools('hide');
-            tempContext.canvas.style.cursor = 'default';
+            // tempContext.canvas.style.cursor = 'default';
 
             if (typeof this.blinkCursorInterval !== 'undefined') {
                 clearInterval(this.blinkCursorInterval);
@@ -1816,6 +1881,9 @@ function canvasresize(id){
             return color;
         },
         writeText: function(keyPressed, isBackKeyPressed) {
+            console.log(textHandler)
+            console.log(typeof(textHandler))
+            
             if (!is.isText) return;
 
             if (isBackKeyPressed) {
@@ -2976,6 +3044,9 @@ function canvasresize(id){
                 }
 
                 if (this.id === 'eraser-icon') {
+                    console.log("Eraser click");
+                    document.getElementById("temp-canvas").className = "";
+                    document.getElementById("temp-canvas").classList.add("eraser");
                     cache.strokeStyle = strokeStyle;
                     cache.fillStyle = fillStyle;
                     cache.lineWidth = lineWidth;
@@ -2994,55 +3065,6 @@ function canvasresize(id){
         var toolBox = find('tool-box');
         toolBox.style.height = (innerHeight) + 'px'; // -toolBox.offsetTop - 77
 
-        // function decorateDragLastPath() {
-        //     var context = getContext('drag-last-path');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'DragLastPath');
-        //     };
-        //     image.src = data_uris.dragSingle;
-        // }
-
-        // decorateDragLastPath();
-
-        // if (tools.dragSingle === true) {
-        //     document.getElementById('drag-last-path').style.display = 'block';
-        // }
-
-        // function decorateDragAllPaths() {
-        //     var context = getContext('drag-all-paths');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'DragAllPaths');
-        //     };
-        //     image.src = data_uris.dragMultiple;
-        // }
-
-        // decorateDragAllPaths();
-
-        // if (tools.dragMultiple === true) {
-        //     document.getElementById('drag-all-paths').style.display = 'block';
-        // }
-
-        // function decorateLine() {
-        //     var context = getContext('line');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'Line');
-        //     };
-        //     image.src = data_uris.line;
-        // }
-
-        // if (tools.line === true) {
-        //     decorateLine();
-        //     document.getElementById('line').style.display = 'block';
-        // }
 
         function decorateUndo() {
             var context = getContext('undo');
@@ -3052,9 +3074,18 @@ function canvasresize(id){
                 context.drawImage(image, 4, 4, 32, 32);
 
                 document.querySelector('#undo').onclick = function() {
-                    console.log(points)
                     if (points.length) {
-                        points.length = points.length - 1;
+                        var idx = pointHistory.length - 2;
+
+                        if(idx == -1 ){
+                            var temp = points[0];
+                            temp[1] = [0,0,0,0];
+                            points = [temp];
+                        }
+                        else{
+                            points.length = pointHistory[idx];
+                            pointHistory.pop();
+                        }
                         drawHelper.redraw();
                     }
 
@@ -3069,58 +3100,6 @@ function canvasresize(id){
             decorateUndo();
             document.getElementById('undo').style.display = 'block';
         }
-
-        // function decorateArrow() {
-        //     var context = getContext('arrow');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'Arrow');
-        //     };
-        //     image.src = data_uris.arrow;
-        // }
-
-        // if (tools.arrow === true) {
-        //     decorateArrow();
-        //     document.getElementById('arrow').style.display = 'block';
-        // }
-
-        // function decoreZoomUp() {
-        //     var context = getContext('zoom-up');
-        //     // zoomHandler.icons.up(context);
-        //     addEvent(context.canvas, 'click', function() {
-        //         zoomHandler.up();
-        //     });
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //     };
-        //     image.src = data_uris.zoom_in;
-        // }
-
-        // function decoreZoomDown() {
-        //     var context = getContext('zoom-down');
-        //     // zoomHandler.icons.down(context);
-        //     addEvent(context.canvas, 'click', function() {
-        //         zoomHandler.down();
-        //     });
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //     };
-        //     image.src = data_uris.zoom_out;
-        // }
-
-        // if (tools.zoom === true) {
-        //     decoreZoomUp();
-        //     decoreZoomDown();
-
-        //     document.getElementById('zoom-up').style.display = 'block';
-        //     document.getElementById('zoom-down').style.display = 'block';
-        // }
 
         function decoratePencil() {
 
@@ -3200,7 +3179,9 @@ function canvasresize(id){
 
             addEvent(canvas, 'click', function() {
                 hideContainers();
-                console.log('Pencil');
+                console.log('Pencil Click');
+                document.getElementById("temp-canvas").className = "";
+                document.getElementById("temp-canvas").classList.add("pen");
 
                 pencilContainer.style.display = 'block';
                 pencilContainer.style.top = (canvas.offsetTop + 1) + 'px';
@@ -3306,7 +3287,9 @@ function canvasresize(id){
 
             addEvent(canvas, 'click', function() {
                 hideContainers();
-                console.log('Marker')
+                console.log('Marker Click')
+                document.getElementById("temp-canvas").className = "";
+                document.getElementById("temp-canvas").classList.add("marker");
 
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
@@ -3405,154 +3388,6 @@ function canvasresize(id){
             document.getElementById('pdf-icon').style.display = 'block';
         }
 
-        function decorateArc() {
-            var context = getContext('arc');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Arc');
-            };
-            image.src = data_uris.arc;
-        }
-
-        if (tools.arc === true) {
-            decorateArc();
-            document.getElementById('arc').style.display = 'block';
-        }
-
-        function decorateRect() {
-            var context = getContext('rectangle');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Rectangle');
-            };
-            image.src = data_uris.rectangle;
-        }
-
-        if (tools.rectangle === true) {
-            decorateRect();
-            document.getElementById('rectangle').style.display = 'block';
-        }
-
-        function decorateQuadratic() {
-            var context = getContext('quadratic-curve');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'QuadraticCurve');
-            };
-            image.src = data_uris.quadratic;
-        }
-
-        if (tools.quadratic === true) {
-            decorateQuadratic();
-            document.getElementById('quadratic-curve').style.display = 'block';
-        }
-
-        function decorateBezier() {
-            var context = getContext('bezier-curve');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Bezier');
-            };
-            image.src = data_uris.bezier;
-        }
-
-        if (tools.bezier === true) {
-            decorateBezier();
-            document.getElementById('bezier-curve').style.display = 'block';
-        }
-
-        function tempStrokeTheLine(context, width, mx, my, lx, ly) {
-            context.beginPath();
-            context.lineWidth = width;
-            context.moveTo(mx, my);
-            context.lineTo(lx, ly);
-            context.stroke();
-        }
-
-        function decorateLineWidth() {
-            var context = getContext('line-width');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-            };
-            image.src = data_uris.lineWidth;
-
-            var lineWidthContainer = find('line-width-container'),
-                lineWidthText = find('line-width-text'),
-                btnLineWidthDone = find('line-width-done'),
-                h1 = document.getElementsByTagName('h1')[0],
-                canvas = context.canvas;
-
-            addEvent(canvas, 'click', function() {
-                hideContainers();
-                console.log('1')
-
-                lineWidthContainer.style.display = 'block';
-                lineWidthContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                lineWidthContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
-
-                lineWidthText.focus();
-            });
-
-            addEvent(btnLineWidthDone, 'click', function() {
-                lineWidthContainer.style.display = 'none';
-                lineWidth = lineWidthText.value;
-            });
-        }
-
-        if (tools.lineWidth === true) {
-            decorateLineWidth();
-            document.getElementById('line-width').style.display = 'block';
-        }
-
-        function decorateColors() {
-            var context = getContext('colors');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-            };
-            image.src = data_uris.colorsPicker;
-
-            var colorsContainer = find('colors-container'),
-                strokeStyleText = find('stroke-style'),
-                fillStyleText = find('fill-style'),
-                btnColorsDone = find('colors-done'),
-                h1 = document.getElementsByTagName('h1')[0],
-                canvas = context.canvas;
-
-            addEvent(canvas, 'click', function() {
-                hideContainers();
-                console.log('1')
-
-                colorsContainer.style.display = 'block';
-                colorsContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                colorsContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
-
-                strokeStyleText.focus();
-            });
-
-            addEvent(btnColorsDone, 'click', function() {
-                colorsContainer.style.display = 'none';
-                strokeStyle = strokeStyleText.value;
-                fillStyle = fillStyleText.value;
-            });
-        }
-
-        if (tools.colorsPicker === true) {
-            decorateColors();
-            document.getElementById('colors').style.display = 'block';
-        }
-
         function decorateClearCanvas() {
             var context = getContext('clear_canvas');
 
@@ -3565,9 +3400,9 @@ function canvasresize(id){
                 var temp = points[0];
                 temp[1] = [0,0,0,0];
                 points = [temp];
-                console.log(points);
                 drawHelper.redraw();
                 syncPoints(true);
+                pointHistory = [];
             };
         }
 
@@ -3685,7 +3520,7 @@ function canvasresize(id){
         };
 
         var cache = is;
-
+        
         if (cache.isLine) lineHandler.mousedown(e);
         else if (cache.isArc) arcHandler.mousedown(e);
         else if (cache.isRectangle) rectHandler.mousedown(e);
@@ -3784,6 +3619,8 @@ function canvasresize(id){
     var keyCode;
 
     function onkeydown(e) {
+        console.log(e);
+
         keyCode = e.which || e.keyCode || 0;
 
         if (keyCode == 8 || keyCode == 46) {
@@ -3830,6 +3667,7 @@ function canvasresize(id){
 
     addEvent(document, 'keydown', onkeydown);
 
+
     function onkeyup(e) {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
@@ -3855,14 +3693,23 @@ function canvasresize(id){
             return;
         }
 
-        // Ctrl + z
-        if (isControlKeyPressed && keyCode === 90) {
+        if (keyCode === 90 && e.ctrlKey) {
+            console.log('zxczxc')
             if (points.length) {
-                points.length = points.length - 1;
-                drawHelper.redraw();
+                var idx = pointHistory.length - 2;
 
-                syncPoints(is.isDragAllPaths || is.isDragLastPath ? true : false);
+                if(idx == -1 ){
+                    var temp = points[0];
+                    temp[1] = [0,0,0,0];
+                    points = [temp];
+                }
+                else{
+                    points.length = pointHistory[idx];
+                    pointHistory.pop();
+                }
+                drawHelper.redraw();
             }
+            syncPoints(true);
         }
 
         // Ctrl + a
@@ -3886,15 +3733,15 @@ function canvasresize(id){
             syncPoints(is.isDragAllPaths || is.isDragLastPath ? true : false);
         }
 
-        // Ending the Control Key
-        if (typeof e.metaKey !== 'undefined' && e.metaKey === false) {
-            isControlKeyPressed = false;
-            keyCode = 17;
-        }
+        // // Ending the Control Key
+        // if (typeof e.metaKey !== 'undefined' && e.metaKey === false) {
+        //     isControlKeyPressed = false;
+        //     keyCode = 17;
+        // }
 
-        if (keyCode === 17) {
-            isControlKeyPressed = false;
-        }
+        // if (keyCode === 17) {
+        //     isControlKeyPressed = false;
+        // }
     }
 
     addEvent(document, 'keyup', onkeyup);
@@ -4145,4 +3992,8 @@ function canvasresize(id){
         }
     };
 
+
+
 })();
+
+

@@ -36,7 +36,6 @@ console.log(connection);
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
-console.log("designer!");
 
 // you can place widget.html anywhere
 designer.widgetHtmlURL = './canvas/widget.html';
@@ -44,17 +43,11 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.addSyncListener(function(data){
-    console.log(data);
-    console.log(data);
-
-})
-console.log(designer)
-
 designer.icons.pencil = '/dashboard/img/pen.png'
 designer.icons.marker = '/dashboard/img/pen2.png'
 designer.icons.eraser = '/dashboard/img/eraser.png'
 designer.icons.clearCanvas = '/dashboard/img/refresh.png'
+designer.icons.pdf = '/dashboard/img/iconfinder_File.png'
 
 designer.addSyncListener(function(data) {
     connection.send(data);
@@ -129,7 +122,7 @@ connection.onopen = function(event) {
         }, 1000);
     }
 
-    document.getElementById('btn-attach-file').style.display = 'inline-block';
+    document.getElementById('top_attach-file').style.display = 'inline-block';
     document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
@@ -443,7 +436,7 @@ window.onkeyup = function(e) {
 };
 
 var recentFile;
-document.getElementById('btn-attach-file').onclick = function() {
+document.getElementById('top_attach-file').onclick = function() {
     var file = new FileSelector();
     file.selectSingleFile(function(file) {
         recentFile = file;
@@ -582,18 +575,29 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             });
     } else {
         console.log("try joining!");
+        connection.DetectRTC.load(function() { 
             SetStudent();
 
-            // Disable student media devices on joining
-            connection.mediaConstraints.video = false;
-            connection.session.video = false;
-            connection.mediaConstraints.audio = false;
-            connection.session.audio = false;
-            connection.session.oneway = true;
-            connection.sdpConstraints.mandatory = {
-                OfferToReceiveAudio: false,
-                OfferToReceiveVideo: false
-            };
+            if (!connection.DetectRTC.hasMicrophone) {
+                connection.mediaConstraints.audio = false;
+                connection.session.audio = false;
+                console.log("user has no mic!");
+                alert("마이크가 없습니다!");
+            }
+        
+            if (!connection.DetectRTC.hasWebcam) {
+                connection.mediaConstraints.video = false;
+                connection.session.video = false;
+                console.log("user has no cam!");
+                alert("캠이 없습니다!");
+                connection.session.oneway = true;
+                connection.sdpConstraints.mandatory = {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                };
+    
+            }
+        });    
      
         connection.join({sessionid:params.sessionid,
                          userid: connection.channel,
@@ -1043,4 +1047,3 @@ function _3DCanvasFunc(){
     }
 
 }
-
