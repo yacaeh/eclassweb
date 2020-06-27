@@ -838,12 +838,12 @@ function setQuestionAnswer(answerList) {
 
 
 var examObj = {
-    isStart : false,
-    questionCount : 0,     // 시험 문제수
+    isStart : false,        // 현재 시험 중인지 아닌지 판단
+    questionCount : 0,      // 시험 문제수
     currentExamTime : 0,   // 현재 시험 남은 시간
-    examTime : 0,         // 시험 시간(minute)    
+    examTime : 0,          // 시험 시간(minute)    
     examAnswer : [],      // question 정답, 선생은 정답 저장, 학생은 자신이 선택한 정답 저장
-    studentsAnswer : {},   // 학생들 정답 저장.
+    studentsAnswer : {},  // 학생들 정답 저장.
     submitStudents : {}
     /*
         학생별 저장값    
