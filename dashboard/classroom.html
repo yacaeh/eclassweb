@@ -25,7 +25,9 @@
     <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
     <script src="/dashboard/js/emojionearea.min.js"></script>
     <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>
     <script defer src="/dashboard/js/classroom.js"></script>
+
 <body>
 
     <header id="header">
@@ -48,6 +50,7 @@
             <img class="top_icon" id="top_alert">
             <img class="top_icon" id="top_share_screen"> 
             <img class="top_icon" id="top_3d">
+            <img class="top_icon" id="top_pdf">
             <img class="top_icon" id="top_share_video">
             <img class="top_icon" id="top_record_video">
             <span class="time">
@@ -96,7 +99,15 @@
         </div>
     </article>
 
-
+    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <!--pdf controller-->
+    <div id="canvas-controller">
+      <button id="prev">Previous</button>
+      <button id="next">Next</button>
+      &nbsp; &nbsp;
+      <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+      <button id="close-pdf">close</button>
+    </div>
 </body>
 
 

@@ -164,6 +164,7 @@ hr {
 
 #temp-stream-canvas{
   display: none;
+  opacity:0.1;
 }
 
 #key-press{
@@ -234,6 +235,9 @@ hr {
 }
 #top_record_video{
   content: url(/dashboard/img/top_record_video_off.png);
+}
+#top_pdf{
+  content: url(/dashboard/img/pdf.png);
 }
 
 
@@ -341,6 +345,13 @@ hr {
   background-color: #dcd7d7;
   display: inline-block;
   margin-bottom: 5px;
+}
+
+#canvas-controller{
+  margin-left:20%;
+  position:relative; 
+  z-index: 0;
+
 }
 
 .no_student{
