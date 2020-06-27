@@ -847,6 +847,8 @@ function receiveExamData (_data) {
         examObj.examTime = examStart.examTime;
         examObj.currentExamTime = examStart.examTime;
         examObj.questionCount = examStart.questionCount;
+
+        setStudentOMR (examObj.questionCount, examObj.examTime);
     }
     else if(_data.examEnd) {
         examObj.isStart = false;
