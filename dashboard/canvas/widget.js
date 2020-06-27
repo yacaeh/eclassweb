@@ -1623,8 +1623,13 @@
 
             t.prevX = x;
             t.prevY = y;
+            
+            document.getElementById("pencil-container").style.display = 'none';
         },
-        mouseup: function(e) {
+        mouseup: function(e) {        
+            pointHistory.push(points.length);
+            console.log(points);
+            
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1678,6 +1683,8 @@
 
             t.prevX = x;
             t.prevY = y;
+
+            document.getElementById("marker-container").style.display = 'none';
         },
         mouseup: function(e) {
             console.log("Marker up");
@@ -1736,6 +1743,7 @@
             t.prevY = y;
         },
         mouseup: function(e) {
+            pointHistory.push(points.length);
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1785,6 +1793,9 @@
             return color;
         },
         writeText: function(keyPressed, isBackKeyPressed) {
+            console.log(textHandler)
+            console.log(typeof(textHandler))
+            
             if (!is.isText) return;
 
             if (isBackKeyPressed) {
@@ -3021,9 +3032,18 @@
                 context.drawImage(image, 4, 4, 32, 32);
 
                 document.querySelector('#undo').onclick = function() {
-                    console.log(points)
                     if (points.length) {
-                        points.length = points.length - 1;
+                        var idx = pointHistory.length - 2;
+
+                        if(idx == -1 ){
+                            var temp = points[0];
+                            temp[1] = [0,0,0,0];
+                            points = [temp];
+                        }
+                        else{
+                            points.length = pointHistory[idx];
+                            pointHistory.pop();
+                        }
                         drawHelper.redraw();
                     }
 
@@ -3534,9 +3554,9 @@
                 var temp = points[0];
                 temp[1] = [0,0,0,0];
                 points = [temp];
-                console.log(points);
                 drawHelper.redraw();
                 syncPoints(true);
+                pointHistory = [];
             };
         }
 

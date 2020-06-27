@@ -58,6 +58,7 @@ designer.icons.pencil = '/dashboard/img/pen.png'
 designer.icons.marker = '/dashboard/img/pen2.png'
 designer.icons.eraser = '/dashboard/img/eraser.png'
 designer.icons.clearCanvas = '/dashboard/img/refresh.png'
+designer.icons.pdf = '/dashboard/img/iconfinder_File.png'
 
 designer.addSyncListener(function(data) {
     connection.send(data);

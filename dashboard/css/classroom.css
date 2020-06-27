@@ -152,7 +152,7 @@ hr {
 
 #widget-container{
   position: fixed;
-  top: 5%;
+  top: 53px;
   bottom: 0;
   right: 0;
   left: 0%;
@@ -251,9 +251,10 @@ hr {
 #icon_exit{
   content: url(/dashboard/img/exit.png);
   cursor: pointer;
-  left: 5px;
-  top: 5px;
+  left: 10px;
+  top: 10px;
   position: absolute;
+  width: 35px;
 }
 
 #header{
@@ -353,6 +354,7 @@ hr {
 }
 
 .top_icon{
+  width: 30px;
   cursor: pointer;
   margin-top: 10px;
 }
