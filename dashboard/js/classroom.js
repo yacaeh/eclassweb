@@ -44,9 +44,6 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.appendTo(document.body || document.documentElement, function() {
-});
-
 designer.addSyncListener(function(data){
     console.log(data);
     console.log(data);
@@ -1002,3 +999,10 @@ function loadPDF(){
         });
     
 }
+
+
+
+$("#top_3d").click(function(){
+    $("#renderCanvas").toggle();
+    $(this).toggleClass('top_3d_off top_3d_on')
+})

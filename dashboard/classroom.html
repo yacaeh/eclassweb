@@ -45,7 +45,7 @@
             <img class="top_icon" id="top_test">
             <img class="top_icon" id="top_alert">
             <img class="top_icon" id="top_share_screen"> 
-            <img class="top_icon" id="top_3d">
+            <img class="top_icon top_3d_off" id="top_3d">
             <img class="top_icon" id="top_pdf">
             <img class="top_icon" id="top_share_video">
             <img class="top_icon" id="top_record_video">
@@ -59,6 +59,8 @@
 
     <article id="article">
         <div id="widget-container"></div>
+        <canvas id="renderCanvas" style="display: none;" width="1280" height="900" touch-action="none"></canvas> <!-- touch-action="none" for best results from PEP -->
+
         <video id="screen-viewer" controls playsinline autoplay></video>
         <div class="lwindow">
 
@@ -105,12 +107,12 @@
       <button id="close-pdf">close</button>
     </div>
 
+
+
     <script src="/dashboard/js/babylon.js"></script>
     <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
     <script src="/dashboard/js/pep.js"></script>
     <script src="/dashboard/js/babylonjs.loaders.js"></script>
-
-    <canvas id="renderCanvas" width="480" height="320" touch-action="none"></canvas> <!-- touch-action="none" for best results from PEP -->
     <script src = /dashboard/js/3d_render.js></script>
 </body>
 
