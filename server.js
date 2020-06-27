@@ -86,7 +86,7 @@ function serverHandler(request, response) {
         }
 
         var matched = false;
-        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/'].forEach(function(item) {
+        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', 'ViewerJS'].forEach(function(item) {
             if (filename.indexOf(resolveURL(item)) !== -1) {
                 matched = true;
             }
@@ -127,7 +127,7 @@ function serverHandler(request, response) {
         try {
             stats = fs.lstatSync(filename);
 
-            if (filename.search(/dashboard/g) === -1 && filename.search(/admin/g) === -1 && stats.isDirectory() && config.homePage === '/dashboard/index.html') {
+            if (filename.search(/dashboard/g) === -1 && filename.search(/admin/g) === -1 && filename.search(/ViewerJS/g) === -1 && stats.isDirectory() && config.homePage === '/dashboard/index.html') {
                 if (response.redirect) {
                     response.redirect('/dashboard/');
                 } else {
@@ -160,6 +160,9 @@ function serverHandler(request, response) {
                 } else if (filename.indexOf(resolveURL('/admin/')) !== -1) {
                     filename = filename.replace(resolveURL('/admin/'), '');
                     filename += resolveURL('/admin/index.html');
+                } else if (filename.indexOf(resolveURL('/ViewerJS/')) !== -1) {
+                    filename = filename.replace(resolveURL('/ViewerJS/'), '');
+                    filename += resolveURL('/ViewerJS/index.html');
                 } else {
                     filename += resolveURL(config.homePage);
                 }
