@@ -161,6 +161,11 @@ connection.onmessage = function (event) {
         return;
     }
 
+    if(event.data.exam) {
+        receiveExamData(event.data.exam);
+        return;
+    }
+
     designer.syncData(event.data);
 };
 
@@ -699,20 +704,30 @@ var m_QuesCount = 0;    // 현재 문제수
 var m_ExamTimerInterval;    // 시험 타이머 인터벌
 var m_ExamTime; // 
 
+var examObj = {
+    questionCount : 0,
+    currentExamTime : 0,
+    examTime : 0,        // (minute)
+    examAnswer : []      // question 정답
+};
+
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
     m_QuesCount = $('#exam-question-count').val();
+    examObj.questionCount = m_QuesCount;
     var answerList = getQuestionAnswerList();
     $('#exam-qustion-list').html("");
     for (var i = 1; i <= m_QuesCount; i++) {
         apeendQuestion(i);
     }
+
     setQuestionAnswer(answerList);
 });
 
 // 문제 1개 추가
 $('#exam-add-question').click(function () {
     apeendQuestion(++m_QuesCount);
+    examObj.questionCount += 1;
     $('#exam-question-count').val(m_QuesCount);
 });
 
@@ -731,6 +746,7 @@ $('#exam-start').toggle(function () {
     $('#exam-start').attr('class', 'btn btn-danger');
     $('#exam-start').html('종료');
 
+    sendExamStart ();
 
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
@@ -744,6 +760,7 @@ $('#exam-start').toggle(function () {
     $('#exam-start').attr('class', 'btn btn-primary');
     $('#exam-start').html('시작');
     clearInterval(m_ExamTimerInterval);
+    sendExamEnd ();
     $('#exam-time').val(parseInt(m_ExamTime / 60))
     // TODO : 학생들에게 시험 종료 알려줌
 });
@@ -791,5 +808,101 @@ function getQuestionAnswerList() {
 function setQuestionAnswer(answerList) {
     for (let i = 1; i <= m_QuesCount; i++) {
         $(`input:radio[name='exam-question-${i}'][value=${answerList[i - 1]}]`).prop('checked', true);
+    }    
+    examObj.examAnswer = answerList;
+}
+
+
+var examObj = {
+    isStart : false,
+    questionCount : 0,
+    currentExamTime : 0,
+    examTime : 0,        // (minute)
+    examAnswer : []      // question 정답
+};
+
+
+
+function receiveExamData (_data) {
+    console.log(_data);
+    if(_data.examAnswerList) {
+        examObj.questionCount = _data.examAnswerList.questionCount;
+    }
+    else if(_data.examStart) {       
+        let examStart = _data.examStart;
+        examObj.isStart = true;
+        examObj.examTime = examStart.examTime;
+        examObj.currentExamTime = examStart.examTime;
+        examObj.questionCount = examStart.questionCount;
+    }
+    else if(_data.examEnd) {
+        examObj.isStart = false;
+
+    }else if (_data.examAnswerCheck) {
+
+    }
+};
+
+
+function sendExamAnswerToStudents () {
+    if(connection.extra.roomOwner === true) {        
+        connection.send ({
+           exam : {            
+                examAnswerList : {
+                    questionCount : examObj.questionCount,
+                    // exameTime : examObj.exameTime
+                }       
+           }
+        });
     }
 }
+
+
+function sendExamStart () {
+
+    if(connection.extra.roomOwner)
+    {        
+        sendExamAnswerToStudents ();
+        examObj.isStart = true;
+        connection.send({
+            exam: {
+                examStart : {
+                    examTime : examObj.examTime,
+                    questionCount : examObj.questionCount
+                }
+            }
+        });    
+    }
+}
+
+function sendExamEnd () {
+    if(connection.extra.roomOwner)
+    {
+        examObj.isStart = false;
+        connection.send({
+            exam: {
+                examEnd : true
+            }
+        });
+    }
+}
+
+function sendSelectExamAnswerToTeacher (_questionNumber, _selectNumber) {
+    // 정답...    
+    connection.send ({      
+        exam : {  
+            examAnswerCheck : {
+                questionNumber : _questionNumber,
+                seletNumber : _selectNumber            
+            }
+        }
+    });
+};
+
+function receiveSelectExamAnswerFromStudent () {
+    // 정답 통계
+    if(connection.extra.roomOwner)
+    {
+        // exam.examAnswer
+    }
+};
