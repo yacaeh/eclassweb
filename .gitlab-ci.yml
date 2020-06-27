@@ -57,13 +57,15 @@ deploy-production:
       - node_modules/
   
   before_script:
-    - apt-get install -y -qq rsync
     - 'which ssh-agent || ( apk --update add openssh-client )'
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     - echo "rsa passed!"
+    - apt-get update -qq
+    - apt-get install -y -qq ssh
+    - apt-get install -y -qq rsync
   script:
     - ssh $REMOTE_USER@$REMOTE_HOST
     - rsync -avzO --exclude='.git' --exclude='.gitlab-ci.yml' --exclude='fake-keys' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_HOST_DIR
