@@ -992,18 +992,55 @@ function loadPDF(){
 }
 
 
+_3DCanvasFunc();
 
-$("#top_3d").click(function(){
-    $("#renderCanvas").toggle();
-    var visible = $("#renderCanvas").is(':visible');
+function _3DCanvasFunc(){
+    var _3dcanvas =  $("#renderCanvas");
+    var rtime;
+    var timeout = false;
+    var delta = 400;
     
-    var jthis = $(this);
-    if(visible){
-        jthis.addClass('top_3d_on');
-        jthis.removeClass('top_3d_off')
+    $("#top_3d").click(function(){
+        _3dcanvas.toggle();
+        var visible = _3dcanvas.is(':visible');
+        var jthis = $(this);
+    
+        if(visible){
+            CanvasResize();
+            jthis.addClass('top_3d_on');
+            jthis.removeClass('top_3d_off')
+        }
+        else{
+            jthis.addClass('top_3d_off');
+            jthis.removeClass('top_3d_on')
+        }
+    })
+
+    function CanvasResize(){
+        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+        var canvas =  frame.document.getElementById("main-canvas")
+        var r = document.getElementsByClassName("lwindow")[0];
+        var rwidth = $(r).width();
+        _3dcanvas.attr("width", canvas.width - rwidth - 50 );
+        _3dcanvas.attr("height", canvas.height- 60);
     }
-    else{
-        jthis.addClass('top_3d_off');
-        jthis.removeClass('top_3d_on')
+
+    window.addEventListener("resize", function() {
+        rtime = new Date();
+        if (timeout === false) {
+            timeout = true;
+            setTimeout(resizeend, delta);
+        }
+    });
+    
+    function resizeend() {
+        if (new Date() - rtime < delta) {
+            setTimeout(resizeend, delta);
+        } else {
+            timeout = false;
+            CanvasResize();
+        }               
     }
-})
+
+}
+
