@@ -1004,5 +1004,15 @@ function loadPDF(){
 
 $("#top_3d").click(function(){
     $("#renderCanvas").toggle();
-    $(this).toggleClass('top_3d_off top_3d_on')
+    var visible = $("#renderCanvas").is(':visible');
+    
+    var jthis = $(this);
+    if(visible){
+        jthis.addClass('top_3d_on');
+        jthis.removeClass('top_3d_off')
+    }
+    else{
+        jthis.addClass('top_3d_off');
+        jthis.removeClass('top_3d_on')
+    }
 })
