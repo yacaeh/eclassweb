@@ -86,7 +86,7 @@ function serverHandler(request, response) {
         }
 
         var matched = false;
-        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', 'ViewerJS'].forEach(function(item) {
+        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', '/ViewerJS/'].forEach(function(item) {
             if (filename.indexOf(resolveURL(item)) !== -1) {
                 matched = true;
             }
@@ -180,6 +180,9 @@ function serverHandler(request, response) {
         }
         if (filename.toLowerCase().indexOf('.png') !== -1) {
             contentType = 'image/png';
+        }
+        if (filename.toLowerCase().indexOf('.pdf') !== -1) {
+            contentType = 'application/pdf';
         }
 
         fs.readFile(filename, 'binary', function(err, file) {
