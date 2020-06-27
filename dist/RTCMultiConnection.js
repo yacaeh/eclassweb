@@ -3480,7 +3480,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             return;
         }
         currentUserMediaRequest.mutex = true;
-
+        console.log("getusermedia");
         // easy way to match
         var idInstance = JSON.stringify(options.localMediaConstraints);
 
@@ -4473,7 +4473,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     // [disabled] retry after 3 seconds
                     false && setTimeout(function() {
                         joinRoom(connectionDescription, cb);
-                    }, 3000);
+                    }, 100);
                 }
 
                 cb(isRoomJoined, connection.sessionid, error);
@@ -5369,9 +5369,12 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         };
 
         connection.onMediaError = function(error, constraints) {
-            if (!!connection.enableLogs) {
-                console.error(error, constraints);
-            }
+            connection.session.audio = false;
+            connection.session.video = false;
+            console.log("mediaError but join");
+            connection.join({sessionid:connection.sessionid,
+                userid: connection.channel,
+                session: connection.session});
         };
 
         connection.autoCloseEntireSession = false;

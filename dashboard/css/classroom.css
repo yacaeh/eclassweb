@@ -15,13 +15,13 @@ h2 {
   border-radius: 0;
   text-decoration: none;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial,
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   font-size: 17px;
   line-height: 1.5em;
+  overflow: hidden;
 }
 
 input[disabled],
@@ -77,12 +77,12 @@ button[disabled] {
 }
 
 #conversation-panel {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: left;
-  max-height: 750px;
+  max-height: 550px;
   overflow: auto;
   border-top: 1px solid #e5e5e5;
-  width: 106%;
+  width: 100%;
 }
 
 #conversation-panel .message {
@@ -152,7 +152,7 @@ hr {
 
 #widget-container{
   position: fixed;
-  top: 5%;
+  top: 54px;
   bottom: 0;
   right: 0;
   left: 0%;
@@ -164,6 +164,7 @@ hr {
 
 #temp-stream-canvas{
   display: none;
+  opacity:0.1;
 }
 
 #key-press{
@@ -189,7 +190,8 @@ hr {
   position: fixed;
   width: 20%;
   height: 95%;
-  right: 5px;
+  right: 0px;
+  top: 53px;
   background-image: url(/dashboard/img/base.png);
 }
 
@@ -198,7 +200,7 @@ hr {
 }
 
 .conversation-panel{
-  left: 20px;
+  left: 12px;
   margin-top: 20px;
   position: absolute;
   bottom: 0px;
@@ -226,14 +228,21 @@ hr {
   content: url(/dashboard/img/top_share_screen_off.png);
 }
 
-#top_3d{
+.top_3d_off{
   content: url(/dashboard/img/top_3d_off.png);
 }
+.top_3d_on{
+  content: url(/dashboard/img/top_3d_on.png);
+}
+
 #top_share_video{
   content: url(/dashboard/img/top_share_video_off.png);
 }
 #top_record_video{
   content: url(/dashboard/img/top_record_video_off.png);
+}
+#top_pdf{
+  content: url(/dashboard/img/pdf.png);
 }
 
 
@@ -251,9 +260,10 @@ hr {
 #icon_exit{
   content: url(/dashboard/img/exit.png);
   cursor: pointer;
-  left: 5px;
-  top: 5px;
+  left: 10px;
+  top: 10px;
   position: absolute;
+  width: 35px;
 }
 
 #header{
@@ -262,10 +272,16 @@ hr {
 }
 
 #top_logo{
-  content: url(/dashboard/img/logo.png);
+  content: url(/dashboard/ai_icon.png);
   left: 60px;
   position: absolute;
-  top: 20px;
+  top: 10px;
+  width: 120px;
+}
+
+
+#top_attach-file{
+  content: url(/dashboard/img/iconfinder_File.png);
 }
 
 #my-name{
@@ -282,20 +298,24 @@ hr {
 #who-am-i{
   position: absolute;
   left: 220px;
-  top: 10px;
+  top: 7px;
   font-size: 25px;
   font-weight: bold;
   color: rgb(135,152,156);
 }
 
 .time{
-  width: 200px;
+  width: 90px;
   color: rgb(129, 129,129);
+  float: right;
+  font-weight: bold;
+  text-align: end;
+  margin-right: 5px;
+  margin-left: 290px;
 }
 
 .icons{
   float: right;
-  margin-top: 15px;
 }
 
 .view_type{
@@ -310,6 +330,11 @@ hr {
   color: rgb(129,129,129);
 }
 
+.view_type-on{
+  background-color: rgb(129,129,129);
+  color: white;
+}
+
 .nos{
   float: right;
   margin-right: 10px;
@@ -320,6 +345,8 @@ hr {
   float: left;
   margin-left: 5px;
   margin-top: 5px;
+  width: 370px;
+  height: 290px;
 }
 
 .student{
@@ -328,4 +355,34 @@ hr {
   background-color: #dcd7d7;
   display: inline-block;
   margin-bottom: 5px;
+}
+
+#canvas-controller{
+  margin-left:20%;
+  position:relative; 
+  z-index: 0;
+
+}
+
+.no_student{
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+  display: inline-grid;
+  align-content: center;
+  font-weight: bold;
+}
+
+.top_icon{
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+
+#renderCanvas{
+  position: absolute;
+  left: 45px;
 }
