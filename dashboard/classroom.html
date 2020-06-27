@@ -81,23 +81,29 @@
             <!-- View Cam -->
             <video id="main-video" controls playsinline autoplay></video>
 
-            <div id="exam-board" style="display: none; position: fixed; top:5%; bottom: 0; right: 0; width: 20%; background-color: white;" >
+            <div id="exam-board"
+                style="display: none; position: fixed; top:5%; bottom: 0; right: 0; width: 20%; background-color: white;">
                 <!-- 테스트 구조 잡는 코딩 시험 생성 -->
-                <div id="exam-setting-bar">
+                <div id="exam-setting-bar" style="display: none;">
                     <div style="display: flex;">
                         <b>답안지</b>
-    
+
                         <label for="exam-question-count">문제수</label>
                         <input id="exam-question-count" class="form-control" type="number" style="width:70px;">
                         <button id="exam-setting-apply" class="btn btn-primary">적용</button>
-    
+
                         <label for="exam-time">시간</label>
                         <input id="exam-time" class="form-control" type="text" placeholder="10분" style="width:70px;">
                         <button id="exam-start" class="btn btn-info">시작</button>
                     </div>
                     <div id="exam-qustion-list" style="height: 300px; overflow-y: auto;"></div>
                     <button id="exam-add-question" class="btn btn-primary" style="width: 100%;">문제 추가</button>
-                </div></div>
+                </div>
+
+                <div id="exam-omr" style="display: none;">
+                    
+                </div>
+            </div>
 
             <!-- View Result -->
             <div id="exam-result" style="display: none; height: 30%; overflow-y: auto;">
@@ -117,7 +123,7 @@
                 <span>1번</span><progress value="10" max="100"></progress><span>0%</span><br>
             </div>
 
-            
+
 
             <!-- Conversation Panel -->
             <div class="conversation-panel">

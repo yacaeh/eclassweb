@@ -693,10 +693,23 @@ function SelectViewType() {
     })
 }
 
-$('#top_test').toggle(function () {
-    $('#exam-board').show();
-},function(){
-    $('#exam-board').hide();
+$('#top_test').click(function () {
+    if ($('#exam-board').is(':visible')) {
+        $('#exam-board').hide();
+    }
+    else {
+        // 선생님
+        if (params.open === 'true') {
+            $("#exam-omr").hide();
+            $("#exam-setting-bar").show();
+        }
+        // 학생
+        else {
+            $("#exam-omr").show();
+            $("#exam-setting-bar").hide();
+        }
+        $('#exam-board').show();
+    }
 });
 
 
@@ -906,3 +919,58 @@ function receiveSelectExamAnswerFromStudent () {
         // exam.examAnswer
     }
 };
+
+// TODO: 선생님이 이 함수를 호출해줘야함
+// 학생들 OMR 세팅 
+function setStudentOMR(quesCount, examTime) {
+    $("#exam-omr").show();
+    $('#exam-board').show();
+
+    $('#exam-omr').html("");
+    question = "<div id='exam-student-timer'>0:0</div>"
+
+    m_QuesCount = quesCount;
+    for (var i = 1; i <= m_QuesCount; i++) {
+        question += `<div id='exam-question-${i}' onchange='omrChange()'>`
+
+        question += `<span id='exam-question-text-${i}'>${i}: </span>`;
+
+        for (var j = 1; j <= 5; j++) {
+            question += `<label for='exam-question-${i}_${j}'>${j}번</label>`;
+            question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
+        }
+
+        question += `</div>`;
+    }
+    question += "<button onclick='submitOMR()' class='btn btn-primary'>시험제출</button>";
+    $('#exam-omr').html(question);
+
+    m_ExamTime = parseInt(examTime * 60);
+
+    m_ExamTimerInterval = setInterval(function () {
+        m_ExamTime--;
+        $('#exam-student-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+        if (m_ExamTime <= 0)
+            clearInterval(m_ExamTimerInterval);
+    }, 1000);
+}
+
+// 학생 시험 OMR 제출
+function submitOMR() {
+    clearInterval(m_ExamTimerInterval);
+    var studentOMR = getQuestionAnswerList();
+    console.log(studentOMR);
+    
+    // TODO: 서버로 학생 시험 정보 전송
+
+    $('#exam-omr').html("");
+    $('#exam-board').hide();
+}
+
+// 학생 OMR이 변경됨
+function omrChange(){
+    var studentOMR = getQuestionAnswerList();
+    console.log(studentOMR);
+    
+    // TODO: 서버로 학생 시험 정보 전송
+}
