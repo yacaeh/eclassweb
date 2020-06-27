@@ -717,12 +717,6 @@ var m_QuesCount = 0;    // 현재 문제수
 var m_ExamTimerInterval;    // 시험 타이머 인터벌
 var m_ExamTime; // 
 
-var examObj = {
-    questionCount : 0,
-    currentExamTime : 0,
-    examTime : 0,        // (minute)
-    examAnswer : []      // question 정답
-};
 
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
@@ -759,7 +753,8 @@ $('#exam-start').toggle(function () {
     $('#exam-start').attr('class', 'btn btn-danger');
     $('#exam-start').html('종료');
 
-    examObj.sendExamStart ();
+    examObj.examAnswer = answerList;
+    examObj.sendExamStart (m_ExamTime);
 
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
@@ -839,21 +834,23 @@ function setQuestionAnswer(answerList) {
     for (let i = 1; i <= m_QuesCount; i++) {
         $(`input:radio[name='exam-question-${i}'][value=${answerList[i - 1]}]`).prop('checked', true);
     }    
-    examObj.examAnswer = answerList;
 }
 
 
 var examObj = {
     isStart : false,
-    questionCount : 0,
-    currentExamTime : 0,
-    examTime : 0,        // (minute)
-    examAnswer : [],      // question 정답
-    studentsAnswer : {}  // 학생들 정답 저장.
+    questionCount : 0,     // 시험 문제수
+    currentExamTime : 0,   // 현재 시험 남은 시간
+    examTime : 0,         // 시험 시간(minute)    
+    examAnswer : [],      // question 정답, 선생은 정답 저장, 학생은 자신이 선택한 정답 저장
+    studentsAnswer : {},   // 학생들 정답 저장.
+    submitStudents : {}
     /*
         학생별 저장값    
         studentsAnswer : {                        
-            id, answers, count
+            id, 유저 아이
+            userAnswers, : 유저가 고른 정답
+            answers : 실패 답과 비교 후, 정답인지 아닌지 값 저장
         }
       */
 };
@@ -876,19 +873,122 @@ examObj.checkAnswerCount = function (studentAnswers) {
     return equalCount;
 };
 
+examObj.checkAnswer = function (_questionNumber, _answerNumber) {
+    try {
+        return examObj.examAnswer[_questionNumber] === _answerNumber;
+    }catch(error) {
+        console.error(`answer error ${error}`);
+        return null;    
+    }
+}
 
-examObj.updateStudentAnswer = function (student) {            
-    exam.studentAnswers[student.userid] = {        
-        id : student.userid,
-        answers : student.answers,
-        
-    };
-    checkAnswerCount ();
+
+examObj.updateStudentAnswer = function (selectAnswer) {   
+    // 학생의 시험 답 하나를 갱싱한다.
+    var studentAnswerInfo = examObj.studentsAnswer[selectAnswer.id];
+    if(!studentAnswerInfo)
+    {
+        // studentAnswer가 없다면 새로 만들어 준다.
+        examObj.studentsAnswer[selectAnswer.id] = {
+            id : selectAnswer.id,   // 학생 아디
+            userAnswers : [],       // 학생이 선택한 번호
+            answers : [],           // bool형. 현재 값이 정답인지 아닌지 미리 계산해서 저장.
+            response : [],          // 학생의 문제 응답률.
+        };
+
+        studentAnswerInfo = examObj.studentsAnswer[selectAnswer.id];
+    }
+    var userAnswers = studentAnswerInfo.userAnswers;
+    userAnswers[selectAnswer.questionNumber] = selectAnswer.answerNumber;
+    studentAnswerInfo.answers[selectAnswer.questionNumber] = examObj.checkAnswer(selectAnswer.questionNumber, selectAnswer.answerNumber);        
+    if(!studentAnswerInfo.response[selectAnswer.questionNumber])
+    {
+        if(null != selectAnswer.answerNumber)
+            studentAnswerInfo.response[selectAnswer.questionNumber] = true;
+    }
 };
 
 
+examObj.updateStudentAnswers = function (examAnswers) {
+    //  학생의 시험 답 전체를 갱신한다.
+    var len = examAnswers.answers.length;
+    for(var questionNumber = 0; questionNumber < len; ++questionNumber) {
+        examObj.updateStudentAnswer ({
+            id : examAnswers.id,
+            questionNumber : questionNumber,
+            answerNumber : examAnswers.answers[questionNumber]
+        }); 
+    }
+};
+
+examObj.updateSubmitStudent = function (submitStudent) {
+    var id = submitStudent.id;
+    let date = new Date();
+    student = examObj.studentsAnswer[id];
+    if(!student.userAnswers)
+        student.userAnswers = {};
+    examObj.submitStudents[id] =  {
+        id : id,
+        userAnswers : student.userAnswers,
+        answers : student.answers,
+        time : date
+    };
+}
+
+
+
+examObj.updateExamResponseStatisticsEach = function (_questionNumber) {
+    const questionLen = examObj.questionCount;
+    const studentCounts = connection.getAllParticipants().length;
+    var responseCount = 0;
+    for(id in examObj.studentsAnswer)
+    {   
+        var student = examObj.studentsAnswer[id];
+        if(student.response[_questionNumber] == true)
+            responseCount += 1;                
+    }
+    setExamState ((_questionNumber + 1), (responseCount / studentCounts) * 100);
+};
+
+
+examObj.updateExamResponseStatistics = function () {
+
+    // 통계값 갱신..
+    const questionLen = examObj.questionCount;
+    for(var currentQuestion = 0; currentQuestion < questionLen; ++currentQuestion) {   
+        examObj.updateExamResponseStatisticsEach (currentQuestion);               
+    }
+};
+
+
+
+
+examObj.updateExamAnswerStatisticsEach = function (_questionNumber) {
+    const questionLen = examObj.questionCount;
+    const studentCounts = connection.getAllParticipants().length;
+    var answerCount = 0;
+    for(id in examObj.studentsAnswer)
+    {   
+        var student = examObj.studentsAnswer[id];
+        if(student.answers[_questionNumber] == true)
+            answerCount += 1;                
+    }
+    setExamState ((_questionNumber + 1), (answerCount / studentCounts) * 100);
+};
+
+
+examObj.updateExamAnswerStatistics = function () {
+
+    // 통계값 갱신..
+    const questionLen = examObj.questionCount;
+    for(var currentQuestion = 0; currentQuestion < questionLen; ++currentQuestion) {   
+        examObj.updateExamAnswerStatisticsEach (currentQuestion);               
+    }
+};
+
+
+
 examObj.receiveExamData = function(_data) {
-    console.log(_data);
    if(_data.examStart) {       
         let examStart = _data.examStart;
         examObj.isStart = true;
@@ -906,15 +1006,22 @@ examObj.receiveExamData = function(_data) {
             // 학생들 시험 제출.   
             submitOMR ();
         }
-    } else if (_data.examAnswerCheck) {
-
+    } 
+    else if (_data.examSelectAnswer) {
+        examObj.receiveSelectExamAnswerFromStudent (_data.examSelectAnswer);
+    }
+    else if(_data.submit) {
+        examObj.receiveSubmit (_data.submit);
     }
 };
 
-examObj.sendExamStart  = function() {
+examObj.sendExamStart  = function(_examTime) {
     if(connection.extra.roomOwner)
     {        
         examObj.isStart = true;
+        examObj.examTime = _examTime;
+        examObj.studentsAnswer = {};
+        examObj.submitStudents = {};
         connection.send({
             exam: {
                 examStart : {
@@ -938,40 +1045,55 @@ examObj.sendExamEnd = function() {
     }
 }
 
-examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _selectNumber) {
-    // 정답...    
-    connection.send ({      
-        exam : {  
-            examAnswerCheck : {
-                questionNumber : _questionNumber,
-                seletNumber : _selectNumber            
+examObj.sendSubmit = function() {
+    //  학생이 선생한테 정답 제출
+    connection.send({
+        exam : {
+            submit : {
+                id : connection.userid,
+                answers : examObj.examAnswer
             }
         }
     });
 };
 
-examObj.receiveSelectExamAnswerFromStudent = function() {
-    // 정답 통계 Update
-    if(connection.extra.roomOwner)
-    {
-        // exam.examAnswer
-    }
-};
 
-examObj.sendSubmit = function() {
-    //  학생이 선생한테 정답 제출
+examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _answerNumber) {
+    //
     connection.send({
         exam : {
-            submit : examObj.answerList
+            examSelectAnswer : {
+                id : connection.userid,
+                questionNumber : (_questionNumber-1), // 번호가 1번부터 할당되기 때문에 -1을 하였다.
+                answerNumber : _answerNumber
+            }
         }
     });
 };
 
-examObj.receiveSubmit = function (exam_answers) {
-    // 학생 정답 확인.
-    if(connection.extra.roomOwner) 
-    {
 
+examObj.receiveSelectExamAnswerFromStudent = function(selectAnswer) {    
+    // 학생으로부터 정답 받았을 때, 처리
+    if(connection.extra.roomOwner)
+    {
+        examObj.updateStudentAnswer ({
+            id : selectAnswer.id,
+            questionNumber : selectAnswer.questionNumber,
+            answerNumber :selectAnswer.answerNumber
+        });
+
+        //examObj.updateExamAnswerStatisticsEach (selectAnswer.questionNumber); // 정답률
+        examObj.updateExamResponseStatisticsEach (selectAnswer.questionNumber); // 응답률
+    }
+};
+
+
+examObj.receiveSubmit = function (submit) {
+    // 학생 정답 확인.
+    if(connection.extra.roomOwner)   {
+        examObj.updateStudentAnswers (submit);  // 최신 기록 저장,     
+        examObj.updateSubmitStudent (submit); 
+        //examObj.updateExamAnswerStatistics ();
     }
 };
 
@@ -1018,9 +1140,10 @@ function setStudentOMR(quesCount, examTime) {
 function submitOMR() {
     clearInterval(m_ExamTimerInterval);
     var studentOMR = getQuestionAnswerList();
-    console.log(studentOMR);
+    examObj.examAnswer = studentOMR;
+  //  console.log(studentOMR);
     
-    // TODO: 서버로 학생 시험 정보 전송
+    examObj.sendSubmit ();
 
     $('#exam-omr').html("");
     $('#exam-board').hide();
@@ -1028,7 +1151,10 @@ function submitOMR() {
 
 // 학생 OMR이 변경됨
 function omrChange(num){
-    console.log(num + "번이 변경됨");
-    
-    // TODO: 서버로 학생 시험 정보 전송
+    // console.log(num + "번이 변경됨");    
+    var questionNumber = num;
+    var answerNumber = $(`input:radio[name='exam-question-${num}']:checked`).val();
+
+    // 선생한테 전송.
+    examObj.sendSelectExamAnswerToTeacher (questionNumber, answerNumber);
 }
