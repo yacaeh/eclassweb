@@ -1635,6 +1635,7 @@ function canvasresize(id){
         prevX: 0,
         prevY: 0,
         mousedown: function(e) {
+            console.log("pen down")
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -1656,6 +1657,7 @@ function canvasresize(id){
             t.prevY = y;
         },
         mouseup: function(e) {
+            console.log('mouse up')
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1800,7 +1802,7 @@ function canvasresize(id){
         onShapeUnSelected: function() {
             this.text = '';
             this.showOrHideTextTools('hide');
-            tempContext.canvas.style.cursor = 'default';
+            // tempContext.canvas.style.cursor = 'default';
 
             if (typeof this.blinkCursorInterval !== 'undefined') {
                 clearInterval(this.blinkCursorInterval);
@@ -2976,6 +2978,9 @@ function canvasresize(id){
                 }
 
                 if (this.id === 'eraser-icon') {
+                    console.log("Eraser click");
+                    document.getElementById("temp-canvas").className = "";
+                    document.getElementById("temp-canvas").classList.add("eraser");
                     cache.strokeStyle = strokeStyle;
                     cache.fillStyle = fillStyle;
                     cache.lineWidth = lineWidth;
@@ -2994,55 +2999,6 @@ function canvasresize(id){
         var toolBox = find('tool-box');
         toolBox.style.height = (innerHeight) + 'px'; // -toolBox.offsetTop - 77
 
-        // function decorateDragLastPath() {
-        //     var context = getContext('drag-last-path');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'DragLastPath');
-        //     };
-        //     image.src = data_uris.dragSingle;
-        // }
-
-        // decorateDragLastPath();
-
-        // if (tools.dragSingle === true) {
-        //     document.getElementById('drag-last-path').style.display = 'block';
-        // }
-
-        // function decorateDragAllPaths() {
-        //     var context = getContext('drag-all-paths');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'DragAllPaths');
-        //     };
-        //     image.src = data_uris.dragMultiple;
-        // }
-
-        // decorateDragAllPaths();
-
-        // if (tools.dragMultiple === true) {
-        //     document.getElementById('drag-all-paths').style.display = 'block';
-        // }
-
-        // function decorateLine() {
-        //     var context = getContext('line');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'Line');
-        //     };
-        //     image.src = data_uris.line;
-        // }
-
-        // if (tools.line === true) {
-        //     decorateLine();
-        //     document.getElementById('line').style.display = 'block';
-        // }
 
         function decorateUndo() {
             var context = getContext('undo');
@@ -3069,58 +3025,6 @@ function canvasresize(id){
             decorateUndo();
             document.getElementById('undo').style.display = 'block';
         }
-
-        // function decorateArrow() {
-        //     var context = getContext('arrow');
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //         bindEvent(context, 'Arrow');
-        //     };
-        //     image.src = data_uris.arrow;
-        // }
-
-        // if (tools.arrow === true) {
-        //     decorateArrow();
-        //     document.getElementById('arrow').style.display = 'block';
-        // }
-
-        // function decoreZoomUp() {
-        //     var context = getContext('zoom-up');
-        //     // zoomHandler.icons.up(context);
-        //     addEvent(context.canvas, 'click', function() {
-        //         zoomHandler.up();
-        //     });
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //     };
-        //     image.src = data_uris.zoom_in;
-        // }
-
-        // function decoreZoomDown() {
-        //     var context = getContext('zoom-down');
-        //     // zoomHandler.icons.down(context);
-        //     addEvent(context.canvas, 'click', function() {
-        //         zoomHandler.down();
-        //     });
-
-        //     var image = new Image();
-        //     image.onload = function() {
-        //         context.drawImage(image, 4, 4, 32, 32);
-        //     };
-        //     image.src = data_uris.zoom_out;
-        // }
-
-        // if (tools.zoom === true) {
-        //     decoreZoomUp();
-        //     decoreZoomDown();
-
-        //     document.getElementById('zoom-up').style.display = 'block';
-        //     document.getElementById('zoom-down').style.display = 'block';
-        // }
 
         function decoratePencil() {
 
@@ -3200,7 +3104,9 @@ function canvasresize(id){
 
             addEvent(canvas, 'click', function() {
                 hideContainers();
-                console.log('Pencil');
+                console.log('Pencil Click');
+                document.getElementById("temp-canvas").className = "";
+                document.getElementById("temp-canvas").classList.add("pen");
 
                 pencilContainer.style.display = 'block';
                 pencilContainer.style.top = (canvas.offsetTop + 1) + 'px';
@@ -3306,7 +3212,9 @@ function canvasresize(id){
 
             addEvent(canvas, 'click', function() {
                 hideContainers();
-                console.log('Marker')
+                console.log('Marker Click')
+                document.getElementById("temp-canvas").className = "";
+                document.getElementById("temp-canvas").classList.add("marker");
 
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
@@ -3403,154 +3311,6 @@ function canvasresize(id){
         if (tools.pdf === true) {
             decoratePDF();
             document.getElementById('pdf-icon').style.display = 'block';
-        }
-
-        function decorateArc() {
-            var context = getContext('arc');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Arc');
-            };
-            image.src = data_uris.arc;
-        }
-
-        if (tools.arc === true) {
-            decorateArc();
-            document.getElementById('arc').style.display = 'block';
-        }
-
-        function decorateRect() {
-            var context = getContext('rectangle');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Rectangle');
-            };
-            image.src = data_uris.rectangle;
-        }
-
-        if (tools.rectangle === true) {
-            decorateRect();
-            document.getElementById('rectangle').style.display = 'block';
-        }
-
-        function decorateQuadratic() {
-            var context = getContext('quadratic-curve');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'QuadraticCurve');
-            };
-            image.src = data_uris.quadratic;
-        }
-
-        if (tools.quadratic === true) {
-            decorateQuadratic();
-            document.getElementById('quadratic-curve').style.display = 'block';
-        }
-
-        function decorateBezier() {
-            var context = getContext('bezier-curve');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-                bindEvent(context, 'Bezier');
-            };
-            image.src = data_uris.bezier;
-        }
-
-        if (tools.bezier === true) {
-            decorateBezier();
-            document.getElementById('bezier-curve').style.display = 'block';
-        }
-
-        function tempStrokeTheLine(context, width, mx, my, lx, ly) {
-            context.beginPath();
-            context.lineWidth = width;
-            context.moveTo(mx, my);
-            context.lineTo(lx, ly);
-            context.stroke();
-        }
-
-        function decorateLineWidth() {
-            var context = getContext('line-width');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-            };
-            image.src = data_uris.lineWidth;
-
-            var lineWidthContainer = find('line-width-container'),
-                lineWidthText = find('line-width-text'),
-                btnLineWidthDone = find('line-width-done'),
-                h1 = document.getElementsByTagName('h1')[0],
-                canvas = context.canvas;
-
-            addEvent(canvas, 'click', function() {
-                hideContainers();
-                console.log('1')
-
-                lineWidthContainer.style.display = 'block';
-                lineWidthContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                lineWidthContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
-
-                lineWidthText.focus();
-            });
-
-            addEvent(btnLineWidthDone, 'click', function() {
-                lineWidthContainer.style.display = 'none';
-                lineWidth = lineWidthText.value;
-            });
-        }
-
-        if (tools.lineWidth === true) {
-            decorateLineWidth();
-            document.getElementById('line-width').style.display = 'block';
-        }
-
-        function decorateColors() {
-            var context = getContext('colors');
-
-            var image = new Image();
-            image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
-            };
-            image.src = data_uris.colorsPicker;
-
-            var colorsContainer = find('colors-container'),
-                strokeStyleText = find('stroke-style'),
-                fillStyleText = find('fill-style'),
-                btnColorsDone = find('colors-done'),
-                h1 = document.getElementsByTagName('h1')[0],
-                canvas = context.canvas;
-
-            addEvent(canvas, 'click', function() {
-                hideContainers();
-                console.log('1')
-
-                colorsContainer.style.display = 'block';
-                colorsContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                colorsContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
-
-                strokeStyleText.focus();
-            });
-
-            addEvent(btnColorsDone, 'click', function() {
-                colorsContainer.style.display = 'none';
-                strokeStyle = strokeStyleText.value;
-                fillStyle = fillStyleText.value;
-            });
-        }
-
-        if (tools.colorsPicker === true) {
-            decorateColors();
-            document.getElementById('colors').style.display = 'block';
         }
 
         function decorateClearCanvas() {
@@ -3685,7 +3445,7 @@ function canvasresize(id){
         };
 
         var cache = is;
-
+        
         if (cache.isLine) lineHandler.mousedown(e);
         else if (cache.isArc) arcHandler.mousedown(e);
         else if (cache.isRectangle) rectHandler.mousedown(e);
