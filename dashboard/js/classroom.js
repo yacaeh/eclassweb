@@ -582,29 +582,18 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             });
     } else {
         console.log("try joining!");
-        connection.DetectRTC.load(function() { 
             SetStudent();
 
-            if (!connection.DetectRTC.hasMicrophone) {
-                connection.mediaConstraints.audio = false;
-                connection.session.audio = false;
-                console.log("user has no mic!");
-                alert("마이크가 없습니다!");
-            }
-        
-            if (!connection.DetectRTC.hasWebcam) {
-                connection.mediaConstraints.video = false;
-                connection.session.video = false;
-                console.log("user has no cam!");
-                alert("캠이 없습니다!");
-                connection.session.oneway = true;
-                connection.sdpConstraints.mandatory = {
-                    OfferToReceiveAudio: false,
-                    OfferToReceiveVideo: false
-                };
-    
-            }
-        });    
+            // Disable student media devices on joining
+            connection.mediaConstraints.video = false;
+            connection.session.video = false;
+            connection.mediaConstraints.audio = false;
+            connection.session.audio = false;
+            connection.session.oneway = true;
+            connection.sdpConstraints.mandatory = {
+                OfferToReceiveAudio: false,
+                OfferToReceiveVideo: false
+            };
      
         connection.join({sessionid:params.sessionid,
                          userid: connection.channel,
