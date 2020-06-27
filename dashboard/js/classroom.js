@@ -162,7 +162,7 @@ connection.onmessage = function (event) {
     }
 
     if(event.data.exam) {
-        receiveExamData(event.data.exam);
+        examObj.receiveExamData(event.data.exam);
         return;
     }
 
@@ -759,7 +759,7 @@ $('#exam-start').toggle(function () {
     $('#exam-start').attr('class', 'btn btn-danger');
     $('#exam-start').html('종료');
 
-    sendExamStart ();
+    examObj.sendExamStart ();
 
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
@@ -773,7 +773,7 @@ $('#exam-start').toggle(function () {
     $('#exam-start').attr('class', 'btn btn-primary');
     $('#exam-start').html('시작');
     clearInterval(m_ExamTimerInterval);
-    sendExamEnd ();
+    examObj.sendExamEnd ();
     $('#exam-time').val(parseInt(m_ExamTime / 60))
     // TODO : 학생들에게 시험 종료 알려줌
 });
@@ -831,17 +831,48 @@ var examObj = {
     questionCount : 0,
     currentExamTime : 0,
     examTime : 0,        // (minute)
-    examAnswer : []      // question 정답
+    examAnswer : [],      // question 정답
+    studentsAnswer : {}  // 학생들 정답 저장.
+    /*
+        학생별 저장값    
+        studentsAnswer : {                        
+            id, answers, count
+        }
+      */
+};
+
+// 정답 확인.
+examObj.checkAnswerCount = function (studentAnswers) {
+    var len = examObj.examAnswer.length;
+    if(studentAnswers.length != len)
+    {
+        console.error('문제와 답의 개수가 맞지 않습니다.');
+        return '문제와 답의 개수가 맞지 않습니다.';
+    }
+
+    var equalCount = 0;
+    for(var i = 0; i < len; ++i)
+    {
+        if(examObj.examAnswer[len] == studentAnswers[i])
+            equalCount += 1;        
+    }
+    return equalCount;
 };
 
 
+examObj.updateStudentAnswer = function (student) {            
+    exam.studentAnswers[student.userid] = {        
+        id : student.userid,
+        answers : student.answers,
+        
+    };
+    checkAnswerCount ();
+};
 
-function receiveExamData (_data) {
+
+examObj.receiveExamData = function(_data) {
     console.log(_data);
-    if(_data.examAnswerList) {
-        examObj.questionCount = _data.examAnswerList.questionCount;
-    }
-    else if(_data.examStart) {       
+   if(_data.examStart) {       
         let examStart = _data.examStart;
         examObj.isStart = true;
         examObj.examTime = examStart.examTime;
@@ -850,34 +881,22 @@ function receiveExamData (_data) {
 
         setStudentOMR (examObj.questionCount, examObj.examTime);
     }
-    else if(_data.examEnd) {
-        examObj.isStart = false;
-
-    }else if (_data.examAnswerCheck) {
+    else if(_data.examEnd) {    
+        // 시험 종료
+        if(examObj.isStart)    
+        {
+            examObj.isStart = false;     
+            // 학생들 시험 제출.   
+            submitOMR ();
+        }
+    } else if (_data.examAnswerCheck) {
 
     }
 };
 
-
-function sendExamAnswerToStudents () {
-    if(connection.extra.roomOwner === true) {        
-        connection.send ({
-           exam : {            
-                examAnswerList : {
-                    questionCount : examObj.questionCount,
-                    // exameTime : examObj.exameTime
-                }       
-           }
-        });
-    }
-}
-
-
-function sendExamStart () {
-
+examObj.sendExamStart  = function() {
     if(connection.extra.roomOwner)
     {        
-        sendExamAnswerToStudents ();
         examObj.isStart = true;
         connection.send({
             exam: {
@@ -890,7 +909,7 @@ function sendExamStart () {
     }
 }
 
-function sendExamEnd () {
+examObj.sendExamEnd = function() {
     if(connection.extra.roomOwner)
     {
         examObj.isStart = false;
@@ -902,7 +921,7 @@ function sendExamEnd () {
     }
 }
 
-function sendSelectExamAnswerToTeacher (_questionNumber, _selectNumber) {
+examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _selectNumber) {
     // 정답...    
     connection.send ({      
         exam : {  
@@ -914,15 +933,36 @@ function sendSelectExamAnswerToTeacher (_questionNumber, _selectNumber) {
     });
 };
 
-function receiveSelectExamAnswerFromStudent () {
-    // 정답 통계
+examObj.receiveSelectExamAnswerFromStudent = function() {
+    // 정답 통계 Update
     if(connection.extra.roomOwner)
     {
         // exam.examAnswer
     }
 };
 
-// TODO: 선생님이 이 함수를 호출해줘야함
+examObj.sendSubmit = function() {
+    //  학생이 선생한테 정답 제출
+    connection.send({
+        exam : {
+            submit : examObj.answerList
+        }
+    });
+};
+
+examObj.receiveSubmit = function (exam_answers) {
+    // 학생 정답 확인.
+    if(connection.extra.roomOwner) 
+    {
+
+    }
+};
+
+examObj.receiveSubmitConfirmToTeacher = function () {
+    // 시험 정답 제출 후, callback
+};
+
+
 // 학생들 OMR 세팅 
 function setStudentOMR(quesCount, examTime) {
     $("#exam-omr").show();
