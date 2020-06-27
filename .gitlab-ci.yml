@@ -68,6 +68,7 @@ deploy-production:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 700 ~/.ssh/id_rsa
     - eval "$(ssh-agent -s)"
+    - ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 --decode)
     - ssh-add ~/.ssh/id_rsa
     - ssh-keyscan -H '$REMOTE_HOST' >> ~/.ssh/known_hosts
     - ssh-keyscan $REMOTE_HOST | sort -u - ~/.ssh/known_hosts -o ~/.ssh/known_hosts
