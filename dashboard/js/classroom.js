@@ -43,11 +43,15 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.icons.pencil = '/dashboard/img/pen.png'
-designer.icons.marker = '/dashboard/img/pen2.png'
-designer.icons.eraser = '/dashboard/img/eraser.png'
-designer.icons.clearCanvas = '/dashboard/img/refresh.png'
-designer.icons.pdf = '/dashboard/img/iconfinder_File.png'
+designer.icons.pencil = '/dashboard/img/pen.png';
+designer.icons.marker = '/dashboard/img/pen2.png';
+designer.icons.eraser = '/dashboard/img/eraser.png';
+designer.icons.clearCanvas = '/dashboard/img/refresh.png';
+designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
+designer.icons.on = '/dashboard/img/view_on.png';
+designer.icons.off = '/dashboard/img/view_off.png';
+
+console.log(designer.icons);
 
 designer.addSyncListener(function(data) {
     connection.send(data);
@@ -60,7 +64,7 @@ designer.setTools({
     image: true,
     pdf: false,
     eraser: true,
-    line: false,
+    line: true,
     arrow: false,
     dragSingle: false,
     dragMultiple: false,
@@ -73,6 +77,7 @@ designer.setTools({
     lineWidth: false,
     colorsPicker: false,
     clearCanvas: true,
+    onoff: true,
     code: false,
     undo: true,
 });
