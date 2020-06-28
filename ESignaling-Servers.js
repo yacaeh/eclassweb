@@ -15,7 +15,7 @@ var pushLogs = require('rtcmulticonnection-server/node_scripts/pushLogs.js');
 // const strings
 var CONST_STRINGS = require('rtcmulticonnection-server/node_scripts/CONST_STRINGS.js');
 
-var isAdminAuthorized = require('rtcmulticonnection-server/node_scripts//verify-admin.js');
+var isAdminAuthorized = require('rtcmulticonnection-server/node_scripts/verify-admin.js');
 
 module.exports = exports = function(socket, config) {
     config = config || {};
@@ -264,7 +264,7 @@ module.exports = exports = function(socket, config) {
             try {
                 if (!ScalableBroadcast) {
                     // path to scalable broadcast script must be accurate
-                    ScalableBroadcast = require('./Scalable-Broadcast.js');
+                    ScalableBroadcast = require('rtcmulticonnection-server/node_scripts/Scalable-Broadcast.js');
                 }
                 ScalableBroadcast._ = ScalableBroadcast(config, socket, params.maxRelayLimitPerUser);
             } catch (e) {
