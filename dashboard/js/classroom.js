@@ -794,7 +794,6 @@ var m_ExamTime; //
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
     m_QuesCount = $('#exam-question-count').val();
-    examObj.questionCount = m_QuesCount;
     var answerList = getQuestionAnswerList();
     $('#exam-qustion-list').html("");
     for (var i = 1; i <= m_QuesCount; i++) {
@@ -807,7 +806,6 @@ $('#exam-setting-apply').click(function () {
 // 문제 1개 추가
 $('#exam-add-question').click(function () {
     apeendQuestion(++m_QuesCount);  
-    ++examObj.questionCount;
     $('#exam-question-count').val(m_QuesCount);
 });
 
