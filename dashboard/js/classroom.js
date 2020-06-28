@@ -1080,20 +1080,17 @@ $(window).on('beforeunload', function () {
 // 모달로 만들어서 pdf 선택 해야함
 // 로드시 글자깨짐 현상 해결 해야함
 // 소켓통신으로 제어 필요
-$('#canvas-controller').hide();
-
-$('#top_pdf').click(function () {
-  $('#canvas-controller').show();
-});
 
 let isFileViewer = false;
 $('#top_pdf').click(function () {
   console.log(isFileViewer);
   if (isFileViewer === false) {
     loadFileViewer();
+    $('#canvas-controller').show();
     isFileViewer = true;
   } else {
     unloadFileViewer();
+    $('#canvas-controller').hide();
     isFileViewer = false;
   }
 });

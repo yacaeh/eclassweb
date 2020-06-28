@@ -128,11 +128,31 @@
     <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
     <!--pdf controller-->
     <div id="canvas-controller">
-      <button id="prev">Previous</button>
-      <button id="next">Next</button>
-      &nbsp; &nbsp;
-      <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-      <button id="close-pdf">close</button>
+      <div class="upper_controller">
+        <label> File Name </label>
+        <button id="close-pdf"> V </button>
+      </div>
+      <div class="thumbnail_list">
+        <div class="thumbnail">
+          <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+        </div>
+        <div class="thumbnail">
+          <img class="thum_img_selected" src="/dashboard/newimg/thumb.jpg">
+        </div>
+        <div class="thumbnail">
+          <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+        </div>
+        <div class="thumbnail">
+          <img class="thum_img"   src="/dashboard/newimg/thumb.jpg">
+        </div>
+        
+      </div>
+      <div class="bottom_controller">
+        <button id="viewer_start"> << </button>
+        <button id="prev"> < </button>
+        <button id="next"> > </button>
+        <button id="viewer_end"> >> </button>
+      </div>
     </div>
 
     <script src="/dashboard/js/babylon.js"></script>
