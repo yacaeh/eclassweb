@@ -124,12 +124,21 @@
 
             <canvas id="temp-stream-canvas"></canvas>
         </div>
-        <!-- View State -->
-        <div id="exam-state" style="display: none; height: 30%; overflow-y: auto;">
-          <!-- 여기에 상태가 추가됨 -->
-        </div>
-      </div>
+    </article>
 
+    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <!--pdf controller-->
+    <div id="canvas-controller">
+      <button id="prev">Previous</button>
+      <button id="next">Next</button>
+      &nbsp; &nbsp;
+      <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+      <button id="close-pdf">close</button>
+    </div>
+
+    <script src="/dashboard/js/babylon.js"></script>
+    <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
+    <script src="/dashboard/js/pep.js"></script>
 
     <script src = /dashboard/js/3d_render.js></script>
 
@@ -154,33 +163,4 @@
 </body>
 
 
-      <!-- Conversation Panel -->
-      <div class="conversation-panel">
-        <div id="conversation-panel"></div>
-        <div id="key-press">
-          <span id="key-press-span"></span>
-          <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
-        </div>
-        <textarea id="txt-chat-message"></textarea>
-      </div>
-
-      <canvas id="temp-stream-canvas"></canvas>
-    </div>
-  </article>
-
-  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-  <!--pdf controller-->
-  <div id="canvas-controller">
-    <button id="prev">Previous</button>
-    <button id="next">Next</button>
-    &nbsp; &nbsp;
-    <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-    <button id="close-pdf">close</button>
-  </div>
-
-  <script src="/dashboard/js/babylon.js"></script>
-  <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
-  <script src="/dashboard/js/pep.js"></script>
-  <script src="/dashboard/js/babylonjs.loaders.js"></script>
-
-  <script src= /dashboard/js/3d_render.js> </script> </body> </html>
+</html>
