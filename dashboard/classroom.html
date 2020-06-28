@@ -30,6 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>
     <script src="/dashboard/js/examObj.js"></script>
     <script defer src="/dashboard/js/classroom.js"></script>
+</head>
 
 <body>
 
@@ -82,30 +83,28 @@
             <!-- View Cam -->
             <video style="display: none;"  id="main-video" controls playsinline autoplay></video>
 
-            <div id="exam-board"
-                style="display: none; position: fixed; top:5%; bottom: 0; right: 0; width: 20%; background-color: white;">
+            <div id="exam-board">
                 <!-- 테스트 구조 잡는 코딩 시험 생성 -->
                 <div id="exam-setting-bar" style="display: none;">
-                    <div style="display: flex;">
-                        <b>답안지</b>
+                  <div style="background-color: white; text-align: center; border-bottom:gray solid 1px;">문제출제</div>
+                    <div style="display: flex; background-color: #eff1f0; border-bottom:gray solid 1px;">
+                        <label style="flex: 1.5; text-align: center; margin-top: 12px;" for="exam-question-count">문항수</label>
+                        <input style="flex: 1.2; padding: 0px; margin: 5px 2px 5px 5px; text-align: center; "  id="exam-question-count" class="form-control" type="number">
+                        <label style="flex: 2; text-align: right; margin-top: 12px; margin-right: 10px;"  for="exam-time">시간</label>
+                        <input style="flex: 1.2; padding: 0px; margin: 5px;  text-align: center; "  id="exam-time" class="form-control" type="text" placeholder="(분)">
+                        <button style="flex: 1.5; padding: 0px; margin: 8px 20px 8px 50px;"  id="exam-setting-apply" class="btn btn-exam"><b>확인</b></button>
+                      </div>
 
-                        <label for="exam-question-count">문제수</label>
-                        <input id="exam-question-count" class="form-control" type="number" style="width:70px;">
-                        <button id="exam-setting-apply" class="btn btn-primary">적용</button>
-
-                        <label for="exam-time">시간</label>
-                        <input id="exam-time" class="form-control" type="text" placeholder="10분" style="width:70px;">
-                        <button id="exam-start" class="btn btn-info">시작</button>
-                    </div>
-                    <div id="exam-qustion-list" style="height: 300px; overflow-y: auto;"></div>
-                    <button id="exam-add-question" class="btn btn-primary" style="width: 100%;">문제 추가</button>
+                      <div id="exam-qustion-list" style="max-height: 50vh; overflow-y: auto; border-bottom: gray solid 1px; "></div>
+                      <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
+                      <button id="exam-start" class="btn btn-exam" style="width: 80%; margin:10%; font-weight:bold;">시험 시작</button>
                 </div>
 
                 <div id="exam-omr" style="display: none;">
                     
                 </div>
                 <!-- View State -->
-                <div id="exam-state" style="display: none; height: 30%; overflow-y: auto;">
+                <div id="exam-state" style="display: none; max-height: 50vh; overflow-y: auto;">
                     <!-- 여기에 상태가 추가됨 -->
                 </div>
             </div>
