@@ -4,146 +4,142 @@
 <html lang="en" dir="ltr">
 
 <head>
-    <link rel="stylesheet" href="/dashboard/css/classroom.css">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title id="class-title">E클래스 000 반 00 수업</title>
-    <meta name="description"
-        content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
+  <link rel="stylesheet" href="/dashboard/css/classroom.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title id="class-title">E클래스 000 반 00 수업</title>
+  <meta name="description"
+    content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
 
-    <link rel="shortcut icon" href="/dashboard/logo.png">
+  <link rel="shortcut icon" href="/dashboard/logo.png">
 
-    <script src="/dashboard/js/jquery.min.js"></script>
-    <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
-    <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
-    <script src="/dist/RTCMultiConnection.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/node_modules/fbr/FileBufferReader.js"></script>
-    <script src="/dashboard/js/xlsx.full.min.js"></script>
-    <script src="/dashboard/js/FileSaver.min.js"></script>
+  <script src="/dashboard/js/jquery.min.js"></script>
+  <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
+  <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
+  <script src="/dist/RTCMultiConnection.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/node_modules/fbr/FileBufferReader.js"></script>
+  <script src="/dashboard/js/xlsx.full.min.js"></script>
+  <script src="/dashboard/js/FileSaver.min.js"></script>
 
-    <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
-    <script src="/node_modules/canvas-designer/canvas-designer-widget.js"></script>
-    <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
-    <script src="/dashboard/js/emojionearea.min.js"></script>
-    <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>
-    <script defer src="/dashboard/js/classroom.js"></script>
+  <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
+  <script src="/node_modules/canvas-designer/canvas-designer-widget.js"></script>
+  <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
+  <script src="/dashboard/js/emojionearea.min.js"></script>
+  <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>
+  <script defer src="/dashboard/js/classroom.js"></script>
 
 <body>
 
-    <header id="header">
-        <img id="icon_exit">
-        <img id="top_logo">
+  <header id="header">
+    <img id="icon_exit">
+    <img id="top_logo">
 
-        <span id="who-am-i"></span>
-        <span id="my-name"></span>
-        <span id="session-id"></span>
+    <span id="who-am-i"></span>
+    <span id="my-name"></span>
+    <span id="session-id"></span>
 
-        <div class="icons">
-            <a href="/ViewerJS/#../dashboard/test.pdf">test</a>
-            <img class="top_icon" id="top_attach-file">
-            <img class="top_icon" id="top_all_controll">
-            <img class="top_icon" id="top_load_book">
-            <img class="top_icon" id="top_test" >
-            <img class="top_icon" id="top_alert">
-            <img class="top_icon" id="top_share_screen"> 
-            <img class="top_icon top_3d_off" id="top_3d">
-            <img class="top_icon" id="top_pdf">
-            <img class="top_icon" id="top_share_video">
-            <img class="top_icon" id="top_record_video">
-            <span class="time">
-                <span id="current-day">0000-00-00</span></br>
-                <span id="current-time">00:00:00</span>
-            </span>
-        </div>
-
-    </header>
-
-    <article id="article">
-        <div id="widget-container"></div>
-        <canvas id="renderCanvas" style="display: none;"></canvas>
-
-        <video id="screen-viewer" controls playsinline autoplay></video>
-        
-        <div class="lwindow">
-            <div class="for_teacher" style="display: none;">
-                <span id="view_student" class='view_type view_type-on'>Student</span>
-                <span id="vidw_cam" class='view_type'>Camera</span>
-                <!-- <span id="view_result" class='view_type'>Result</span> -->
-                <span class="nos">
-                    <span id="nos"></span>
-                    <img src="/dashboard/img/man_icon.png">
-                </span>
-                <div id="student_list">
-                </div>
-            </div>
-            <!-- View Student  -->
-            <!-- View Cam -->
-            <video style="display: none;"  id="main-video" controls playsinline autoplay></video>
-
-            <div id="exam-board"
-                style="display: none; position: fixed; top:5%; bottom: 0; right: 0; width: 20%; background-color: white;">
-                <!-- 테스트 구조 잡는 코딩 시험 생성 -->
-                <div id="exam-setting-bar" style="display: none;">
-                    <div style="display: flex;">
-                        <b>답안지</b>
-
-                        <label for="exam-question-count">문제수</label>
-                        <input id="exam-question-count" class="form-control" type="number" style="width:70px;">
-                        <button id="exam-setting-apply" class="btn btn-primary">적용</button>
-
-                        <label for="exam-time">시간</label>
-                        <input id="exam-time" class="form-control" type="text" placeholder="10분" style="width:70px;">
-                        <button id="exam-start" class="btn btn-info">시작</button>
-                    </div>
-                    <div id="exam-qustion-list" style="height: 300px; overflow-y: auto;"></div>
-                    <button id="exam-add-question" class="btn btn-primary" style="width: 100%;">문제 추가</button>
-                </div>
-
-                <div id="exam-omr" style="display: none;">
-                    
-                </div>
-                <!-- View State -->
-                <div id="exam-state" style="display: none; height: 30%; overflow-y: auto;">
-                    <!-- 여기에 상태가 추가됨 -->
-                </div>
-            </div>
-
-
-
-
-            <!-- Conversation Panel -->
-            <div class="conversation-panel">
-                <div id="conversation-panel"></div>
-                <div id="key-press">
-                    <span id="key-press-span"></span>
-                    <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
-                </div>
-                <textarea id="txt-chat-message"></textarea>
-            </div>
-
-            <canvas id="temp-stream-canvas"></canvas>
-        </div>
-    </article>
-
-    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-    <!--pdf controller-->
-    <div id="canvas-controller">
-      <button id="prev">Previous</button>
-      <button id="next">Next</button>
-      &nbsp; &nbsp;
-      <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-      <button id="close-pdf">close</button>
+    <div class="icons">
+      <a href="/ViewerJS/#../dashboard/test.pdf">test</a>
+      <img class="top_icon" id="top_attach-file">
+      <img class="top_icon" id="top_all_controll">
+      <img class="top_icon" id="top_load_book">
+      <img class="top_icon" id="top_test">
+      <img class="top_icon" id="top_alert">
+      <img class="top_icon" id="top_share_screen">
+      <img class="top_icon top_3d_off" id="top_3d">
+      <img class="top_icon" id="top_pdf">
+      <img class="top_icon" id="top_share_video">
+      <img class="top_icon" id="top_record_video">
+      <span class="time">
+        <span id="current-day">0000-00-00</span></br>
+        <span id="current-time">00:00:00</span>
+      </span>
     </div>
 
-    <script src="/dashboard/js/babylon.js"></script>
-    <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
-    <script src="/dashboard/js/pep.js"></script>
-    <script src="/dashboard/js/babylonjs.loaders.js"></script>
+  </header>
 
-    <script src = /dashboard/js/3d_render.js></script>
-</body>
+  <article id="article">
+    <div id="widget-container"></div>
+    <canvas id="renderCanvas" style="display: none;"></canvas>
+
+    <video id="screen-viewer" controls playsinline autoplay></video>
+
+    <div class="lwindow">
+      <div class="for_teacher" style="display: none;">
+        <span id="view_student" class='view_type view_type-on'>Student</span>
+        <span id="vidw_cam" class='view_type'>Camera</span>
+        <!-- <span id="view_result" class='view_type'>Result</span> -->
+        <span class="nos">
+          <span id="nos"></span>
+          <img src="/dashboard/img/man_icon.png">
+        </span>
+        <div id="student_list">
+        </div>
+      </div>
+      <!-- View Student  -->
+      <!-- View Cam -->
+      <video style="display: none;" id="main-video" controls playsinline autoplay></video>
+
+      <div id="exam-board"
+        style="display: none; position: fixed; top:5%; bottom: 0; right: 0; width: 20%; background-color: white;">
+        <!-- 테스트 구조 잡는 코딩 시험 생성 -->
+        <div id="exam-setting-bar" style="display: none;">
+          <div style="display: flex;">
+            <b>답안지</b>
+
+            <label for="exam-question-count">문제수</label>
+            <input id="exam-question-count" class="form-control" type="number" style="width:70px;">
+            <button id="exam-setting-apply" class="btn btn-primary">적용</button>
+
+            <label for="exam-time">시간</label>
+            <input id="exam-time" class="form-control" type="text" placeholder="10분" style="width:70px;">
+            <button id="exam-start" class="btn btn-info">시작</button>
+          </div>
+          <div id="exam-qustion-list" style="height: 300px; overflow-y: auto;"></div>
+          <button id="exam-add-question" class="btn btn-primary" style="width: 100%;">문제 추가</button>
+        </div>
+
+        <div id="exam-omr" style="display: none;">
+
+        </div>
+        <!-- View State -->
+        <div id="exam-state" style="display: none; height: 30%; overflow-y: auto;">
+          <!-- 여기에 상태가 추가됨 -->
+        </div>
+      </div>
 
 
-</html>
+
+
+      <!-- Conversation Panel -->
+      <div class="conversation-panel">
+        <div id="conversation-panel"></div>
+        <div id="key-press">
+          <span id="key-press-span"></span>
+          <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
+        </div>
+        <textarea id="txt-chat-message"></textarea>
+      </div>
+
+      <canvas id="temp-stream-canvas"></canvas>
+    </div>
+  </article>
+
+  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <!--pdf controller-->
+  <div id="canvas-controller">
+    <button id="prev">Previous</button>
+    <button id="next">Next</button>
+    &nbsp; &nbsp;
+    <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+    <button id="close-pdf">close</button>
+  </div>
+
+  <script src="/dashboard/js/babylon.js"></script>
+  <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
+  <script src="/dashboard/js/pep.js"></script>
+  <script src="/dashboard/js/babylonjs.loaders.js"></script>
+
+  <script src= /dashboard/js/3d_render.js> </script> </body> </html>
