@@ -197,20 +197,14 @@ connection.onmessage = function(event) {
         }
         return;
     }
-
-    if(event.data.alert) {
-        alert('receive alert');         
-        timeHandler = setTimeout (alertConfirm, 1000);
+    
+    if(event.data.alert) {     
+        classroomInfo.alert.receivAlert ();    
         return;    
     }
 
-    if(event.data.alertConfirm) {        
-        if(checkRoomOwner())
-        {                  
-            console.log(connection.getAllParticipants());
-            // 체크 알림...
-            //console.log(event.data.alertConfirm);            
-        }
+    if(event.data.alertResponse) {     
+        classroomInfo.alert.receiveAlertResponse (event.data.alertResponse);               
         return;
     };
 
@@ -220,86 +214,11 @@ connection.onmessage = function(event) {
         return;
     }
 
-
     designer.syncData(event.data);
 };
 
 
-connection.extra.classRoom = {
-    allControl : false,
-    shareScreen : false,
-    share3D : false,
-    exam : {
-        // 문항수
-        // 시간
-    }
-};
-
-
-
-var timeHandler;    // 임시...
-
-function alertConfirm () {           
-    connection.send({
-        alertConfirm : connection.userid
-    }); 
-    clearTimeout(timeHandler);    
-};
-
-
-function checkRoomOwner () {
-
-    return connection.extra.roomOwner;
-};
-
-
-$('#top_all_controll').click ( () =>  {
-    if(checkRoomOwner()) {      
-        var currentAllControlState = !connection.extra.classRoom.allControl;
-        connection.extra.classRoom.allControl = currentAllControlState;
-        connection.send({
-            allControl : currentAllControlState
-        });
-    }
-});
-
-$('#top_load_book').click ( () =>  {
-    console.log('top_load_book');  
-});
-
-$('#top_test').click ( () => {
-        console.log('top_test');  
-});
-
-$('#top_alert').click ( () => {
-    if(checkRoomOwner())    {        
-        // get students numbers        
-        connection.send ({
-            alert : true
-        });
-    }
-    else
-    {
-        console.log('not room owner');
-    }
-});
-
-$('#top_3d').click ( () => {
-    console.log('top_3d');  
-});
-
-$('#top_share_video').click ( () => {
-    console.log('top_share_video');  
-});
-
-$('#top_record_video').click ( () => {
-    console.log('top_record_video');  
-});
-
-
-
 // extra code
-
 connection.onstream = function(event) {
     console.log("onstream!");
     if (event.stream.isScreen && !event.stream.canvasStream) {
@@ -1283,6 +1202,19 @@ function alertBox(message, title, callback_yes, callback_no) {
     $('#alert-box').fadeIn(300);
 }
 
+
 $('#top_alert').click(function () {
-    alertBox("학생들에게 알림을 보내겠습니까?", "알림", null, null);
+    classroomInfo.alert.sendAlert ();
+});
+
+
+// 학생들 제어하기 버튼
+$('#top_all_controll').click ( () =>  {
+    // if(connection.extra.roomOwner) {      
+    //     var currentAllControlState = !connection.extra.classRoom.allControl;
+    //     connection.extra.classRoom.allControl = currentAllControlState;
+    //     connection.send({
+    //         allControl : currentAllControlState
+    //     });
+    // }
 });
