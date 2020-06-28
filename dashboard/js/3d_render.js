@@ -36,9 +36,16 @@ var createScene = function () {
     });
 
     setInterval(function () {
-        camera.position = new BABYLON.Vector3.Lerp(camera.position,newPosition,0.2);
-        camera.absoluteRotation = new BABYLON.Vector3.Lerp(camera.position,newRotation,0.2);
-        
+        if(camera !== null)
+        {
+            if(classroomInfo.allControl == true)
+            {
+            if(newPosition !== undefined)
+                camera.position = new BABYLON.Vector3.Lerp(camera.position,newPosition,0.2);
+            if(newRotation !== undefined)
+                camera.absoluteRotation = new BABYLON.Vector3.Lerp(camera.position,newRotation,0.2);
+            }
+        }
     }, 10);
 
     scene.onPointerObservable.add((pointerInfo) => {
@@ -110,15 +117,17 @@ var rtime;
 var timeout = false;
 var delta = 400;
 
+var top_3d_render_jthis;
 function _3DCanvasFunc(){
-    $("#top_3d").click(function(){
+    top_3d_render_jthis = $("#top_3d");
+    top_3d_render_jthis.click(function(){
         //_3dcanvas.toggle();
         var visible = _3dcanvas.is(':visible');
-        var jthis = $(this);
+       
     
         if(params.open == "true")
         {
-            modelEnable(jthis,!visible,true);
+            modelEnable(top_3d_render_jthis,!visible,true);
         }
     })
 
@@ -144,6 +153,7 @@ function _3DCanvasFunc(){
 
 function modelEnable(jthis,visible, send)
 {
+    classroomInfo.share3D = visible;
     if (visible) {
         _3dcanvas.show();
         //_3dcanvas.style.display = 'inline-block';

@@ -3,8 +3,7 @@ classroomInfo = {
     allControl : false,
     shareScreen : false,
     share3D : false,    
-    students : {},
-    alert : {}
+    students : {},   
     /*
         
         alert : {
@@ -14,14 +13,22 @@ classroomInfo = {
     */
 };
 
-classroomInfo.init = function() {
 
-    // connection.connectCallback = function () {
-    // };
+classroomCommand = {
 };
 
 
-classroomInfo.alert.sendAlert = function () {    
+classroomCommand.sendsyncRoomInfo = function () {
+    connection.send ({
+        roomSync : classroomInfo
+    });
+};
+
+classroomCommand.receiveSyncRoomInfo = function (_roomInfo) {
+    classroomInfo = _roomInfo;
+};
+
+classroomCommand.sendAlert = function () {    
     if(connection.extra.roomOwner)
     {
         alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => {
@@ -35,7 +42,7 @@ classroomInfo.alert.sendAlert = function () {
     }
 };
 
-classroomInfo.alert.receivAlert = function () {
+classroomCommand.receivAlert = function () {
     var alertTimeHandler;    
     alertBox("알림이 도착하였습니다", "알림", () => {
         response ('yes');
@@ -61,7 +68,7 @@ classroomInfo.alert.receivAlert = function () {
     };
 };
 
-classroomInfo.alert.receiveAlertResponse = function (_response) {
+classroomCommand.receiveAlertResponse = function (_response) {
     if(connection.extra.roomOwner)
     {                  
         const userId = _response.userId;
@@ -72,5 +79,5 @@ classroomInfo.alert.receiveAlertResponse = function (_response) {
         // 체크 알림...
         //console.log(event.data.alertConfirm);            
     }
-
 };
+

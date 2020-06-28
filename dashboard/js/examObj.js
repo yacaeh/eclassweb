@@ -218,10 +218,19 @@ examObj.receiveExamData = function(_data) {
 };
 
 //  시험지 모든 문제에 체크를 했는지 확인. 
-examObj.checkAnswerChecked = function () {
+examObj.checkAnswerChecked = function () {    
     const questionCount = $('#exam-question-count').val();    
     for(let i = 1; i <= questionCount; ++i) {
         let checked = 1 == $(`input:radio[name='exam-question-${i}']:checked`).length;                
+        if(!checked)
+            return false;
+    }
+    return true;
+};
+
+examObj.checkStudentAnswerChecked = function (_questionCount) {
+    for (var i = 1; i <= _questionCount; i++) {
+        let checked = 1 == $(`input:radio[name='exam-question-${i}']:checked`).length;
         if(!checked)
             return false;
     }
