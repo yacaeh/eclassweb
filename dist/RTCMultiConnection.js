@@ -3423,6 +3423,10 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     'stun:stun2.l.google.com:19302',
                     'stun:stun.l.google.com:19302?transport=udp',
                 ]
+            },{ 
+                'urls' : ['turn:34.64.252.139:3478'], 
+                'credential' : 'webrtc',
+                 'username': 'primomceo'
             }];
 
             return iceServers;
