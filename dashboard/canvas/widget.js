@@ -4043,6 +4043,14 @@ function canvasresize(id){
     };
 
 
+    var c = document.getElementsByClassName("i");
+    for(var i = 0 ; i < c.length; i++){
+        c[i].addEventListener("click", function(){
+            document.getElementById("marker-container").style.display = 'none';
+            document.getElementById("pencil-container").style.display = 'none';
+        })
+    }
+
     MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
     MakeTitlePop("pencil-icon", "연필");
     MakeTitlePop("marker-icon", "마커");

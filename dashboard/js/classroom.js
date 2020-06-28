@@ -365,8 +365,24 @@ function appendChatMessage(event, checkmark_id) {
 
     div.className = 'message';
 
+    try {
+        if(event.extra.roomOwner){
+            var notice = document.getElementById("notice");
+
+            var div2 = document.createElement('div');
+            div2.innerHTML = "<b>" + event.data.chatMessage + "</b>";
+            notice.appendChild(div2);
+            notice.scrollTop = notice.clientHeight;
+            notice.scrollTop = notice.scrollHeight - notice.scrollTop;
+
+        }
+    }
+    catch{
+
+    }
+
     if (event.data) {
-        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ':</b><br>' + event.data.chatMessage;
+        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + event.data.chatMessage;
 
         if (event.data.checkmark_id) {
             connection.send({
@@ -521,6 +537,7 @@ connection.onFileStart = function(file) {
         div.innerHTML = '<b>You (to: ' + userFullName + '):</b><br><label>0%</label> <progress></progress>';
         div.style.background = '#cbffcb';
     } else {
+        
         div.innerHTML = '<b>' + getFullName(file.userid) + ':</b><br><label>0%</label> <progress></progress>';
     }
 
@@ -798,7 +815,7 @@ ClassTime();
 
 
 function SetTeacher(){
-    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
 }
@@ -814,34 +831,31 @@ function SetStudent(){
 SelectViewType();
 
 function SetStudentList(){
-    $("#student_list").empty();
+    // $("#student_list").empty();
 
-    if(connection.getAllParticipants().length == 0){
-        $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
-    }
-    else {
-        connection.getAllParticipants().forEach(function(pid) {
-            $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
-        });
-    }
+    // if(connection.getAllParticipants().length == 0){
+    //     $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
+    // }
+    // else {
+    //     connection.getAllParticipants().forEach(function(pid) {
+    //         $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
+    //     });
+    // }
 }
 
 function SelectViewType(){
     $(".view_type").click(function(){
         $(".view_type").removeClass("view_type-on");
         $(this).addClass("view_type-on");
+
         switch(this.id){
-            case "view_student" :
+            case "top_student" :
                 $("#main-video").hide();
                 $("#student_list").show();
                 break;
-            case "vidw_cam" :
+            case "top_camera" :
                 $("#main-video").show();
                 $("#student_list").hide();
-                break;
-            case "view_result" :
-                $("#student_list").hide();
-                $("#main-video").hide();
                 break;
         }
     })
@@ -1286,3 +1300,11 @@ function alertBox(message, title, callback_yes, callback_no) {
 $('#top_alert').click(function () {
     alertBox("학생들에게 알림을 보내겠습니까?", "알림", null, null);
 });
+
+OnClickStudent();
+
+function OnClickStudent(){
+    $(".student").click(function(){
+        console.log("asd")
+    })
+}
