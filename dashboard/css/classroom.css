@@ -1,3 +1,8 @@
+@font-face{
+  font-family: "NanumGothic";
+  src: url('H2GTRE.TTF');
+}
+
 html,
 body,
 section,
@@ -16,9 +21,7 @@ h2 {
   text-decoration: none;
 }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial,
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: "NanumGothic";
   font-size: 17px;
   line-height: 1.5em;
   overflow: hidden;
@@ -192,7 +195,8 @@ hr {
   height: 95%;
   right: 0px;
   top: 53px;
-  background-image: url(/dashboard/img/base.png);
+  background-color: white;
+  border-left: solid 1px gray;
 }
 
 .onUserStatusChanged{
@@ -311,7 +315,7 @@ hr {
   font-weight: bold;
   text-align: end;
   margin-right: 5px;
-  margin-left: 290px;
+  margin-left: 80px;
 }
 
 .icons{

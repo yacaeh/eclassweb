@@ -1881,8 +1881,6 @@ function canvasresize(id){
             return color;
         },
         writeText: function(keyPressed, isBackKeyPressed) {
-            console.log(textHandler)
-            console.log(typeof(textHandler))
             
             if (!is.isText) return;
 
@@ -3075,7 +3073,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
 
                 document.querySelector('#undo').onclick = function() {
                     if (points.length) {
@@ -3123,7 +3121,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Pencil');
             };
             image.src = data_uris.pencil;
@@ -3140,12 +3138,6 @@ function canvasresize(id){
                 alpha = 0.2;
 
             // START INIT PENCIL
-            strokeStyleText.addEventListener('change', function(){
-                pencilContainer.style.display = 'none';
-                pencilColorContainer.style.display = 'none';
-                document.getElementById("pencil-done").click();
-            })
-
             pencilStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
             pencilSelectedColor.style.backgroundColor =
                 pencilSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
@@ -3175,7 +3167,7 @@ function canvasresize(id){
                     fillStyleText.value = elColor;
                     pencilContainer.style.display = 'none';
                     pencilColorContainer.style.display = 'none';
-                    document.getElementById("pencil-done").click();
+                    btnPencilDone.click();
                 });
             })
 
@@ -3188,8 +3180,8 @@ function canvasresize(id){
                 document.getElementById("temp-canvas").classList.add("pen");
 
                 pencilContainer.style.display = 'block';
-                pencilContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                pencilContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
+                pencilContainer.style.top = (canvas.offsetTop) + 'px';
+                pencilContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) - 2 + 'px';
 
                 fillStyleText.focus();
             });
@@ -3228,7 +3220,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Marker');
             };
             image.src = data_uris.marker;
@@ -3245,13 +3237,6 @@ function canvasresize(id){
                 alpha = 0.2;
 
             // START INIT MARKER
-            strokeStyleText.addEventListener('change', function(){
-                markerContainer.style.display = 'none';
-                markerColorContainer.style.display = 'none';
-                document.getElementById("marker-done").click();
-            })
-
-
             markerStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
 
             markerSelectedColor.style.backgroundColor =
@@ -3303,7 +3288,6 @@ function canvasresize(id){
             });
 
             addEvent(btnMarkerDone, 'click', function() {
-                console.log('??')
                 markerContainer.style.display = 'none';
                 markerColorContainer.style.display = 'none';
 
@@ -3326,7 +3310,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Eraser');
             };
             image.src = data_uris.eraser;
@@ -3348,7 +3332,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Text');
             };
             image.src = data_uris.text;
@@ -3364,7 +3348,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Image');
             };
             image.src = data_uris.image;
@@ -3381,7 +3365,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Pdf');
             };
             image.src = data_uris.pdf;
@@ -3397,7 +3381,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.clearCanvas;
             document.querySelector('#clear_canvas').onclick = function() {
@@ -3424,7 +3408,7 @@ function canvasresize(id){
             var image = new Image();
             image.onload = function() {
                 context.clearRect(0, 0, 40, 40);
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.on;
             
@@ -3555,15 +3539,13 @@ function canvasresize(id){
             markerContainer = find('marker-container'),
             markerColorContainer = find('marker-fill-colors'),
             pencilContainer = find('pencil-container'),
-            pencilColorContainer = find('pencil-fill-colors'),
-            lineWidthContainer = find('line-width-container');
+            pencilColorContainer = find('pencil-fill-colors');
 
             colorsContainer.style.display =
             markerColorContainer.style.display =
             markerContainer.style.display =
             pencilColorContainer.style.display =
-            pencilContainer.style.display =
-            lineWidthContainer.style.display = 'none';
+            pencilContainer.style.display = 'none';
     }
 
     function setTemporaryLine() {
@@ -3689,8 +3671,6 @@ function canvasresize(id){
     var keyCode;
 
     function onkeydown(e) {
-        console.log(e);
-
         keyCode = e.which || e.keyCode || 0;
 
         if (keyCode == 8 || keyCode == 46) {
@@ -4063,7 +4043,115 @@ function canvasresize(id){
     };
 
 
+    MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
+    MakeTitlePop("pencil-icon", "연필");
+    MakeTitlePop("marker-icon", "마커");
+    MakeTitlePop("eraser-icon", "지우개");
+    MakeTitlePop("text-icon", "글자를 적습니다");
+    MakeTitlePop("image-icon", "이미지를 불러옵니다");
+    MakeTitlePop("pdf-icon", "PDF파일을 불러옵니다");
+    MakeTitlePop("undo", "작업 하나를 취소합니다");
+    MakeTitlePop("clear_canvas", "캔버스를 비웁니다");
+
+    SliderSetting("pencileslider", "pencil-stroke-style", 0, function(v){
+        var pencilDrawHelper = clone(drawHelper);
+        pencilDrawHelper.getOptions = function() {
+            return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+        }
+        pencilLineWidth = v;
+    });
+
+    SliderSetting("markerslider", "marker-stroke-style", 0, function(v){
+        var markerDrawHelper = clone(drawHelper);
+        markerDrawHelper.getOptions = function() {
+            return [markerLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+        }
+        markerLineWidth = v;
+    });
 
 })();
+
+
+
+function MakeTitlePop(element, contents){
+    var ele = document.getElementById(element);
+    var pop = document.getElementById("titlebox");
+
+    ele.addEventListener("mouseover", function(){
+        pop.style.display = 'block';
+        var rect = ele.getBoundingClientRect();
+        var y= rect.y;
+        var height = 7;
+        pop.style.top =  y + height+  'px';
+        pop.children[0].innerHTML = contents;
+    })
+
+    ele.addEventListener("mouseleave", function(){
+        pop.style.display = 'none';
+    })
+}
+
+
+function SliderSetting(element, targetinput, defaultv, callback){
+var maxSlider = 48;
+
+    var slider = document.getElementById(element);
+    var bar = slider.getElementsByClassName("slider_btn")[0];
+    var back = slider.getElementsByClassName("slider-back")[0];
+    var sliderval = document.getElementById(targetinput);
+    var isClick = false;
+
+    Set(defaultv);
+
+    function Set(v){
+        var ratio = v / maxSlider;
+        var sliderWidth = slider.getBoundingClientRect().width;
+        back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
+        bar.style.left = '-7.5px'
+        sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
+        callback(v);
+    }
+
+    bar.addEventListener("mousedown", function(){
+        isClick = true;
+    })
+
+    window.addEventListener("mousemove", function(e){
+        if(isClick){
+            var sliderLeft = slider.getBoundingClientRect().left;
+            var sliderWidth = slider.getBoundingClientRect().width;
+            var mousex = e.x;
+            var ratio = (mousex - sliderLeft) / sliderWidth;
+            ratio = Math.min(Math.max(0, ratio), 1);
+            back.style.width = (ratio * sliderWidth) + 'px';
+            bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+            sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
+            // param[nowListIdx] = sliderval.value;
+        }
+    })
+
+    window.addEventListener("mouseup", function(){
+        if(isClick){
+            isClick = false;
+            callback(sliderval.value);
+        }
+    })
+
+    slider.addEventListener("mousedown", function(e){
+        var sliderWidth = slider.getBoundingClientRect().width;
+        var mousex = e.offsetX;
+        isClick= true;
+
+        if(e.target == bar){
+            return false;
+        }
+
+        var ratio = mousex / sliderWidth;
+        ratio = Math.min(Math.max(0, ratio), 1);
+        back.style.width = (ratio * sliderWidth) + 'px';
+        bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+        sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
+    })
+}
 
 
