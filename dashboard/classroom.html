@@ -14,6 +14,7 @@
     <link rel="shortcut icon" href="/dashboard/logo.png">
 
     <script src="/dashboard/js/jquery.min.js"></script>
+    <script src="/dashboard/js/jquery-ui.min.js"></script>
     <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
     <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
     <script src="/dist/RTCMultiConnection.js"></script>
@@ -56,7 +57,7 @@
 
 
             <!-- -------------------------------------------------- -->
-            <img class="top_icon view_type" id="top_student">
+            <img class="top_icon view_type-on view_type" id="top_student">
             <img class="top_icon view_type" id="top_camera">
             <!-- -------------------------------------------------- -->
 
@@ -75,133 +76,40 @@
         <canvas id="renderCanvas" style="display: none;"></canvas>
 
         <video id="screen-viewer" controls playsinline autoplay></video>
+        <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
+            <div class="stuname">이름</div>
+            <div class="status" >접속중</div>
+            <div class="line" ></div>
+            <div class="permission">권한주기 <span id="perbtn" class="perbtn off"><span class="circle"></span> </span> </div>
+            <div class="line" ></div>
+            <div class="out">내보내기</div>
+        </div>
         
         <div class="lwindow">
+
+
             <div class="for_teacher" style="display: none;">
                 <span class="nos">
                     <span id="nos"></span>
                     <img src="/dashboard/newimg/student.png">
                 </span>
+
                 <div id="student_list">
-                    <span class="student">
-                        <span class="name">
-                            <span class="alert alert_yes"> </span>
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            <span class="alert alert_no"> </span>
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
-                    </span>
-                    <span class="student">
-                        <span class="name">
-                            이도현
-                        </span>
+
+                    <span data-id="fw4miboudw9" data-name='ste' class="student">   
+                        <span class="name">  
+                            <span class="alert alert_yes"></span>
+                            t23             
+                        </span>                
                     </span>
 
-                   
+                    <span data-id="fw4miboffgudw9" data-name='ssate' class="student">   
+                        <span class="name">  
+                            <span class="alert alert_yes"></span>
+                            tas23             
+                        </span>                
+                    </span>
+
                 </div>
             </div>
             <!-- View Student  -->

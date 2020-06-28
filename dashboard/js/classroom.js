@@ -833,14 +833,24 @@ SelectViewType();
 function SetStudentList(){
     // $("#student_list").empty();
 
-    // if(connection.getAllParticipants().length == 0){
-    //     $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
-    // }
-    // else {
-    //     connection.getAllParticipants().forEach(function(pid) {
-    //         $("#student_list").append('<span class="student">' +getFullName(pid) + '</span>')
-    //     });
-    // }
+    console.log(connection.getAllParticipants());
+
+    if(connection.getAllParticipants().length == 0){
+        $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
+    }
+    else {
+        connection.getAllParticipants().forEach(function(pid) {
+            var name = getFullName(pid)
+            var div =       $('  <span data-name"' + name + '"  data-id="' + pid + '" class="student">\
+                                <span class="name">\
+                                    <span class="alert alert_yes"> </span>\
+                                    ' + name + ' \
+                                </span>\
+                            </span>');
+            OnClickStudent(div,pid,name);
+            $("#student_list").append(div);
+        });
+    }
 }
 
 function SelectViewType(){
@@ -1301,10 +1311,131 @@ $('#top_alert').click(function () {
     alertBox("학생들에게 알림을 보내겠습니까?", "알림", null, null);
 });
 
-OnClickStudent();
 
-function OnClickStudent(){
-    $(".student").click(function(){
-        console.log("asd")
+
+var nowPermission = undefined;
+var nowSelectStudent = undefined;
+
+
+$(".student").click(function(e){
+    var menu = document.getElementById("student-menu");
+    nowSelectStudent = e.target;
+    
+    var name = e.target.dataset.name;
+    var pid = e.target.dataset.id;
+
+    $("#perbtn").clearQueue();
+    $("#perbtn > .circle").clearQueue();
+
+    console.log(e.target.dataset.permission);
+
+    if(e.target.dataset.permission == "true"){
+        $("#perbtn").css({
+            'background-color' : "#18dbbe"
+        })
+        $("#perbtn > .circle").css({
+            left: "20px"
+        })
+        $("#perbtn").addClass("on");
+        $("#perbtn").removeClass("off");
+        
+    }
+    else{
+        $("#perbtn").css({
+            'background-color' : "gray"
+        })
+        $("#perbtn > .circle").css({
+            left: "2px"
+        })
+        $("#perbtn").addClass("off");
+        $("#perbtn").removeClass("on");
+    }
+
+    $(menu).css({
+        left: e.clientX,
+        top : e.clientY
+    })
+
+    if(!$("#student-menu").is(':visible')){
+        $( "#student-menu" ).show( "blind", {}, 150, function(){});
+    }
+
+    menu.getElementsByClassName("stuname")[0].innerHTML = name;
+})
+
+$(window).click(function(e){
+    if(document.getElementById("student-menu") .contains(e.target))
+        return false;
+    
+    if($(e.target).hasClass('student'))
+        return false;
+
+    if( $("#student-menu").show() )
+        $("#student-menu").hide();
+})
+
+
+function OnClickStudent(div){
+    
+    div.click(function(e){
+        var options = {};
+        console.log("Aas")
+        // some effects have required parameters
+        if ( selectedEffect === "scale" ) {
+          options = { percent: 50 };
+        } else if ( selectedEffect === "size" ) {
+          options = { to: { width: 280, height: 185 } };
+        }
+
+        $( "#student-menu" ).show( "blind", options, 500, function(){
+            $("#student-menu").hide();
+        });
+
+        var menu = document.getElementById("student-menu");
+        menu.style.left = e.clientX + "px";
+        menu.style.top = e.clientY + "px";
+
+        menu.getElementsByClassName("stuname")[0].innerHTML = name;
     })
 }
+
+$("#perbtn").click(function(){
+    var circle = this.getElementsByClassName("circle")[0];
+    var name = nowSelectStudent.dataset.name;
+    var pid = nowSelectStudent.dataset.id;
+
+    console.log(nowPermission);
+
+    if(this.classList.contains("off")){
+        console.log(nowPermission != undefined);
+        
+        if(nowPermission != undefined){
+            alert("이미 다른 학생에게 권한이 있습니다.");
+            return false;
+        }
+        
+        nowPermission = pid;
+        nowSelectStudent.dataset.permission = true
+
+        $(this).animate({
+            'background-color' : "#18dbbe"
+        }, 'fast')
+        $(circle).animate({
+            left: "20px"
+        }, 'fast')    
+        // $(nowSelectStudent).css('border', 'solid 1px #18dbbe')
+    }
+    else {
+        nowPermission = undefined;
+        nowSelectStudent.dataset.permission = false;
+
+        $(this).animate({
+            'background-color' : "gray"
+        }, 'fast')
+        $(circle).animate({
+            left: "2px"
+        },'fast')     
+    }
+    this.classList.toggle("on");
+    this.classList.toggle("off");
+})
