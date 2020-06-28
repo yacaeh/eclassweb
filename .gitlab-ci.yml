@@ -20,7 +20,6 @@ build:
 test:
     stage: test
     script:
-      - npm install
       - npm test
     artifacts:
         paths:
@@ -51,7 +50,6 @@ deploy-test:
 
 deploy-production:
   stage: production
-    
   environment:
     name: deploying
   artifacts:
@@ -59,18 +57,17 @@ deploy-production:
       - node_modules/
   
   before_script:
+    - 'which ssh-agent || ( apk --update add openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - echo "rsa passed!"
     - apt-get update -qq
     - apt-get install -y -qq ssh
     - apt-get install -y -qq rsync
-    - apt-get install -y -qq sshpass
-    - mkdir ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 700 ~/.ssh/id_rsa
-    - eval "$(ssh-agent -s)"
-    - ssh-add ~/.ssh/id_rsa
-    - ssh-keyscan -H '$REMOTE_HOST' >> ~/.ssh/known_hosts
   script:
+    - ssh $REMOTE_USER@$REMOTE_HOST
     - rsync -avzO --exclude='.git' --exclude='.gitlab-ci.yml' --exclude='fake-keys' . $REMOTE_USER@$REMOTE_HOST:$REMOTE_HOST_DIR
-    - npm install
   only:
     - master

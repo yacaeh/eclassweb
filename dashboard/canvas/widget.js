@@ -3467,6 +3467,8 @@ function canvasresize(id){
 
                     document.getElementById("main-canvas").style.display = 'none';
                     document.getElementById("temp-canvas").style.display = 'none';
+                    document.getElementById("pencil-container").style.display = 'none';
+                    document.getElementById("marker-container").style.display = 'none';
                 }
 
             };
