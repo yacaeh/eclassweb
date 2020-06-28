@@ -224,7 +224,11 @@ hr {
   width: 94%;
 }
 
-#top_all_controll{
+.top_all_controll_on{
+  content: url(/dashboard/img/top_lock_on.png);
+}
+
+.top_all_controll_off{
   content: url(/dashboard/img/top_unlock_off.png);
 }
 
@@ -422,7 +426,7 @@ hr {
   margin-left: 5px;
   margin-top: 5px;
   width: 380px;
-  height: 260px;
+  height: 255px;
   overflow-x: hidden;
   /* overflow-y: hidden; */
 }
@@ -432,11 +436,22 @@ hr {
   height: 60px;
   background-color: rgb(55,55,55);
   display: inline-block;
-  margin-bottom: 5px;
+  margin: 2px;
+  margin-right: -5px;
   cursor: pointer;
   color: white;
   vertical-align: bottom;
   position: relative;
+}
+
+.student > .bor{
+  position: absolute;
+    width: 100%;
+    height: 100%;
+    border: solid 3px #3ee1c9;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
 }
 
 .student .name{
@@ -473,12 +488,55 @@ hr {
   background-color: red;
 }
 
-#canvas-controller{
-  margin-left:20%;
-  position:relative; 
-  z-index: 0;
-
+.student .name .alert_wait{
+  background-color: yellow;
 }
+
+#canvas-controller{
+  border: 1px solid;
+  box-shadow: 1px 2px #999999;
+  min-height: 90%;
+  width:150px;  
+
+  right:20%;
+  position: absolute;; 
+  z-index: 0;
+  display:none;
+}
+
+.upper_controller{
+  border:1px solid;
+}
+
+.bottom_controller{
+  border:1px solid;
+  position: absolute;
+  bottom: 10px;
+}
+
+.thumbnail_list{
+  display: flex;
+  margin-top: 40px;
+  flex-direction: column;
+  flex-wrap: wrap;  
+}
+
+.thumbnail{
+  margin-left:15px;
+  padding-bottom:50px;  
+}
+
+.thum_img_selected{
+  box-shadow: 5px 5px 10px #3ee1c9;
+  width:100px;
+  height:140px;
+}      
+
+.thum_img{
+  box-shadow: 5px 5px 10px #999;
+  width:100px;
+  height:140px;
+}      
 
 .no_student{
   width: 100%;
@@ -505,4 +563,48 @@ hr {
 #renderCanvas{
   position: absolute;
   left: 45px;
+}
+
+
+input[type=radio] { display:none; }
+
+input[type=radio] + label { 
+display: inline-block; 
+cursor: pointer; 
+font-size: 12px;
+line-height: 28px; 
+padding-right: 22px;
+background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
+margin-left: 0.5vw;
+margin-right: 1vw;
+}
+
+input[type=radio]:checked + label { background-image: url(/dashboard/newimg/radio_on.png); }
+
+.btn-exam{
+  color: #fff;
+    background-color: #3ee1c9;
+    border-color: #3ee1c9;
+}
+
+#exam-board{
+  display: none; 
+  z-index: 5;
+  position: fixed; 
+  top:53px; 
+  bottom: 0; 
+  right: 0; 
+  width: 20%; 
+  border-left: gray solid 1px;
+  background-color: white;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"]:focus{
+  border: #3ee1c9  solid 1px;
 }

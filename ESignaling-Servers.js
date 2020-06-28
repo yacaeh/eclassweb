@@ -856,6 +856,14 @@ module.exports = exports = function(socket, config) {
                     listOfRooms[arg.sessionid].socketCustomEvent = listOfUsers[socket.userid].socketCustomEvent;
                     listOfRooms[arg.sessionid].maxParticipantsAllowed = parseInt(params.maxParticipantsAllowed || 1000) || 1000;
 
+                    // // custom code
+                    // listOfRooms[arg.sessionid].roomInfo = {
+                    //     allControl : false,
+                    //     shareScreen :false,
+                    //     share3D = false
+                    // };
+
+
                     if(arg.identifier && arg.identifier.toString().length) {
                         listOfRooms[arg.sessionid].identifier = arg.identifier;
                     }

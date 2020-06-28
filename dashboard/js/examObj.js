@@ -9,6 +9,17 @@ var examObj = {
     studentsAnswer : {},  // 학생들 정답 저장.
     submitStudents : {}    // 학생이 제출 했을 때, 최종 값
     /*
+        - 
+        testStudentCount:
+        questionCount:
+        examTime:
+        examAnswer : {}
+        
+    */
+    
+        
+
+    /*
         학생별 저장값    
         studentsAnswer : {                        
             id, 유저 아디,
@@ -149,8 +160,6 @@ examObj.updateExamResponseStatistics = function () {
 };
 
 
-
-
 examObj.updateExamAnswerStatisticsEach = function (_questionNumber) {    
     const studentCounts = examObj.totalCount;
     var answerCount = 0;
@@ -177,9 +186,9 @@ examObj.updateExamAnswerStatistics = function () {
 
 examObj.receiveExamData = function(_data) {
    
-    if(_data.examStart) {       
-        let examStart = _data.examStart;
-        examObj.isStart = true;
+    if(_data.examStart) {               
+        let examStart = _data.examStart;        
+        examObj.isStart = true;        
         examObj.examTime = examStart.examTime;
         examObj.currentExamTime = examStart.examTime;
         examObj.questionCount = examStart.questionCount;
@@ -209,8 +218,9 @@ examObj.receiveExamData = function(_data) {
 };
 
 //  시험지 모든 문제에 체크를 했는지 확인. 
-examObj.checkAnswerChecked = function () {
-    for(let i = 1; i <= examObj.questionCount; ++i) {
+examObj.checkAnswerChecked = function () {    
+    const questionCount = $('#exam-question-count').val();    
+    for(let i = 1; i <= questionCount; ++i) {
         let checked = 1 == $(`input:radio[name='exam-question-${i}']:checked`).length;                
         if(!checked)
             return false;
@@ -218,15 +228,39 @@ examObj.checkAnswerChecked = function () {
     return true;
 };
 
+examObj.checkStudentAnswerChecked = function (_questionCount) {
+    for (var i = 1; i <= _questionCount; i++) {
+        let checked = 1 == $(`input:radio[name='exam-question-${i}']:checked`).length;
+        if(!checked)
+            return false;
+    }
+    return true;
+};
+
+examObj.setExamInfo = function () {
+
+    examObj.examInfo =  {
+        testStudentCount : examObj.totalCount,
+        questionCount : examObj.questionCount,
+        examTime : examObj.examTime,
+        examAnswer : examObj.examAnswer
+    };
+}
+
 examObj.sendExamStart  = function(_examTime) {
     if(connection.extra.roomOwner)
     {    
+        const questionCount = $('#exam-question-count').val();
+        examObj.questionCount = questionCount;       
         examObj.isStart = true;
         examObj.totalCount = connection.getAllParticipants().length;
         examObj.examTime = _examTime;
         examObj.submitCount = 0;
         examObj.studentsAnswer = {};
         examObj.submitStudents = {};
+
+        examObj.setExamInfo ();
+
         connection.send({
             exam: {
                 examStart : {
