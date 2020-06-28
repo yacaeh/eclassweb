@@ -995,9 +995,19 @@ $("#canvas-controller").hide();
 
 $("#top_pdf").click(function(){
     $("#canvas-controller").show();
-    loadPDF();
+    loadFileViewer();
 })
 
+function loadFileViewer(){
+    var fileViewer= document.createElement('iframe');
+        fileViewer.setAttribute("id", "file-viewer");
+        fileViewer.setAttribute("src", "http://localhost:9001/ViewerJS/#../dashboard/files/test.pdf");
+        fileViewer.style.width = "1024px";
+        fileViewer.style.height = "724px";
+        fileViewer.setAttribute('allowFullScreen', '')
+        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+        frame.document.getElementsByClassName("design-surface")[0].appendChild(fileViewer);
+}
 
 function loadPDF(){
     var oriPdfCanvas= document.createElement('canvas');
