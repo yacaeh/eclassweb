@@ -43,10 +43,10 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.icons.pencil = '/dashboard/img/pen.png';
-designer.icons.marker = '/dashboard/img/pen2.png';
-designer.icons.eraser = '/dashboard/img/eraser.png';
-designer.icons.clearCanvas = '/dashboard/img/refresh.png';
+designer.icons.pencil = '/dashboard/newimg/pen.png';
+designer.icons.marker = '/dashboard/newimg/pen2.png';
+designer.icons.eraser = '/dashboard/newimg/eraser.png';
+designer.icons.clearCanvas = '/dashboard/newimg/trash.png';
 designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
 designer.icons.on = '/dashboard/img/view_on.png';
 designer.icons.off = '/dashboard/img/view_off.png';
@@ -375,7 +375,7 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b>나:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
+        div.innerHTML = '<b> 나 : </b>' + event;
         div.style.background = '#cbffcb';
     }
 
@@ -769,46 +769,41 @@ $('#top_share_screen').click(function() {
 });
 
 
-function TimeUpdate(){
-    var time =  document.getElementById("main-video").currentTime;
-console.log(time);
+function ClassTime(){
+    var now = 0;
+    function Sec(){
+        now++;
+        var time = now;
 
-    var date = new Date;
-    var year = date.getFullYear();
-    var month = date.getMonth();
-    var day = date.getDate();
-    var hours = date.getHours();
-    var min = date.getMinutes();
-    var sec = date.getSeconds();
+        var hour = Math.floor(time / 3600);
+        time %= 3600;
+        
+        var min = Math.floor(time / 60);
+        time %= 60;
 
-    month += 1;
-    if(month < 10)
-        month = "0" + month;
-    if(day < 10)
-        day = "0" + day;
-    if(hours < 10)
-        hours = "0" + hours;
-    if(min < 10)
-        min = "0" + min;
-    if(sec < 10)
-        sec = "0" + sec;
+        if(min <10)
+            min = "0" + min;
 
+        if(time < 10)
+            time = "0" + time;
 
-    $("#current-day").text(year+'-'+month+'-'+day);
-    $("#current-time").text(hours+':'+min+':'+sec);
+        $("#current-day").text(hour+":"+min+":"+time);
+    }
+    setInterval(Sec, 1000);
 }
 
-setInterval(TimeUpdate,1000);
+ClassTime();
+
+
+
 
 function SetTeacher(){
-    $("#who-am-i").text("선생님");
     $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
 }
 
 function SetStudent(){
-    $("#who-am-i").text("학생");
     $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
     $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
     $(".for_teacher").hide();
