@@ -197,8 +197,24 @@ connection.onmessage = function (event) {
 
 
     if (null != event.data.allControl) {
+<<<<<<< HEAD
         if (!connection.extra.roomOwner) 
                 classroomCommand.receiveAllControl (event.data.allControl);            
+=======
+        if (/*!checkRoomOwner()*/true) {
+            classroomInfo.allControl = event.data.allControl;
+            
+            if (event.data.allControl) {
+                // 제어 하기    
+                allControllEnable(top_all_controll_jthis,true,false);        
+            }
+            else {
+                // 제어 풀기
+                allControllEnable(top_all_controll_jthis,false,false);       
+                
+            }
+        }
+>>>>>>> 1e3b7a564d94ddc3a84f9d15189d4cd21febec3b
         return;
     }
     
@@ -230,9 +246,9 @@ connection.onmessage = function (event) {
     {
         console.log(event.data.modelEnable);
 
-        var jthis = $(this);
+        
         var enable = event.data.modelEnable.enable;
-        modelEnable(jthis, enable , false);
+        modelEnable(top_3d_render_jthis, enable , false);
         return;
 
     }
@@ -761,7 +777,7 @@ function SetStudent(){
     $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
     $(".for_teacher").hide();
     $("#main-video").show();
-    $("#top_all_controll").hide();
+    //$("#top_all_controll").hide();
 }
 
 SelectViewType();
@@ -1162,7 +1178,7 @@ function loadPDF() {
 
 
 _3DCanvasFunc();
-
+_AllCantrallFunc();
 
 
 // 알림 박스 생성
