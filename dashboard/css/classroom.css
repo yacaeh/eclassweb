@@ -212,7 +212,11 @@ hr {
   width: 94%;
 }
 
-#top_all_controll{
+.top_all_controll_on{
+  content: url(/dashboard/img/top_lock_on.png);
+}
+
+.top_all_controll_off{
   content: url(/dashboard/img/top_unlock_off.png);
 }
 
