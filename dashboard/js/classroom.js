@@ -194,25 +194,18 @@ connection.onmessage = function (event) {
 
 
     if (null != event.data.allControl) {
-        if (!checkRoomOwner()) {
-            connection.extra.classRoom.allControl = event.data.allControl;
-            if (event.data.allControl) {
-                // 제어 하기                
-            }
-            else {
-                // 제어 풀기
-            }
-        }
+        if (!connection.extra.roomOwner) 
+                classroomCommand.receiveAllControl (event.data.allControl);            
         return;
     }
     
     if(event.data.alert) {     
-        classroomInfo.alert.receivAlert ();    
+        classroomCommand.receivAlert ();    
         return;    
     }
 
     if(event.data.alertResponse) {     
-        classroomInfo.alert.receiveAlertResponse (event.data.alertResponse);               
+        classroomCommand.receiveAlertResponse (event.data.alertResponse);               
         return;
     };
 
@@ -222,9 +215,11 @@ connection.onmessage = function (event) {
         return;
     }
 
-    if(event.data.examAnswer) {
 
-    }
+    if(event.data.roomSync) {
+        classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
+        return;
+    };
 
     //3d 모델링 Enable
     if(event.data.modelEnable)
@@ -980,7 +975,6 @@ function setStudentOMR(quesCount, examTime) {
     $('#exam-omr').html(question);
 
     m_ExamTime = parseInt(examTime * 60);
-
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
         $('#exam-student-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
@@ -991,7 +985,7 @@ function setStudentOMR(quesCount, examTime) {
 
 // 학생 시험 OMR 제출
 function submitOMR() {
-    if (!examObj.checkAnswerChecked()) {
+    if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
         // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
         return;
     }
@@ -1196,17 +1190,11 @@ function alertBox(message, title, callback_yes, callback_no) {
 
 
 $('#top_alert').click(function () {
-    classroomInfo.alert.sendAlert ();
+    classroomCommand.sendAlert ();
 });
 
 
 // 학생들 제어하기 버튼
 $('#top_all_controll').click ( () =>  {
-    // if(connection.extra.roomOwner) {      
-    //     var currentAllControlState = !connection.extra.classRoom.allControl;
-    //     connection.extra.classRoom.allControl = currentAllControlState;
-    //     connection.send({
-    //         allControl : currentAllControlState
-    //     });
-    // }
+    classroomCommand.sendAllControl ();        
 });
