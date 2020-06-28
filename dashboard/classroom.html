@@ -26,8 +26,6 @@
     <script src="/node_modules/canvas-designer/canvas-designer-widget.js"></script>
     <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
     <script src="/dashboard/js/emojionearea.min.js"></script>
-    <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>    
     <script src="/dashboard/js/examObj.js"></script>
     <script src="/dashboard/js/classroomInfo.js"></script>
     <script src="/dashboard/js/all_controll.js"></script>
@@ -130,17 +128,36 @@
     <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
     <!--pdf controller-->
     <div id="canvas-controller">
-      <button id="prev">Previous</button>
-      <button id="next">Next</button>
-      &nbsp; &nbsp;
-      <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
-      <button id="close-pdf">close</button>
+      <div class="upper_controller">
+        <label> File Name </label>
+        <button id="close-pdf"> V </button>
+      </div>
+      <div class="thumbnail_list">
+        <div class="thumbnail">
+          <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+        </div>
+        <div class="thumbnail">
+          <img class="thum_img_selected" src="/dashboard/newimg/thumb.jpg">
+        </div>
+        <div class="thumbnail">
+          <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+        </div>
+        <div class="thumbnail">
+          <img class="thum_img"   src="/dashboard/newimg/thumb.jpg">
+        </div>
+        
+      </div>
+      <div class="bottom_controller">
+        <button id="viewer_start"> << </button>
+        <button id="prev"> < </button>
+        <button id="next"> > </button>
+        <button id="viewer_end"> >> </button>
+      </div>
     </div>
 
     <script src="/dashboard/js/babylon.js"></script>
     <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
     <script src="/dashboard/js/pep.js"></script>
-    <script src="/dashboard/js/babylonjs.loaders.js"></script>
 
     <script src = /dashboard/js/3d_render.js></script>
 

@@ -5,6 +5,8 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 var httpServer = require('http');
+var nStatic = require('node-static');
+var fileServer = new nStatic.Server('./files');
 
 const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
@@ -40,7 +42,6 @@ function serverHandler(request, response) {
     // even if external codes are overriding it
     config = getValuesFromConfigJson(jsonPath);
     config = getBashParameters(config, BASH_COLORS_HELPER);
-
     // HTTP_GET handling code goes below
     try {
         var uri, filename;
@@ -86,7 +87,7 @@ function serverHandler(request, response) {
         }
 
         var matched = false;
-        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/'].forEach(function(item) {
+        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', '/ViewerJS/'].forEach(function(item) {
             if (filename.indexOf(resolveURL(item)) !== -1) {
                 matched = true;
             }
@@ -127,7 +128,7 @@ function serverHandler(request, response) {
         try {
             stats = fs.lstatSync(filename);
 
-            if (filename.search(/dashboard/g) === -1 && filename.search(/admin/g) === -1 && stats.isDirectory() && config.homePage === '/dashboard/index.html') {
+            if (filename.search(/dashboard/g) === -1 && filename.search(/admin/g) === -1 && filename.search(/ViewerJS/g) === -1 && stats.isDirectory() && config.homePage === '/dashboard/index.html') {
                 if (response.redirect) {
                     response.redirect('/dashboard/');
                 } else {
@@ -155,11 +156,16 @@ function serverHandler(request, response) {
 
                 if (filename.indexOf(resolveURL('/dashboard/')) !== -1) {
                     filename = filename.replace(resolveURL('/dashboard/'), '');
-                    filename = filename.replace(resolveURL('/dashboard'), '');
                     filename += resolveURL('/dashboard/index.html');
                 } else if (filename.indexOf(resolveURL('/admin/')) !== -1) {
                     filename = filename.replace(resolveURL('/admin/'), '');
                     filename += resolveURL('/admin/index.html');
+                } else if (filename.indexOf(resolveURL('/ViewerJS/')) !== -1) {
+                    filename = filename.replace(resolveURL('/ViewerJS/'), '');
+                    filename += resolveURL('/ViewerJS/index.html');
+                } else if (filename.indexOf(resolveURL('/files/')) !== -1) {
+                    filename = filename.replace(resolveURL('/files/'), '');
+                    filename += resolveURL('/files/*');
                 } else {
                     filename += resolveURL(config.homePage);
                 }
@@ -177,6 +183,9 @@ function serverHandler(request, response) {
         }
         if (filename.toLowerCase().indexOf('.png') !== -1) {
             contentType = 'image/png';
+        }
+        if (filename.toLowerCase().indexOf('.pdf') !== -1) {
+            contentType = 'application/pdf';
         }
 
         fs.readFile(filename, 'binary', function(err, file) {
@@ -208,6 +217,7 @@ function serverHandler(request, response) {
         response.write('404 Not Found: Unexpected error.\n' + e.message + '\n\n' + e.stack);
         response.end();
     }
+
 }
 
 var httpApp;
