@@ -918,7 +918,7 @@ function SetStudentList(){
             var name = getFullName(pid)
            var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
                 <span class="bor"></span> \
-                <span class="name"><span class="alert alert_yes"></span>' + name + '</span></span>')
+                <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
             OnClickStudent(div,pid,name);
             $("#student_list").append(div);
         });
@@ -1389,15 +1389,14 @@ function alertBox(message, title, callback_yes, callback_no) {
 }
 
 $('#top_alert').click(function () {
-    classroomCommand.sendAlert ();
-
-    var chilldren = document.getElementById("student_list").children;
+    classroomCommand.sendAlert (function(){
+        var chilldren = document.getElementById("student_list").children;
             
-    for(var i = 0; i < chilldren.length; i++){
-        var al = chilldren[i].getElementsByClassName("alert")[0];
-        al.classList.add("alert_wait");
-    }
-
+        for(var i = 0; i < chilldren.length; i++){
+            var al = chilldren[i].getElementsByClassName("alert")[0];
+            al.classList.add("alert_wait");
+        }
+    });
 });
 
 

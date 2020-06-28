@@ -28,13 +28,14 @@ classroomCommand.receiveSyncRoomInfo = function (_roomInfo) {
     classroomInfo = _roomInfo;
 };
 
-classroomCommand.sendAlert = function () {    
+classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
         alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => {
            // classroomInfo.alert
             // console.log(connection.getAllParticipants());
             // console.log(connection.getAllParticipants().length);
+            callback()
             connection.send ({
                 alert : true
             });
@@ -76,7 +77,7 @@ classroomCommand.receiveAlertResponse = function (_response, callback) {
         console.log(_response);
         console.log(connection.getAllParticipants());
         callback(_response);
-        
+
         // 체크 알림...
         //console.log(event.data.alertConfirm);            
     }
