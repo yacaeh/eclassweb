@@ -42,7 +42,6 @@ function serverHandler(request, response) {
     // even if external codes are overriding it
     config = getValuesFromConfigJson(jsonPath);
     config = getBashParameters(config, BASH_COLORS_HELPER);
-
     // HTTP_GET handling code goes below
     try {
         var uri, filename;
@@ -157,7 +156,6 @@ function serverHandler(request, response) {
 
                 if (filename.indexOf(resolveURL('/dashboard/')) !== -1) {
                     filename = filename.replace(resolveURL('/dashboard/'), '');
-                    filename = filename.replace(resolveURL('/dashboard'), '');
                     filename += resolveURL('/dashboard/index.html');
                 } else if (filename.indexOf(resolveURL('/admin/')) !== -1) {
                     filename = filename.replace(resolveURL('/admin/'), '');
@@ -165,6 +163,9 @@ function serverHandler(request, response) {
                 } else if (filename.indexOf(resolveURL('/ViewerJS/')) !== -1) {
                     filename = filename.replace(resolveURL('/ViewerJS/'), '');
                     filename += resolveURL('/ViewerJS/index.html');
+                } else if (filename.indexOf(resolveURL('/files/')) !== -1) {
+                    filename = filename.replace(resolveURL('/files/'), '');
+                    filename += resolveURL('/files/*');
                 } else {
                     filename += resolveURL(config.homePage);
                 }
@@ -216,6 +217,7 @@ function serverHandler(request, response) {
         response.write('404 Not Found: Unexpected error.\n' + e.message + '\n\n' + e.stack);
         response.end();
     }
+
 }
 
 var httpApp;
