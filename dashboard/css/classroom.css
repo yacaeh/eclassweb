@@ -390,3 +390,47 @@ hr {
   position: absolute;
   left: 45px;
 }
+
+
+input[type=radio] { display:none; }
+
+input[type=radio] + label { 
+display: inline-block; 
+cursor: pointer; 
+font-size: 12px;
+line-height: 28px; 
+padding-right: 22px;
+background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
+margin-left: 0.5vw;
+margin-right: 1vw;
+}
+
+input[type=radio]:checked + label { background-image: url(/dashboard/newimg/radio_on.png); }
+
+.btn-exam{
+  color: #fff;
+    background-color: #3ee1c9;
+    border-color: #3ee1c9;
+}
+
+#exam-board{
+  display: none; 
+  z-index: 5;
+  position: fixed; 
+  top:53px; 
+  bottom: 0; 
+  right: 0; 
+  width: 20%; 
+  border-left: gray solid 1px;
+  background-color: white;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"]:focus{
+  border: #3ee1c9  solid 1px;
+}
