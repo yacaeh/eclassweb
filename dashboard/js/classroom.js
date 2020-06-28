@@ -106,13 +106,9 @@ connection.onUserStatusChanged = function (event) {
     var infoBar = document.getElementById('onUserStatusChanged');
     var names = [];
 
-    connection.getAllParticipants().forEach(function (pid) {
-        names.push(getFullName(pid));
-    });
-
-  connection.getAllParticipants().forEach(function (pid) {
+connection.getAllParticipants().forEach(function (pid) {
     names.push(getFullName(pid));
-  });
+});
 
   if (!names.length) {
     $('#nos').text('0');
@@ -216,7 +212,24 @@ connection.onmessage = function (event) {
     }
 
     if(event.data.alertResponse) {     
-        classroomCommand.receiveAlertResponse (event.data.alertResponse);               
+        classroomCommand.receiveAlertResponse (event.data.alertResponse, function(e){
+            var chilldren = document.getElementById("student_list").children;
+            
+            for(var i = 0; i < chilldren.length; i++){
+                if(chilldren[i].dataset.id == e.userId){
+                    var al = chilldren[i].getElementsByClassName("alert")[0];
+                    al.className = "";
+                    al.classList.add("alert");
+
+                    if(e.response == "yes")
+                        al.classList.add("alert_yes");
+                    else 
+                        al.classList.add("alert_no");
+                }
+            }
+
+
+        });               
         return;
     };
 
@@ -370,27 +383,39 @@ connection.onstreamended = function (event) {
 var conversationPanel = document.getElementById('conversation-panel');
 
 function appendChatMessage(event, checkmark_id) {
-  var div = document.createElement('div');
+    var div = document.createElement('div');
 
-  div.className = 'message';
+    div.className = 'message';
 
-  if (event.data) {
-    div.innerHTML =
-      '<b>' +
-      (event.extra.userFullName || event.userid) +
-      ':</b><br>' +
-      event.data.chatMessage;
+    try {
+        if(event.extra.roomOwner){
+            var notice = document.getElementById("notice");
 
-    if (event.data.checkmark_id) {
-      connection.send({
-        checkmark: 'received',
-        checkmark_id: event.data.checkmark_id,
-      });
+            var div2 = document.createElement('div');
+            div2.innerHTML = "<b>" + event.data.chatMessage + "</b>";
+            notice.appendChild(div2);
+            notice.scrollTop = notice.clientHeight;
+            notice.scrollTop = notice.scrollHeight - notice.scrollTop;
+
+        }
     }
-  } else {
-    div.innerHTML = '<b> 나 : </b>' + event;
-    div.style.background = '#cbffcb';
-  }
+    catch{
+
+    }
+
+    if (event.data) {
+        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + event.data.chatMessage;
+
+        if (event.data.checkmark_id) {
+            connection.send({
+                checkmark: 'received',
+                checkmark_id: event.data.checkmark_id
+            });
+        }
+    } else {
+        div.innerHTML = '<b> 나 : </b>' + event;
+        div.style.background = '#cbffcb';
+    }
 
   conversationPanel.appendChild(div);
 
@@ -535,27 +560,28 @@ connection.onFileProgress = function (chunk, uuid) {
 };
 
 connection.onFileStart = function (file) {
-  var div = document.createElement('div');
-  div.className = 'message';
-
-  if (file.userid === connection.userid) {
-    var userFullName = file.remoteUserId;
-    if (connection.peersBackup[file.remoteUserId]) {
-      userFullName =
-        connection.peersBackup[file.remoteUserId].extra.userFullName;
+    var div = document.createElement('div');
+    div.className = 'message';
+  
+    if (file.userid === connection.userid) {
+      var userFullName = file.remoteUserId;
+      if (connection.peersBackup[file.remoteUserId]) {
+        userFullName =
+          connection.peersBackup[file.remoteUserId].extra.userFullName;
+      }
+  
+      div.innerHTML =
+        '<b>You (to: ' +
+        userFullName +
+        '):</b><br><label>0%</label> <progress></progress>';
+      div.style.background = '#cbffcb';
+    } else {
+      div.innerHTML =
+        '<b>' +
+        getFullName(file.userid) +
+        ':</b><br><label>0%</label> <progress></progress>';
     }
-
-    div.innerHTML =
-      '<b>You (to: ' +
-      userFullName +
-      '):</b><br><label>0%</label> <progress></progress>';
-    div.style.background = '#cbffcb';
-  } else {
-    div.innerHTML =
-      '<b>' +
-      getFullName(file.userid) +
-      ':</b><br><label>0%</label> <progress></progress>';
-  }
+  
 
   div.title = file.name;
   conversationPanel.appendChild(div);
@@ -858,12 +884,13 @@ function ClassTime() {
 
 ClassTime();
 
-function SetTeacher() {
-  $('#session-id').text(
-    connection.extra.userFullName + '(' + params.sessionid + ')'
-  );
-  $('#my-name').remove();
-  $('.for_teacher').show();
+
+
+
+function SetTeacher(){
+    $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
+    $("#my-name").remove();
+    $(".for_teacher").show();
 }
 
 function SetStudent() {
@@ -878,41 +905,42 @@ function SetStudent() {
 
 SelectViewType();
 
-function SetStudentList() {
-  $('#student_list').empty();
+function SetStudentList(){
+    $("#student_list").empty();
 
-  if (connection.getAllParticipants().length == 0) {
-    $('#student_list').append(
-      '<span class="no_student"> 접속한 학생이 없습니다 </span>'
-    );
-  } else {
-    connection.getAllParticipants().forEach(function (pid) {
-      $('#student_list').append(
-        '<span class="student">' + getFullName(pid) + '</span>'
-      );
-    });
-  }
+    console.log(connection.getAllParticipants());
+
+    if(connection.getAllParticipants().length == 0){
+        $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
+    }
+    else {
+        connection.getAllParticipants().forEach(function(pid) {
+            var name = getFullName(pid)
+           var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
+                <span class="bor"></span> \
+                <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
+            OnClickStudent(div,pid,name);
+            $("#student_list").append(div);
+        });
+    }
 }
 
-function SelectViewType() {
-  $('.view_type').click(function () {
-    $('.view_type').removeClass('view_type-on');
-    $(this).addClass('view_type-on');
-    switch (this.id) {
-      case 'view_student':
-        $('#main-video').hide();
-        $('#student_list').show();
-        break;
-      case 'vidw_cam':
-        $('#main-video').show();
-        $('#student_list').hide();
-        break;
-      case 'view_result':
-        $('#student_list').hide();
-        $('#main-video').hide();
-        break;
-    }
-  });
+function SelectViewType(){
+    $(".view_type").click(function(){
+        $(".view_type").removeClass("view_type-on");
+        $(this).addClass("view_type-on");
+
+        switch(this.id){
+            case "top_student" :
+                $("#main-video").hide();
+                $("#student_list").show();
+                break;
+            case "top_camera" :
+                $("#main-video").show();
+                $("#student_list").hide();
+                break;
+        }
+    })
 }
 
 $('#top_test').click(function () {
@@ -1361,6 +1389,169 @@ function alertBox(message, title, callback_yes, callback_no) {
 }
 
 $('#top_alert').click(function () {
-    classroomCommand.sendAlert ();
+    classroomCommand.sendAlert (function(){
+        var chilldren = document.getElementById("student_list").children;
+            
+        for(var i = 0; i < chilldren.length; i++){
+            var al = chilldren[i].getElementsByClassName("alert")[0];
+            al.classList.add("alert_wait");
+        }
+    });
 });
 
+
+var nowPermission = undefined;
+var nowSelectStudent = undefined;
+
+
+$(".student").click(function(e){
+    var menu = document.getElementById("student-menu");
+    nowSelectStudent = e.target;
+    
+    var name = e.target.dataset.name;
+    var pid = e.target.dataset.id;
+
+    $("#perbtn").clearQueue();
+    $("#perbtn > .circle").clearQueue();
+
+    console.log(e.target.dataset.permission);
+
+    if(e.target.dataset.permission == "true"){
+        $("#perbtn").css({
+            'background-color' : "#18dbbe"
+        })
+        $("#perbtn > .circle").css({
+            left: "20px"
+        })
+        $("#perbtn").addClass("on");
+        $("#perbtn").removeClass("off");
+        
+    }
+    else{
+        $("#perbtn").css({
+            'background-color' : "gray"
+        })
+        $("#perbtn > .circle").css({
+            left: "2px"
+        })
+        $("#perbtn").addClass("off");
+        $("#perbtn").removeClass("on");
+    }
+
+    $(menu).css({
+        left: e.clientX,
+        top : e.clientY
+    })
+
+    if(!$("#student-menu").is(':visible')){
+        $( "#student-menu" ).show( "blind", {}, 150, function(){});
+    }
+
+    menu.getElementsByClassName("stuname")[0].innerHTML = name;
+})
+
+$(window).click(function(e){
+    if(document.getElementById("student-menu") .contains(e.target))
+        return false;
+    
+    if($(e.target).hasClass('student'))
+        return false;
+
+    if( $("#student-menu").show() )
+        $("#student-menu").hide();
+})
+
+
+function OnClickStudent(div){
+    
+    div.click(function(e){
+        var menu = document.getElementById("student-menu");
+        nowSelectStudent = e.target;
+        
+        var name = e.target.dataset.name;
+        var pid = e.target.dataset.id;
+    
+        $("#perbtn").clearQueue();
+        $("#perbtn > .circle").clearQueue();
+    
+        console.log(e.target.dataset.permission);
+    
+        if(e.target.dataset.permission == "true"){
+            $("#perbtn").css({
+                'background-color' : "#18dbbe"
+            })
+            $("#perbtn > .circle").css({
+                left: "20px"
+            })
+            $("#perbtn").addClass("on");
+            $("#perbtn").removeClass("off");
+            
+        }
+        else{
+            $("#perbtn").css({
+                'background-color' : "gray"
+            })
+            $("#perbtn > .circle").css({
+                left: "2px"
+            })
+            $("#perbtn").addClass("off");
+            $("#perbtn").removeClass("on");
+        }
+    
+        $(menu).css({
+            left: e.clientX,
+            top : e.clientY
+        })
+    
+        if(!$("#student-menu").is(':visible')){
+            $( "#student-menu" ).show( "blind", {}, 150, function(){});
+        }
+    
+        menu.getElementsByClassName("stuname")[0].innerHTML = name;
+    })
+}
+
+$("#perbtn").click(function(){
+    var circle = this.getElementsByClassName("circle")[0];
+    var name = nowSelectStudent.dataset.name;
+    var pid = nowSelectStudent.dataset.id;
+
+    console.log(nowPermission);
+
+    if(this.classList.contains("off")){
+        console.log(nowPermission != undefined);
+        
+        if(nowPermission != undefined){
+            alert("이미 다른 학생에게 권한이 있습니다.");
+            return false;
+        }
+        
+        nowPermission = pid;
+        nowSelectStudent.dataset.permission = true
+
+        $(this).animate({
+            'background-color' : "#18dbbe"
+        }, 'fast')
+        $(circle).animate({
+            left: "20px"
+        }, 'fast')    
+
+        $(nowSelectStudent).find(".bor").show();
+    }
+    else {
+        nowPermission = undefined;
+        nowSelectStudent.dataset.permission = false;
+
+        $(this).animate({
+            'background-color' : "gray"
+        }, 'fast')
+        $(circle).animate({
+            left: "2px"
+        },'fast')     
+        $(nowSelectStudent).find(".bor").hide();
+
+
+    }
+    this.classList.toggle("on");
+    this.classList.toggle("off");
+})

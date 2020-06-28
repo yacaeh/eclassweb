@@ -346,6 +346,15 @@ input:focus {
 }
 /* context menu */
 
+.tooldivide{
+    width: 30px;
+    height: 20px;
+    border-bottom: solid 2px gray;
+    left: 6px;
+    position: relative;
+    margin-bottom: 20px;
+}
+
 .context-popup {
     position: absolute;
     width: 225px;
