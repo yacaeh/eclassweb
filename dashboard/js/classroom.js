@@ -205,14 +205,14 @@ connection.onmessage = function (event) {
         }
         return;
     }
-    
-    if(event.data.alert) {     
-        classroomInfo.alert.receivAlert ();    
-        return;    
+
+    if (event.data.alert) {
+        classroomInfo.alert.receivAlert();
+        return;
     }
 
-    if(event.data.alertResponse) {     
-        classroomInfo.alert.receiveAlertResponse (event.data.alertResponse);               
+    if (event.data.alertResponse) {
+        classroomInfo.alert.receiveAlertResponse(event.data.alertResponse);
         return;
     };
 
@@ -222,24 +222,23 @@ connection.onmessage = function (event) {
         return;
     }
 
-    if(event.data.examAnswer) {
+    if (event.data.examAnswer) {
 
     }
 
     //3d 모델링 Enable
-    if(event.data.modelEnable)
-    {
+    if (event.data.modelEnable) {
         console.log(event.data.modelEnable);
 
         var jthis = $(this);
         var enable = event.data.modelEnable.enable;
-        modelEnable(jthis, enable , false);
+        modelEnable(jthis, enable, false);
         return;
 
     }
 
     //3d 모델링 상대값
-    if(event.data.ModelState) {
+    if (event.data.ModelState) {
 
         console.log(event.data.ModelState);
 
@@ -252,7 +251,7 @@ connection.onmessage = function (event) {
 
 
 // extra code
-connection.onstream = function(event) {
+connection.onstream = function (event) {
     console.log("onstream!");
     if (event.stream.isScreen && !event.stream.canvasStream) {
         $('#screen-viewer').get(0).srcObject = event.stream;
@@ -723,25 +722,25 @@ $('#top_share_screen').click(function () {
 });
 
 
-function ClassTime(){
+function ClassTime() {
     var now = 0;
-    function Sec(){
+    function Sec() {
         now++;
         var time = now;
 
         var hour = Math.floor(time / 3600);
         time %= 3600;
-        
+
         var min = Math.floor(time / 60);
         time %= 60;
 
-        if(min <10)
+        if (min < 10)
             min = "0" + min;
 
-        if(time < 10)
+        if (time < 10)
             time = "0" + time;
 
-        $("#current-day").text(hour+":"+min+":"+time);
+        $("#current-day").text(hour + ":" + min + ":" + time);
     }
     setInterval(Sec, 1000);
 }
@@ -751,15 +750,15 @@ ClassTime();
 
 
 
-function SetTeacher(){
-    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+function SetTeacher() {
+    $('#session-id').text(connection.extra.userFullName + "(" + params.sessionid + ")");
     $("#my-name").remove();
     $(".for_teacher").show();
 }
 
-function SetStudent(){
-    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
-    $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
+function SetStudent() {
+    $('#session-id').text(connection.extra.userFullName + "(" + params.sessionid + ")");
+    $("#my-name").text("학생 이름 : " + connection.extra.userFullName);
     $(".for_teacher").hide();
     $("#main-video").show();
     $("#top_all_controll").hide();
@@ -809,12 +808,12 @@ $('#top_test').click(function () {
         // 선생님
         if (params.open === 'true') {
             $("#exam-omr").hide();
-            $("#exam-setting-bar").show();
+            $("#exam-teacher-menu").show();
         }
         // 학생
         else {
             $("#exam-omr").show();
-            $("#exam-setting-bar").hide();
+            $("#exam-teacher-menu").hide();
         }
         $('#exam-board').show(300);
     }
@@ -840,12 +839,12 @@ $('#exam-setting-apply').click(function () {
 
 // 문제 1개 추가
 $('#exam-add-question').click(function () {
-    apeendQuestion(++m_QuesCount);  
+    apeendQuestion(++m_QuesCount);
     $('#exam-question-count').val(m_QuesCount);
 });
 
 // 시험 시작, 종료
-$('#exam-start').toggle(function () {
+$('#exam-start').click(function () {
     if (!examObj.checkAnswerChecked()) {
         //  TODO : 모든 문제에 대한 답 작성 하라는 알림
         console.log('빠진 답');
@@ -862,37 +861,51 @@ $('#exam-start').toggle(function () {
 
     var answerList = getQuestionAnswerList();
 
-    $('#exam-start').attr('class', 'btn btn-danger');
-    $('#exam-start').html('시험 종료');
-
     examObj.examAnswer = answerList;
     examObj.sendExamStart(parseInt(m_ExamTime / 60));
 
+    $('#exam-setting-bar').hide();
+    showExamStateForm();
+
+    $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
-        $('#exam-time').val(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+        $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
         if (m_ExamTime <= 0)
             $('#exam-start').click();
     }, 1000);
+});
 
-    showExamStateForm();
-
-}, function () {
-    $('#exam-start').attr('class', 'btn btn-exam');
-    $('#exam-start').html('시험 시작');
+function finishExam() {
     clearInterval(m_ExamTimerInterval);
     $('#exam-time').val(parseInt(m_ExamTime / 60))
-
+    $('#exam-setting-bar').show();
+    $('#exam-state').html("");
+    console.log(123);
     examObj.sendExamEnd();
-});
+}
 
 // 시험 문제 정답률 폼 표시
 function showExamStateForm() {
     $('#exam-state').show();
     var stateHtmlStr = "";
+
+    stateHtmlStr += "<div class='exam-header'>";
+    stateHtmlStr += "<div>시험 중</div>";
+    stateHtmlStr += "<div id='exam-teacher-timer' style='color:red;'>0:0</div>";
+    stateHtmlStr += "</div>";
+    stateHtmlStr += "<div class='exam-background exam-overflow'>";
     for (var i = 1; i <= m_QuesCount; i++) {
-        stateHtmlStr += `<span style='font-weight:bold'>${i}.</span><progress id="exam-state-progress-${i}" value="0" max="100"></progress><span id="exam-state-percent-${i}" >0%</span><br>`;
+        stateHtmlStr += `<div style='display:flex; height:3vh;'>`;
+        stateHtmlStr += `<span class='text-center-bold' style='flex:1;'>${i}.</span>`;
+        stateHtmlStr += `<progress style='flex:4; margin-top:10px' id="exam-state-progress-${i}" class='exam-state-progress'  value="0" max="100"></progress>`;
+        stateHtmlStr += `<span style='flex:1; text-align:center;'  id='exam-state-percent-${i}'>0%</span><br>`;
+        stateHtmlStr += `</div>`;
     }
+    stateHtmlStr += "</div>";
+    stateHtmlStr += "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>시험 종료</button>"
+
+
     $('#exam-state').html(stateHtmlStr);
 }
 
@@ -906,14 +919,14 @@ function setExamState(num, percent) {
 function apeendQuestion(i) {
     question = `<div id='exam-question-${i}' style='display: flex;'>`
 
-    question += `<span id='exam-question-text-${i}' style='flex:2; text-align:center; font-weight:bold; margin-top:2px;'>${i}.</span>`;
+    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:2; margin-top:2px;'>${i}.</span>`;
 
     for (var j = 1; j <= 5; j++) {
         question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
         question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
     }
 
-    question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam' style='flex:1; padding: 0px 3px 0px 3px; margin:5px; font-weight:bold;'>─</button>`;
+    question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 0px 3px; margin:5px;'>─</button>`;
 
     question += `</div>`;
     $('#exam-qustion-list').append(question);
@@ -961,25 +974,33 @@ function setStudentOMR(quesCount, examTime) {
     $('#exam-board').show();
 
     $('#exam-omr').html("");
-    question = "<div id='exam-student-timer'>0:0</div>"
+    var question = "";
 
+    question += "<div class='exam-header'>";
+    question += "<div>시험 중</div>";
+    question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
+    question += "</div>";
+    question += "<div id='exam-question-list' class='exam-border-bottom'>";
     m_QuesCount = quesCount;
     for (var i = 1; i <= m_QuesCount; i++) {
-        question += `<div id='exam-question-${i}' onchange='omrChange(${i})'>`
+        question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`
 
-        question += `<span id='exam-question-text-${i}'>${i}: </span>`;
+        question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1;'>${i}.</span>`;
 
         for (var j = 1; j <= 5; j++) {
-            question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
+            question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
             question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
         }
+        question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1;'></span>`;
 
         question += `</div>`;
     }
-    question += "<button onclick='submitOMR()' class='btn btn-primary'>시험제출</button>";
+    question += `</div>`;
+    question += "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
     $('#exam-omr').html(question);
 
     m_ExamTime = parseInt(examTime * 60);
+    $('#exam-student-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
 
     m_ExamTimerInterval = setInterval(function () {
         m_ExamTime--;
@@ -1001,10 +1022,24 @@ function submitOMR() {
     examObj.examAnswer = studentOMR;
     //  console.log(studentOMR);
 
+    $('#exam-question-list').css('pointer-events','none');
+    $('#exam-answer-submit').hide();
+
     examObj.sendSubmit();
 
-    $('#exam-omr').html("");
-    $('#exam-board').hide();
+    // $('#exam-omr').html("");
+    // $('#exam-board').hide();
+}
+
+// 학생 정답 표시
+function markStudent(num, check, answer){
+    if(check === answer){
+        $(`#exam-question-${num}`).css('background-color','lightgreen');
+    }
+    else{
+        $(`#exam-question-${num}`).css('background-color','pink');
+    }
+    $(`#exam-student-answer-${num}`).html(answer);
 }
 
 // 학생 OMR이 변경됨
@@ -1196,12 +1231,12 @@ function alertBox(message, title, callback_yes, callback_no) {
 
 
 $('#top_alert').click(function () {
-    classroomInfo.alert.sendAlert ();
+    classroomInfo.alert.sendAlert();
 });
 
 
 // 학생들 제어하기 버튼
-$('#top_all_controll').click ( () =>  {
+$('#top_all_controll').click(() => {
     // if(connection.extra.roomOwner) {      
     //     var currentAllControlState = !connection.extra.classRoom.allControl;
     //     connection.extra.classRoom.allControl = currentAllControlState;
