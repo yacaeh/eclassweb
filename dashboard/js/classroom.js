@@ -907,13 +907,19 @@ $('#exam-setting-apply').click(function () {
 
 // 문제 1개 추가
 $('#exam-add-question').click(function () {
-    apeendQuestion(++m_QuesCount);
-    examObj.questionCount += 1;
+    apeendQuestion(++m_QuesCount);  
+    ++examObj.questionCount;
     $('#exam-question-count').val(m_QuesCount);
 });
 
 // 시험 시작, 종료
 $('#exam-start').toggle(function () {
+    if(!examObj.checkAnswerChecked()) {
+        //  TODO : 모든 문제에 대한 답 작성 하라는 알림
+        console.log('빠진 답');
+        return;
+    }    
+
     if (isNaN($('#exam-time').val())) {
         // TODO : 시간 설정하라고 알림
         $('#exam-start').click();
@@ -936,16 +942,16 @@ $('#exam-start').toggle(function () {
         if (m_ExamTime <= 0)
             $('#exam-start').click();
     }, 1000);
-    // TODO : 학생들에게 시험 시작을 알려줌
 
     showExamStateForm();
+
 }, function () {
     $('#exam-start').attr('class', 'btn btn-primary');
     $('#exam-start').html('시작');
-    clearInterval(m_ExamTimerInterval);
-    examObj.sendExamEnd ();
+    clearInterval(m_ExamTimerInterval);    
     $('#exam-time').val(parseInt(m_ExamTime / 60))
-    // TODO : 학생들에게 시험 종료 알려줌
+
+    examObj.sendExamEnd ();
 });
 
 // 시험 문제 상태(응답률) 폼 표시
@@ -1196,9 +1202,19 @@ examObj.receiveExamData = function(_data) {
     }
 };
 
+//  시험지 모든 문제에 체크를 했는지 확인. 
+examObj.checkAnswerChecked = function () {
+    for(let i = 1; i <= examObj.questionCount; ++i) {
+        let checked = 1 == $(`input:radio[name='exam-question-${i}']:checked`).length;                
+        if(!checked)
+            return false;
+    }
+    return true;
+};
+
 examObj.sendExamStart  = function(_examTime) {
     if(connection.extra.roomOwner)
-    {        
+    {    
         examObj.isStart = true;
         examObj.totalCount = connection.getAllParticipants().length;
         examObj.examTime = _examTime;
@@ -1283,7 +1299,13 @@ examObj.receiveSubmit = function (submit) {
         const len = examObj.totalCount;
         examObj.submitCount += 1;
         if(examObj.totalCount == examObj.submitCount)   // 마지막 제출이 끝났을 때, 결과를 export 한다.
-            examObj.exportExam ();
+          { 
+               examObj.exportExam ();
+               $('#exam-start').attr('class', 'btn btn-primary');
+               $('#exam-start').html('시작');
+               clearInterval(m_ExamTimerInterval);    
+               $('#exam-time').val(parseInt(m_ExamTime / 60))
+          }
     }
 };
 
@@ -1351,6 +1373,8 @@ examObj.exportExam = function () {
 };
 
 
+
+
 // 학생들 OMR 세팅 
 function setStudentOMR(quesCount, examTime) {
     $("#exam-omr").show();
@@ -1387,6 +1411,12 @@ function setStudentOMR(quesCount, examTime) {
 
 // 학생 시험 OMR 제출
 function submitOMR() {
+    if(!examObj.checkAnswerChecked())
+    {
+        // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
+        return;
+    }
+
     clearInterval(m_ExamTimerInterval);
     var studentOMR = getQuestionAnswerList();
     examObj.examAnswer = studentOMR;
