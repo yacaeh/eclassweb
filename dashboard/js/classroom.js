@@ -1007,3 +1007,21 @@ $("#top_3d").click(function(){
         jthis.removeClass('top_3d_on')
     }
 })
+
+
+$("#top_alert").click(function(){
+    $("#renderCanvas").toggle();
+    var visible = $("#renderCanvas").is(':visible');
+    
+    var jthis = $(this);
+    if(visible){
+        jthis.addClass('top_3d_on');
+        jthis.removeClass('top_3d_off')
+    }
+    else{
+        jthis.addClass('top_3d_off');
+        jthis.removeClass('top_3d_on')
+    }
+})
+
+
