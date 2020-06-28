@@ -102,10 +102,13 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: true,
 };
 
-connection.onUserStatusChanged = function (event) {
-  console.log('onUserStatusChanged!');
-  var infoBar = document.getElementById('onUserStatusChanged');
-  var names = [];
+connection.onUserStatusChanged = function (event) {   
+    var infoBar = document.getElementById('onUserStatusChanged');
+    var names = [];
+
+    connection.getAllParticipants().forEach(function (pid) {
+        names.push(getFullName(pid));
+    });
 
   connection.getAllParticipants().forEach(function (pid) {
     names.push(getFullName(pid));
@@ -120,6 +123,7 @@ connection.onUserStatusChanged = function (event) {
   SetStudentList();
 };
 
+
 connection.onopen = function (event) {
   console.log('onopen!');
   connection.onUserStatusChanged(event);
@@ -130,8 +134,12 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-  document.getElementById('top_attach-file').style.display = 'inline-block';
-  document.getElementById('top_share_screen').style.display = 'inline-block';
+    document.getElementById('top_attach-file').style.display = 'inline-block';
+    document.getElementById('top_share_screen').style.display = 'inline-block';
+
+    // 접속시 방정보 동기화.
+    if(connection.extra.roomOwner)
+        classroomCommand.sendsyncRoomInfo ();
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -142,41 +150,100 @@ connection.onclose = connection.onerror = connection.onleave = function (
 };
 
 connection.onmessage = function (event) {
-  if (event.data.showMainVideo) {
-    // $('#main-video').show();
-    $('#screen-viewer').css({
-      top: $('#widget-container').offset().top,
-      left: $('#widget-container').offset().left,
-      width: $('#widget-container').width(),
-      height: $('#widget-container').height(),
-    });
-    $('#screen-viewer').show();
-    return;
-  }
-
-  if (event.data.hideMainVideo) {
-    // $('#main-video').hide();
-    $('#screen-viewer').hide();
-    return;
-  }
-
-  if (event.data.typing === false) {
-    $('#key-press').hide().find('span').html('');
-    return;
-  }
-
-  if (event.data.chatMessage) {
-    appendChatMessage(event);
-    return;
-  }
-
-  if (event.data.checkmark === 'received') {
-    var checkmarkElement = document.getElementById(event.data.checkmark_id);
-    if (checkmarkElement) {
-      checkmarkElement.style.display = 'inline';
+    if (event.data.showMainVideo) {
+        // $('#main-video').show();
+        $('#screen-viewer').css({
+            top: $('#widget-container').offset().top,
+            left: $('#widget-container').offset().left,
+            width: $('#widget-container').width(),
+            height: $('#widget-container').height()
+        });
+        $('#screen-viewer').show();
+        return;
     }
-    return;
-  }
+
+    if (event.data.hideMainVideo) {
+        // $('#main-video').hide();
+        $('#screen-viewer').hide();
+        return;
+    }
+
+
+    if (event.data.typing === false) {
+        $('#key-press').hide().find('span').html('');
+        return;
+    }
+
+    if (event.data.chatMessage) {
+        appendChatMessage(event);
+        return;
+    }
+
+    if (event.data.checkmark === 'received') {
+        var checkmarkElement = document.getElementById(event.data.checkmark_id);
+        if (checkmarkElement) {
+            checkmarkElement.style.display = 'inline';
+        }
+        return;
+    }
+
+    if (event.data === 'plz-sync-points') {
+        designer.sync();
+        return;
+    }
+
+
+    if (null != event.data.allControl) {
+        if (/*!checkRoomOwner()*/true) {
+            classroomInfo.allControl = event.data.allControl;
+            
+            if (event.data.allControl) {
+                // 제어 하기    
+                allControllEnable(top_all_controll_jthis,true,false);        
+            }
+            else {
+                // 제어 풀기
+                allControllEnable(top_all_controll_jthis,false,false);       
+                
+            }
+        }
+        return;
+    }
+    
+    if(event.data.alert) {     
+        classroomCommand.receivAlert ();    
+        return;    
+    }
+
+    if(event.data.alertResponse) {     
+        classroomCommand.receiveAlertResponse (event.data.alertResponse);               
+        return;
+    };
+
+    if (event.data.exam) {
+        // 시험치기..        
+        examObj.receiveExamData(event.data.exam);
+        return;
+    }
+
+
+    if(event.data.roomSync) {
+        console.log('event.data.roomSync');;
+        classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
+        return;
+    };
+
+    //3d 모델링 Enable
+    if(event.data.modelEnable)
+    {
+        console.log(event.data.modelEnable);
+
+        
+        var enable = event.data.modelEnable.enable;
+        modelEnable(top_3d_render_jthis, enable , false);
+        return;
+
+    }
 
   if (event.data === 'plz-sync-points') {
     designer.sync();
@@ -1040,10 +1107,10 @@ function setStudentOMR(quesCount, examTime) {
 
 // 학생 시험 OMR 제출
 function submitOMR() {
-  if (!examObj.checkAnswerChecked()) {
-    // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
-    return;
-  }
+    if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
+        // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
+        return;
+    }
 
   clearInterval(m_ExamTimerInterval);
   var studentOMR = getQuestionAnswerList();
@@ -1294,16 +1361,6 @@ function alertBox(message, title, callback_yes, callback_no) {
 }
 
 $('#top_alert').click(function () {
-  classroomInfo.alert.sendAlert();
+    classroomCommand.sendAlert ();
 });
 
-// 학생들 제어하기 버튼
-$('#top_all_controll').click(() => {
-  // if(connection.extra.roomOwner) {
-  //     var currentAllControlState = !connection.extra.classRoom.allControl;
-  //     connection.extra.classRoom.allControl = currentAllControlState;
-  //     connection.send({
-  //         allControl : currentAllControlState
-  //     });
-  // }
-});
