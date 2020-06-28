@@ -36,7 +36,6 @@ console.log(connection);
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
-console.log("designer!");
 
 // you can place widget.html anywhere
 designer.widgetHtmlURL = './canvas/widget.html';
@@ -44,17 +43,15 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.addSyncListener(function(data){
-    console.log(data);
-    console.log(data);
+designer.icons.pencil = '/dashboard/img/pen.png';
+designer.icons.marker = '/dashboard/img/pen2.png';
+designer.icons.eraser = '/dashboard/img/eraser.png';
+designer.icons.clearCanvas = '/dashboard/img/refresh.png';
+designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
+designer.icons.on = '/dashboard/img/view_on.png';
+designer.icons.off = '/dashboard/img/view_off.png';
 
-})
-console.log(designer)
-
-designer.icons.pencil = '/dashboard/img/pen.png'
-designer.icons.marker = '/dashboard/img/pen2.png'
-designer.icons.eraser = '/dashboard/img/eraser.png'
-designer.icons.clearCanvas = '/dashboard/img/refresh.png'
+console.log(designer.icons);
 
 designer.addSyncListener(function(data) {
     connection.send(data);
@@ -67,7 +64,7 @@ designer.setTools({
     image: true,
     pdf: false,
     eraser: true,
-    line: false,
+    line: true,
     arrow: false,
     dragSingle: false,
     dragMultiple: false,
@@ -80,6 +77,7 @@ designer.setTools({
     lineWidth: false,
     colorsPicker: false,
     clearCanvas: true,
+    onoff: true,
     code: false,
     undo: true,
 });
@@ -129,7 +127,7 @@ connection.onopen = function(event) {
         }, 1000);
     }
 
-    document.getElementById('btn-attach-file').style.display = 'inline-block';
+    document.getElementById('top_attach-file').style.display = 'inline-block';
     document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
@@ -218,13 +216,10 @@ connection.onmessage = function(event) {
 
     if(event.data.exam) {
         // 시험치기..        
-
+        examObj.receiveExamData (event.data.exam);
         return;
     }
 
-    if(event.data.examAnswer) {
-
-    }
 
     designer.syncData(event.data);
 };
@@ -443,7 +438,7 @@ window.onkeyup = function(e) {
 };
 
 var recentFile;
-document.getElementById('btn-attach-file').onclick = function() {
+document.getElementById('top_attach-file').onclick = function() {
     var file = new FileSelector();
     file.selectSingleFile(function(file) {
         recentFile = file;
@@ -582,18 +577,29 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             });
     } else {
         console.log("try joining!");
+        connection.DetectRTC.load(function() { 
             SetStudent();
 
-            // Disable student media devices on joining
-            connection.mediaConstraints.video = false;
-            connection.session.video = false;
-            connection.mediaConstraints.audio = false;
-            connection.session.audio = false;
-            connection.session.oneway = true;
-            connection.sdpConstraints.mandatory = {
-                OfferToReceiveAudio: false,
-                OfferToReceiveVideo: false
-            };
+            if (!connection.DetectRTC.hasMicrophone) {
+                connection.mediaConstraints.audio = false;
+                connection.session.audio = false;
+                console.log("user has no mic!");
+                alert("마이크가 없습니다!");
+            }
+        
+            if (!connection.DetectRTC.hasWebcam) {
+                connection.mediaConstraints.video = false;
+                connection.session.video = false;
+                console.log("user has no cam!");
+                alert("캠이 없습니다!");
+                connection.session.oneway = true;
+                connection.sdpConstraints.mandatory = {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                };
+    
+            }
+        });    
      
         connection.join({sessionid:params.sessionid,
                          userid: connection.channel,
@@ -763,12 +769,10 @@ $('#top_share_screen').click(function() {
 });
 
 
-
-console.log("success");
-
-
-
 function TimeUpdate(){
+    var time =  document.getElementById("main-video").currentTime;
+console.log(time);
+
     var date = new Date;
     var year = date.getFullYear();
     var month = date.getMonth();
@@ -848,7 +852,220 @@ function SelectViewType(){
     })
 }
 
-$("#icon_exit").click(function(){
+$('#top_test').click(function () {
+    if ($('#exam-board').is(':visible')) {
+        $('#exam-board').hide();
+    }
+    else {
+        // 선생님
+        if (params.open === 'true') {
+            $("#exam-omr").hide();
+            $("#exam-setting-bar").show();
+        }
+        // 학생
+        else {
+            $("#exam-omr").show();
+            $("#exam-setting-bar").hide();
+        }
+        $('#exam-board').show();
+    }
+});
+
+
+var m_QuesCount = 0;    // 현재 문제수
+var m_ExamTimerInterval;    // 시험 타이머 인터벌
+var m_ExamTime; // 
+
+
+// 문제수 적용 (문제 n개 만들기)
+$('#exam-setting-apply').click(function () {
+    m_QuesCount = $('#exam-question-count').val();
+    examObj.questionCount = m_QuesCount;
+    var answerList = getQuestionAnswerList();
+    $('#exam-qustion-list').html("");
+    for (var i = 1; i <= m_QuesCount; i++) {
+        apeendQuestion(i);
+    }
+
+    setQuestionAnswer(answerList);
+});
+
+// 문제 1개 추가
+$('#exam-add-question').click(function () {
+    apeendQuestion(++m_QuesCount);  
+    ++examObj.questionCount;
+    $('#exam-question-count').val(m_QuesCount);
+});
+
+// 시험 시작, 종료
+$('#exam-start').toggle(function () {
+    if(!examObj.checkAnswerChecked()) {
+        //  TODO : 모든 문제에 대한 답 작성 하라는 알림
+        console.log('빠진 답');
+        return;
+    }    
+
+    if (isNaN($('#exam-time').val())) {
+        // TODO : 시간 설정하라고 알림
+        $('#exam-start').click();
+        return;
+    } else {
+        m_ExamTime = parseInt($('#exam-time').val() * 60);
+    }
+
+    var answerList = getQuestionAnswerList();
+
+    $('#exam-start').attr('class', 'btn btn-danger');
+    $('#exam-start').html('종료');
+
+    examObj.examAnswer = answerList;
+    examObj.sendExamStart (parseInt(m_ExamTime / 60));
+
+    m_ExamTimerInterval = setInterval(function () {
+        m_ExamTime--;
+        $('#exam-time').val(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+        if (m_ExamTime <= 0)
+            $('#exam-start').click();
+    }, 1000);
+
+    showExamStateForm();
+
+}, function () {
+    $('#exam-start').attr('class', 'btn btn-primary');
+    $('#exam-start').html('시작');
+    clearInterval(m_ExamTimerInterval);    
+    $('#exam-time').val(parseInt(m_ExamTime / 60))
+
+    examObj.sendExamEnd ();
+});
+
+// 시험 문제 상태(응답률) 폼 표시
+function showExamStateForm(){
+    $('#exam-state').show();
+    var stateHtmlStr = "";
+    for (var i = 1; i <= m_QuesCount; i++) {
+        stateHtmlStr += `<span>${i}번</span><progress id="exam-state-progress-${i}" value="0" max="100"></progress><span id="exam-state-percent-${i}" >0%</span><br>`;
+    }
+    $('#exam-state').html(stateHtmlStr);
+}
+
+// 시험 문제 하나의 상태(응답률) 변경 / 형식 -> (문제번호, 문제응답률/학생수)
+function setExamState(num, percent){
+    $(`#exam-state-progress-${num}`).val(percent);
+    $(`#exam-state-percent-${num}`).html(percent+"%");
+}
+
+// 문제 html에 하나 추가 (apeend)
+function apeendQuestion(i) {
+    question = `<div id='exam-question-${i}'>`
+
+    question += `<span id='exam-question-text-${i}'>${i}: </span>`;
+
+    for (var j = 1; j <= 5; j++) {
+        question += `<label for='exam-question-${i}_${j}'>${j}번</label>`;
+        question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
+    }
+
+    question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-primary'>-</button>`;
+
+    question += `</div>`;
+    $('#exam-qustion-list').append(question);
+}
+
+// 문제 하나 제거
+function deleteQuestion(num) {
+    var answerList = getQuestionAnswerList();
+    m_QuesCount--;
+    answerList.splice(num - 1, 1);
+    $('#exam-qustion-list').html("");
+    for (var i = 1; i <= m_QuesCount; i++) {
+        apeendQuestion(i);
+    }
+    setQuestionAnswer(answerList);
+    $('#exam-question-count').val(m_QuesCount);
+}
+
+// 문제 정답 불러오기
+function getQuestionAnswerList() {
+    var checkList = new Array();
+    for (var i = 1; i <= m_QuesCount; i++) {
+        checkList.push($(`input:radio[name='exam-question-${i}']:checked`).val());
+    }
+    return checkList;
+}
+
+// 문제 정답 세팅
+function setQuestionAnswer(answerList) {
+    for (let i = 1; i <= m_QuesCount; i++) {
+        $(`input:radio[name='exam-question-${i}'][value=${answerList[i - 1]}]`).prop('checked', true);
+    }    
+}
+
+
+
+// 학생들 OMR 세팅 
+function setStudentOMR(quesCount, examTime) {
+    $("#exam-omr").show();
+    $('#exam-board').show();
+
+    $('#exam-omr').html("");
+    question = "<div id='exam-student-timer'>0:0</div>"
+
+    m_QuesCount = quesCount;
+    for (var i = 1; i <= m_QuesCount; i++) {
+        question += `<div id='exam-question-${i}' onchange='omrChange(${i})'>`
+
+        question += `<span id='exam-question-text-${i}'>${i}: </span>`;
+
+        for (var j = 1; j <= 5; j++) {
+            question += `<label for='exam-question-${i}_${j}'>${j}번</label>`;
+            question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
+        }
+
+        question += `</div>`;
+    }
+    question += "<button onclick='submitOMR()' class='btn btn-primary'>시험제출</button>";
+    $('#exam-omr').html(question);
+
+    m_ExamTime = parseInt(examTime * 60);
+
+    m_ExamTimerInterval = setInterval(function () {
+        m_ExamTime--;
+        $('#exam-student-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+        if (m_ExamTime <= 0)
+            clearInterval(m_ExamTimerInterval);
+    }, 1000);
+}
+
+// 학생 시험 OMR 제출
+function submitOMR() {
+    if(!examObj.checkAnswerChecked())
+    {
+        // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
+        return;
+    }
+
+    clearInterval(m_ExamTimerInterval);
+    var studentOMR = getQuestionAnswerList();
+    examObj.examAnswer = studentOMR;
+  //  console.log(studentOMR);
+    
+    examObj.sendSubmit ();
+
+    $('#exam-omr').html("");
+    $('#exam-board').hide();
+}
+
+// 학생 OMR이 변경됨
+function omrChange(num){
+    // console.log(num + "번이 변경됨");    
+    var questionNumber = num;
+    var answerNumber = $(`input:radio[name='exam-question-${num}']:checked`).val();
+
+    // 선생한테 전송.
+    examObj.sendSelectExamAnswerToTeacher (questionNumber, answerNumber);
+}
+    $("#icon_exit").click(function(){
     history.back();
 })
 
@@ -992,18 +1209,54 @@ function loadPDF(){
 }
 
 
+_3DCanvasFunc();
 
-$("#top_3d").click(function(){
-    $("#renderCanvas").toggle();
-    var visible = $("#renderCanvas").is(':visible');
+function _3DCanvasFunc(){
+    var _3dcanvas =  $("#renderCanvas");
+    var rtime;
+    var timeout = false;
+    var delta = 400;
     
-    var jthis = $(this);
-    if(visible){
-        jthis.addClass('top_3d_on');
-        jthis.removeClass('top_3d_off')
+    $("#top_3d").click(function(){
+        _3dcanvas.toggle();
+        var visible = _3dcanvas.is(':visible');
+        var jthis = $(this);
+    
+        if(visible){
+            CanvasResize();
+            jthis.addClass('top_3d_on');
+            jthis.removeClass('top_3d_off')
+        }
+        else{
+            jthis.addClass('top_3d_off');
+            jthis.removeClass('top_3d_on')
+        }
+    })
+
+    function CanvasResize(){
+        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+        var canvas =  frame.document.getElementById("main-canvas")
+        var r = document.getElementsByClassName("lwindow")[0];
+        var rwidth = $(r).width();
+        _3dcanvas.attr("width", canvas.width - rwidth - 50 );
+        _3dcanvas.attr("height", canvas.height- 60);
     }
-    else{
-        jthis.addClass('top_3d_off');
-        jthis.removeClass('top_3d_on')
+
+    window.addEventListener("resize", function() {
+        rtime = new Date();
+        if (timeout === false) {
+            timeout = true;
+            setTimeout(resizeend, delta);
+        }
+    });
+    
+    function resizeend() {
+        if (new Date() - rtime < delta) {
+            setTimeout(resizeend, delta);
+        } else {
+            timeout = false;
+            CanvasResize();
+        }               
     }
-})
+
+}
