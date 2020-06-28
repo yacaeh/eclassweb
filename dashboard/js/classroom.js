@@ -218,16 +218,6 @@ connection.onmessage = function(event) {
 };
 
 
-connection.extra.classRoom = {
-    allControl : false,
-    shareScreen : false,
-    share3D : false,
-    exam : {
-        // 문항수
-        // 시간
-    }
-};
-
 // extra code
 connection.onstream = function(event) {
     console.log("onstream!");
