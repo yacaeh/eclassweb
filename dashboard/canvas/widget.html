@@ -22,27 +22,32 @@
     </section>
 
     <section id="tool-box" class="tool-box">
-        <canvas id="onoff-icon" class="on" width="40" height="40" title="On OFf"></canvas>
-        <canvas id="pencil-icon" width="40" height="40" title="연필"></canvas>
-        <canvas id="marker-icon" width="40" height="40" title="마커"></canvas>
-        <canvas id="eraser-icon" width="40" height="40" title="지우개"></canvas>
-        <canvas id="text-icon" width="40" height="40" title="글자를 적습니다"></canvas>
-        <canvas id="image-icon" width="40" height="40" title="이미지를 불러옵니다"></canvas>
-        <canvas id="pdf-icon" width="40" height="40" title="PDF파일을 불러옵니다"></canvas>
-        <canvas id="undo" width="40" height="40" title="작업 하나를 취소합니다"></canvas>
-        <canvas id="clear_canvas" width="40" height="40" title="캔버스를 비웁니다"></canvas>
+        
+        <canvas id="onoff-icon" class="on" width="28" height="28" title="On OFf"></canvas>
+        <canvas id="pencil-icon" width="28" height="28" title="연필"></canvas>
+        <canvas id="marker-icon" width="28" height="28" title="마커"></canvas>
+        <canvas id="eraser-icon" width="28" height="28" title="지우개"></canvas>
+        <canvas id="text-icon" width="28" height="28" title="글자를 적습니다"></canvas>
+        <canvas id="image-icon" width="28" height="28" title="이미지를 불러옵니다"></canvas>
+        <canvas id="pdf-icon" width="28" height="28" title="PDF파일을 불러옵니다"></canvas>
+        <canvas id="undo" width="28" height="28" title="작업 하나를 취소합니다"></canvas>
+        <canvas id="clear_canvas" width="28" height="28" title="캔버스를 비웁니다"></canvas>
 
-        <canvas id="drag-last-path" width="40" height="40" title="Drag/move last path"></canvas>
-        <canvas id="drag-all-paths" width="40" height="40" title="Drag/move all paths"></canvas>
-        <canvas id="arrow" width="40" height="40" title="Draw Arrows"></canvas>
-        <canvas id="zoom-up" width="40" height="40" title="Zoon-In"></canvas>
-        <canvas id="zoom-down" width="40" height="40" title="Zoom-Out"></canvas>
-        <canvas id="arc" width="40" height="40" title="Arc"></canvas>
-        <canvas id="rectangle" width="40" height="40" title="Rectangle"></canvas>
-        <canvas id="quadratic-curve" width="40" height="40" title="Quadratic curve"></canvas>
-        <canvas id="bezier-curve" width="40" height="40" title="Bezier curve"></canvas>
-        <canvas id="line-width" width="40" height="40" title="Set line-width"></canvas>
-        <canvas id="colors" width="40" height="40" title="Set foreground and background colors"></canvas>
+        <canvas id="drag-last-path" width="28" height="28" title="Drag/move last path"></canvas>
+        <canvas id="drag-all-paths" width="28" height="28" title="Drag/move all paths"></canvas>
+        <canvas id="arrow" width="28" height="28" title="Draw Arrows"></canvas>
+        <canvas id="zoom-up" width="28" height="28" title="Zoon-In"></canvas>
+        <canvas id="zoom-down" width="28" height="28" title="Zoom-Out"></canvas>
+        <canvas id="arc" width="28" height="28" title="Arc"></canvas>
+        <canvas id="rectangle" width="28" height="28" title="Rectangle"></canvas>
+        <canvas id="quadratic-curve" width="28" height="28" title="Quadratic curve"></canvas>
+        <canvas id="bezier-curve" width="28" height="28" title="Bezier curve"></canvas>
+        <canvas id="line-width" width="28" height="28" title="Set line-width"></canvas>
+        <canvas id="colors" width="28" height="28" title="Set foreground and background colors"></canvas>
+    </section>
+    <section id="titlebox">
+        <span id="titletext">설명입니다</span>
+
     </section>
 
     <!-- pdf -->
@@ -158,8 +163,8 @@
     </section>
 
     <section id="pencil-container" class="context-popup colors-container">
-        <div class="input-div">
-            <label for="pencil-stroke-style">굵기:</label>
+        <span class="input-div">
+
             <select id="pencil-stroke-style" value="8">
                 <option value='5'>5</option>
                 <option value='6'>6</option>
@@ -183,9 +188,9 @@
                 <option value='48'>48</option>
                 <option value='72'>72</option>
             </select>
-        </div>
-        <div class="input-div" id='pencil-color-container'>
-            <label for="pencil-fill-style">색깔:</label>
+        </span>
+
+        <span class="input-div" id='pencil-color-container'>
             <div id="pencil-selected-color"></div>
             <div id="pencil-fill-colors" class='context-popup'>
                 <div class="top">
@@ -193,25 +198,12 @@
                     <input id="pencil-fill-style" type="text" value="6699FF">
                 </div>
                 <table id="pencil-colors-list">
-
                 </table>
             </div>
         </div>
-        </div>
+        </span>
 
         <div id="pencil-done" style="display: none;" class="btn-007">선택</div>
-    </section>
-
-
-    <section id="copy-container" class="context-popup">
-        <div>
-            <input type="checkbox" id="copy-last" checked="" />
-            <label for="copy-last">Copy last path</label>
-        </div>
-        <div style="margin-top: 5px;">
-            <input type="checkbox" id="copy-all" />
-            <label for="copy-all">Copy all paths</label>
-        </div>
     </section>
 
   
