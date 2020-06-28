@@ -43,10 +43,10 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.icons.pencil = '/dashboard/img/pen.png';
-designer.icons.marker = '/dashboard/img/pen2.png';
-designer.icons.eraser = '/dashboard/img/eraser.png';
-designer.icons.clearCanvas = '/dashboard/img/refresh.png';
+designer.icons.pencil = '/dashboard/newimg/pen.png';
+designer.icons.marker = '/dashboard/newimg/pen2.png';
+designer.icons.eraser = '/dashboard/newimg/eraser.png';
+designer.icons.clearCanvas = '/dashboard/newimg/trash.png';
 designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
 designer.icons.on = '/dashboard/img/view_on.png';
 designer.icons.off = '/dashboard/img/view_off.png';
@@ -195,19 +195,14 @@ connection.onmessage = function (event) {
         }
         return;
     }
-
-    if (event.data.alert) {
-        alert('receive alert');
-        timeHandler = setTimeout(alertConfirm, 1000);
-        return;
+    
+    if(event.data.alert) {     
+        classroomInfo.alert.receivAlert ();    
+        return;    
     }
 
-    if (event.data.alertConfirm) {
-        if (checkRoomOwner()) {
-            console.log(connection.getAllParticipants());
-            // 체크 알림...
-            //console.log(event.data.alertConfirm);            
-        }
+    if(event.data.alertResponse) {     
+        classroomInfo.alert.receiveAlertResponse (event.data.alertResponse);               
         return;
     };
 
@@ -217,86 +212,12 @@ connection.onmessage = function (event) {
         return;
     }
 
-
     designer.syncData(event.data);
 };
 
 
-connection.extra.classRoom = {
-    allControl: false,
-    shareScreen: false,
-    share3D: false,
-    exam: {
-        // 문항수
-        // 시간
-    }
-};
-
-
-
-var timeHandler;    // 임시...
-
-function alertConfirm() {
-    connection.send({
-        alertConfirm: connection.userid
-    });
-    clearTimeout(timeHandler);
-};
-
-
-function checkRoomOwner() {
-
-    return connection.extra.roomOwner;
-};
-
-
-$('#top_all_controll').click(() => {
-    if (checkRoomOwner()) {
-        var currentAllControlState = !connection.extra.classRoom.allControl;
-        connection.extra.classRoom.allControl = currentAllControlState;
-        connection.send({
-            allControl: currentAllControlState
-        });
-    }
-});
-
-$('#top_load_book').click(() => {
-    console.log('top_load_book');
-});
-
-$('#top_test').click(() => {
-    console.log('top_test');
-});
-
-$('#top_alert').click(() => {
-    if (checkRoomOwner()) {
-        // get students numbers        
-        connection.send({
-            alert: true
-        });
-    }
-    else {
-        console.log('not room owner');
-    }
-});
-
-$('#top_3d').click(() => {
-    console.log('top_3d');
-});
-
-$('#top_share_video').click(() => {
-    console.log('top_share_video');
-});
-
-$('#top_record_video').click(() => {
-    console.log('top_record_video');
-});
-
-
-
 // extra code
-
-connection.onstream = function (event) {
+connection.onstream = function(event) {
     console.log("onstream!");
     if (event.stream.isScreen && !event.stream.canvasStream) {
         $('#screen-viewer').get(0).srcObject = event.stream;
@@ -371,7 +292,7 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b>나:</b> <img class="checkmark" id="' + checkmark_id + '" title="Received" src="https://www.webrtc-experiment.com/images/checkmark.png"><br>' + event;
+        div.innerHTML = '<b> 나 : </b>' + event;
         div.style.background = '#cbffcb';
     }
 
@@ -767,48 +688,43 @@ $('#top_share_screen').click(function () {
 });
 
 
-function TimeUpdate() {
-    var time = document.getElementById("main-video").currentTime;
-    console.log(time);
+function ClassTime(){
+    var now = 0;
+    function Sec(){
+        now++;
+        var time = now;
 
-    var date = new Date;
-    var year = date.getFullYear();
-    var month = date.getMonth();
-    var day = date.getDate();
-    var hours = date.getHours();
-    var min = date.getMinutes();
-    var sec = date.getSeconds();
+        var hour = Math.floor(time / 3600);
+        time %= 3600;
+        
+        var min = Math.floor(time / 60);
+        time %= 60;
 
-    month += 1;
-    if (month < 10)
-        month = "0" + month;
-    if (day < 10)
-        day = "0" + day;
-    if (hours < 10)
-        hours = "0" + hours;
-    if (min < 10)
-        min = "0" + min;
-    if (sec < 10)
-        sec = "0" + sec;
+        if(min <10)
+            min = "0" + min;
 
+        if(time < 10)
+            time = "0" + time;
 
-    $("#current-day").text(year + '-' + month + '-' + day);
-    $("#current-time").text(hours + ':' + min + ':' + sec);
+        $("#current-day").text(hour+":"+min+":"+time);
+    }
+    setInterval(Sec, 1000);
 }
 
-setInterval(TimeUpdate, 1000);
+ClassTime();
 
-function SetTeacher() {
-    $("#who-am-i").text("선생님");
-    $('#session-id').text(connection.extra.userFullName + "(" + params.sessionid + ")");
+
+
+
+function SetTeacher(){
+    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
 }
 
-function SetStudent() {
-    $("#who-am-i").text("학생");
-    $('#session-id').text(connection.extra.userFullName + "(" + params.sessionid + ")");
-    $("#my-name").text("학생 이름 : " + connection.extra.userFullName);
+function SetStudent(){
+    $('#session-id').text(connection.extra.userFullName+"("+params.sessionid+")");
+    $("#my-name").text("학생 이름 : "+connection.extra.userFullName);
     $(".for_teacher").hide();
     $("#main-video").show();
     $("#top_all_controll").hide();
@@ -878,7 +794,6 @@ var m_ExamTime; //
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
     m_QuesCount = $('#exam-question-count').val();
-    examObj.questionCount = m_QuesCount;
     var answerList = getQuestionAnswerList();
     $('#exam-qustion-list').html("");
     for (var i = 1; i <= m_QuesCount; i++) {
@@ -890,8 +805,7 @@ $('#exam-setting-apply').click(function () {
 
 // 문제 1개 추가
 $('#exam-add-question').click(function () {
-    apeendQuestion(++m_QuesCount);
-    ++examObj.questionCount;
+    apeendQuestion(++m_QuesCount);  
     $('#exam-question-count').val(m_QuesCount);
 });
 
@@ -1265,3 +1179,47 @@ function _3DCanvasFunc() {
     }
 
 }
+
+// 알림 박스 생성
+function alertBox(message, title, callback_yes, callback_no) {
+    callback_yes = callback_yes || function () { };
+    callback_no = callback_no || function () { };
+
+    var clickCount = 0;
+
+    $('.btn-alert-yes').unbind('click').bind('click', function (e) {
+        if (clickCount++ == 0) {
+            e.preventDefault();
+            $('#alert-box').fadeOut(300);
+            callback_yes();
+        }
+    });
+    $('.btn-alert-no').unbind('click').bind('click', function (e) {
+        if (clickCount++ == 0) {
+            e.preventDefault();
+            $('#alert-box').fadeOut(300);
+            callback_no();
+        }
+    });
+
+    $('#alert-title').html(title || '알림');
+    $('#alert-message').html(message);
+    $('#alert-box').fadeIn(300);
+}
+
+
+$('#top_alert').click(function () {
+    classroomInfo.alert.sendAlert ();
+});
+
+
+// 학생들 제어하기 버튼
+$('#top_all_controll').click ( () =>  {
+    // if(connection.extra.roomOwner) {      
+    //     var currentAllControlState = !connection.extra.classRoom.allControl;
+    //     connection.extra.classRoom.allControl = currentAllControlState;
+    //     connection.send({
+    //         allControl : currentAllControlState
+    //     });
+    // }
+});

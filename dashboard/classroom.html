@@ -27,8 +27,9 @@
     <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
     <script src="/dashboard/js/emojionearea.min.js"></script>
     <!-- <script src="/node_modules/multistreamsmixer/MultiStreamsMixer.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.4.456/build/pdf.min.js"></script>    
     <script src="/dashboard/js/examObj.js"></script>
+    <script src="/dashboard/js/classroomInfo.js"></script>
     <script defer src="/dashboard/js/classroom.js"></script>
 </head>
 
@@ -38,7 +39,6 @@
         <img id="icon_exit">
         <img id="top_logo">
 
-        <span id="who-am-i"></span>
         <span id="my-name"></span>
         <span id="session-id"></span>
 
@@ -54,8 +54,8 @@
             <img class="top_icon" id="top_share_video">
             <img class="top_icon" id="top_record_video">
             <span class="time">
-                <span id="current-day">0000-00-00</span></br>
-                <span id="current-time">00:00:00</span>
+                <span id="current-day"></span></br>
+                <span id="current-time"></span>
             </span>
         </div>
 
@@ -74,7 +74,7 @@
                 <!-- <span id="view_result" class='view_type'>Result</span> -->
                 <span class="nos">
                     <span id="nos"></span>
-                    <img src="/dashboard/img/man_icon.png">
+                    <img src="/dashboard/newimg/student.png">
                 </span>
                 <div id="student_list">
                 </div>
@@ -142,6 +142,25 @@
     <script src="/dashboard/js/babylonjs.loaders.js"></script>
 
     <script src = /dashboard/js/3d_render.js></script>
+
+    <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="alert-title">Alert</h5>
+            </div>
+            <div class="modal-body">
+              <div id="alert-message" style="text-align: center; margin-top: 10px; margin-bottom: 10px;"></div>
+            </div>
+    
+            <div class="modal-footer">
+                <button style="margin-right: 10%; width: 45%;" class="btn btn-info btn-alert-yes">Yes</button>
+              <button style="width: 45%;" class="btn btn-danger btn-alert-no">No</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
 </body>
 
 
