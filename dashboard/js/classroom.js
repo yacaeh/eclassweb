@@ -11,8 +11,14 @@
     window.params = params;
 })();
 var connection = new RTCMultiConnection();
-console.log("Connection!");
 console.log(connection);
+console.log("Connection!");
+
+// function printHarryPotter(){ console.log("Harry Potter!"); } 
+// function printDawnOfDead(){ console.log("Dawn Of Dead!"); } 
+// module.exports.HarryPotter = printHarryPotter; 
+// module.exports.DawnOfDead = printDawnOfDead;​
+
 
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -33,6 +39,10 @@ connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
 console.log(connection);
+
+
+
+
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
@@ -211,6 +221,31 @@ connection.onmessage = function(event) {
     if(event.data.exam) {
         // 시험치기..        
         examObj.receiveExamData (event.data.exam);
+        return;
+    }
+
+    if(event.data.examAnswer) {
+
+    }
+
+    //3d 모델링 Enable
+    if(event.data.modelEnable)
+    {
+        console.log(event.data.modelEnable);
+
+        var jthis = $(this);
+        var enable = event.data.modelEnable.enable;
+        modelEnable(jthis, enable , false);
+        return;
+
+    }
+
+    //3d 모델링 상대값
+    if(event.data.ModelState) {
+
+        console.log(event.data.ModelState);
+
+        set3DModelStateData(event.data.ModelState.position, event.data.ModelState.rotation);
         return;
     }
 
@@ -1123,55 +1158,8 @@ function loadPDF(){
 
 _3DCanvasFunc();
 
-function _3DCanvasFunc(){
-    var _3dcanvas =  $("#renderCanvas");
-    var rtime;
-    var timeout = false;
-    var delta = 400;
-    
-    $("#top_3d").click(function(){
-        _3dcanvas.toggle();
-        var visible = _3dcanvas.is(':visible');
-        var jthis = $(this);
-    
-        if(visible){
-            CanvasResize();
-            jthis.addClass('top_3d_on');
-            jthis.removeClass('top_3d_off')
-        }
-        else{
-            jthis.addClass('top_3d_off');
-            jthis.removeClass('top_3d_on')
-        }
-    })
 
-    function CanvasResize(){
-        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
-        var canvas =  frame.document.getElementById("main-canvas")
-        var r = document.getElementsByClassName("lwindow")[0];
-        var rwidth = $(r).width();
-        _3dcanvas.attr("width", canvas.width - rwidth - 50 );
-        _3dcanvas.attr("height", canvas.height- 60);
-    }
 
-    window.addEventListener("resize", function() {
-        rtime = new Date();
-        if (timeout === false) {
-            timeout = true;
-            setTimeout(resizeend, delta);
-        }
-    });
-    
-    function resizeend() {
-        if (new Date() - rtime < delta) {
-            setTimeout(resizeend, delta);
-        } else {
-            timeout = false;
-            CanvasResize();
-        }               
-    }
-
-}
 
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {
