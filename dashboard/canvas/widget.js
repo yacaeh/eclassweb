@@ -1881,8 +1881,6 @@ function canvasresize(id){
             return color;
         },
         writeText: function(keyPressed, isBackKeyPressed) {
-            console.log(textHandler)
-            console.log(typeof(textHandler))
             
             if (!is.isText) return;
 
@@ -3075,7 +3073,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
 
                 document.querySelector('#undo').onclick = function() {
                     if (points.length) {
@@ -3123,7 +3121,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Pencil');
             };
             image.src = data_uris.pencil;
@@ -3228,7 +3226,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Marker');
             };
             image.src = data_uris.marker;
@@ -3326,7 +3324,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Eraser');
             };
             image.src = data_uris.eraser;
@@ -3348,7 +3346,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Text');
             };
             image.src = data_uris.text;
@@ -3364,7 +3362,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Image');
             };
             image.src = data_uris.image;
@@ -3381,7 +3379,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Pdf');
             };
             image.src = data_uris.pdf;
@@ -3397,7 +3395,7 @@ function canvasresize(id){
 
             var image = new Image();
             image.onload = function() {
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.clearCanvas;
             document.querySelector('#clear_canvas').onclick = function() {
@@ -3424,7 +3422,7 @@ function canvasresize(id){
             var image = new Image();
             image.onload = function() {
                 context.clearRect(0, 0, 40, 40);
-                context.drawImage(image, 4, 4, 32, 32);
+                context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.on;
             
@@ -3689,8 +3687,6 @@ function canvasresize(id){
     var keyCode;
 
     function onkeydown(e) {
-        console.log(e);
-
         keyCode = e.which || e.keyCode || 0;
 
         if (keyCode == 8 || keyCode == 46) {
@@ -4063,7 +4059,35 @@ function canvasresize(id){
     };
 
 
+    MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
+    MakeTitlePop("pencil-icon", "연필");
+    MakeTitlePop("marker-icon", "마커");
+    MakeTitlePop("eraser-icon", "지우개");
+    MakeTitlePop("text-icon", "글자를 적습니다");
+    MakeTitlePop("image-icon", "이미지를 불러옵니다");
+    MakeTitlePop("pdf-icon", "PDF파일을 불러옵니다");
+    MakeTitlePop("undo", "작업 하나를 취소합니다");
+    MakeTitlePop("clear_canvas", "캔버스를 비웁니다");
+
 
 })();
 
 
+
+function MakeTitlePop(element, contents){
+    var ele = document.getElementById(element);
+    var pop = document.getElementById("titlebox");
+
+    ele.addEventListener("mouseover", function(){
+        pop.style.display = 'block';
+        var rect = ele.getBoundingClientRect();
+        var y= rect.y;
+        var height = 7;
+        pop.style.top =  y + height+  'px';
+        pop.children[0].innerHTML = contents;
+    })
+
+    ele.addEventListener("mouseleave", function(){
+        pop.style.display = 'none';
+    })
+}

@@ -1,7 +1,35 @@
 /* Muaz Khan (@muazkh/@WebRTCWeb) */
 
+@font-face{
+    font-family: "H2GTRE";
+    src: url(/dashboard/css/H2GTRE.TTF);
+  }
+#titlebox{
+    width: auto;
+    height: 20px;
+    position: absolute;
+    background-color: black;
+    left: 45px;
+    color: white;
+    border-radius: 7px;
+    font-family: sans-serif;
+    display: none;
+}
+
+#titletext{
+    margin: 10px;
+}
+
+
+  body {
+    font-family: "NanumGothic";
+    font-size: 17px;
+    line-height: 1.5em;
+    overflow: hidden;
+  }
 .pen{
     cursor: url('/dashboard/img/pen.png') 6 38,pointer;
+
 }
 .marker{
     cursor: url('/dashboard/img/pen2.png') 6 38,pointer;
@@ -63,7 +91,6 @@ h2 {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    font-family: Verdana, arial, helvetica, sans-serif;
 }
 html,
 body {
@@ -158,11 +185,12 @@ a:hover {
 }
 
 .tool-box canvas {
-    border-bottom: 1px solid #E5E5E5;
     border-radius: 2px;
-    margin-top: -4px;
+    margin-top: 15px;
+    margin-left: 6px;
     display: none;
 }
+
 .tool-box canvas:first-child,
 .tool-box canvas:first-child:hover {
     margin-top: 0;
@@ -170,9 +198,10 @@ a:hover {
 }
 .tool-box canvas:hover {
     box-shadow: none;
-    background: #eeeeee;
+    background: rgb(204,204,204);
 }
 .selected-shape {
+    content: url(/dashboard/newimg/click_box.png);
     background: #eeeeee!important;
 }
 /* surface */
@@ -284,6 +313,8 @@ input:focus {
 
 .context-popup {
     position: absolute;
+    width: 200px;
+    height: 16px;
     display: none;
     padding: 5px;
     border: 1px solid #E5E5E5;
@@ -424,8 +455,8 @@ input:focus {
 #pencil-selected-color-2 {
     display: inline-block;
     vertical-align: middle;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
 }
 #marker-fill-colors, #pencil-fill-colors {
     display: none;
