@@ -1035,18 +1035,30 @@ $("#canvas-controller").hide();
 
 $("#top_pdf").click(function () {
     $("#canvas-controller").show();
-    loadFileViewer();
 })
 
+
+let isFileViewer = false;
+$('#top_pdf').click(function () {
+    console.log(isFileViewer);
+    if(!isFileViewer) () => loadFileViewer;
+    else unloadFileViewer , isFileViewer=false;
+});
+
+function unloadFileViewer(){
+    let fileViewer = document.getElementById("file-viewer")
+        fileViewer.remove();
+}
+
 function loadFileViewer(){
-    var fileViewer= document.createElement('iframe');
+    let fileViewer= document.createElement('iframe');
         fileViewer.setAttribute("id", "file-viewer");
         fileViewer.setAttribute("src", "https://localhost:9001/ViewerJS/#../dashboard/files/test.pdf");
         fileViewer.style.width = "1024px";
         fileViewer.style.height = "724px";
         fileViewer.style.cssText = 'border: 1px solid black;height:1024px;direction: ltr;margin-left:0%;width:60%;';
         fileViewer.setAttribute('allowFullScreen', '')
-        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+        let frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
         frame.document.getElementsByClassName("design-surface")[0].appendChild(fileViewer);
 }
 
