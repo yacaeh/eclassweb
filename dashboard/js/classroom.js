@@ -36,7 +36,6 @@ console.log(connection);
 
 // here goes canvas designer
 var designer = new CanvasDesigner();
-console.log("designer!");
 
 // you can place widget.html anywhere
 designer.widgetHtmlURL = './canvas/widget.html';
@@ -44,17 +43,15 @@ designer.widgetJsURL = './widget.js';
 
 // setInterval(designer.clearCanvas, 1000)
 
-designer.addSyncListener(function(data){
-    console.log(data);
-    console.log(data);
+designer.icons.pencil = '/dashboard/img/pen.png';
+designer.icons.marker = '/dashboard/img/pen2.png';
+designer.icons.eraser = '/dashboard/img/eraser.png';
+designer.icons.clearCanvas = '/dashboard/img/refresh.png';
+designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
+designer.icons.on = '/dashboard/img/view_on.png';
+designer.icons.off = '/dashboard/img/view_off.png';
 
-})
-console.log(designer)
-
-designer.icons.pencil = '/dashboard/img/pen.png'
-designer.icons.marker = '/dashboard/img/pen2.png'
-designer.icons.eraser = '/dashboard/img/eraser.png'
-designer.icons.clearCanvas = '/dashboard/img/refresh.png'
+console.log(designer.icons);
 
 designer.addSyncListener(function(data) {
     connection.send(data);
@@ -67,7 +64,7 @@ designer.setTools({
     image: true,
     pdf: false,
     eraser: true,
-    line: false,
+    line: true,
     arrow: false,
     dragSingle: false,
     dragMultiple: false,
@@ -80,6 +77,7 @@ designer.setTools({
     lineWidth: false,
     colorsPicker: false,
     clearCanvas: true,
+    onoff: true,
     code: false,
     undo: true,
 });
@@ -129,7 +127,7 @@ connection.onopen = function(event) {
         }, 1000);
     }
 
-    document.getElementById('btn-attach-file').style.display = 'inline-block';
+    document.getElementById('top_attach-file').style.display = 'inline-block';
     document.getElementById('top_share_screen').style.display = 'inline-block';
 };
 
@@ -443,7 +441,7 @@ window.onkeyup = function(e) {
 };
 
 var recentFile;
-document.getElementById('btn-attach-file').onclick = function() {
+document.getElementById('top_attach-file').onclick = function() {
     var file = new FileSelector();
     file.selectSingleFile(function(file) {
         recentFile = file;
@@ -582,18 +580,29 @@ designer.appendTo(document.getElementById('widget-container'), function() {
             });
     } else {
         console.log("try joining!");
+        connection.DetectRTC.load(function() { 
             SetStudent();
 
-            // Disable student media devices on joining
-            connection.mediaConstraints.video = false;
-            connection.session.video = false;
-            connection.mediaConstraints.audio = false;
-            connection.session.audio = false;
-            connection.session.oneway = true;
-            connection.sdpConstraints.mandatory = {
-                OfferToReceiveAudio: false,
-                OfferToReceiveVideo: false
-            };
+            if (!connection.DetectRTC.hasMicrophone) {
+                connection.mediaConstraints.audio = false;
+                connection.session.audio = false;
+                console.log("user has no mic!");
+                alert("마이크가 없습니다!");
+            }
+        
+            if (!connection.DetectRTC.hasWebcam) {
+                connection.mediaConstraints.video = false;
+                connection.session.video = false;
+                console.log("user has no cam!");
+                alert("캠이 없습니다!");
+                connection.session.oneway = true;
+                connection.sdpConstraints.mandatory = {
+                    OfferToReceiveAudio: false,
+                    OfferToReceiveVideo: false
+                };
+    
+            }
+        });    
      
         connection.join({sessionid:params.sessionid,
                          userid: connection.channel,
@@ -763,12 +772,10 @@ $('#top_share_screen').click(function() {
 });
 
 
-
-console.log("success");
-
-
-
 function TimeUpdate(){
+    var time =  document.getElementById("main-video").currentTime;
+console.log(time);
+
     var date = new Date;
     var year = date.getFullYear();
     var month = date.getMonth();
@@ -992,36 +999,54 @@ function loadPDF(){
 }
 
 
+_3DCanvasFunc();
 
-$("#top_3d").click(function(){
-    $("#renderCanvas").toggle();
-    var visible = $("#renderCanvas").is(':visible');
+function _3DCanvasFunc(){
+    var _3dcanvas =  $("#renderCanvas");
+    var rtime;
+    var timeout = false;
+    var delta = 400;
     
-    var jthis = $(this);
-    if(visible){
-        jthis.addClass('top_3d_on');
-        jthis.removeClass('top_3d_off')
-    }
-    else{
-        jthis.addClass('top_3d_off');
-        jthis.removeClass('top_3d_on')
-    }
-})
-
-
-$("#top_alert").click(function(){
-    $("#renderCanvas").toggle();
-    var visible = $("#renderCanvas").is(':visible');
+    $("#top_3d").click(function(){
+        _3dcanvas.toggle();
+        var visible = _3dcanvas.is(':visible');
+        var jthis = $(this);
     
-    var jthis = $(this);
-    if(visible){
-        jthis.addClass('top_3d_on');
-        jthis.removeClass('top_3d_off')
-    }
-    else{
-        jthis.addClass('top_3d_off');
-        jthis.removeClass('top_3d_on')
-    }
-})
+        if(visible){
+            CanvasResize();
+            jthis.addClass('top_3d_on');
+            jthis.removeClass('top_3d_off')
+        }
+        else{
+            jthis.addClass('top_3d_off');
+            jthis.removeClass('top_3d_on')
+        }
+    })
 
+    function CanvasResize(){
+        var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+        var canvas =  frame.document.getElementById("main-canvas")
+        var r = document.getElementsByClassName("lwindow")[0];
+        var rwidth = $(r).width();
+        _3dcanvas.attr("width", canvas.width - rwidth - 50 );
+        _3dcanvas.attr("height", canvas.height- 60);
+    }
 
+    window.addEventListener("resize", function() {
+        rtime = new Date();
+        if (timeout === false) {
+            timeout = true;
+            setTimeout(resizeend, delta);
+        }
+    });
+    
+    function resizeend() {
+        if (new Date() - rtime < delta) {
+            setTimeout(resizeend, delta);
+        } else {
+            timeout = false;
+            CanvasResize();
+        }               
+    }
+
+}
