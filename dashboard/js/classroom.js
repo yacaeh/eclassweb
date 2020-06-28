@@ -1041,9 +1041,10 @@ $("#top_pdf").click(function () {
 function loadFileViewer(){
     var fileViewer= document.createElement('iframe');
         fileViewer.setAttribute("id", "file-viewer");
-        fileViewer.setAttribute("src", "http://localhost:9001/ViewerJS/#../dashboard/files/test.pdf");
+        fileViewer.setAttribute("src", "https://localhost:9001/ViewerJS/#../dashboard/files/test.pdf");
         fileViewer.style.width = "1024px";
         fileViewer.style.height = "724px";
+        fileViewer.style.cssText = 'border: 1px solid black;height:1024px;direction: ltr;margin-left:0%;width:60%;';
         fileViewer.setAttribute('allowFullScreen', '')
         var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
         frame.document.getElementsByClassName("design-surface")[0].appendChild(fileViewer);
@@ -1052,7 +1053,7 @@ function loadFileViewer(){
 function loadPDF() {
     var oriPdfCanvas = document.createElement('canvas');
     oriPdfCanvas.setAttribute("id", "the-canvas");
-    oriPdfCanvas.style.cssText = 'border: 1px solid black;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
+    oriPdfCanvas.style.cssText = 'border: 1px solid black;min-height:900px;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
     var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
 
 
