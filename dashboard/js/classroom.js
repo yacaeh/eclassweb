@@ -108,8 +108,7 @@ connection.sdpConstraints.mandatory = {
     OfferToReceiveVideo: true
 };
 
-connection.onUserStatusChanged = function (event) {
-    console.log("onUserStatusChanged!");
+connection.onUserStatusChanged = function (event) {   
     var infoBar = document.getElementById('onUserStatusChanged');
     var names = [];
 
@@ -123,9 +122,9 @@ connection.onUserStatusChanged = function (event) {
     } else {
         $("#nos").text(names.length);
     }
-
     SetStudentList();
 };
+
 
 connection.onopen = function (event) {
     console.log("onopen!");
@@ -139,6 +138,10 @@ connection.onopen = function (event) {
 
     document.getElementById('top_attach-file').style.display = 'inline-block';
     document.getElementById('top_share_screen').style.display = 'inline-block';
+
+    // 접속시 방정보 동기화.
+    if(connection.extra.roomOwner)
+        classroomCommand.sendsyncRoomInfo ();
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
@@ -217,6 +220,7 @@ connection.onmessage = function (event) {
 
 
     if(event.data.roomSync) {
+        console.log('event.data.roomSync');;
         classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
         return;
     };
