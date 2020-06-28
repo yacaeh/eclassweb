@@ -28,28 +28,6 @@ classroomCommand.receiveSyncRoomInfo = function (_roomInfo) {
     classroomInfo = _roomInfo;
 };
 
-classroomCommand.sendAllControl = function () {    
-    if(connection.extra.roomOwner)
-    {
-        classroomInfo.allControl = !classroomInfo.allControl;
-        connection.send({
-            allControl : classroomInfo.allControl
-        });
-    }
-};
-
-classroomCommand.receiveAllControl = function (_lock) {
-    classroomInfo.allControl = _lock;
-    if(_lock) {
-
-    }
-    else {
-
-    }
-
-
-};
-
 classroomCommand.sendAlert = function () {    
     if(connection.extra.roomOwner)
     {

@@ -197,10 +197,6 @@ connection.onmessage = function (event) {
 
 
     if (null != event.data.allControl) {
-<<<<<<< HEAD
-        if (!connection.extra.roomOwner) 
-                classroomCommand.receiveAllControl (event.data.allControl);            
-=======
         if (/*!checkRoomOwner()*/true) {
             classroomInfo.allControl = event.data.allControl;
             
@@ -214,7 +210,6 @@ connection.onmessage = function (event) {
                 
             }
         }
->>>>>>> 1e3b7a564d94ddc3a84f9d15189d4cd21febec3b
         return;
     }
     
@@ -1213,8 +1208,3 @@ $('#top_alert').click(function () {
     classroomCommand.sendAlert ();
 });
 
-
-// 학생들 제어하기 버튼
-$('#top_all_controll').click ( () =>  {
-    classroomCommand.sendAllControl ();        
-});
