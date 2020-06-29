@@ -271,8 +271,10 @@ connection.onmessage = function (event) {
     var moveURL = event.data.MoiveURL;
     if(moveURL.type == "YOUTUBE")
       embedYoutubeContent(moveURL.enable, moveURL.url, false);
+    else if(moveURL.type == "VIDEO")
+      VideoEdunetContent(moveURL.enable, moveURL.url, false);
     else
-    iframeEdunetContent(moveURL.enable, moveURL.url, false);
+      iframeEdunetContent(moveURL.enable, moveURL.url, false)
     return;
   }
 

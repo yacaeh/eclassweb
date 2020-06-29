@@ -74,12 +74,19 @@ function _Movie_Render_Func() {
     }
     else{
         if(url.indexOf("mp4") !== -1)
-            iframeEdunetContent(true, url, true);
+            VideoEdunetContent(true, url, true);
+        else{
+            iframeEdunetContent(true,url,true);
+        }
     }
 }
 
 function embedYoutubeContent(bshow, url, send)
 {
+    var webview_edunet = document.getElementById("webview_edunet");
+    if(webview_edunet && bshow == true)
+        return;
+
     if( bshow ){
         var viwerEdunet = document.getElementById("edunetContent");
         console.log("div create");
@@ -125,7 +132,7 @@ function embedYoutubeContent(bshow, url, send)
         embed.allowfullscreen = "true";
         obj.appendChild(embed);		
         
-        
+        viwerEdunet.style.display = "inline-block";
         
     }
     else{
@@ -133,6 +140,8 @@ function embedYoutubeContent(bshow, url, send)
         if( viwerEdunet !== null ){
             var viwer = document.getElementById("edunetContent");
             viwer.removeChild(viwerEdunet);
+
+            viwer.style.display = "none";
         }
     }
 
@@ -140,10 +149,37 @@ function embedYoutubeContent(bshow, url, send)
     _Send_Moive_Video("YOUTUBE",url, bshow, send);
 
 }
-
-
-
 function iframeEdunetContent(bshow, url, send) {
+    var webview_edunet = document.getElementById("webview_edunet");
+    if(webview_edunet && bshow == true)
+        return;
+    if( bshow ){
+        var viwerEdunet = document.getElementById("edunetContent");
+            var ifrmEdunetContent = document.createElement("iframe");
+            ifrmEdunetContent.setAttribute("src", url);
+            ifrmEdunetContent.setAttribute("id", "webview_edunet");
+			ifrmEdunetContent.style.width = "100%";
+            ifrmEdunetContent.style.height = "100%";
+            ifrmEdunetContent.frameBorder = "0";
+			
+            viwerEdunet.appendChild(ifrmEdunetContent);
+        viwerEdunet.style.display = "inline-block";
+    }else{
+        var webview_cam = document.getElementById("webview_edunet");
+        if( webview_cam !== null ){
+            var viwer = document.getElementById("edunetContent");
+            viwer.removeChild(webview_cam);
+            viwer.style.display = "none";
+        }
+    }
+    _Send_Moive_Video("IFRAME",url, bshow, send);
+}
+
+
+function VideoEdunetContent(bshow, url, send) {
+    var webview_edunet = document.getElementById("webview_edunet");
+    if(webview_edunet && bshow == true)
+        return;
     var timer = 0;
     if( bshow ){
         var viwerEdunet = document.getElementById("edunetContent");
@@ -164,11 +200,13 @@ function iframeEdunetContent(bshow, url, send) {
                 console.log(percentage);
             } 
         }, false); 
+        viwerEdunet.style.display = "inline-block";
     }else{
         var webview_cam = document.getElementById("webview_edunet");
         if( webview_cam !== null ){
             var viwer = document.getElementById("edunetContent");
             viwer.removeChild(webview_cam);
+            viwer.style.display = "none";
         }
     }
     _Send_Moive_Video("VIDEO",url, bshow, send);
