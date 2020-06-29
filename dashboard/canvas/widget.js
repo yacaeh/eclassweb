@@ -1876,10 +1876,11 @@ function canvasresize(id){
 
     var textHandler = {
         text: '',
-        selectedFontFamily: 'Arial',
-        selectedFontSize: '15',
+        selectedFontFamily: '나눔고딕',
+        selectedFontSize: '25',
         lastFillStyle: '',
         onShapeSelected: function() {
+
             tempContext.canvas.style.cursor = 'text';
             this.x = this.y = this.pageX = this.pageY = 0;
             this.text = '';
@@ -1955,7 +1956,24 @@ function canvasresize(id){
             var options = textHandler.getOptions();
             points[points.length] = ['text', ['"' + textHandler.text + '"', textHandler.x, textHandler.y], drawHelper.getOptions(options)];
         },
+        canvasInput:null,
         mousedown: function(e) {
+            console.log("mouse down!");
+            if (this.canvasInput !== null) {
+                document.getElementById('text-input').remove();
+                this.canvasInput=null;
+            }
+            else{
+            console.log("canvas input is not null");
+            this.canvasInput = document.createElement("INPUT");
+            this.canvasInput.setAttribute("id", "text-input");
+            this.canvasInput.setAttribute("type", "text");
+            this.canvasInput.setAttribute("style","ime-mode:active");
+            this.canvasInput.style.cssText =
+            'border: 1px solid black;width:60%;position:absolute;top:100px;left:100px;z-index=999;height:100px';
+            document.getElementsByTagName('body')[0].appendChild(this.canvasInput);
+            }
+
             if (!is.isText) return;
 
             if (textHandler.text.length) {
@@ -1980,7 +1998,8 @@ function canvasresize(id){
 
             this.showTextTools();
         },
-        mouseup: function(e) {},
+        mouseup: function(e) {
+        },
         mousemove: function(e) {},
         showOrHideTextTools: function(show) {
             if (show === 'hide') {
