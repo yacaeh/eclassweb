@@ -22,15 +22,15 @@ classroomCommand = {
 classroomCommand.updateSyncRoom = function () {
 
     if(classroomInfo.allControl) {
-
+        allControllEnable(top_all_controll_jthis, classroomInfo.allControl, false);
     }
+    // else
 
     // if(classroomInfo.shareScreen) {
         
     // }
-
-    if(classroomInfo.share3D) {
-
+    if(classroomInfo.share3D) {          
+        modelEnable (false);
     }
 };
 

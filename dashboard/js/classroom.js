@@ -1001,7 +1001,7 @@ $('#exam-start').click(function () {
     return;    
   }
   //const questionCount = $('#exam-question-count').val();  
-  if (!examObj.checkAnswerChecked()) {
+  if (!examObj.checkAnswerChecked(m_QuesCount)) {
     alert('문제애 대한 모든 답을 선택해야 합니다');    
     return;
   }
@@ -1017,7 +1017,7 @@ $('#exam-start').click(function () {
   var answerList = getQuestionAnswerList();
 
   examObj.examAnswer = answerList;
-  examObj.sendExamStart(parseInt(m_ExamTime / 60));
+  examObj.sendExamStart(m_QuesCount, parseInt(m_ExamTime / 60));
 
   $('#exam-setting-bar').hide();
   showExamStateForm();
@@ -1193,6 +1193,7 @@ function stopQuestionOMR () {
 
 // 학생 정답 표시
 function markStudent(num, check, answer) {
+  console.log(check);
   if (check === answer) {
     $(`#exam-question-${num}`).css('background-color', 'lightgreen');
   }
