@@ -28,13 +28,14 @@ classroomCommand.receiveSyncRoomInfo = function (_roomInfo) {
     classroomInfo = _roomInfo;
 };
 
-classroomCommand.sendAlert = function () {    
+classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
         alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => {
            // classroomInfo.alert
             // console.log(connection.getAllParticipants());
             // console.log(connection.getAllParticipants().length);
+            callback()
             connection.send ({
                 alert : true
             });
@@ -68,14 +69,28 @@ classroomCommand.receivAlert = function () {
     };
 };
 
-classroomCommand.receiveAlertResponse = function (_response) {
+// 학생이 응답했을 때, 선생님 처리 부분
+classroomCommand.receiveAlertResponse = function (_response, callback) {
     if(connection.extra.roomOwner)
     {                  
         const userId = _response.userId;
-        const reposne = _response.reposne;
-        console.log(_response);
-        console.log(connection.getAllParticipants());
-        
+        const reposne = _response.reposne; 
+
+        var chilldren = document.getElementById("student_list").children;
+            
+        for(var i = 0; i < chilldren.length; i++){
+            if(chilldren[i].dataset.id == userId){
+                var al = chilldren[i].getElementsByClassName("alert")[0];
+                al.className = "";
+                al.classList.add("alert");
+
+                if(reposne == "yes")
+                    al.classList.add("alert_yes");
+                else 
+                    al.classList.add("alert_no");
+            }
+        }
+
         // 체크 알림...
         //console.log(event.data.alertConfirm);            
     }
