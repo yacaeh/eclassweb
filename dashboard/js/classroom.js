@@ -993,21 +993,26 @@ $('#exam-add-question').click(function () {
   $('#exam-question-count').val(m_QuesCount);
 });
 
-// 시험 시작, 종료
+// 시험 시작, 종료 버튼 이벤트
 $('#exam-start').click(function () {
+
+  if(m_QuesCount <= 0 ) {
+    alert('답안지를 먼저 작성해야 합니다');        
+    return;    
+  }
+  //const questionCount = $('#exam-question-count').val();  
   if (!examObj.checkAnswerChecked()) {
-    //  TODO : 모든 문제에 대한 답 작성 하라는 알림
-    console.log('빠진 답');
+    alert('문제애 대한 모든 답을 선택해야 합니다');    
     return;
   }
 
-  if (isNaN($('#exam-time').val())) {
-    // TODO : 시간 설정하라고 알림
-    $('#exam-start').click();
+  const examTime = $('#exam-time').val();
+  if(examTime <= 0 || isNaN(examTime)) {
+    alert('시간 설정이 잘못 되었습니다.');    
     return;
-  } else {
-    m_ExamTime = parseInt($('#exam-time').val() * 60);
-  }
+  };
+
+  m_ExamTime = parseInt($('#exam-time').val() * 60);  
 
   var answerList = getQuestionAnswerList();
 
@@ -1020,6 +1025,7 @@ $('#exam-start').click(function () {
   $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
   m_ExamTimerInterval = setInterval(function () {
     m_ExamTime--;
+    examObj.updateExameTimer (m_ExamTime);
     $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
     if (m_ExamTime <= 0)
       $('#exam-start').click();
@@ -1031,7 +1037,6 @@ function finishExam() {
   $('#exam-time').val(parseInt(m_ExamTime / 60))
   $('#exam-setting-bar').show();
   $('#exam-state').html("");
-  console.log(123);
   examObj.sendExamEnd();
 }
 
@@ -1166,6 +1171,7 @@ function setStudentOMR(quesCount, examTime) {
 function submitOMR() {
   if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
     // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
+    alert('아직 답안지 작성이 완료 안되었습니다');
     return;
   }
 
