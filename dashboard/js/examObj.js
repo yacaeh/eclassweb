@@ -202,7 +202,9 @@ examObj.receiveExamData = function(_data) {
         {
             examObj.isStart = false;     
             // 학생들 시험 제출.   
-            submitOMR ();
+            stopQuestionOMR ();
+            examObj.sendSubmit();
+
         }
     } 
     else if (_data.examSelectAnswer) {
@@ -368,11 +370,13 @@ examObj.receiveSubmit = function (submit) {
 
         if(examObj.totalCount == examObj.submitCount)   // 마지막 제출이 끝났을 때, 결과를 export 한다.
           { 
-               examObj.exportExam ();
+              finishExam();
+              examObj.exportExam ();
+              /*
                $('#exam-start').attr('class', 'btn btn-primary');
                $('#exam-start').html('시작');
                clearInterval(m_ExamTimerInterval);    
-               $('#exam-time').val(parseInt(m_ExamTime / 60))
+               $('#exam-time').val(parseInt(m_ExamTime / 60))*/
           }
     }
 };
