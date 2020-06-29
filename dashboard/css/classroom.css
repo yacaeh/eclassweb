@@ -255,7 +255,12 @@ hr {
   content: url(/dashboard/img/top_3d_on.png);
 }
 
-#top_share_video{
+
+.top_share_video_on{
+  content: url(/dashboard/img/top_share_video_on.png);
+}
+
+.top_share_video_off{
   content: url(/dashboard/img/top_share_video_off.png);
 }
 #top_record_video{
@@ -616,6 +621,8 @@ input[type="number"]:focus{
   background-color: white;
   border: solid 1px black;
   z-index: 100;
+  top:  100px;
+  left:  100px;
 }
 #urlinput{
   width: 100%;
