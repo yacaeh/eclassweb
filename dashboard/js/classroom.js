@@ -147,7 +147,8 @@ connection.onclose = connection.onerror = connection.onleave = function (
 
 connection.onmessage = function (event) {
   if (event.data.showMainVideo) {
-    // $('#main-video').show();
+      classroomInfo.shareScreen = true;
+          // $('#main-video').show();
     $('#screen-viewer').css({
       top: $('#widget-container').offset().top,
       left: $('#widget-container').offset().left,
@@ -161,6 +162,7 @@ connection.onmessage = function (event) {
   if (event.data.hideMainVideo) {
     // $('#main-video').hide();
     $('#screen-viewer').hide();
+    classroomInfo.shareScreen = false;    
     return;
   }
 
@@ -267,9 +269,10 @@ connection.onmessage = function (event) {
 // extra code
 connection.onstream = function (event) {
   console.log('onstream!');
-  if (event.stream.isScreen && !event.stream.canvasStream) {
+  if (event.stream.isScreen && !event.stream.canvasStream) {      
     $('#screen-viewer').get(0).srcObject = event.stream;
-    $('#screen-viewer').hide();
+    if(!classroomInfo.shareScreen)
+      $('#screen-viewer').hide();
   } else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
     video.setAttribute('data-streamid', event.streamid);
@@ -694,7 +697,9 @@ function addStreamStopListener(stream, callback) {
   });
 }
 
+
 function replaceTrack(videoTrack, screenTrackId) {
+
   if (!videoTrack) return;
   if (videoTrack.readyState === 'ended') {
     alert(
@@ -704,25 +709,63 @@ function replaceTrack(videoTrack, screenTrackId) {
     return;
   }
   connection.getAllParticipants().forEach(function (pid) {
-    var peer = connection.peers[pid].peer;
-    if (!peer.getSenders) return;
-    var trackToReplace = videoTrack;
-    peer.getSenders().forEach(function (sender) {
-      if (!sender || !sender.track) return;
-      if (screenTrackId) {
-        if (trackToReplace && sender.track.id === screenTrackId) {
-          sender.replaceTrack(trackToReplace);
-          trackToReplace = null;
-        }
-        return;
-      }
-
-      if (sender.track.id !== tempStream.getTracks()[0].id) return;
-      if (sender.track.kind === 'video' && trackToReplace) {
+    replaceTrackToPeer (pid, videoTrack, screenTrackId);   
+  });
+}
+/*
+    Peer당 replaceTrack
+*/
+function replaceTrackToPeer (pid, videoTrack, screenTrackId) {
+  if(!connection.peers[pid])
+  {
+    console.error('connection peer error');
+    return;
+  }
+  var peer = connection.peers[pid].peer;
+  if (!peer.getSenders) return;
+  var trackToReplace = videoTrack;
+  peer.getSenders().forEach(function (sender) {            
+    if (!sender || !sender.track) return;
+    if (screenTrackId) {
+      if (trackToReplace && sender.track.id === screenTrackId) {
         sender.replaceTrack(trackToReplace);
         trackToReplace = null;
       }
-    });
+      return;
+    }
+
+    if (sender.track.id !== tempStream.getTracks()[0].id) return;
+    if (sender.track.kind === 'video' && trackToReplace) {
+      sender.replaceTrack(trackToReplace);
+      trackToReplace = null;
+    }
+  });
+}
+
+
+/*
+   특정 유저에게 스크린공유를 걸어준다.
+*/
+function currentScreenViewShare (_pid) {
+  let stream = window.shareStream;
+  if(!stream) {
+      console.error('stream not found');
+      return;
+  }
+
+  //  선생님만 할 수 있게..
+  if(!connection.extra.roomOwner)
+    return;
+  
+  const pid = _pid;
+  stream.getTracks().forEach(function (track) {
+      if (track.kind === 'video' && track.readyState === 'live') {
+          replaceTrackToPeer (pid, track);
+      }
+  });
+
+  connection.send({
+    showMainVideo: true,
   });
 }
 
@@ -739,15 +782,19 @@ function replaceScreenTrack(stream) {
     // mediaElement: video
   });
 
+  // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
+  window.shareStream = stream;  
+  classroomInfo.shareScreen = true;
+
   var screenTrackId = stream.getTracks()[0].id;
-  addStreamStopListener(stream, function () {
+  addStreamStopListener(stream, function () {    
     connection.send({
       hideMainVideo: true,
     });
-
     // $('#main-video').hide();
-    $('#screen-viewer').hide();
-    $('#top_share_screen').show();
+    classroomInfo.shareScreen = false;
+    window.sharedStream = null;
+    hideScreenViewerUI();
     replaceTrack(tempStream.getTracks()[0], screenTrackId);
   });
 
@@ -761,7 +808,13 @@ function replaceScreenTrack(stream) {
     showMainVideo: true,
   });
 
+  showScreenViewerUI ();
   // $('#main-video').show();
+}
+
+
+
+function showScreenViewerUI () {
   $('#screen-viewer').css({
     top: $('#widget-container').offset().top,
     left: $('#widget-container').offset().left,
@@ -770,6 +823,14 @@ function replaceScreenTrack(stream) {
   });
   $('#screen-viewer').show();
 }
+
+
+function hideScreenViewerUI () {
+  $('#screen-viewer').hide();
+  $('#top_share_screen').show();
+}
+
+
 
 $('#top_share_screen').click(function () {
   if (!window.tempStream) {

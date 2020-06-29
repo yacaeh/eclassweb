@@ -24,9 +24,9 @@ classroomCommand.updateSyncRoom = function () {
 
     }
 
-    if(classroomInfo.shareScreen) {
-
-    }
+    // if(classroomInfo.shareScreen) {
+        
+    // }
 
     if(classroomInfo.share3D) {
 
@@ -34,12 +34,21 @@ classroomCommand.updateSyncRoom = function () {
 };
 
 classroomCommand.sendsyncRoomInfo = function (_data) {
+    /*
+        방에 학생이 들어오면, 현재 방 상태 정보를 동기화 시키기 위해
+        방상태 정보를 보낸다.
+    */
     connection.send ({
         roomSync : {
             userid : _data.userid,
             info : classroomInfo
         }
     });
+
+    // shareScreen은 선생님이 해당 학생한테 공유 해줘야 한다. 
+    if(classroomInfo.shareScreen) {
+        classroomCommand.syncScreenShare (_data.userid);
+    };
 };
 
 classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {  
@@ -49,8 +58,6 @@ classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {
         classroomCommand.updateSyncRoom ();
     }
 };
-
-
 
 
 classroomCommand.sendAlert = function (callback) {    
@@ -115,9 +122,15 @@ classroomCommand.receiveAlertResponse = function (_response) {
                     al.classList.add("alert_no");
             }
         }
-
         // 체크 알림...
         //console.log(event.data.alertConfirm);            
     }
+}
+
+
+
+
+classroomCommand.syncScreenShare = function (_userid) {
+    currentScreenViewShare (_userid);
 };
 
