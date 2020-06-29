@@ -2,7 +2,8 @@
 classroomInfo = {    
     allControl : false,
     shareScreen : false,
-    share3D : false 
+    share3D : false,
+    exam : false
     /*
         
         alert : {

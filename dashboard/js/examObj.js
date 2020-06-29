@@ -8,15 +8,6 @@ var examObj = {
     examAnswer : [],      // question 정답, 선생은 정답 저장, 학생은 자신이 선택한 정답 저장
     studentsAnswer : {},  // 학생들 정답 저장.
     submitStudents : {}    // 학생이 제출 했을 때, 최종 값
-    /*
-        - 
-        testStudentCount:
-        questionCount:
-        examTime:
-        examAnswer : {}
-        
-    */
-    
         
 
     /*
@@ -25,11 +16,11 @@ var examObj = {
             id, 유저 아디,
             name : 유저 이름
             userAnswers, : 유저가 고른 정답
-            answers : 실패 답과 비교 후, 정답인지 아닌지 값 저장
+            answers : 실패 답과 비교 후, 정답인지 아닌지 값 저장,
+            examState : 현재 시험 상태 저장 ('on', 'off', 'submit')
         }
-      */
 
-      /*
+        // 최종 제출값 저장
         subitStudents : {
             id,
             name,        
@@ -76,11 +67,12 @@ examObj.updateStudentAnswer = function (selectAnswer) {
     {
         // studentAnswer가 없다면 새로 만들어 준다.
         examObj.studentsAnswer[selectAnswer.userid] = {
-            id : selectAnswer.userid,   // 학생 아디
+            userid : selectAnswer.userid,   // 학생 아디
             name : selectAnswer.name,
             userAnswers : [],       // 학생이 선택한 번호
             answers : [],           // bool형. 현재 값이 정답인지 아닌지 미리 계산해서 저장.
             response : [],          // 학생의 문제 응답률.
+            examState : 'on'        // 시험중 체크    
         };
 
         studentAnswerInfo = examObj.studentsAnswer[selectAnswer.userid];
@@ -115,7 +107,8 @@ examObj.updateSubmitStudent = function (submitStudent) {
     student = examObj.studentsAnswer[userid];
     if(null == student.userAnswers)
         student.userAnswers = {};
-
+    
+    student.examState = 'submit';  // 시험 제출
     examObj.submitStudents[userid] =  {
         userid : userid,
         name : student.name,
@@ -182,11 +175,15 @@ examObj.updateExamAnswerStatistics = function () {
     }
 };
 
-
+// 현재 시험 update
+examObj.updateExameTimer = function (_currentExamTimer) {
+    examObj.currentExamTime = _currentExamTimer;
+}
 
 examObj.receiveExamData = function(_data) {
    
     if(_data.examStart) {               
+        classroomInfo.exam = true;
         let examStart = _data.examStart;        
         examObj.isStart = true;        
         examObj.examTime = examStart.examTime;
@@ -200,6 +197,7 @@ examObj.receiveExamData = function(_data) {
         // 시험 종료
         if(examObj.isStart)    
         {
+            classroomInfo.exam = false;
             examObj.isStart = false;     
             // 학생들 시험 제출.   
             stopQuestionOMR ();
@@ -252,6 +250,7 @@ examObj.setExamInfo = function () {
 examObj.sendExamStart  = function(_examTime) {
     if(connection.extra.roomOwner)
     {    
+        classroomInfo.exam = true;
         const questionCount = $('#exam-question-count').val();
         examObj.questionCount = questionCount;       
         examObj.isStart = true;
@@ -277,6 +276,7 @@ examObj.sendExamStart  = function(_examTime) {
 examObj.sendExamEnd = function() {
     if(connection.extra.roomOwner)
     {
+        classroomInfo.exam = false;
         examObj.isStart = false;
         connection.send({
             exam: {
@@ -317,17 +317,13 @@ examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _answerNumber
 
 
 
+/*
+    선생님이 학생에게 채점 결과를 보내준다.
+*/
 examObj.sendResultToStudent = function (_studentId) {
     if(connection.extra.roomOwner) {
-        const submit = examObj.submitStudents[_studentId];     
-
-        console.log(submit);
-        // id,
-        // name,        
-        // userAnswers : 선택한 번호
-        // answers :  실제 정답
-        // time : 제출시간
-        // score : 점수
+        const submit = examObj.submitStudents[_studentId];    
+    
         connection.send({
             exam : {
                 submitResult : {
