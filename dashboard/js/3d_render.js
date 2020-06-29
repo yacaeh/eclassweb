@@ -1,16 +1,17 @@
 
 
 
-var canvas = document.getElementById("renderCanvas"); // Get the canvas element
-var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
 
 
 var newPosition;
 var newRotation;
 /******* Add the create scene function ******/
-var createScene = function () {
-    var scene = new BABYLON.Scene(engine);
+var createScene = function (_canvas) {
+    let canvas = _canvas; // Get the canvas element
+
+    let engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+        var scene = new BABYLON.Scene(engine);
 
     // Add a camera to the scene and attach it to the canvas
     var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0, 0, 0), scene);
@@ -90,48 +91,47 @@ var createScene = function () {
     //     scene.activeCamera.alpha += Math.PI; // camera +180°
     //     console.log("testssss z z z z z z");
     // });
-
-    return scene;
+    console.log("Create 3D!");
+    // Register a render loop to repeatedly render the scene
+    engine.runRenderLoop(function () {
+        scene.render();
+    });
+    
+    // Watch for browser/canvas resize events
+    window.addEventListener("resize", function () {
+        engine.resize();
+    });
 };
 /******* End of the create scene function ******/
 
-var scene = createScene(); //Call the createScene function
+let frame;
+let _3dcanvas;
+let rtime;
+let timeout = false;
+let delta = 400;
+
+let top_3d_button = $('#top_3d');
+let is3dViewer = false;
 
 
-
-console.log("Create 3D!");
-// Register a render loop to repeatedly render the scene
-engine.runRenderLoop(function () {
-    scene.render();
-});
-
-// Watch for browser/canvas resize events
-window.addEventListener("resize", function () {
-    engine.resize();
-});
-
-
-
-var _3dcanvas =  $("#renderCanvas");
-var rtime;
-var timeout = false;
-var delta = 400;
-
-var top_3d_render_jthis;
 function _3DCanvasFunc(){
+    console.log("3d cansvasFunc!");
+    console.log(top_3d_button);
+    top_3d_button.click(function () {
+        console.log(is3dViewer);
+        if (is3dViewer === false) {
+          if(params.open == "true")
+          {
+            modelEnable(send=true);
+          }  
+          is3dViewer = true;
 
-    top_3d_render_jthis = $("#top_3d");
-    top_3d_render_jthis.click(function(){
-        //_3dcanvas.toggle();
-        var visible = _3dcanvas.is(':visible');
-        
-        if(params.open == "true")
-        {
-            modelEnable(top_3d_render_jthis,!visible,true);
+        } else {
+            remove3DCanvas();
+            is3dViewer = false;
         }
-    })
-
-    
+      });
+      
 
     window.addEventListener("resize", function() {
         rtime = new Date();
@@ -151,50 +151,59 @@ function _3DCanvasFunc(){
     }
 }
 
-function modelEnable(jthis,visible, send)
+function modelEnable(send)
 {
-    classroomInfo.share3D = visible;
-    if (visible) {
-        _3dcanvas.show();
-        //_3dcanvas.style.display = 'inline-block';
-        CanvasResize();
-        jthis.addClass('top_3d_on');
-        jthis.removeClass('top_3d_off')
-        
-        let _3d_canvas = document.getElementById("renderCanvas");
-
-        let frame = document
-        .getElementById('widget-container')
-        .getElementsByTagName('iframe')[0].contentWindow;
+    frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    console.log(classroomInfo);
+    classroomInfo.share3D = true;
+    // create 3d canvas on model enanbled      
+    let _3d_canvas = document.createElement('canvas');
+    _3d_canvas.setAttribute('id', 'renderCanvas');
+    _3d_canvas.style.cssText = 'position:absolute';
     
-        frame.document
-        .getElementsByClassName('design-surface')[0]
-        .appendChild(_3d_canvas);
-        frame.document.getElementById("main-canvas").style.zIndex = "1";
-        frame.document.getElementById("temp-canvas").style.zIndex = "2";
-        frame.document.getElementById("tool-box").style.zIndex = "3";
-            
-
-    }
-    else {
-        _3dcanvas.hide();
-        jthis.addClass('top_3d_off');
-        jthis.removeClass('top_3d_on')
-    }
+    frame.document
+    .getElementsByClassName('design-surface')[0]
+    .appendChild(_3d_canvas);
+    frame.document.getElementById("main-canvas").style.zIndex = "1";
+    frame.document.getElementById("temp-canvas").style.zIndex = "2";
+    frame.document.getElementById("tool-box").style.zIndex = "3";
+    _3d_canvas = frame.document.getElementById("renderCanvas"); 
+    _3dcanvas = _3d_canvas;
+    createScene(_3d_canvas); //Call the createScene function
+    //_3dcanvas.style.display = 'inline-block';
+    CanvasResize();
+    top_3d_button.addClass('top_3d_on');
+    top_3d_button.removeClass('top_3d_off')
     if (send == true) {
         connection.send({
-            modelEnable: { enable: visible }
+            modelEnable: { enable: true }
         });
     }
 }
 
+function remove3DCanvas(){
+    console.log("remove 3d!");
+    frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    
+    frame.document.getElementById("renderCanvas").remove();
+    top_3d_button.addClass('top_3d_off');
+    top_3d_button.removeClass('top_3d_on')    
+}
+
 function CanvasResize() {
-    var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
-    var canvas = frame.document.getElementById("main-canvas")
+    console.log(_3dcanvas);
+    _3dcanvas = frame.document.getElementById("renderCanvas")
+    
+    var canvas = frame.document.getElementById("main-canvas");
     var r = document.getElementsByClassName("lwindow")[0];
     var rwidth = $(r).width();
-    _3dcanvas.attr("width", canvas.width - rwidth - 50);
-    _3dcanvas.attr("height", canvas.height - 60);
+    
+    _3dcanvas.width = canvas.width - rwidth - 50;
+    _3dcanvas.height = canvas.height - 60;
 }
 
 function set3DModelStateData(_newPosition, _newRotation) {
