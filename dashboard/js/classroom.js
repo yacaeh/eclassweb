@@ -1177,9 +1177,9 @@ function unloadFileViewer() {
     let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
-    frame.document.getElementById("main-canvas").style.zIndex = "0";
-    frame.document.getElementById("temp-canvas").style.zIndex = "1";
-    frame.document.getElementById("tool-box").style.zIndex = "2";
+    frame.document.getElementById("main-canvas").style.zIndex = "1";
+    frame.document.getElementById("temp-canvas").style.zIndex = "2";
+    frame.document.getElementById("tool-box").style.zIndex = "3";
 
     let fileViewer = frame.document.getElementById('file-viewer');
     fileViewer.remove();
@@ -1191,12 +1191,12 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://localhost:9001/ViewerJS/#https://localhost:9001/files/pdf-test.pdf'
+    'https://localhost:9001/ViewerJS/#https://arxiv.org/pdf/2006.14536v1.pdf'
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
-    'border: 1px solid black;height:1024px;direction: ltr;margin-left:0%;width:60%;';
+    'border: 1px solid black;height:1024px;direction: ltr;margin-left:5%;width:60%;';
   fileViewer.setAttribute('allowFullScreen', '');
   let frame = document
     .getElementById('widget-container')
