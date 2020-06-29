@@ -119,12 +119,12 @@ var delta = 400;
 
 var top_3d_render_jthis;
 function _3DCanvasFunc(){
+
     top_3d_render_jthis = $("#top_3d");
     top_3d_render_jthis.click(function(){
         //_3dcanvas.toggle();
         var visible = _3dcanvas.is(':visible');
-       
-    
+        
         if(params.open == "true")
         {
             modelEnable(top_3d_render_jthis,!visible,true);
@@ -160,6 +160,21 @@ function modelEnable(jthis,visible, send)
         CanvasResize();
         jthis.addClass('top_3d_on');
         jthis.removeClass('top_3d_off')
+        
+        let _3d_canvas = document.getElementById("renderCanvas");
+
+        let frame = document
+        .getElementById('widget-container')
+        .getElementsByTagName('iframe')[0].contentWindow;
+    
+        frame.document
+        .getElementsByClassName('design-surface')[0]
+        .appendChild(_3d_canvas);
+        frame.document.getElementById("main-canvas").style.zIndex = "1";
+        frame.document.getElementById("temp-canvas").style.zIndex = "2";
+        frame.document.getElementById("tool-box").style.zIndex = "3";
+            
+
     }
     else {
         _3dcanvas.hide();
