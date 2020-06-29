@@ -822,6 +822,7 @@ function Viewer( viewerPlugin, parameters ) {
                 cb(matchingPluginData);
             }
         };
+        console.log("docuemntURL",documentUrl);
         xhr.open("HEAD", documentUrl, true);
         xhr.send();
     }

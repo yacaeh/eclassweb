@@ -5,8 +5,6 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 var httpServer = require('http');
-var nStatic = require('node-static');
-var fileServer = new nStatic.Server('./files');
 
 const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
