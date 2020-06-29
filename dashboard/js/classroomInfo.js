@@ -56,7 +56,7 @@ classroomCommand.receivAlert = function () {
     function response (yesOrno) {
         connection.send({                
             alertResponse :  {
-                userId : connection.userid,
+                userid : connection.userid,
                 response : yesOrno
             }
         }); 
@@ -70,11 +70,11 @@ classroomCommand.receivAlert = function () {
 };
 
 // 학생이 응답했을 때, 선생님 처리 부분
-classroomCommand.receiveAlertResponse = function (_response, callback) {
+classroomCommand.receiveAlertResponse = function (_response) {
     if(connection.extra.roomOwner)
     {                  
-        const userId = _response.userId;
-        const reposne = _response.reposne; 
+        const userId = _response.userid;
+        const response = _response.response; 
 
         var chilldren = document.getElementById("student_list").children;
             
@@ -84,7 +84,7 @@ classroomCommand.receiveAlertResponse = function (_response, callback) {
                 al.className = "";
                 al.classList.add("alert");
 
-                if(reposne == "yes")
+                if(response == "yes")
                     al.classList.add("alert_yes");
                 else 
                     al.classList.add("alert_no");
