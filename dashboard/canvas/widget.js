@@ -689,20 +689,66 @@ function canvasresize(id){
         ]
     }
 
+    var marking = false;
+    var lastmarkpos = undefined;
+
     var drawHelper = {
         redraw: function() {
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
 
             var i, point, length = points.length;
+
             for (i = 0; i < length; i++) {
                 point = points[i];
-                // point[0] != 'pdf' && 
-                if (point && point.length && this[point[0]]) {
-                    this[point[0]](context, point[1], point[2]);
+
+                if(point[0] == "marker"){
+                    if(!marking){
+                        context.beginPath();
+                        marking = true;
+                    }   
+                    var p = point[1];
+
+                    var now = [p[0], p[1]];
+                    if(lastmarkpos != undefined && lastmarkpos[0] != now[0] && lastmarkpos[1] != now[1]){
+                        context.stroke();
+                        context.beginPath();
+                    }
+
+                    if( p[0] == p[2] && p[1] == p[3] )
+                        continue;
+                        
+                    var opt = point[2];
+                    context.globalAlpha = opt[3];
+                    context.globalCompositeOperation = opt[4];
+                    context.lineCap = opt[5];
+                    context.lineJoin = opt[6];
+                    context.lineWidth = opt[0];
+                    context.strokeStyle = opt[1];
+                    context.fillStyle = opt[2];
+                    context.font = opt[7];
+
+                    context.moveTo(p[0], p[1]);
+                    context.lineTo(p[2], p[3]);
+                    lastmarkpos = [p[2], p[3]];
+                }
+                else{
+                    if(marking){
+                        marking = !marking;
+                        context.stroke();
+                    }
+
+                    if (point && point.length && this[point[0]]) {
+                        this[point[0]](context, point[1], point[2]);
+                    }
                 }
                 // else warn
             }
+            if(marking){
+                marking = !marking;
+                context.stroke();
+            }
+
         },
         getOptions: function(opt) {
             opt = opt || {};
@@ -741,44 +787,27 @@ function canvasresize(id){
             context.beginPath();
             context.moveTo(point[0], point[1]);
             context.lineTo(point[2], point[3]);
-
+            
             this.handleOptions(context, options);
         },
         marker: function(context, point, options) {
             context.beginPath();
-            context.moveTo(point[0], point[1]);
-            context.lineTo(point[2], point[3]);
+            context.clearRect(0,0,innerWidth, innerHeight)
 
+            for(var i = 0 ; i < point.length; i++){
+                var p = point[i];
+                context.moveTo(p[0], p[1]);
+                context.lineTo(p[2], p[3]);
+            }
             this.handleOptions(context, options);
         },
-        arrow: function(context, point, options) {
-            var mx = point[0];
-            var my = point[1];
-
-            var lx = point[2];
-            var ly = point[3];
-
-            var arrowSize = arrowHandler.arrowSize;
-
-            if (arrowSize == 10) {
-                arrowSize = (options ? options[0] : lineWidth) * 5;
+        markerall: function(context, point, options){
+            context.beginPath();
+            for(var i = 0 ; i < point.length; i++){
+                var p = point[i];
+                context.moveTo(p[0], p[1]);
+                context.lineTo(p[2], p[3]);
             }
-
-            var angle = Math.atan2(ly - my, lx - mx);
-
-            context.beginPath();
-            context.moveTo(mx, my);
-            context.lineTo(lx, ly);
-
-            this.handleOptions(context, options);
-
-            context.beginPath();
-            context.moveTo(lx, ly);
-            context.lineTo(lx - arrowSize * Math.cos(angle - Math.PI / 7), ly - arrowSize * Math.sin(angle - Math.PI / 7));
-            context.lineTo(lx - arrowSize * Math.cos(angle + Math.PI / 7), ly - arrowSize * Math.sin(angle + Math.PI / 7));
-            context.lineTo(lx, ly);
-            context.lineTo(lx - arrowSize * Math.cos(angle - Math.PI / 7), ly - arrowSize * Math.sin(angle - Math.PI / 7));
-
             this.handleOptions(context, options);
         },
         text: function(context, point, options) {
@@ -791,12 +820,6 @@ function canvasresize(id){
             context.arc(point[0], point[1], point[2], point[3], 0, point[4]);
 
             this.handleOptions(context, options);
-        },
-        rect: function(context, point, options) {
-            this.handleOptions(context, options, true);
-
-            context.strokeRect(point[0], point[1], point[2], point[3]);
-            context.fillRect(point[0], point[1], point[2], point[3]);
         },
         image: function(context, point, options) {
             this.handleOptions(context, options, true);
@@ -848,13 +871,6 @@ function canvasresize(id){
 
             this.handleOptions(context, options);
         },
-        bezier: function(context, point, options) {
-            context.beginPath();
-            context.moveTo(point[0], point[1]);
-            context.bezierCurveTo(point[2], point[3], point[4], point[5], point[6], point[7]);
-
-            this.handleOptions(context, options);
-        }
     };
 
     var dragHelper = {
@@ -1664,7 +1680,6 @@ function canvasresize(id){
             document.getElementById("pencil-container").style.display = 'none';
         },
         mouseup: function(e) {        
-            console.log(points)
             pointHistory.push(points.length);
             console.log('pen up')
             this.ismousedown = false;
@@ -1696,6 +1711,8 @@ function canvasresize(id){
         return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
     }
 
+    var markerpoint = [];
+
     var markerHandler = {
         ismousedown: false,
         prevX: 0,
@@ -1713,9 +1730,12 @@ function canvasresize(id){
             // make sure that pencil is drawing shapes even 
             // if mouse is down but mouse isn't moving
             tempContext.lineCap = 'round';
-            markerDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+            markerpoint = [];
+            markerpoint.push([t.prevX, t.prevY, x, y]);
 
-            points[points.length] = ['line', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
+            // markerDrawHelper.marker(tempContext, markerpoint);
+
+            points[points.length] = ['marker', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
 
             t.prevX = x;
             t.prevY = y;
@@ -1723,7 +1743,6 @@ function canvasresize(id){
             document.getElementById("marker-container").style.display = 'none';
         },
         mouseup: function(e) {
-            console.log("Marker up");
             pointHistory.push(points.length);
             this.ismousedown = false;
         },
@@ -1735,9 +1754,11 @@ function canvasresize(id){
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-                markerDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+                markerpoint.push([t.prevX, t.prevY, x, y]);
 
-                points[points.length] = ['line', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
+                markerDrawHelper.marker(tempContext, markerpoint);
+
+                points[points.length] = ['marker', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
 
                 t.prevX = x;
                 t.prevY = y;
@@ -4137,8 +4158,6 @@ function SliderSetting(element, targetinput, defaultv, callback){
             back.style.width = (ratio * sliderWidth) + 'px';
             bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
             sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
-            // param[nowListIdx] = sliderval.value;
-            console.log(window);
         }
     })
 
