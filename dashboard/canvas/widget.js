@@ -30,6 +30,8 @@
         isText: false,
         isImage: false,
         isPdf: false,
+        screenShare : false,
+        view3d : false,
 
         set: function(shape) {
             var cache = this;
@@ -88,6 +90,8 @@
 
         return ctx;
     }
+
+    var callbacks = {}
 
 var rtime;
 var timeout = false;
@@ -264,24 +268,7 @@ function canvasresize(id){
                     ], p[2]);
                 }
 
-                if (p[0] === 'line') {
-                    output += this.shortenHelper(p[0], [
-                        getPoint(point[0], x, 'x'),
-                        getPoint(point[1], y, 'y'),
-                        getPoint(point[2], x, 'x'),
-                        getPoint(point[3], y, 'y')
-                    ], p[2]);
-                }
-
-                if (p[0] === 'arrow') {
-                    output += this.shortenHelper(p[0], [
-                        getPoint(point[0], x, 'x'),
-                        getPoint(point[1], y, 'y'),
-                        getPoint(point[2], x, 'x'),
-                        getPoint(point[3], y, 'y')
-                    ], p[2]);
-                }
-
+           
                 if (p[0] === 'text') {
                     output += this.shortenHelper(p[0], [
                         point[0],
@@ -290,48 +277,8 @@ function canvasresize(id){
                     ], p[2]);
                 }
 
-                if (p[0] === 'arc') {
-                    output += this.shortenHelper(p[0], [
-                        getPoint(point[0], x, 'x'),
-                        getPoint(point[1], y, 'y'),
-                        point[2],
-                        point[3],
-                        point[4]
-                    ], p[2]);
-                }
+           
 
-                if (p[0] === 'rect') {
-                    output += this.shortenHelper(p[0], [
-                        getPoint(point[0], x, 'x'),
-                        getPoint(point[1], y, 'y'),
-                        getPoint(point[2], x, 'x'),
-                        getPoint(point[3], y, 'y')
-                    ], p[2]);
-                }
-
-                if (p[0] === 'quadratic') {
-                    output += this.shortenHelper(p[0], [
-                        getPoint(point[0], x, 'x'),
-                        getPoint(point[1], y, 'y'),
-                        getPoint(point[2], x, 'x'),
-                        getPoint(point[3], y, 'y'),
-                        getPoint(point[4], x, 'x'),
-                        getPoint(point[5], y, 'y')
-                    ], p[2]);
-                }
-
-                if (p[0] === 'bezier') {
-                    output += this.shortenHelper(p[0], [
-                        getPoint(point[0], x, 'x'),
-                        getPoint(point[1], y, 'y'),
-                        getPoint(point[2], x, 'x'),
-                        getPoint(point[3], y, 'y'),
-                        getPoint(point[4], x, 'x'),
-                        getPoint(point[5], y, 'y'),
-                        getPoint(point[6], x, 'x'),
-                        getPoint(point[7], y, 'y')
-                    ], p[2]);
-                }
             }
 
             output = output.substr(0, output.length - 2);
@@ -361,12 +308,7 @@ function canvasresize(id){
                     output = 'var x = ' + x + ', y = ' + y + ';\n\n';
                 }
 
-                if (p[0] === 'arc') {
-                    output += 'context.beginPath();\n' + 'context.arc(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ', ' + point[2] + ', ' + point[3] + ', 0, ' + point[4] + ');\n'
-
-                        +
-                        this.strokeOrFill(p[2]);
-                }
+               
 
                 if (p[0] === 'pencil') {
                     output += 'context.beginPath();\n' + 'context.moveTo(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ');\n' + 'context.lineTo(' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ');\n'
@@ -389,38 +331,10 @@ function canvasresize(id){
                         this.strokeOrFill(p[2]);
                 }
 
-                if (p[0] === 'line') {
-                    output += 'context.beginPath();\n' + 'context.moveTo(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ');\n' + 'context.lineTo(' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ');\n'
-
-                        +
-                        this.strokeOrFill(p[2]);
-                }
-
-                if (p[0] === 'arrow') {
-                    output += 'drawArrow(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ', ' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ', \'' + p[2].join('\',\'') + '\');\n';
-                }
-
                 if (p[0] === 'text') {
                     output += this.strokeOrFill(p[2]) + '\n' + 'context.fillText(' + point[0] + ', ' + getPoint(point[1], x, 'x') + ', ' + getPoint(point[2], y, 'y') + ');';
                 }
 
-                if (p[0] === 'rect') {
-                    output += this.strokeOrFill(p[2]) + '\n' + 'context.strokeRect(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ', ' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ');\n' + 'context.fillRect(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ', ' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ');';
-                }
-
-                if (p[0] === 'quadratic') {
-                    output += 'context.beginPath();\n' + 'context.moveTo(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ');\n' + 'context.quadraticCurveTo(' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ', ' + getPoint(point[4], x, 'x') + ', ' + getPoint(point[5], y, 'y') + ');\n'
-
-                        +
-                        this.strokeOrFill(p[2]);
-                }
-
-                if (p[0] === 'bezier') {
-                    output += 'context.beginPath();\n' + 'context.moveTo(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ');\n' + 'context.bezierCurveTo(' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ', ' + getPoint(point[4], x, 'x') + ', ' + getPoint(point[5], y, 'y') + ', ' + getPoint(point[6], x, 'x') + ', ' + getPoint(point[7], y, 'y') + ');\n'
-
-                        +
-                        this.strokeOrFill(p[2]);
-                }
 
                 if (i !== length - 1) output += '\n\n';
             }
@@ -468,29 +382,7 @@ function canvasresize(id){
             +
             '    if(p[0] === "eraser") { \n' + '\tcontext.moveTo(point[0], point[1]);\n' + '\tcontext.lineTo(point[2], point[3]);\n' + '    }\n\n'
 
-            // arc
-
-            +
-            '    if(p[0] === "arc") context.arc(point[0], point[1], point[2], point[3], 0, point[4]); \n\n'
-
-            // rect
-
-            +
-            '    if(p[0] === "rect") {\n' + '\tcontext.strokeRect(point[0], point[1], point[2], point[3]);\n' + '\tcontext.fillRect(point[0], point[1], point[2], point[3]);\n'
-
-            +
-            '    }\n\n'
-
-            // quadratic
-
-            +
-            '    if(p[0] === "quadratic") {\n' + '\tcontext.moveTo(point[0], point[1]);\n' + '\tcontext.quadraticCurveTo(point[2], point[3], point[4], point[5]);\n' + '    }\n\n'
-
-            // bezier
-
-            +
-            '    if(p[0] === "bezier") {\n' + '\tcontext.moveTo(point[0], point[1]);\n' + '\tcontext.bezierCurveTo(point[2], point[3], point[4], point[5], point[6], point[7]);\n' + '    }\n\n'
-
+          
             // end-fill
 
             +
@@ -531,61 +423,6 @@ function canvasresize(id){
         }
     };
 
-    function drawArrow(mx, my, lx, ly, options) {
-        function getOptions(opt) {
-            opt = opt || {};
-
-            return [
-                opt.lineWidth || 2,
-                opt.strokeStyle || '#6c96c8',
-                opt.fillStyle || 'rgba(0,0,0,0)',
-                opt.globalAlpha || 1,
-                opt.globalCompositeOperation || 'source-over',
-                opt.lineCap || 'round',
-                opt.lineJoin || 'round',
-                opt.font || '15px "Arial"'
-            ];
-        }
-
-        function handleOptions(opt, isNoFillStroke) {
-            opt = opt || getOptions();
-
-            context.globalAlpha = opt[3];
-            context.globalCompositeOperation = opt[4];
-
-            context.lineCap = opt[5];
-            context.lineJoin = opt[6];
-            context.lineWidth = opt[0];
-
-            context.strokeStyle = opt[1];
-            context.fillStyle = opt[2];
-
-            context.font = opt[7];
-
-            if (!isNoFillStroke) {
-                context.stroke();
-                context.fill();
-            }
-        }
-
-        var arrowSize = 10;
-        var angle = Math.atan2(ly - my, lx - mx);
-
-        context.beginPath();
-        context.moveTo(mx, my);
-        context.lineTo(lx, ly);
-
-        handleOptions();
-
-        context.beginPath();
-        context.moveTo(lx, ly);
-        context.lineTo(lx - arrowSize * Math.cos(angle - Math.PI / 7), ly - arrowSize * Math.sin(angle - Math.PI / 7));
-        context.lineTo(lx - arrowSize * Math.cos(angle + Math.PI / 7), ly - arrowSize * Math.sin(angle + Math.PI / 7));
-        context.lineTo(lx, ly);
-        context.lineTo(lx - arrowSize * Math.cos(angle - Math.PI / 7), ly - arrowSize * Math.sin(angle - Math.PI / 7));
-
-        handleOptions();
-    }
 
     function endLastPath() {
         var cache = is;
@@ -605,44 +442,6 @@ function canvasresize(id){
 
     var copiedStuff = [],
         isControlKeyPressed;
-
-    function copy() {
-        endLastPath();
-
-        dragHelper.global.startingIndex = 0;
-
-        if (find('copy-last').checked) {
-            copiedStuff = points[points.length - 1];
-            setSelection(find('drag-last-path'), 'DragLastPath');
-        } else {
-            copiedStuff = points;
-            setSelection(find('drag-all-paths'), 'DragAllPaths');
-        }
-    }
-
-    function paste() {
-        endLastPath();
-
-        dragHelper.global.startingIndex = 0;
-
-        if (find('copy-last').checked) {
-            points[points.length] = copiedStuff;
-
-            dragHelper.global = {
-                prevX: 0,
-                prevY: 0,
-                startingIndex: points.length - 1
-            };
-
-            dragHelper.dragAllPaths(0, 0);
-            setSelection(find('drag-last-path'), 'DragLastPath');
-        } else {
-
-            dragHelper.global.startingIndex = points.length;
-            points = points.concat(copiedStuff);
-            setSelection(find('drag-all-paths'), 'DragAllPaths');
-        }
-    }
 
     // marker + pencil
     function hexToR(h) {
@@ -801,26 +600,13 @@ function canvasresize(id){
             }
             this.handleOptions(context, options);
         },
-        markerall: function(context, point, options){
-            context.beginPath();
-            for(var i = 0 ; i < point.length; i++){
-                var p = point[i];
-                context.moveTo(p[0], p[1]);
-                context.lineTo(p[2], p[3]);
-            }
-            this.handleOptions(context, options);
-        },
+        
         text: function(context, point, options) {
             this.handleOptions(context, options);
             context.fillStyle = textHandler.getFillColor(options[2]);
             context.fillText(point[0].substr(1, point[0].length - 2), point[1], point[2]);
         },
-        arc: function(context, point, options) {
-            context.beginPath();
-            context.arc(point[0], point[1], point[2], point[3], 0, point[4]);
-
-            this.handleOptions(context, options);
-        },
+       
         image: function(context, point, options) {
             this.handleOptions(context, options, true);
 
@@ -864,13 +650,7 @@ function canvasresize(id){
             context.drawImage(image, point[1], point[2], point[3], point[4]);
             pdfHandler.reset_pos(point[1], point[2]);
         },
-        quadratic: function(context, point, options) {
-            context.beginPath();
-            context.moveTo(point[0], point[1]);
-            context.quadraticCurveTo(point[2], point[3], point[4], point[5]);
-
-            this.handleOptions(context, options);
-        },
+        
     };
 
     var dragHelper = {
@@ -914,35 +694,7 @@ function canvasresize(id){
                     }
                 }
 
-                if (p[0] === 'arrow') {
-
-                    if (dHelper.isPointInPath(x, y, point[0], point[1])) {
-                        g.pointsToMove = 'head';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[2], point[3])) {
-                        g.pointsToMove = 'tail';
-                    }
-                }
-
-                if (p[0] === 'rect') {
-
-                    if (dHelper.isPointInPath(x, y, point[0], point[1])) {
-                        g.pointsToMove = 'stretch-first';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[0] + point[2], point[1])) {
-                        g.pointsToMove = 'stretch-second';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[0], point[1] + point[3])) {
-                        g.pointsToMove = 'stretch-third';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[0] + point[2], point[1] + point[3])) {
-                        g.pointsToMove = 'stretch-last';
-                    }
-                }
+            
 
                 if (p[0] === 'image') {
 
@@ -982,39 +734,7 @@ function canvasresize(id){
                     }
                 }
 
-                if (p[0] === 'quadratic') {
-
-                    if (dHelper.isPointInPath(x, y, point[0], point[1])) {
-                        g.pointsToMove = 'starting-points';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[2], point[3])) {
-                        g.pointsToMove = 'control-points';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[4], point[5])) {
-                        g.pointsToMove = 'ending-points';
-                    }
-                }
-
-                if (p[0] === 'bezier') {
-
-                    if (dHelper.isPointInPath(x, y, point[0], point[1])) {
-                        g.pointsToMove = 'starting-points';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[2], point[3])) {
-                        g.pointsToMove = '1st-control-points';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[4], point[5])) {
-                        g.pointsToMove = '2nd-control-points';
-                    }
-
-                    if (dHelper.isPointInPath(x, y, point[6], point[7])) {
-                        g.pointsToMove = 'ending-points';
-                    }
-                }
+           
             }
 
             g.ismousedown = true;
@@ -1052,72 +772,10 @@ function canvasresize(id){
 
             if (g.ismousedown) tempContext.fillStyle = 'rgba(255,85 ,154,.9)';
             else tempContext.fillStyle = 'rgba(255,85 ,154,.4)';
-
-            if (p[0] === 'quadratic') {
-
-                tempContext.beginPath();
-
-                tempContext.arc(point[0], point[1], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[2], point[3], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[4], point[5], 10, Math.PI * 2, 0, !1);
-
-                tempContext.fill();
-            }
-
-            if (p[0] === 'bezier') {
-
-                tempContext.beginPath();
-
-                tempContext.arc(point[0], point[1], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[2], point[3], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[4], point[5], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[6], point[7], 10, Math.PI * 2, 0, !1);
-
-                tempContext.fill();
-            }
-
-            if (p[0] === 'line') {
-
-                tempContext.beginPath();
-
-                tempContext.arc(point[0], point[1], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[2], point[3], 10, Math.PI * 2, 0, !1);
-
-                tempContext.fill();
-            }
-
-            if (p[0] === 'arrow') {
-
-                tempContext.beginPath();
-
-                tempContext.arc(point[0], point[1], 10, Math.PI * 2, 0, !1);
-                tempContext.arc(point[2], point[3], 10, Math.PI * 2, 0, !1);
-
-                tempContext.fill();
-            }
-
+        
             if (p[0] === 'text') {
                 tempContext.font = "15px Verdana";
                 tempContext.fillText(point[0], point[1], point[2]);
-            }
-
-            if (p[0] === 'rect') {
-
-                tempContext.beginPath();
-                tempContext.arc(point[0], point[1], 10, Math.PI * 2, 0, !1);
-                tempContext.fill();
-
-                tempContext.beginPath();
-                tempContext.arc(point[0] + point[2], point[1], 10, Math.PI * 2, 0, !1);
-                tempContext.fill();
-
-                tempContext.beginPath();
-                tempContext.arc(point[0], point[1] + point[3], 10, Math.PI * 2, 0, !1);
-                tempContext.fill();
-
-                tempContext.beginPath();
-                tempContext.arc(point[0] + point[2], point[1] + point[3], 10, Math.PI * 2, 0, !1);
-                tempContext.fill();
             }
 
             if (p[0] === 'image') {
@@ -1398,21 +1056,6 @@ function canvasresize(id){
                 points[points.length - 1] = [p[0], point, p[2]];
             }
 
-            if (p[0] === 'arrow') {
-
-                if (g.pointsToMove === 'head' || isMoveAllPoints) {
-                    point[0] = getPoint(x, prevX, point[0]);
-                    point[1] = getPoint(y, prevY, point[1]);
-                }
-
-                if (g.pointsToMove === 'tail' || isMoveAllPoints) {
-                    point[2] = getPoint(x, prevX, point[2]);
-                    point[3] = getPoint(y, prevY, point[3]);
-                }
-
-                points[points.length - 1] = [p[0], point, p[2]];
-            }
-
             if (p[0] === 'text') {
 
                 if (g.pointsToMove === 'head' || isMoveAllPoints) {
@@ -1423,71 +1066,7 @@ function canvasresize(id){
                 points[points.length - 1] = [p[0], point, p[2]];
             }
 
-            if (p[0] === 'arc') {
-                point[0] = getPoint(x, prevX, point[0]);
-                point[1] = getPoint(y, prevY, point[1]);
-
-                points[points.length - 1] = [p[0], point, p[2]];
-            }
-
-            if (p[0] === 'rect') {
-
-                if (isMoveAllPoints) {
-                    point[0] = getPoint(x, prevX, point[0]);
-                    point[1] = getPoint(y, prevY, point[1]);
-                }
-
-                if (g.pointsToMove === 'stretch-first') {
-                    var newPoints = getXYWidthHeight(x, y, prevX, prevY, {
-                        x: point[0],
-                        y: point[1],
-                        width: point[2],
-                        height: point[3],
-                        pointsToMove: g.pointsToMove
-                    });
-
-                    point[0] = newPoints.x;
-                    point[1] = newPoints.y;
-                    point[2] = newPoints.width;
-                    point[3] = newPoints.height;
-                }
-
-                if (g.pointsToMove === 'stretch-second') {
-                    var newPoints = getXYWidthHeight(x, y, prevX, prevY, {
-                        x: point[0],
-                        y: point[1],
-                        width: point[2],
-                        height: point[3],
-                        pointsToMove: g.pointsToMove
-                    });
-
-                    point[1] = newPoints.y;
-                    point[2] = newPoints.width;
-                    point[3] = newPoints.height;
-                }
-
-                if (g.pointsToMove === 'stretch-third') {
-                    var newPoints = getXYWidthHeight(x, y, prevX, prevY, {
-                        x: point[0],
-                        y: point[1],
-                        width: point[2],
-                        height: point[3],
-                        pointsToMove: g.pointsToMove
-                    });
-
-                    point[0] = newPoints.x;
-                    point[2] = newPoints.width;
-                    point[3] = newPoints.height;
-                }
-
-                if (g.pointsToMove === 'stretch-last') {
-                    point[2] = getPoint(x, prevX, point[2]);
-                    point[3] = getPoint(y, prevY, point[3]);
-                }
-
-                points[points.length - 1] = [p[0], point, p[2]];
-            }
-
+       
             if (p[0] === 'image') {
 
                 if (isMoveAllPoints) {
@@ -1604,50 +1183,7 @@ function canvasresize(id){
                 points[points.length - 1] = [p[0], point, p[2]];
             }
 
-            if (p[0] === 'quadratic') {
-
-                if (g.pointsToMove === 'starting-points' || isMoveAllPoints) {
-                    point[0] = getPoint(x, prevX, point[0]);
-                    point[1] = getPoint(y, prevY, point[1]);
-                }
-
-                if (g.pointsToMove === 'control-points' || isMoveAllPoints) {
-                    point[2] = getPoint(x, prevX, point[2]);
-                    point[3] = getPoint(y, prevY, point[3]);
-                }
-
-                if (g.pointsToMove === 'ending-points' || isMoveAllPoints) {
-                    point[4] = getPoint(x, prevX, point[4]);
-                    point[5] = getPoint(y, prevY, point[5]);
-                }
-
-                points[points.length - 1] = [p[0], point, p[2]];
-            }
-
-            if (p[0] === 'bezier') {
-
-                if (g.pointsToMove === 'starting-points' || isMoveAllPoints) {
-                    point[0] = getPoint(x, prevX, point[0]);
-                    point[1] = getPoint(y, prevY, point[1]);
-                }
-
-                if (g.pointsToMove === '1st-control-points' || isMoveAllPoints) {
-                    point[2] = getPoint(x, prevX, point[2]);
-                    point[3] = getPoint(y, prevY, point[3]);
-                }
-
-                if (g.pointsToMove === '2nd-control-points' || isMoveAllPoints) {
-                    point[4] = getPoint(x, prevX, point[4]);
-                    point[5] = getPoint(y, prevY, point[5]);
-                }
-
-                if (g.pointsToMove === 'ending-points' || isMoveAllPoints) {
-                    point[6] = getPoint(x, prevX, point[6]);
-                    point[7] = getPoint(y, prevY, point[7]);
-                }
-
-                points[points.length - 1] = [p[0], point, p[2]];
-            }
+            
         }
     };
 
@@ -2247,322 +1783,6 @@ function canvasresize(id){
 
     arcHandler.init();
 
-    // var lineHandler = {
-    //     ismousedown: false,
-    //     prevX: 0,
-    //     prevY: 0,
-    //     mousedown: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-
-    //         t.prevX = x;
-    //         t.prevY = y;
-
-    //         t.ismousedown = true;
-    //     },
-    //     mouseup: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-    //         if (t.ismousedown) {
-    //             points[points.length] = ['line', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
-    //             t.ismousedown = false;
-    //         }
-    //     },
-    //     mousemove: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-
-    //         if (t.ismousedown) {
-    //             tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-    //             drawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-    //         }
-    //     }
-    // };
-
-    // var arrowHandler = {
-    //     ismousedown: false,
-    //     prevX: 0,
-    //     prevY: 0,
-    //     arrowSize: 10,
-    //     mousedown: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-
-    //         t.prevX = x;
-    //         t.prevY = y;
-
-    //         t.ismousedown = true;
-    //     },
-    //     mouseup: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-    //         if (t.ismousedown) {
-    //             points[points.length] = ['arrow', [t.prevX, t.prevY, x, y], drawHelper.getOptions()];
-
-    //             t.ismousedown = false;
-    //         }
-    //     },
-    //     mousemove: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-
-    //         if (t.ismousedown) {
-    //             tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-    //             drawHelper.arrow(tempContext, [t.prevX, t.prevY, x, y]);
-    //         }
-    //     }
-    // };
-
-    // var rectHandler = {
-    //     ismousedown: false,
-    //     prevX: 0,
-    //     prevY: 0,
-    //     mousedown: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-
-    //         t.prevX = x;
-    //         t.prevY = y;
-
-    //         t.ismousedown = true;
-    //     },
-    //     mouseup: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-    //         if (t.ismousedown) {
-    //             points[points.length] = ['rect', [t.prevX, t.prevY, x - t.prevX, y - t.prevY], drawHelper.getOptions()];
-
-    //             t.ismousedown = false;
-    //         }
-
-    //     },
-    //     mousemove: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var t = this;
-    //         if (t.ismousedown) {
-    //             tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-    //             drawHelper.rect(tempContext, [t.prevX, t.prevY, x - t.prevX, y - t.prevY]);
-    //         }
-    //     }
-    // };
-
-    // var quadraticHandler = {
-    //     global: {
-    //         ismousedown: false,
-    //         prevX: 0,
-    //         prevY: 0,
-    //         controlPointX: 0,
-    //         controlPointY: 0,
-    //         isFirstStep: true,
-    //         isLastStep: false
-    //     },
-    //     mousedown: function(e) {
-    //         var g = this.global;
-
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         if (!g.isLastStep) {
-    //             g.prevX = x;
-    //             g.prevY = y;
-    //         }
-
-    //         g.ismousedown = true;
-
-    //         if (g.isLastStep && g.ismousedown) {
-    //             this.end(x, y);
-    //         }
-    //     },
-    //     mouseup: function(e) {
-    //         var g = this.global;
-
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         if (g.ismousedown && g.isFirstStep) {
-    //             g.controlPointX = x;
-    //             g.controlPointY = y;
-
-    //             g.isFirstStep = false;
-    //             g.isLastStep = true;
-    //         }
-    //     },
-    //     mousemove: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var g = this.global;
-
-    //         tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-    //         if (g.ismousedown && g.isFirstStep) {
-    //             drawHelper.quadratic(tempContext, [g.prevX, g.prevY, x, y, x, y]);
-    //         }
-
-    //         if (g.isLastStep) {
-    //             drawHelper.quadratic(tempContext, [g.prevX, g.prevY, g.controlPointX, g.controlPointY, x, y]);
-    //         }
-    //     },
-    //     end: function(x, y) {
-    //         var g = this.global;
-
-    //         if (!g.ismousedown) return;
-
-    //         g.isLastStep = false;
-
-    //         g.isFirstStep = true;
-    //         g.ismousedown = false;
-
-    //         x = x || g.controlPointX || g.prevX;
-    //         y = y || g.controlPointY || g.prevY;
-
-    //         points[points.length] = ['quadratic', [g.prevX, g.prevY, g.controlPointX, g.controlPointY, x, y], drawHelper.getOptions()];
-    //     }
-    // };
-
-    // var bezierHandler = {
-    //     global: {
-    //         ismousedown: false,
-    //         prevX: 0,
-    //         prevY: 0,
-
-    //         firstControlPointX: 0,
-    //         firstControlPointY: 0,
-    //         secondControlPointX: 0,
-    //         secondControlPointY: 0,
-
-    //         isFirstStep: true,
-    //         isSecondStep: false,
-    //         isLastStep: false
-    //     },
-    //     mousedown: function(e) {
-    //         var g = this.global;
-
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         if (!g.isLastStep && !g.isSecondStep) {
-    //             g.prevX = x;
-    //             g.prevY = y;
-    //         }
-
-    //         g.ismousedown = true;
-
-    //         if (g.isLastStep && g.ismousedown) {
-    //             this.end(x, y);
-    //         }
-
-    //         if (g.ismousedown && g.isSecondStep) {
-    //             g.secondControlPointX = x;
-    //             g.secondControlPointY = y;
-
-    //             g.isSecondStep = false;
-    //             g.isLastStep = true;
-    //         }
-    //     },
-    //     mouseup: function(e) {
-    //         var g = this.global;
-
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         if (g.ismousedown && g.isFirstStep) {
-    //             g.firstControlPointX = x;
-    //             g.firstControlPointY = y;
-
-    //             g.isFirstStep = false;
-    //             g.isSecondStep = true;
-    //         }
-    //     },
-    //     mousemove: function(e) {
-    //         var x = e.pageX - canvas.offsetLeft,
-    //             y = e.pageY - canvas.offsetTop;
-
-    //         var g = this.global;
-
-    //         tempContext.clearRect(0, 0, innerWidth, innerHeight);
-
-    //         if (g.ismousedown && g.isFirstStep) {
-    //             drawHelper.bezier(tempContext, [g.prevX, g.prevY, x, y, x, y, x, y]);
-    //         }
-
-    //         if (g.ismousedown && g.isSecondStep) {
-    //             drawHelper.bezier(tempContext, [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, x, y, x, y]);
-    //         }
-
-    //         if (g.isLastStep) {
-    //             drawHelper.bezier(tempContext, [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, g.secondControlPointX, g.secondControlPointY, x, y]);
-    //         }
-    //     },
-    //     end: function(x, y) {
-    //         var g = this.global;
-
-    //         if (!g.ismousedown) return;
-
-    //         g.isLastStep = g.isSecondStep = false;
-
-    //         g.isFirstStep = true;
-    //         g.ismousedown = false;
-
-    //         g.secondControlPointX = g.secondControlPointX || g.firstControlPointX;
-    //         g.secondControlPointY = g.secondControlPointY || g.firstControlPointY;
-
-    //         x = x || g.secondControlPointX;
-    //         y = y || g.secondControlPointY;
-
-    //         points[points.length] = ['bezier', [g.prevX, g.prevY, g.firstControlPointX, g.firstControlPointY, g.secondControlPointX, g.secondControlPointY, x, y], drawHelper.getOptions()];
-    //     }
-    // };
-
-    // var zoomHandler = {
-    //     scale: 1.0,
-    //     up: function(e) {
-    //         this.scale += .01;
-    //         this.apply();
-    //     },
-    //     down: function(e) {
-    //         this.scale -= .01;
-    //         this.apply();
-    //     },
-    //     apply: function() {
-    //         tempContext.scale(this.scale, this.scale);
-    //         context.scale(this.scale, this.scale);
-    //         drawHelper.redraw();
-    //     },
-    //     icons: {
-    //         up: function(ctx) {
-    //             ctx.font = '22px Verdana';
-    //             ctx.strokeText('+', 10, 30);
-    //         },
-    //         down: function(ctx) {
-    //             ctx.font = '22px Verdana';
-    //             ctx.strokeText('-', 15, 30);
-    //         }
-    //     }
-    // };
-
     var FileSelector = function() {
         var selector = this;
 
@@ -2853,6 +2073,7 @@ function canvasresize(id){
     };
 
     var icons = {};
+    console.log(params)
     if (params.icons) {
         try {
             icons = JSON.parse(params.icons);
@@ -2887,8 +2108,11 @@ function canvasresize(id){
 
         clearCanvas: icons.clearCanvas || '',
         on : icons.on || '',
-        off : icons.off || ''
+        off : icons.off || '',
+        screenShare : icons.screenShare || '',
+        view3d : icons.view3d || ''
     };
+
 
     var tools = {
         line: true,
@@ -2908,10 +2132,12 @@ function canvasresize(id){
         zoom: true,
         lineWidth: true,
         colorsPicker: true,
+        code: true,
+        
         clearCanvas: true,
         onoff: true,
-        code: true,
-        undo: true
+        undo: true,
+        screenShare: true
     };
 
     if (params.tools) {
@@ -2969,9 +2195,6 @@ function canvasresize(id){
 
     (function() {
         var cache = {};
-
-        var lineCapSelect = find('lineCap-select');
-        var lineJoinSelect = find('lineJoin-select');
 
         function getContext(id) {
             var context = find(id).getContext('2d');
@@ -3124,6 +2347,29 @@ function canvasresize(id){
             decorateUndo();
             document.getElementById('undo').style.display = 'block';
         }
+
+        function decorate3dview() {
+            var context = getContext('3d_view');
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.view3d;
+
+            document.getElementById('3d_view').onclick = function() {
+                this.classList.toggle("on");
+                this.classList.toggle("selected-shape");
+                
+            }
+
+        }
+
+        if (tools.view3d === true) {
+            decorate3dview();
+            document.getElementById('3d_view').style.display = 'block';
+        }
+
+
 
         function decoratePencil() {
 
@@ -3422,6 +2668,21 @@ function canvasresize(id){
         if (tools.clearCanvas === true) {
             decorateClearCanvas();
             document.getElementById('clear_canvas').style.display = 'block';
+        }
+
+        function decorateScreenShare() {
+            var context = getContext('screen_share');
+
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.screenShare;
+        }
+
+        if (tools.clearCanvas === true) {
+            decorateScreenShare();
+            document.getElementById('screen_share').style.display = 'block';
         }
 
         function decorateonoff(){
@@ -3848,18 +3109,22 @@ function canvasresize(id){
 
     addEvent(document, 'paste', onTextFromClipboard);
 
-    // scripts on this page directly touches DOM-elements
-    // removing or altering anything may cause failures in the UI event handlers
-    // it is used only to bring collaboration for canvas-surface
     var lastPointIndex = 0;
 
     var uid;
 
     window.addEventListener('message', function(event) {
+        
         if (!event.data) return;
-
+        
         if (!uid) {
             uid = event.data.uid;
+        }
+        
+        console.log(event.data);
+        if(event.data.screenShare){
+
+            callbacks.screenShare = event.data.screenShare;
         }
 
         if (event.data.captureStream) {
@@ -4082,28 +3347,23 @@ function canvasresize(id){
     MakeTitlePop("pdf-icon", "PDF파일을 불러옵니다");
     MakeTitlePop("undo", "작업 하나를 취소합니다");
     MakeTitlePop("clear_canvas", "캔버스를 비웁니다");
+    MakeTitlePop("screen_share", "내 화면을 공유합니다");
 
-    var pensilder = new SliderSetting("pencileslider", "pencil-stroke-style", 1, function(v){
+    SliderSetting("pencileslider", "pencil-stroke-style", 1, function(v){
         var pencilDrawHelper = clone(drawHelper);
-        console.log(pencilDrawHelper)
         pencilDrawHelper.getOptions = function() {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
         }
         pencilLineWidth = v;
     });
 
-    var markerslider = new SliderSetting("markerslider", "marker-stroke-style", 1, function(v){
+    SliderSetting("markerslider", "marker-stroke-style", 1, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
             return [markerLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
         }
         markerLineWidth = v;
     });
-
-    console.log(pensilder);
-
-    pensilder.set;
-
 })();
 
 function MakeTitlePop(element, contents){

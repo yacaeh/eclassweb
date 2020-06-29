@@ -121,17 +121,6 @@ var top_3d_render_jthis;
 function _3DCanvasFunc(){
 
     top_3d_render_jthis = $("#top_3d");
-    top_3d_render_jthis.click(function(){
-        //_3dcanvas.toggle();
-        var visible = _3dcanvas.is(':visible');
-        
-        if(params.open == "true")
-        {
-            modelEnable(top_3d_render_jthis,!visible,true);
-        }
-    })
-
-    
 
     window.addEventListener("resize", function() {
         rtime = new Date();

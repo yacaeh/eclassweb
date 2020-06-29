@@ -12,7 +12,6 @@
   window.params = params;
 })();
 var connection = new RTCMultiConnection();
-console.log(connection);
 console.log('Connection!');
 
 // function printHarryPotter(){ console.log("Harry Potter!"); }
@@ -37,54 +36,52 @@ connection.autoCloseEntireSession = false;
 connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
-console.log(connection);
 
-// here goes canvas designer
-var designer = new CanvasDesigner();
+SetCanvasBtn('screen_share', ScreenShare);
+SetCanvasBtn('3d_view', _3DCanvasOnOff);
 
-// you can place widget.html anywhere
-designer.widgetHtmlURL = './canvas/widget.html';
-designer.widgetJsURL = './widget.js';
+function _3DCanvasOnOff(btn){
+    var visible = $(btn).hasClass('on');
+    if(params.open == "true")
+    {
+        modelEnable(top_3d_render_jthis,visible,true);
+    }
+}
 
-// setInterval(designer.clearCanvas, 1000)
+function ScreenShare(){
+  if (!window.tempStream) {
+    alert('Screen sharing is not enabled.');
+    return;
+  }
+  screen_constraints = {
+    screen: true,
+    oneway: true,
+  };
 
-designer.icons.pencil = '/dashboard/newimg/pen.png';
-designer.icons.marker = '/dashboard/newimg/pen2.png';
-designer.icons.eraser = '/dashboard/newimg/eraser.png';
-designer.icons.clearCanvas = '/dashboard/newimg/trash.png';
-designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
-designer.icons.on = '/dashboard/img/view_on.png';
-designer.icons.off = '/dashboard/img/view_off.png';
+  if (navigator.mediaDevices.getDisplayMedia) {
+    navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
+      (stream) => {
+        replaceScreenTrack(stream);
+      },
+      (error) => {
+        alert('Please make sure to use Edge 17 or higher.');
+      }
+    );
+  } else if (navigator.getDisplayMedia) {
+    navigator.getDisplayMedia(screen_constraints).then(
+      (stream) => {
+        replaceScreenTrack(stream);
+      },
+      (error) => {
+        alert('Please make sure to use Edge 17 or higher.');
+      }
+    );
+  } else {
+    alert('getDisplayMedia API is not available in this browser.');
+  }
+}
 
-console.log(designer.icons);
 
-designer.addSyncListener(function (data) {
-  connection.send(data);
-});
-
-designer.setTools({
-  pencil: true,
-  text: true,
-  image: true,
-  pdf: false,
-  eraser: true,
-  line: true,
-  arrow: false,
-  dragSingle: false,
-  dragMultiple: false,
-  arc: false,
-  rectangle: false,
-  quadratic: false,
-  bezier: false,
-  marker: true,
-  zoom: false,
-  lineWidth: false,
-  colorsPicker: false,
-  clearCanvas: true,
-  onoff: true,
-  code: false,
-  undo: true,
-});
 
 // here goes RTCMultiConnection
 
@@ -130,8 +127,6 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-  document.getElementById('top_attach-file').style.display = 'inline-block';
-  document.getElementById('top_share_screen').style.display = 'inline-block';
 
   // 접속시 방정보 동기화.
   if (connection.extra.roomOwner)
@@ -232,12 +227,9 @@ connection.onmessage = function (event) {
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     console.log(event.data.modelEnable);
-
-
     var enable = event.data.modelEnable.enable;
     modelEnable(top_3d_render_jthis, enable, false);
     return;
-
   }
 
   if (event.data === 'plz-sync-points') {
@@ -743,7 +735,6 @@ function replaceScreenTrack(stream) {
 
     // $('#main-video').hide();
     $('#screen-viewer').hide();
-    $('#top_share_screen').show();
     replaceTrack(tempStream.getTracks()[0], screenTrackId);
   });
 
@@ -766,40 +757,6 @@ function replaceScreenTrack(stream) {
   });
   $('#screen-viewer').show();
 }
-
-$('#top_share_screen').click(function () {
-  if (!window.tempStream) {
-    alert('Screen sharing is not enabled.');
-    return;
-  }
-  screen_constraints = {
-    screen: true,
-    oneway: true,
-  };
-  //$('#top_share_screen').hide();
-
-  if (navigator.mediaDevices.getDisplayMedia) {
-    navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
-      (stream) => {
-        replaceScreenTrack(stream);
-      },
-      (error) => {
-        alert('Please make sure to use Edge 17 or higher.');
-      }
-    );
-  } else if (navigator.getDisplayMedia) {
-    navigator.getDisplayMedia(screen_constraints).then(
-      (stream) => {
-        replaceScreenTrack(stream);
-      },
-      (error) => {
-        alert('Please make sure to use Edge 17 or higher.');
-      }
-    );
-  } else {
-    alert('getDisplayMedia API is not available in this browser.');
-  }
-});
 
 function ClassTime() {
   var now = 0;
