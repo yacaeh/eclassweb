@@ -1961,10 +1961,8 @@ function canvasresize(id){
             console.log("mouse down!");
             if (this.canvasInput !== null) {
                 document.getElementById('text-input').remove();
-                this.canvasInput=null;
             }
-            else{
-            console.log("canvas input is not null");
+            
             this.canvasInput = document.createElement("INPUT");
             this.canvasInput.setAttribute("id", "text-input");
             this.canvasInput.setAttribute("type", "text");
@@ -1972,7 +1970,6 @@ function canvasresize(id){
             this.canvasInput.style.cssText =
             'border: 1px solid black;width:60%;position:absolute;top:100px;left:100px;z-index=999;height:100px';
             document.getElementsByTagName('body')[0].appendChild(this.canvasInput);
-            }
 
             if (!is.isText) return;
 
