@@ -195,19 +195,16 @@ connection.onmessage = function (event) {
   }
 
 
-  if (null != event.data.allControl) {
-    if (/*!checkRoomOwner()*/true) {
-      classroomInfo.allControl = event.data.allControl;
+  if (null != event.data.allControl) { 
+    classroomInfo.allControl = event.data.allControl;
+    if (event.data.allControl) {
+      // 제어 하기    
+      allControllEnable(top_all_controll_jthis, true, false);
+    }
+    else {
+      // 제어 풀기
+      allControllEnable(top_all_controll_jthis, false, false);
 
-      if (event.data.allControl) {
-        // 제어 하기    
-        allControllEnable(top_all_controll_jthis, true, false);
-      }
-      else {
-        // 제어 풀기
-        allControllEnable(top_all_controll_jthis, false, false);
-
-      }
     }
     return;
   }
@@ -230,21 +227,22 @@ connection.onmessage = function (event) {
 
 
   if (event.data.roomSync) {
-    console.log('event.data.roomSync');;
     classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
     return;
   };
 
   //3d 모델링 Enable
   if (event.data.modelEnable) {
-    console.log(event.data.modelEnable);
-
 
     var enable = event.data.modelEnable.enable;
     console.log("enable",enable);
     modelEnable(false);
     return;
+  }
 
+  if (event.data.modelDisable) {
+    remove3DCanvas ();
+    return;
   }
 
   if (event.data === 'plz-sync-points') {
@@ -255,8 +253,7 @@ connection.onmessage = function (event) {
 
   //3d 모델링 상대값
   if (event.data.ModelState) {
-    console.log(event.data.ModelState);
-
+    //console.log(event.data.ModelState);
     set3DModelStateData(
       event.data.ModelState.position,
       event.data.ModelState.rotation
@@ -1001,7 +998,7 @@ $('#exam-start').click(function () {
     return;    
   }
   //const questionCount = $('#exam-question-count').val();  
-  if (!examObj.checkAnswerChecked()) {
+  if (!examObj.checkAnswerChecked(m_QuesCount)) {
     alert('문제애 대한 모든 답을 선택해야 합니다');    
     return;
   }
@@ -1017,7 +1014,7 @@ $('#exam-start').click(function () {
   var answerList = getQuestionAnswerList();
 
   examObj.examAnswer = answerList;
-  examObj.sendExamStart(parseInt(m_ExamTime / 60));
+  examObj.sendExamStart(m_QuesCount, parseInt(m_ExamTime / 60));
 
   $('#exam-setting-bar').hide();
   showExamStateForm();
@@ -1193,6 +1190,7 @@ function stopQuestionOMR () {
 
 // 학생 정답 표시
 function markStudent(num, check, answer) {
+  console.log(check);
   if (check === answer) {
     $(`#exam-question-${num}`).css('background-color', 'lightgreen');
   }

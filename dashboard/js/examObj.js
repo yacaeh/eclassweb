@@ -218,9 +218,8 @@ examObj.receiveExamData = function(_data) {
 };
 
 //  시험지 모든 문제에 체크를 했는지 확인. 
-examObj.checkAnswerChecked = function () {    
-    const questionCount = $('#exam-question-count').val();    
-    for(let i = 1; i <= questionCount; ++i) {
+examObj.checkAnswerChecked = function (_questionCount) {     
+    for(let i = 1; i <= _questionCount; ++i) {
         let checked = 1 == $(`input:radio[name='exam-question-${i}']:checked`).length;                
         if(!checked)
             return false;
@@ -237,6 +236,8 @@ examObj.checkStudentAnswerChecked = function (_questionCount) {
     return true;
 };
 
+
+
 examObj.setExamInfo = function () {
 
     examObj.examInfo =  {
@@ -247,12 +248,23 @@ examObj.setExamInfo = function () {
     };
 }
 
-examObj.sendExamStart  = function(_examTime) {
+
+examObj.examClose = function () {
+
+    examObj.exportExam ();   
+    classroomInfo.exam = false;
+    examObj.isStart = false; 
+    examObj.studentsAnswer = {};
+    examObj.examAnswer = {};      
+
+}
+
+
+examObj.sendExamStart  = function(_questionCount, _examTime) {
     if(connection.extra.roomOwner)
     {    
         classroomInfo.exam = true;
-        const questionCount = $('#exam-question-count').val();
-        examObj.questionCount = questionCount;       
+        examObj.questionCount = _questionCount;       
         examObj.isStart = true;
         examObj.totalCount = connection.getAllParticipants().length;
         examObj.examTime = _examTime;
@@ -276,8 +288,9 @@ examObj.sendExamStart  = function(_examTime) {
 examObj.sendExamEnd = function() {
     if(connection.extra.roomOwner)
     {
-        classroomInfo.exam = false;
-        examObj.isStart = false;
+        if(!examObj.isStart)
+            return;
+        
         connection.send({
             exam: {
                 examEnd : true
@@ -285,6 +298,8 @@ examObj.sendExamEnd = function() {
         });
     }
 }
+
+
 
 examObj.sendSubmit = function() {
     //  학생이 선생한테 정답 제출
@@ -369,13 +384,9 @@ examObj.receiveSubmit = function (submit) {
 
         if(examObj.totalCount == examObj.submitCount)   // 마지막 제출이 끝났을 때, 결과를 export 한다.
           { 
-              finishExam();
-              examObj.exportExam ();
-              /*
-               $('#exam-start').attr('class', 'btn btn-primary');
-               $('#exam-start').html('시작');
-               clearInterval(m_ExamTimerInterval);    
-               $('#exam-time').val(parseInt(m_ExamTime / 60))*/
+            examObj.examClose ();    
+              // 시험 종료.
+            finishExam();
           }
     }
 };
@@ -385,18 +396,17 @@ examObj.receiveSubmitResult = function (_examResult) {
     console.log(_examResult);
 
     if(connection.userid == _examResult.userid) {        
-        const len = _examResult.examAnswers.length;    
-        console.log(len);    
+        const len = _examResult.examAnswers.length;  
         for(let i = 0; i < len; ++i) {
             const questionNumber = i + 1;
             const examAnswer = _examResult.examAnswers[i];
             const studentAnsweer  = _examResult.userAnswers[i];
 
-            markStudent(questionNumber, studentAnsweer, examAnswer)
-            console.log(questionNumber + ", " + studentAnsweer + ", " + examAnswer);
+            markStudent(questionNumber, studentAnsweer, examAnswer)         
         }       
     }
 };
+
 
 examObj.exportExam = function () {
     if(connection.extra.roomOwner) {
