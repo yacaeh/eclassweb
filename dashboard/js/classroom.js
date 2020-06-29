@@ -195,19 +195,16 @@ connection.onmessage = function (event) {
   }
 
 
-  if (null != event.data.allControl) {
-    if (/*!checkRoomOwner()*/true) {
-      classroomInfo.allControl = event.data.allControl;
+  if (null != event.data.allControl) { 
+    classroomInfo.allControl = event.data.allControl;
+    if (event.data.allControl) {
+      // 제어 하기    
+      allControllEnable(top_all_controll_jthis, true, false);
+    }
+    else {
+      // 제어 풀기
+      allControllEnable(top_all_controll_jthis, false, false);
 
-      if (event.data.allControl) {
-        // 제어 하기    
-        allControllEnable(top_all_controll_jthis, true, false);
-      }
-      else {
-        // 제어 풀기
-        allControllEnable(top_all_controll_jthis, false, false);
-
-      }
     }
     return;
   }
@@ -241,7 +238,11 @@ connection.onmessage = function (event) {
     console.log("enable",enable);
     modelEnable(false);
     return;
+  }
 
+  if (event.data.modelDisable) {
+    remove3DCanvas ();
+    return;
   }
 
   if (event.data === 'plz-sync-points') {

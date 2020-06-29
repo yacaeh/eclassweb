@@ -113,27 +113,27 @@ let timeout = false;
 let delta = 400;
 
 let top_3d_button = $('#top_3d');
-let is3dViewer = false;
+// let is3dViewer = false;
 
 
 function _3DCanvasFunc(){
     console.log("3d cansvasFunc!");
     console.log(top_3d_button);
-    top_3d_button.click(function () {
-        console.log(is3dViewer);
-        if (is3dViewer === false) {
+    top_3d_button.click(function () {        
           if(params.open == "true")
-          {
-            modelEnable(send=true);
-            is3dViewer = true;
-          }  
-        } else {
-            if(params.open == "true")
+          {  
+            const isViewer = classroomInfo.share3D.state;
+            if(false == isViewer)
             {
-                remove3DCanvas();
-                classroomInfo.share3D.state = false;
-                is3dViewer = false;
+                modelEnable(send=true);
             }
+            else
+            {
+                remove3DCanvas();                
+                connection.send({
+                    modelDisable : true
+                });
+            }          
         }
       });
       
@@ -197,6 +197,7 @@ function remove3DCanvas(){
     frame.document.getElementById("renderCanvas").remove();
     top_3d_button.addClass('top_3d_off');
     top_3d_button.removeClass('top_3d_on')    
+    classroomInfo.share3D.state = false;
 }
 
 function CanvasResize() {
