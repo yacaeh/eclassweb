@@ -102,11 +102,11 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: true,
 };
 
-connection.onUserStatusChanged = function (event) {   
-    var infoBar = document.getElementById('onUserStatusChanged');
-    var names = [];
+connection.onUserStatusChanged = function (event) {
+  var infoBar = document.getElementById('onUserStatusChanged');
+  var names = [];
 
-connection.getAllParticipants().forEach(function (pid) {
+    connection.getAllParticipants().forEach(function (pid) {
     names.push(getFullName(pid));
 });
 
@@ -130,12 +130,12 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-    document.getElementById('top_attach-file').style.display = 'inline-block';
-    document.getElementById('top_share_screen').style.display = 'inline-block';
+  document.getElementById('top_attach-file').style.display = 'inline-block';
+  document.getElementById('top_share_screen').style.display = 'inline-block';
 
     // 접속시 방정보 동기화.
     if(connection.extra.roomOwner)
-        classroomCommand.sendsyncRoomInfo ();
+        classroomCommand.sendsyncRoomInfo (event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -146,148 +146,112 @@ connection.onclose = connection.onerror = connection.onleave = function (
 };
 
 connection.onmessage = function (event) {
-    if (event.data.showMainVideo) {
-        // $('#main-video').show();
-        $('#screen-viewer').css({
-            top: $('#widget-container').offset().top,
-            left: $('#widget-container').offset().left,
-            width: $('#widget-container').width(),
-            height: $('#widget-container').height()
-        });
-        $('#screen-viewer').show();
-        return;
-    }
+  if (event.data.showMainVideo) {
+      classroomInfo.shareScreen = true;
+          // $('#main-video').show();
+    $('#screen-viewer').css({
+      top: $('#widget-container').offset().top,
+      left: $('#widget-container').offset().left,
+      width: $('#widget-container').width(),
+      height: $('#widget-container').height()
+    });
+    $('#screen-viewer').show();
+    return;
+  }
 
-    if (event.data.hideMainVideo) {
-        // $('#main-video').hide();
-        $('#screen-viewer').hide();
-        return;
-    }
-
-
-    if (event.data.typing === false) {
-        $('#key-press').hide().find('span').html('');
-        return;
-    }
-
-    if (event.data.chatMessage) {
-        appendChatMessage(event);
-        return;
-    }
-
-    if (event.data.checkmark === 'received') {
-        var checkmarkElement = document.getElementById(event.data.checkmark_id);
-        if (checkmarkElement) {
-            checkmarkElement.style.display = 'inline';
-        }
-        return;
-    }
-
-    if (event.data === 'plz-sync-points') {
-        designer.sync();
-        return;
-    }
-
-
-    if (null != event.data.allControl) {
-        if (/*!checkRoomOwner()*/true) {
-            classroomInfo.allControl = event.data.allControl;
-            
-            if (event.data.allControl) {
-                // 제어 하기    
-                allControllEnable(top_all_controll_jthis,true,false);        
-            }
-            else {
-                // 제어 풀기
-                allControllEnable(top_all_controll_jthis,false,false);       
-                
-            }
-        }
-        return;
-    }
-    
-    if(event.data.alert) {     
-        classroomCommand.receivAlert ();    
-        return;    
-    }
-
-    if(event.data.alertResponse) {     
-        classroomCommand.receiveAlertResponse (event.data.alertResponse);
-        return;
-    };
-
-    if (event.data.exam) {
-        // 시험치기..        
-        examObj.receiveExamData(event.data.exam);
-        return;
-    }
-
+  if (event.data.hideMainVideo) {
+    // $('#main-video').hide();
+    $('#screen-viewer').hide();
+    classroomInfo.shareScreen = false;    
+    return;
+  }
 
     if(event.data.roomSync) {
-        console.log('event.data.roomSync');;
         classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
         return;
     };
 
-    //3d 모델링 Enable
-    if(event.data.modelEnable)
-    {
-        console.log(event.data.modelEnable);
+  if (event.data.typing === false) {
+    $('#key-press').hide().find('span').html('');
+    return;
+  }
 
-        
-        var enable = event.data.modelEnable.enable;
-        modelEnable(top_3d_render_jthis, enable , false);
-        return;
+  if (event.data.chatMessage) {
+    appendChatMessage(event);
+    return;
+  }
 
+  if (event.data.checkmark === 'received') {
+    var checkmarkElement = document.getElementById(event.data.checkmark_id);
+    if (checkmarkElement) {
+      checkmarkElement.style.display = 'inline';
     }
+    return;
+  }
 
   if (event.data === 'plz-sync-points') {
     designer.sync();
     return;
   }
 
+
   if (null != event.data.allControl) {
-    if (/*!checkRoomOwner()*/ true) {
+    if (/*!checkRoomOwner()*/true) {
       classroomInfo.allControl = event.data.allControl;
 
       if (event.data.allControl) {
-        // 제어 하기
+        // 제어 하기    
         allControllEnable(top_all_controll_jthis, true, false);
-      } else {
+      }
+      else {
         // 제어 풀기
         allControllEnable(top_all_controll_jthis, false, false);
+
       }
     }
     return;
   }
 
   if (event.data.alert) {
-    classroomInfo.alert.receivAlert();
+    classroomCommand.receivAlert();
     return;
   }
 
   if (event.data.alertResponse) {
-    classroomInfo.alert.receiveAlertResponse(event.data.alertResponse);
+    classroomCommand.receiveAlertResponse(event.data.alertResponse);
     return;
-  }
+  };
 
   if (event.data.exam) {
-    // 시험치기..
+    // 시험치기..        
     examObj.receiveExamData(event.data.exam);
     return;
   }
 
-  if (event.data.examAnswer) {
-  }
+
+  if (event.data.roomSync) {
+    console.log('event.data.roomSync');;
+    classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
+    return;
+  };
 
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     console.log(event.data.modelEnable);
 
+
     var enable = event.data.modelEnable.enable;
-    modelEnable(top_3d_render_jthis, enable, false);
+    console.log("enable",enable);
+    modelEnable(false);
+    return;
+
+  }
+
+  if (event.data === 'plz-sync-points') {
+    designer.sync();
     return;
   }
+  
 
   //3d 모델링 상대값
   if (event.data.ModelState) {
@@ -318,9 +282,10 @@ connection.onmessage = function (event) {
 // extra code
 connection.onstream = function (event) {
   console.log('onstream!');
-  if (event.stream.isScreen && !event.stream.canvasStream) {
+  if (event.stream.isScreen && !event.stream.canvasStream) {      
     $('#screen-viewer').get(0).srcObject = event.stream;
-    $('#screen-viewer').hide();
+    if(!classroomInfo.shareScreen)
+      $('#screen-viewer').hide();
   } else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
     video.setAttribute('data-streamid', event.streamid);
@@ -710,7 +675,7 @@ function addStreamStopListener(stream, callback) {
     'ended',
     function () {
       callback();
-      callback = function () {};
+      callback = function () { };
     },
     false
   );
@@ -719,7 +684,7 @@ function addStreamStopListener(stream, callback) {
     'inactive',
     function () {
       callback();
-      callback = function () {};
+      callback = function () { };
     },
     false
   );
@@ -729,7 +694,7 @@ function addStreamStopListener(stream, callback) {
       'ended',
       function () {
         callback();
-        callback = function () {};
+        callback = function () { };
       },
       false
     );
@@ -738,44 +703,87 @@ function addStreamStopListener(stream, callback) {
       'inactive',
       function () {
         callback();
-        callback = function () {};
+        callback = function () { };
       },
       false
     );
   });
 }
 
+
 function replaceTrack(videoTrack, screenTrackId) {
+
   if (!videoTrack) return;
   if (videoTrack.readyState === 'ended') {
     alert(
       'Can not replace an "ended" track. track.readyState: ' +
-        videoTrack.readyState
+      videoTrack.readyState
     );
     return;
   }
   connection.getAllParticipants().forEach(function (pid) {
-    var peer = connection.peers[pid].peer;
-    if (!peer.getSenders) return;
-    var trackToReplace = videoTrack;
-    peer.getSenders().forEach(function (sender) {
-      if (!sender || !sender.track) return;
-      if (screenTrackId) {
-        if (trackToReplace && sender.track.id === screenTrackId) {
-          sender.replaceTrack(trackToReplace);
-          trackToReplace = null;
-        }
-        return;
-      }
-
-      if (sender.track.id !== tempStream.getTracks()[0].id) return;
-      if (sender.track.kind === 'video' && trackToReplace) {
+    replaceTrackToPeer (pid, videoTrack, screenTrackId);   
+  });
+}
+/*
+    Peer당 replaceTrack
+*/
+function replaceTrackToPeer (pid, videoTrack, screenTrackId) {
+  if(!connection.peers[pid])
+  {
+    console.error('connection peer error');
+    return;
+  }
+  var peer = connection.peers[pid].peer;
+  if (!peer.getSenders) return;
+  var trackToReplace = videoTrack;
+  peer.getSenders().forEach(function (sender) {            
+    if (!sender || !sender.track) return;
+    if (screenTrackId) {
+      if (trackToReplace && sender.track.id === screenTrackId) {
         sender.replaceTrack(trackToReplace);
         trackToReplace = null;
       }
-    });
+      return;
+    }
+
+    if (sender.track.id !== tempStream.getTracks()[0].id) return;
+    if (sender.track.kind === 'video' && trackToReplace) {
+      sender.replaceTrack(trackToReplace);
+      trackToReplace = null;
+    }
   });
 }
+
+
+/*
+   특정 유저에게 스크린공유를 걸어준다.
+*/
+function currentScreenViewShare (_pid) {
+  let stream = window.shareStream;
+  if(!stream) {
+      console.error('stream not found');
+      return;
+  }
+
+  //  선생님만 할 수 있게..
+  if(!connection.extra.roomOwner)
+    return;
+
+    // var remoteUserId = _pid;
+    // var videoTrack = stream.getVideoTracks()[0];
+    // connection.replaceTrack(videoTrack, remoteUserId);    
+    const pid = _pid;
+    stream.getTracks().forEach(function (track) {
+        if (track.kind === 'video' && track.readyState === 'live') {
+            replaceTrackToPeer (pid, track);
+        }
+    });
+
+    connection.send({
+      showMainVideo: true,
+    });
+  }
 
 function replaceScreenTrack(stream) {
   stream.isScreen = true;
@@ -790,15 +798,19 @@ function replaceScreenTrack(stream) {
     // mediaElement: video
   });
 
+  // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
+  window.shareStream = stream;  
+  classroomInfo.shareScreen = true;
+
   var screenTrackId = stream.getTracks()[0].id;
-  addStreamStopListener(stream, function () {
+  addStreamStopListener(stream, function () {    
     connection.send({
       hideMainVideo: true,
     });
-
     // $('#main-video').hide();
-    $('#screen-viewer').hide();
-    $('#top_share_screen').show();
+    classroomInfo.shareScreen = false;
+    window.sharedStream = null;
+    hideScreenViewerUI();
     replaceTrack(tempStream.getTracks()[0], screenTrackId);
   });
 
@@ -812,7 +824,13 @@ function replaceScreenTrack(stream) {
     showMainVideo: true,
   });
 
+  showScreenViewerUI ();
   // $('#main-video').show();
+}
+
+
+
+function showScreenViewerUI () {
   $('#screen-viewer').css({
     top: $('#widget-container').offset().top,
     left: $('#widget-container').offset().left,
@@ -821,6 +839,14 @@ function replaceScreenTrack(stream) {
   });
   $('#screen-viewer').show();
 }
+
+
+function hideScreenViewerUI () {
+  $('#screen-viewer').hide();
+  $('#top_share_screen').show();
+}
+
+
 
 $('#top_share_screen').click(function () {
   if (!window.tempStream) {
@@ -941,16 +967,17 @@ function SelectViewType(){
 $('#top_test').click(function () {
   if ($('#exam-board').is(':visible')) {
     $('#exam-board').hide(300);
-  } else {
+  }
+  else {
     // 선생님
     if (params.open === 'true') {
-      $('#exam-omr').hide();
-      $('#exam-setting-bar').show();
+      $("#exam-omr").hide();
+      $("#exam-teacher-menu").show();
     }
     // 학생
     else {
-      $('#exam-omr').show();
-      $('#exam-setting-bar').hide();
+      $("#exam-omr").show();
+      $("#exam-teacher-menu").hide();
     }
     $('#exam-board').show(300);
   }
@@ -978,56 +1005,74 @@ $('#exam-add-question').click(function () {
   $('#exam-question-count').val(m_QuesCount);
 });
 
-// 시험 시작, 종료
-$('#exam-start').toggle(
-  function () {
-    if (!examObj.checkAnswerChecked()) {
-      //  TODO : 모든 문제에 대한 답 작성 하라는 알림
-      console.log('빠진 답');
-      return;
-    }
+// 시험 시작, 종료 버튼 이벤트
+$('#exam-start').click(function () {
 
-    if (isNaN($('#exam-time').val())) {
-      // TODO : 시간 설정하라고 알림
-      $('#exam-start').click();
-      return;
-    } else {
-      m_ExamTime = parseInt($('#exam-time').val() * 60);
-    }
-
-    var answerList = getQuestionAnswerList();
-
-    $('#exam-start').attr('class', 'btn btn-danger');
-    $('#exam-start').html('시험 종료');
-
-    examObj.examAnswer = answerList;
-    examObj.sendExamStart(parseInt(m_ExamTime / 60));
-
-    m_ExamTimerInterval = setInterval(function () {
-      m_ExamTime--;
-      $('#exam-time').val(parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60));
-      if (m_ExamTime <= 0) $('#exam-start').click();
-    }, 1000);
-
-    showExamStateForm();
-  },
-  function () {
-    $('#exam-start').attr('class', 'btn btn-exam');
-    $('#exam-start').html('시험 시작');
-    clearInterval(m_ExamTimerInterval);
-    $('#exam-time').val(parseInt(m_ExamTime / 60));
-
-    examObj.sendExamEnd();
+  if(m_QuesCount <= 0 ) {
+    alert('답안지를 먼저 작성해야 합니다');        
+    return;    
   }
-);
+  //const questionCount = $('#exam-question-count').val();  
+  if (!examObj.checkAnswerChecked()) {
+    alert('문제애 대한 모든 답을 선택해야 합니다');    
+    return;
+  }
+
+  const examTime = $('#exam-time').val();
+  if(examTime <= 0 || isNaN(examTime)) {
+    alert('시간 설정이 잘못 되었습니다.');    
+    return;
+  };
+
+  m_ExamTime = parseInt($('#exam-time').val() * 60);  
+
+  var answerList = getQuestionAnswerList();
+
+  examObj.examAnswer = answerList;
+  examObj.sendExamStart(parseInt(m_ExamTime / 60));
+
+  $('#exam-setting-bar').hide();
+  showExamStateForm();
+
+  $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+  m_ExamTimerInterval = setInterval(function () {
+    m_ExamTime--;
+    examObj.updateExameTimer (m_ExamTime);
+    $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
+    if (m_ExamTime <= 0)
+      $('#exam-start').click();
+  }, 1000);
+});
+
+function finishExam() {
+  clearInterval(m_ExamTimerInterval);
+  $('#exam-time').val(parseInt(m_ExamTime / 60))
+  $('#exam-setting-bar').show();
+  $('#exam-state').html("");
+  examObj.sendExamEnd();
+}
 
 // 시험 문제 정답률 폼 표시
 function showExamStateForm() {
   $('#exam-state').show();
-  var stateHtmlStr = '';
+  var stateHtmlStr = "";
+
+  stateHtmlStr += "<div class='exam-header'>";
+  stateHtmlStr += "<div>시험 중</div>";
+  stateHtmlStr += "<div id='exam-teacher-timer' style='color:red;'>0:0</div>";
+  stateHtmlStr += "</div>";
+  stateHtmlStr += "<div class='exam-background exam-overflow'>";
   for (var i = 1; i <= m_QuesCount; i++) {
-    stateHtmlStr += `<span style='font-weight:bold'>${i}.</span><progress id="exam-state-progress-${i}" value="0" max="100"></progress><span id="exam-state-percent-${i}" >0%</span><br>`;
+    stateHtmlStr += `<div style='display:flex; height:3vh;'>`;
+    stateHtmlStr += `<span class='text-center-bold' style='flex:1;'>${i}.</span>`;
+    stateHtmlStr += `<progress style='flex:4; margin-top:10px' id="exam-state-progress-${i}" class='exam-state-progress'  value="0" max="100"></progress>`;
+    stateHtmlStr += `<span style='flex:1; text-align:center;'  id='exam-state-percent-${i}'>0%</span><br>`;
+    stateHtmlStr += `</div>`;
   }
+  stateHtmlStr += "</div>";
+  stateHtmlStr += "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>시험 종료</button>"
+
+
   $('#exam-state').html(stateHtmlStr);
 }
 
@@ -1041,14 +1086,14 @@ function setExamState(num, percent) {
 function apeendQuestion(i) {
   question = `<div id='exam-question-${i}' style='display: flex;'>`;
 
-  question += `<span id='exam-question-text-${i}' style='flex:2; text-align:center; font-weight:bold; margin-top:2px;'>${i}.</span>`;
+  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:2; margin-top:2px;'>${i}.</span>`;
 
   for (var j = 1; j <= 5; j++) {
     question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
     question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
   }
 
-  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam' style='flex:1; padding: 0px 3px 0px 3px; margin:5px; font-weight:bold;'>─</button>`;
+  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 0px 3px; margin:5px;'>─</button>`;
 
   question += `</div>`;
   $('#exam-qustion-list').append(question);
@@ -1094,28 +1139,34 @@ function setQuestionAnswer(answerList) {
 
 // 학생들 OMR 세팅
 function setStudentOMR(quesCount, examTime) {
-  $('#exam-omr').show();
+  $("#exam-omr").show();
   $('#exam-board').show();
 
-  $('#exam-omr').html('');
-  question = "<div id='exam-student-timer'>0:0</div>";
+  $('#exam-omr').html("");
+  var question = "";
 
+  question += "<div class='exam-header'>";
+  question += "<div>시험 중</div>";
+  question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
+  question += "</div>";
+  question += "<div id='exam-question-list' class='exam-border-bottom'>";
   m_QuesCount = quesCount;
   for (var i = 1; i <= m_QuesCount; i++) {
-    question += `<div id='exam-question-${i}' onchange='omrChange(${i})'>`;
-
-    question += `<span id='exam-question-text-${i}'>${i}: </span>`;
-
+    question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`
+    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1;'>${i}.</span>`;
     for (var j = 1; j <= 5; j++) {
-      question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
+      question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
       question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
     }
-
+    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1;'></span>`;
     question += `</div>`;
   }
-  question +=
-    "<button onclick='submitOMR()' class='btn btn-primary'>시험제출</button>";
+  question += `</div>`;
+  question += "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
   $('#exam-omr').html(question);
+
+  m_ExamTime = parseInt(examTime * 60);
+  $('#exam-student-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
 
   m_ExamTime = parseInt(examTime * 60);
 
@@ -1130,20 +1181,37 @@ function setStudentOMR(quesCount, examTime) {
 
 // 학생 시험 OMR 제출
 function submitOMR() {
-    if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
-        // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
-        return;
-    }
+  if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
+    // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
+    alert('아직 답안지 작성이 완료 안되었습니다');
+    return;
+  }
 
+  stopQuestionOMR ();
+  examObj.sendSubmit();
+  // $('#exam-omr').html("");
+  // $('#exam-board').hide();
+}
+
+function stopQuestionOMR () {
   clearInterval(m_ExamTimerInterval);
   var studentOMR = getQuestionAnswerList();
   examObj.examAnswer = studentOMR;
   //  console.log(studentOMR);
 
-  examObj.sendSubmit();
+  $('#exam-question-list').css('pointer-events', 'none');
+  $('#exam-answer-submit').hide();
+}
 
-  $('#exam-omr').html('');
-  $('#exam-board').hide();
+// 학생 정답 표시
+function markStudent(num, check, answer) {
+  if (check === answer) {
+    $(`#exam-question-${num}`).css('background-color', 'lightgreen');
+  }
+  else {
+    $(`#exam-question-${num}`).css('background-color', 'pink');
+  }
+  $(`#exam-student-answer-${num}`).html(answer);
 }
 
 // 학생 OMR이 변경됨
@@ -1186,14 +1254,15 @@ $('#top_pdf').click(function () {
 });
 
 function unloadFileViewer() {
-    let frame = document
+  let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
     frame.document.getElementById("main-canvas").style.zIndex = "1";
-    frame.document.getElementById("temp-canvas").style.zIndex = "1";
+    frame.document.getElementById("temp-canvas").style.zIndex = "2";
+    frame.document.getElementById("tool-box").style.zIndex = "3";
 
-    let fileViewer = frame.document.getElementById('file-viewer');
-    fileViewer.remove();
+  let fileViewer = frame.document.getElementById('file-viewer');
+  fileViewer.remove();
 }
 
 function loadFileViewer() {
@@ -1202,151 +1271,24 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://localhost:9001/ViewerJS/#../dashboard/files/test.pdf'
+    'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
-    'border: 1px solid black;height:1024px;direction: ltr;margin-left:0%;width:60%;';
+    'border: 1px solid black;height:1024px;direction: ltr;margin-left:5%;width:60%;';
   fileViewer.setAttribute('allowFullScreen', '');
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
 
 
-    frame.document
-    .getElementsByClassName('design-surface')[0]
-    .appendChild(fileViewer);
-    frame.document.getElementById("main-canvas").style.zIndex = "1";
-    frame.document.getElementById("temp-canvas").style.zIndex = "2";
-    frame.document.getElementById("tool-box").style.zIndex = "3";
-}
-
-function loadPDF() {
-  var oriPdfCanvas = document.createElement('canvas');
-  oriPdfCanvas.setAttribute('id', 'the-canvas');
-  oriPdfCanvas.style.cssText =
-    'border: 1px solid black;min-height:900px;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
-  var frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-
   frame.document
     .getElementsByClassName('design-surface')[0]
-    .appendChild(oriPdfCanvas);
-  const pdfCanvas = frame.document.getElementById('the-canvas');
-  // If absolute URL from the remote server is provided, configure the CORS
-  // header on that server.
-  var url = 'test2.pdf';
-
-  // Loaded via <script> tag, create shortcut to access PDF.js exports.
-  var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-  // The workerSrc property shall be specified.
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-  var pdfDoc = null,
-    pageNum = 1,
-    pageRendering = false,
-    pageNumPending = null,
-    scale = 1,
-    canvas = pdfCanvas, //document.getElementById('the-canvas'),
-    ctx = canvas.getContext('2d');
-
-  /**
-   * Get page info from document, resize canvas accordingly, and render page.
-   * @param num Page number.
-   */
-  function renderPage(num) {
-    pageRendering = true;
-    // Using promise to fetch the page
-    pdfDoc.getPage(num).then(function (page) {
-      var viewport = page.getViewport({ scale: scale });
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      // Render PDF page into canvas context
-      var renderContext = {
-        canvasContext: ctx,
-        viewport: viewport,
-      };
-      var renderTask = page.render(renderContext);
-
-      // Wait for rendering to finish
-      renderTask.promise.then(function () {
-        pageRendering = false;
-        if (pageNumPending !== null) {
-          // New page rendering is pending
-          renderPage(pageNumPending);
-          pageNumPending = null;
-        }
-        pdfCanvas.style.zIndex = +1;
-        //   document.getElementById('the-canvas').style.zIndex = +1;
-      });
-    });
-
-    // Update page counters
-    document.getElementById('page_num').textContent = num;
-  }
-
-  /**
-   * If another page rendering in progress, waits until the rendering is
-   * finised. Otherwise, executes rendering immediately.
-   */
-  function queueRenderPage(num) {
-    if (pageRendering) {
-      pageNumPending = num;
-    } else {
-      renderPage(num);
-    }
-  }
-
-  /**
-   * Displays previous page.
-   */
-  function onPrevPage() {
-    if (pageNum <= 1) {
-      return;
-    }
-    pageNum--;
-    queueRenderPage(pageNum);
-  }
-  document.getElementById('prev').addEventListener('click', onPrevPage);
-
-  /**
-   * Displays next page.
-   */
-  function onNextPage() {
-    if (pageNum >= pdfDoc.numPages) {
-      return;
-    }
-    pageNum++;
-    queueRenderPage(pageNum);
-  }
-  document.getElementById('next').addEventListener('click', onNextPage);
-
-  function closePDF() {
-    console.log('close!');
-    console.log(pdfDoc);
-    $('#canvas-controller').hide();
-    pdfCanvas.remove();
-  }
-  document.getElementById('close-pdf').addEventListener('click', closePDF);
-
-  /**
-   * Asynchronously downloads PDF.
-   */
-  pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
-    pdfDoc = pdfDoc_;
-    document.getElementById('page_count').textContent = pdfDoc.numPages;
-
-    // Initial/first page rendering
-    renderPage(pageNum);
-  });
-  document.addEventListener('webviewerloaded', function () {
-    PDFViewerApplicationOptions.set('printResolution', 300);
-  });
+    .appendChild(fileViewer);
+  frame.document.getElementById("main-canvas").style.zIndex = "1";
+  frame.document.getElementById("temp-canvas").style.zIndex = "2";
+  frame.document.getElementById("tool-box").style.zIndex = "3";
 }
 
 _3DCanvasFunc();
@@ -1355,8 +1297,8 @@ _Movie_Render_Button_Func();
 
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {
-  callback_yes = callback_yes || function () {};
-  callback_no = callback_no || function () {};
+  callback_yes = callback_yes || function () { };
+  callback_no = callback_no || function () { };
 
   var clickCount = 0;
 

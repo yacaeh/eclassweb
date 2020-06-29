@@ -2,8 +2,8 @@
 classroomInfo = {    
     allControl : false,
     shareScreen : false,
-    share3D : false,    
-    students : {},   
+    share3D : false,
+    exam : false
     /*
         
         alert : {
@@ -18,15 +18,48 @@ classroomCommand = {
 };
 
 
-classroomCommand.sendsyncRoomInfo = function () {
-    connection.send ({
-        roomSync : classroomInfo
-    });
+
+classroomCommand.updateSyncRoom = function () {
+
+    if(classroomInfo.allControl) {
+
+    }
+
+    // if(classroomInfo.shareScreen) {
+        
+    // }
+
+    if(classroomInfo.share3D) {
+
+    }
 };
 
-classroomCommand.receiveSyncRoomInfo = function (_roomInfo) {
-    classroomInfo = _roomInfo;
+classroomCommand.sendsyncRoomInfo = function (_data) {
+    /*
+        방에 학생이 들어오면, 현재 방 상태 정보를 동기화 시키기 위해
+        방상태 정보를 보낸다.
+    */
+    connection.send ({
+        roomSync : {
+            userid : _data.userid,
+            info : classroomInfo
+        }
+    });
+
+    // shareScreen은 선생님이 해당 학생한테 공유 해줘야 한다. 
+    if(classroomInfo.shareScreen) {
+        classroomCommand.syncScreenShare (_data.userid);
+    };
 };
+
+classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {  
+    console.log(_syncRoom);
+    if(_syncRoom.userid == connection.userid) {              
+        classroomInfo = _syncRoom.info;
+        classroomCommand.updateSyncRoom ();
+    }
+};
+
 
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
@@ -56,7 +89,7 @@ classroomCommand.receivAlert = function () {
     function response (yesOrno) {
         connection.send({                
             alertResponse :  {
-                userId : connection.userid,
+                userid : connection.userid,
                 response : yesOrno
             }
         }); 
@@ -70,11 +103,11 @@ classroomCommand.receivAlert = function () {
 };
 
 // 학생이 응답했을 때, 선생님 처리 부분
-classroomCommand.receiveAlertResponse = function (_response, callback) {
+classroomCommand.receiveAlertResponse = function (_response) {
     if(connection.extra.roomOwner)
     {                  
-        const userId = _response.userId;
-        const reposne = _response.reposne; 
+        const userId = _response.userid;
+        const response = _response.response; 
 
         var chilldren = document.getElementById("student_list").children;
             
@@ -84,15 +117,23 @@ classroomCommand.receiveAlertResponse = function (_response, callback) {
                 al.className = "";
                 al.classList.add("alert");
 
-                if(reposne == "yes")
+                if(response == "yes")
                     al.classList.add("alert_yes");
                 else 
                     al.classList.add("alert_no");
             }
         }
-
         // 체크 알림...
         //console.log(event.data.alertConfirm);            
     }
+}
+
+
+/*
+    Screen share
+ */
+
+classroomCommand.syncScreenShare = function (_userid) {
+    currentScreenViewShare (_userid);
 };
 

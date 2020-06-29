@@ -299,6 +299,7 @@ $('#btn-create-room').click(function () {
     connection.checkPresence(roomid, function (isRoomExist) {
         if (isRoomExist === true) {
             alertBox('이미 존재하는 방입니다.', '에러');
+            $('#btn-create-room').html(initialHTML).prop('disabled', false);
             return;
         }
 

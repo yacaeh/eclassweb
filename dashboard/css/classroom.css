@@ -564,13 +564,6 @@ hr {
 
 }
 
-
-#renderCanvas{
-  position: absolute;
-  left: 45px;
-}
-
-
 input[type=radio] { display:none; }
 
 input[type=radio] + label { 

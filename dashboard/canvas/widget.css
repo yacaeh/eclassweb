@@ -357,6 +357,7 @@ input:focus {
 
 .context-popup {
     position: absolute;
+    z-index: 100;
     width: 225px;
     height: 18px;
     display: none;
