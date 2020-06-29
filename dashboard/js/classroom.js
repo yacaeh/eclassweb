@@ -1207,8 +1207,8 @@ function loadFileViewer() {
     .getElementsByClassName('design-surface')[0]
     .appendChild(fileViewer);
     frame.document.getElementById("main-canvas").style.zIndex = "1";
-    frame.document.getElementById("temp-canvas").style.zIndex = "1";
-    frame.document.getElementById("tool-box").style.zIndex = "2";
+    frame.document.getElementById("temp-canvas").style.zIndex = "2";
+    frame.document.getElementById("tool-box").style.zIndex = "3";
 }
 
 _3DCanvasFunc();
