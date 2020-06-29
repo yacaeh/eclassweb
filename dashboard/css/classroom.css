@@ -437,7 +437,7 @@ hr {
   background-color: rgb(55,55,55);
   display: inline-block;
   margin: 2px;
-  margin-right: -5px;
+  margin-right: 0px;
   cursor: pointer;
   color: white;
   vertical-align: bottom;

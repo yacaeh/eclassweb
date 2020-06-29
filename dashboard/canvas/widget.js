@@ -1664,6 +1664,7 @@ function canvasresize(id){
             document.getElementById("pencil-container").style.display = 'none';
         },
         mouseup: function(e) {        
+            console.log(points)
             pointHistory.push(points.length);
             console.log('pen up')
             this.ismousedown = false;
@@ -4061,15 +4062,16 @@ function canvasresize(id){
     MakeTitlePop("undo", "작업 하나를 취소합니다");
     MakeTitlePop("clear_canvas", "캔버스를 비웁니다");
 
-    SliderSetting("pencileslider", "pencil-stroke-style", 0, function(v){
+    var pensilder = new SliderSetting("pencileslider", "pencil-stroke-style", 1, function(v){
         var pencilDrawHelper = clone(drawHelper);
+        console.log(pencilDrawHelper)
         pencilDrawHelper.getOptions = function() {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
         }
         pencilLineWidth = v;
     });
 
-    SliderSetting("markerslider", "marker-stroke-style", 0, function(v){
+    var markerslider = new SliderSetting("markerslider", "marker-stroke-style", 1, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
             return [markerLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
@@ -4077,9 +4079,11 @@ function canvasresize(id){
         markerLineWidth = v;
     });
 
+    console.log(pensilder);
+
+    pensilder.set;
+
 })();
-
-
 
 function MakeTitlePop(element, contents){
     var ele = document.getElementById(element);
@@ -4101,8 +4105,7 @@ function MakeTitlePop(element, contents){
 
 
 function SliderSetting(element, targetinput, defaultv, callback){
-var maxSlider = 48;
-
+    var maxSlider = 48;
     var slider = document.getElementById(element);
     var bar = slider.getElementsByClassName("slider_btn")[0];
     var back = slider.getElementsByClassName("slider-back")[0];
@@ -4110,12 +4113,12 @@ var maxSlider = 48;
     var isClick = false;
 
     Set(defaultv);
-
     function Set(v){
         var ratio = v / maxSlider;
         var sliderWidth = slider.getBoundingClientRect().width;
         back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
-        bar.style.left = '-7.5px'
+        bar.style.left = '-7.5px';
+        // bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
         callback(v);
     }
@@ -4135,6 +4138,14 @@ var maxSlider = 48;
             bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
             sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
             // param[nowListIdx] = sliderval.value;
+            console.log(window);
+        }
+    })
+
+    document.getElementById("temp-canvas").addEventListener("mouseup", function(){
+        if(isClick){
+            isClick = false;
+            callback(sliderval.value);
         }
     })
 
@@ -4161,5 +4172,3 @@ var maxSlider = 48;
         sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
     })
 }
-
-
