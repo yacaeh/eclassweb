@@ -1177,7 +1177,7 @@ function unloadFileViewer() {
     let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
-    frame.document.getElementById("main-canvas").style.zIndex = "1";
+    frame.document.getElementById("main-canvas").style.zIndex = "0";
     frame.document.getElementById("temp-canvas").style.zIndex = "1";
     frame.document.getElementById("tool-box").style.zIndex = "2";
 
@@ -1191,7 +1191,7 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://localhost:9001/ViewerJS/#../dashboard/files/test.pdf'
+    'https://localhost:9001/ViewerJS/#https://localhost:9001/files/pdf-test.pdf'
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
