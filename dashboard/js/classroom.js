@@ -212,24 +212,7 @@ connection.onmessage = function (event) {
     }
 
     if(event.data.alertResponse) {     
-        classroomCommand.receiveAlertResponse (event.data.alertResponse, function(e){
-            var chilldren = document.getElementById("student_list").children;
-            
-            for(var i = 0; i < chilldren.length; i++){
-                if(chilldren[i].dataset.id == e.userId){
-                    var al = chilldren[i].getElementsByClassName("alert")[0];
-                    al.className = "";
-                    al.classList.add("alert");
-
-                    if(e.response == "yes")
-                        al.classList.add("alert_yes");
-                    else 
-                        al.classList.add("alert_no");
-                }
-            }
-
-
-        });               
+        classroomCommand.receiveAlertResponse (event.data.alertResponse);
         return;
     };
 
