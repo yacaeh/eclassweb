@@ -230,15 +230,12 @@ connection.onmessage = function (event) {
 
 
   if (event.data.roomSync) {
-    console.log('event.data.roomSync');;
     classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
     return;
   };
 
   //3d 모델링 Enable
   if (event.data.modelEnable) {
-    console.log(event.data.modelEnable);
-
 
     var enable = event.data.modelEnable.enable;
     console.log("enable",enable);
@@ -255,8 +252,7 @@ connection.onmessage = function (event) {
 
   //3d 모델링 상대값
   if (event.data.ModelState) {
-    console.log(event.data.ModelState);
-
+    //console.log(event.data.ModelState);
     set3DModelStateData(
       event.data.ModelState.position,
       event.data.ModelState.rotation

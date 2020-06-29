@@ -73,7 +73,9 @@ var createScene = function (_canvas) {
     function SendStateData(_position, _rotation)
     {
         if(params.open == "true")
-        {
+        {            
+            // 공유 데이터에 update
+            updateShared3DData (_position, _rotation);
             connection.send({
                 ModelState : {
                     position : _position,
@@ -123,12 +125,15 @@ function _3DCanvasFunc(){
           if(params.open == "true")
           {
             modelEnable(send=true);
+            is3dViewer = true;
           }  
-          is3dViewer = true;
-
         } else {
-            remove3DCanvas();
-            is3dViewer = false;
+            if(params.open == "true")
+            {
+                remove3DCanvas();
+                classroomInfo.share3D.state = false;
+                is3dViewer = false;
+            }
         }
       });
       
@@ -157,7 +162,7 @@ function modelEnable(send)
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
     console.log(classroomInfo);
-    classroomInfo.share3D = true;
+    classroomInfo.share3D.state = true;
     // create 3d canvas on model enanbled      
     let _3d_canvas = document.createElement('canvas');
     _3d_canvas.setAttribute('id', 'renderCanvas');
@@ -209,4 +214,24 @@ function CanvasResize() {
 function set3DModelStateData(_newPosition, _newRotation) {
     newPosition = _newPosition;
     newRotation = _newRotation;
+}
+
+
+/*
+    data를 갱신
+*/
+function updateShared3DData (_pos, _rot) {
+    // data를 추가할 때, json으로 추가하면 된다.
+    classroomInfo.share3D.data = {
+        newPosition : _pos,
+        newRotation : _rot
+    }
+}
+/*
+    선생님의 화면과 동기화 시킨다
+*/
+function sync3DModel () {    
+    var data = classroomInfo.share3D.data;    
+    set3DModelStateData (data.newPosition, data.newRotation);
+    modelEnable (false);
 }
