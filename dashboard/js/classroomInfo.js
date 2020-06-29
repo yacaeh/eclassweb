@@ -128,7 +128,9 @@ classroomCommand.receiveAlertResponse = function (_response) {
 }
 
 
-
+/*
+    Screen share
+ */
 
 classroomCommand.syncScreenShare = function (_userid) {
     currentScreenViewShare (_userid);

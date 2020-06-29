@@ -756,18 +756,21 @@ function currentScreenViewShare (_pid) {
   //  선생님만 할 수 있게..
   if(!connection.extra.roomOwner)
     return;
-  
-  const pid = _pid;
-  stream.getTracks().forEach(function (track) {
-      if (track.kind === 'video' && track.readyState === 'live') {
-          replaceTrackToPeer (pid, track);
-      }
-  });
 
-  connection.send({
-    showMainVideo: true,
-  });
-}
+    // var remoteUserId = _pid;
+    // var videoTrack = stream.getVideoTracks()[0];
+    // connection.replaceTrack(videoTrack, remoteUserId);    
+    const pid = _pid;
+    stream.getTracks().forEach(function (track) {
+        if (track.kind === 'video' && track.readyState === 'live') {
+            replaceTrackToPeer (pid, track);
+        }
+    });
+
+    connection.send({
+      showMainVideo: true,
+    });
+  }
 
 function replaceScreenTrack(stream) {
   stream.isScreen = true;
