@@ -71,19 +71,19 @@ examObj.checkAnswer = function (_questionNumber, _answerNumber) {
 
 examObj.updateStudentAnswer = function (selectAnswer) {   
     // 학생의 시험 답 하나를 갱싱한다.
-    var studentAnswerInfo = examObj.studentsAnswer[selectAnswer.id];
+    var studentAnswerInfo = examObj.studentsAnswer[selectAnswer.userid];
     if(!studentAnswerInfo)
     {
         // studentAnswer가 없다면 새로 만들어 준다.
-        examObj.studentsAnswer[selectAnswer.id] = {
-            id : selectAnswer.id,   // 학생 아디
+        examObj.studentsAnswer[selectAnswer.userid] = {
+            id : selectAnswer.userid,   // 학생 아디
             name : selectAnswer.name,
             userAnswers : [],       // 학생이 선택한 번호
             answers : [],           // bool형. 현재 값이 정답인지 아닌지 미리 계산해서 저장.
             response : [],          // 학생의 문제 응답률.
         };
 
-        studentAnswerInfo = examObj.studentsAnswer[selectAnswer.id];
+        studentAnswerInfo = examObj.studentsAnswer[selectAnswer.userid];
     }
     var userAnswers = studentAnswerInfo.userAnswers;
     userAnswers[selectAnswer.questionNumber] = selectAnswer.answerNumber;
@@ -101,7 +101,7 @@ examObj.updateStudentAnswers = function (examAnswers) {
     var len = examAnswers.answers.length;
     for(var questionNumber = 0; questionNumber < len; ++questionNumber) {
         examObj.updateStudentAnswer ({
-            id : examAnswers.id,
+            userid : examAnswers.userid,
             name : examAnswers.name,
             questionNumber : questionNumber,
             answerNumber : examAnswers.answers[questionNumber]
@@ -110,14 +110,14 @@ examObj.updateStudentAnswers = function (examAnswers) {
 };
 
 examObj.updateSubmitStudent = function (submitStudent) {
-    var id = submitStudent.id;
+    var userid = submitStudent.userid;
     let date = new Date();
-    student = examObj.studentsAnswer[id];
+    student = examObj.studentsAnswer[userid];
     if(null == student.userAnswers)
         student.userAnswers = {};
 
-    examObj.submitStudents[id] =  {
-        id : id,
+    examObj.submitStudents[userid] =  {
+        userid : userid,
         name : student.name,
         userAnswers : student.userAnswers,
         answers : student.answers,
@@ -132,7 +132,7 @@ examObj.updateSubmitStudent = function (submitStudent) {
     
     // 100점이 만점..백분률    
     let scoreRate =  parseInt( (score / examObj.questionCount ) * 100);
-    examObj.submitStudents[id] .score = scoreRate;
+    examObj.submitStudents[userid] .score = scoreRate;
 }
 
 
@@ -291,7 +291,7 @@ examObj.sendSubmit = function() {
     connection.send({
         exam : {
             submit : {
-                id : connection.userid,
+                userid : connection.userid,
                 name : params.userFullName,
                 answers : examObj.examAnswer
             }
@@ -305,7 +305,7 @@ examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _answerNumber
     connection.send({
         exam : {
             examSelectAnswer : {
-                id : connection.userid,
+                userid : connection.userid,
                 name : params.userFullName,
                 questionNumber : (_questionNumber-1), // 번호가 1번부터 할당되기 때문에 -1을 하였다.
                 answerNumber : _answerNumber
@@ -320,19 +320,22 @@ examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _answerNumber
 examObj.sendResultToStudent = function (_studentId) {
     if(connection.extra.roomOwner) {
         const submit = examObj.submitStudents[_studentId];     
+
+        console.log(submit);
         // id,
         // name,        
         // userAnswers : 선택한 번호
-        // answers :  정답 (true, false)
+        // answers :  실제 정답
         // time : 제출시간
         // score : 점수
         connection.send({
             exam : {
                 submitResult : {
+                    userid : _studentId,
                     score : submit.score,
                     name : submit.name,
                     userAnswers : submit.userAnswers,
-                    answers : submit.answers
+                    examAnswers : examObj.examAnswer
                 }
             }
         });
@@ -345,7 +348,7 @@ examObj.receiveSelectExamAnswerFromStudent = function(selectAnswer) {
     if(connection.extra.roomOwner)
     {
         examObj.updateStudentAnswer ({
-            id : selectAnswer.id,
+            userid : selectAnswer.userid,
             name : selectAnswer.name,
             questionNumber : selectAnswer.questionNumber,
             answerNumber :selectAnswer.answerNumber
@@ -366,7 +369,7 @@ examObj.receiveSubmit = function (submit) {
         examObj.submitCount += 1;
                 
         // sendResult        
-        examObj.sendResultToStudent (submit.id);
+        examObj.sendResultToStudent (submit.userid);
 
         if(examObj.totalCount == examObj.submitCount)   // 마지막 제출이 끝났을 때, 결과를 export 한다.
           { 
@@ -384,8 +387,19 @@ examObj.receiveSubmit = function (submit) {
 examObj.receiveSubmitResult = function (_examResult) {
     // 시험 정답 제출 후, callback
     console.log(_examResult);
-    // TODO - 새로운 UI로 띄우기
 
+    if(connection.userid == _examResult.userid) {        
+        const len = _examResult.examAnswers.length;    
+        console.log(len);    
+        for(let i = 0; i < len; ++i) {
+            const questionNumber = i + 1;
+            const examAnswer = _examResult.examAnswers[i];
+            const studentAnsweer  = _examResult.userAnswers[i];
+
+            markStudent(questionNumber, studentAnsweer, examAnswer)
+            console.log(questionNumber + ", " + studentAnsweer + ", " + examAnswer);
+        }       
+    }
 };
 
 examObj.exportExam = function () {
