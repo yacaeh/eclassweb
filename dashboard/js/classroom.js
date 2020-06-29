@@ -261,6 +261,20 @@ connection.onmessage = function (event) {
     return;
   }
 
+  //동영상 공유
+  if (event.data.MoiveURL) {
+    console.log(event.data.MoiveURL);
+
+    var moveURL = event.data.MoiveURL;
+    if(moveURL.type == "YOUTUBE")
+      embedYoutubeContent(moveURL.enable, moveURL.url, false);
+    else if(moveURL.type == "VIDEO")
+      VideoEdunetContent(moveURL.enable, moveURL.url, false);
+    else
+      iframeEdunetContent(moveURL.enable, moveURL.url, false)
+    return;
+  }
+
   designer.syncData(event.data);
 };
 
@@ -1279,6 +1293,7 @@ function loadFileViewer() {
 
 _3DCanvasFunc();
 _AllCantrallFunc();
+_Movie_Render_Button_Func();
 
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {

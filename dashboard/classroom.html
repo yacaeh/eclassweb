@@ -30,10 +30,15 @@
     <script src="/dashboard/js/examObj.js"></script>
     <script src="/dashboard/js/classroomInfo.js"></script>
     <script src="/dashboard/js/all_controll.js"></script>
+    <script src="/dashboard/js/movie_render.js"></script>
     <script defer src="/dashboard/js/classroom.js"></script>
 </head>
 
 <body>
+
+  <div id="urlform" style="display: none;">
+    <input id="urlinput" onkeyup="_Movie_Render_key_event();" type="text" placeholder="URL 입력">
+  </div>
 
     <header id="header">
         <img id="icon_exit">
@@ -51,7 +56,7 @@
             <img class="top_icon" id="top_share_screen"> 
             <img class="top_icon top_3d_off" id="top_3d">
             <img class="top_icon" id="top_pdf">
-            <img class="top_icon" id="top_share_video">
+            <img class="top_icon top_share_video_off" id="top_share_video">
             <img class="top_icon" id="top_record_video">
 
             <!-- <span class="top_icon divide"></span> -->
@@ -74,6 +79,8 @@
 
     <article id="article">
         <div id="widget-container"></div>
+        <canvas id="renderCanvas" style="display: none;"></canvas>
+        <div id="edunetContent" style="left: 3%; width: 77%; height: 95%; position: absolute; display: none;"></div>
         <video id="screen-viewer" controls playsinline autoplay></video>
         <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
             <div class="stuname">이름</div>
