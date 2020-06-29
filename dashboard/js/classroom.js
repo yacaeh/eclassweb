@@ -1253,7 +1253,7 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://localhost:9001/ViewerJS/#https://arxiv.org/pdf/2006.14536v1.pdf'
+    'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
