@@ -387,14 +387,6 @@ examObj.receiveSubmit = function (submit) {
 examObj.receiveSubmitResult = function (_examResult) {
     // 시험 정답 제출 후, callback
     console.log(_examResult);
-    // TODO - 새로운 UI로 띄우기
-    // submitResult : {
-    //     id : _studentId,
-    //     score : submit.score,
-    //     name : submit.name,
-    //     userAnswers : submit.userAnswers,
-    //     examAnswers : submit.answers
-    // }
 
     if(connection.userid == _examResult.userid) {        
         const len = _examResult.examAnswers.length;    
