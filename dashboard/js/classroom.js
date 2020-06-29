@@ -135,7 +135,7 @@ connection.onopen = function (event) {
 
     // 접속시 방정보 동기화.
     if(connection.extra.roomOwner)
-        classroomCommand.sendsyncRoomInfo ();
+        classroomCommand.sendsyncRoomInfo (event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -224,7 +224,6 @@ connection.onmessage = function (event) {
 
 
     if(event.data.roomSync) {
-        console.log('event.data.roomSync');;
         classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
         return;
     };

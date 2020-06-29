@@ -2,8 +2,7 @@
 classroomInfo = {    
     allControl : false,
     shareScreen : false,
-    share3D : false,    
-    students : {},   
+    share3D : false 
     /*
         
         alert : {
@@ -18,15 +17,40 @@ classroomCommand = {
 };
 
 
-classroomCommand.sendsyncRoomInfo = function () {
+
+classroomCommand.updateSyncRoom = function () {
+
+    if(classroomInfo.allControl) {
+
+    }
+
+    if(classroomInfo.shareScreen) {
+
+    }
+
+    if(classroomInfo.share3D) {
+
+    }
+};
+
+classroomCommand.sendsyncRoomInfo = function (_data) {
     connection.send ({
-        roomSync : classroomInfo
+        roomSync : {
+            userid : _data.userid,
+            info : classroomInfo
+        }
     });
 };
 
-classroomCommand.receiveSyncRoomInfo = function (_roomInfo) {
-    classroomInfo = _roomInfo;
+classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {   
+    if(_syncRoom.userid == connection.userid) {              
+        classroomInfo = _syncRoom.info;
+        classroomCommand.updateSyncRoom ();
+    }
 };
+
+
+
 
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
