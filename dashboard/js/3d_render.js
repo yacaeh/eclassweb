@@ -178,7 +178,7 @@ function modelEnable(send)
     top_3d_button.removeClass('top_3d_off')
     if (send == true) {
         connection.send({
-            modelEnable: { enable: visible }
+            modelEnable: { enable: true }
         });
     }
 }
@@ -195,15 +195,15 @@ function remove3DCanvas(){
 }
 
 function CanvasResize() {
-    console.log("resize!");
+    console.log(_3dcanvas);
     _3dcanvas = frame.document.getElementById("renderCanvas")
     
     var canvas = frame.document.getElementById("main-canvas");
     var r = document.getElementsByClassName("lwindow")[0];
     var rwidth = $(r).width();
     
-    _3dcanvas.attr("width", canvas.width - rwidth - 50);
-    _3dcanvas.attr("height", canvas.height - 60);
+    _3dcanvas.width = canvas.width - rwidth - 50;
+    _3dcanvas.height = canvas.height - 60;
 }
 
 function set3DModelStateData(_newPosition, _newRotation) {

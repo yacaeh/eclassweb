@@ -241,7 +241,8 @@ connection.onmessage = function (event) {
 
 
     var enable = event.data.modelEnable.enable;
-    modelEnable(top_3d_render_jthis, enable, false);
+    console.log("enable",enable);
+    modelEnable(false);
     return;
 
   }
