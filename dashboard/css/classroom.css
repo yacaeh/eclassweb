@@ -609,6 +609,7 @@ input[type="number"]:focus{
   border: #3ee1c9  solid 1px;
 }
 
+<<<<<<< HEAD
 #urlform{
   position: absolute;
   width: 400px;
@@ -620,4 +621,52 @@ input[type="number"]:focus{
 #urlinput{
   width: 100%;
   height: auto;
+=======
+.exam-state-progress{
+  height: 5px;
+}
+
+.exam-state-progress[value]{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.exam-state-progress[value]::-webkit-progress-value {
+  background: #3ee1c9;
+}
+.exam-state-progress[value]::-webkit-progress-bar {
+  background: gray;
+}
+
+.exam-header{
+  font-weight:bold; 
+  background-color: white; 
+  text-align: center; 
+  border-bottom:gray solid 1px;
+}
+
+.exam-border-bottom{
+  border-bottom:gray solid 1px;
+}
+
+.exam-80-button{
+  width: 80%; 
+  margin:10%; 
+  font-weight:bold;
+}
+
+.exam-background{
+  background-color:#eff1f0; 
+  border-bottom:gray solid 1px;
+}
+
+.exam-overflow{
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.text-center-bold{
+  text-align:center; 
+  font-weight:bold;
+>>>>>>> 3860b7be64b2ba11fc17e903587f2731bd933131
 }
