@@ -1957,20 +1957,29 @@ function canvasresize(id){
             points[points.length] = ['text', ['"' + textHandler.text + '"', textHandler.x, textHandler.y], drawHelper.getOptions(options)];
         },
         canvasInput:null,
+        updateInput: function(){
+            // if (this.canvasInput !== null) {
+            //     document.getElementById('text-input').remove();
+            // }
+            
+            // this.canvasInput = document.createElement("INPUT");
+            // this.canvasInput.setAttribute("id", "text-input");
+            // this.canvasInput.setAttribute("placeholder", "글자를 입력하고 엔터를 누르세요.");
+            // this.canvasInput.setAttribute("type", "text");
+            // this.canvasInput.setAttribute("style","ime-mode:active");
+            // this.canvasInput.style.cssText =
+            // 'border: 5px solid black;width:40%;position:absolute;top:100px;margin-left:30%;z-index=999;height:50px';
+            // document.getElementsByTagName('body')[0].appendChild(this.canvasInput);
+            // document.getElementById("text-input").focus();
+            document.querySelector(".textInputUI").focus();
+            document.querySelector(".textInputUI").addEventListener('change', (event) => {
+                console.log("Change!");
+                textHandler.text = event.target.value;
+            });
+        },
         mousedown: function(e) {
             console.log("mouse down!");
-            if (this.canvasInput !== null) {
-                document.getElementById('text-input').remove();
-            }
-            
-            this.canvasInput = document.createElement("INPUT");
-            this.canvasInput.setAttribute("id", "text-input");
-            this.canvasInput.setAttribute("type", "text");
-            this.canvasInput.setAttribute("style","ime-mode:active");
-            this.canvasInput.style.cssText =
-            'border: 1px solid black;width:60%;position:absolute;top:100px;left:100px;z-index=999;height:100px';
-            document.getElementsByTagName('body')[0].appendChild(this.canvasInput);
-
+            this.updateInput();
             if (!is.isText) return;
 
             if (textHandler.text.length) {
@@ -1986,12 +1995,12 @@ function canvasresize(id){
             textHandler.x = e.pageX - canvas.offsetLeft - 5;
             textHandler.y = e.pageY - canvas.offsetTop + 10;
 
-            if (typeof textHandler.blinkCursorInterval !== 'undefined') {
-                clearInterval(textHandler.blinkCursorInterval);
-            }
+            // if (typeof textHandler.blinkCursorInterval !== 'undefined') {
+            //     clearInterval(textHandler.blinkCursorInterval);
+            // }
 
-            textHandler.blinkCursor();
-            textHandler.blinkCursorInterval = setInterval(textHandler.blinkCursor, 700);
+            // textHandler.blinkCursor();
+            // textHandler.blinkCursorInterval = setInterval(textHandler.blinkCursor, 700);
 
             this.showTextTools();
         },
@@ -2008,6 +2017,9 @@ function canvasresize(id){
                 this.lastFillStyle = fillStyle;
                 fillStyle = 'black';
             }
+            this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
+            this.textInputBox.style.left = this.x + 'px';
+            this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -2019,7 +2031,7 @@ function canvasresize(id){
             this.fontFamilyBox.style.top = this.y + 'px';
         },
         showTextTools: function() {
-            if (!this.fontFamilyBox || !this.fontSizeBox) return;
+            if (!this.fontFamilyBox || !this.fontSizeBox || !this.textInputBox) return;
 
             this.unselectAllFontFamilies();
             this.unselectAllFontSizes();
@@ -2080,6 +2092,7 @@ function canvasresize(id){
         },
         onReturnKeyPressed: function() {
             if (!textHandler.text || !textHandler.text.length) return;
+            $('#jj_input23').val("");
             var fontSize = parseInt(textHandler.selectedFontSize) || 15;
             this.mousedown({
                 pageX: this.pageX,
@@ -2088,6 +2101,7 @@ function canvasresize(id){
             });
             drawHelper.redraw();
         },
+        textInputBox: document.querySelector('.textInputUI'),
         fontFamilyBox: document.querySelector('.fontSelectUl'),
         fontSizeBox: document.querySelector('.fontSizeUl')
     };
