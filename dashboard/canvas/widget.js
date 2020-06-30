@@ -126,13 +126,6 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-        
-        var renderCanvas = document.getElementById("renderCanvas");
-        if(renderCanvas) {            
-            renderCanvas.style.width = innerWidth;
-            renderCanvas.style.width = innerHeight;
-        }
-
         drawHelper.redraw();
         syncPoints(true);
     }               
