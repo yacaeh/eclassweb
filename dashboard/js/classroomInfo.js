@@ -4,16 +4,15 @@ classroomInfo = {
     shareScreen : false,
     share3D : {
         state : false,
-        data : {}   // position, rotation 
+        data : {
+            src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
+        }   // position, rotation 
     },
-    exam : false
-    /*
-        
-        alert : {
-            // response
-            // time
-        }
-    */
+    pdf : {
+        state : false,
+        data : {}   // 어떤 pdf, 몇 페이지 등
+    },
+    exam : false    
 };
 
 
@@ -34,6 +33,10 @@ classroomCommand.updateSyncRoom = function () {
     // }
     if(classroomInfo.share3D.state) {                  
         sync3DModel ();
+    }
+
+    if(classroomInfo.pdf.state) {
+        classroomCommand.openPdf ();
     }
 };
 
@@ -138,5 +141,54 @@ classroomCommand.receiveAlertResponse = function (_response) {
 
 classroomCommand.syncScreenShare = function (_userid) {
     currentScreenViewShare (_userid);
+};
+
+/*
+    PDF
+*/
+
+classroomCommand.sendOpenPdf = function () {
+    classroomInfo.pdf.state = true;
+    connection.send({
+        pdf : classroomInfo.pdf
+    });
+};
+
+classroomCommand.sendClosePdf = function () {
+    classroomInfo.pdf.state = false;
+    connection.send({
+        pdf : {
+            state : false
+        }
+    });
+};
+
+classroomCommand.receivePdfMessage = function (_pdf) {  
+    let currentState = classroomInfo.pdf.state;
+    if(currentState != _pdf.state) {       
+        classroomInfo.pdf = _pdf;
+        classroomCommand.syncPdf ();
+    }
+};
+
+classroomCommand.openPdf = function () {
+    loadFileViewer ();
+    $('#canvas-controller').show();
+};
+
+classroomCommand.closePdf = function () {
+    unloadFileViewer();
+    $('#canvas-controller').hide();
+}
+
+classroomCommand.syncPdf = function () {    
+    if(classroomInfo.pdf.state) {
+        // open
+        classroomCommand.openPdf ();
+    }
+    else {
+        // close        
+        classroomCommand.closePdf ();     
+    }
 };
 

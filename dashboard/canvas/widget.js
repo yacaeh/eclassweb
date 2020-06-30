@@ -3348,7 +3348,8 @@ function canvasresize(id){
         if (!event.data.canvasDesignerSyncData) return;
 
         // drawing is shared here (array of points)
-        var d = event.data.canvasDesignerSyncData;
+        var d = event.data.canvasDesignerSyncData;        
+        if(!d.points) return;
             
         if (d.startIndex !== 0) {
             for (var i = 0; i < d.points.length; i++) {
