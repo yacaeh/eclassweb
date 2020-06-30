@@ -2678,6 +2678,11 @@ function canvasresize(id){
                 context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.screenShare;
+
+            document.getElementById('screen_share').onclick = function() {
+                this.classList.toggle("on");
+                this.classList.toggle("selected-shape");
+            }
         }
 
         if (tools.clearCanvas === true) {

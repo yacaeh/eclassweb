@@ -48,40 +48,56 @@ function _3DCanvasOnOff(btn){
     }
 }
 
-function ScreenShare(){
+var lastStream ;
+
+function ScreenShare(btn){
+  var on = $(btn).hasClass("on")
+
   if (!window.tempStream) {
     alert('Screen sharing is not enabled.');
     return;
   }
-  screen_constraints = {
-    screen: true,
-    oneway: true,
-  };
 
-  if (navigator.mediaDevices.getDisplayMedia) {
-    navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
-      (stream) => {
-        replaceScreenTrack(stream);
-        CanvasResize();
-      },
-      (error) => {
-        if(error == "DOMException: Permission denied")
-          console.log(error);
-        alert('Please make sure to use Edge 17 or higher.');
-      }
-    );
-  } else if (navigator.getDisplayMedia) {
-    navigator.getDisplayMedia(screen_constraints).then(
-      (stream) => {
-        replaceScreenTrack(stream);
-      },
-      (error) => {
-        alert('Please make sure to use Edge 17 or higher.');
-      }
-    );
-  } else {
-    alert('getDisplayMedia API is not available in this browser.');
+  if(!on){
+    lastStream.getTracks().forEach(track => track.stop());
+    connection.send({
+      hideMainVideo: true,
+    });
+    return false;
   }
+
+    screen_constraints = {
+      screen: true,
+      oneway: true,
+    };
+  
+    if (navigator.mediaDevices.getDisplayMedia) {
+      navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
+        (stream) => {
+          lastStream = stream;
+          replaceScreenTrack(stream, btn);
+          CanvasResize();
+        },
+        (error) => {
+          alert('Please make sure to use Edge 17 or higher.');
+        }
+      );
+    } else if (navigator.getDisplayMedia) {
+      navigator.getDisplayMedia(screen_constraints).then(
+        (stream) => {
+          replaceScreenTrack(stream, btn);
+        },
+        (error) => {
+          alert('Please make sure to use Edge 17 or higher.');
+        }
+      );
+    } else {
+      alert('getDisplayMedia API is not available in this browser.');
+    }
+
+
+
+
 }
 
 
@@ -270,6 +286,7 @@ connection.onstream = function (event) {
       video.volume = 0;
     }
     video.srcObject = event.stream;
+    console.log(evnet.stream);
     // $('#main-video').show();
   } else {
     // 타 사용자 캠 표시 막기
@@ -717,26 +734,25 @@ function replaceTrack(videoTrack, screenTrackId) {
   });
 }
 
-function replaceScreenTrack(stream) {
+function replaceScreenTrack(stream, btn) {
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
 
-  // connection.attachStreams.push(stream);
   connection.onstream({
     stream: stream,
     type: 'local',
     streamid: stream.id,
-    // mediaElement: video
   });
 
   var screenTrackId = stream.getTracks()[0].id;
+
   addStreamStopListener(stream, function () {
     connection.send({
       hideMainVideo: true,
     });
-
-    // $('#main-video').hide();
+    $(btn).removeClass("on");
+    $(btn).removeClass("selected-shape");
     $('#screen-viewer').hide();
     replaceTrack(tempStream.getTracks()[0], screenTrackId);
   });
@@ -751,7 +767,6 @@ function replaceScreenTrack(stream) {
     showMainVideo: true,
   });
 
-  // $('#main-video').show();
   $('#screen-viewer').css({
     top: $('#widget-container').offset().top,
     left: $('#widget-container').offset().left,
