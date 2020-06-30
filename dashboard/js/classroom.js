@@ -258,10 +258,14 @@ connection.onmessage = function (event) {
     return;
   };
 
+  if(event.data.pdf) {    
+    classroomCommand.receivePdfMessage (event.data.pdf);
+    return;
+  }  
+
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     var enable = event.data.modelEnable.enable;
-    console.log("enable",enable);
     modelEnable(false);
     return;
   }
@@ -1287,15 +1291,19 @@ $(window).on('beforeunload', function () {
 
 let isFileViewer = false;
 $('#top_pdf').click(function () {
+  if(!connection.extra.roomOwner)    return;
+  
   console.log(isFileViewer);
   if (isFileViewer === false) {
     loadFileViewer();
     $('#canvas-controller').show();
     isFileViewer = true;
+    classroomCommand.sendOpenPdf ();
   } else {
     unloadFileViewer();
     $('#canvas-controller').hide();
     isFileViewer = false;
+    classroomCommand.sendClosePdf ();
   }
 });
 
