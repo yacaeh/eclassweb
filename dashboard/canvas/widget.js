@@ -1472,7 +1472,7 @@ function canvasresize(id){
         text: '',
         selectedFontFamily: '나눔펜글씨',
         selectedFontSize: '48',
-        lastFillStyle: '#FF7373',
+        lastFillStyle: 'black',
         onShapeSelected: function() {
             document.getElementById("temp-canvas").className = "";
             document.getElementById("temp-canvas").classList.add("texti");
@@ -1593,7 +1593,7 @@ function canvasresize(id){
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
             
             this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
-            this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 'px'; 
+            this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 30+'px'; 
             this.fontColorBox.style.top =  this.y - this.textInputBox.clientHeight + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';

@@ -517,12 +517,19 @@ input:focus {
 #marker-selected-color-2, 
 #pencil-selected-color,
 #pencil-selected-color-2,
-#text-selected-color,
-#text-selected-color-2 {
+#text-selected-color {
     display: inline-block;
     vertical-align: middle;
     width: 20px;
     left: 195px;
+    height: 20px;
+    position: absolute;
+}
+#text-selected-color-2 {
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    left: -25px;
     height: 20px;
     position: absolute;
 }
@@ -532,8 +539,14 @@ input:focus {
 #marker-color-container, #pencil-color-container {
     position: relative;
 }
-#marker-fill-colors, #pencil-fill-colors, #text-fill-colors {
+#marker-fill-colors, #pencil-fill-colors {
     left: 100%;
+    top: -10px;
+    width: 100px;
+    padding: 10px;
+}
+#text-fill-colors {
+    left: 220px;
     top: -10px;
     width: 100px;
     padding: 10px;
