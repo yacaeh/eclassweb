@@ -1538,8 +1538,12 @@ function CanvasResize() {
   var x = canvas.width - rwidth - 50;
   var y = canvas.height - 60;
 
+  console.log(x);
+  console.log(y);
+
   $("#screen-viewer").width(x);
   $("#screen-viewer").height(y);
-
+  frame.document.getElementById("renderCanvas").width = x;
+  frame.document.getElementById("renderCanvas").height = y;
   console.log(x);
 }
