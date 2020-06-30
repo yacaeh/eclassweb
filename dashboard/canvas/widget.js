@@ -3272,24 +3272,16 @@ function canvasresize(id){
 
         // drawing is shared here (array of points)
         var d = event.data.canvasDesignerSyncData;
-
-        if(d.point != undefined){
-
             
-            if (d.startIndex !== 0) {
-                for (var i = 0; i < d.points.length; i++) {
-                    points[i + d.startIndex] = d.points[i];
-                }
-            } else {
-                points = d.points;
+        if (d.startIndex !== 0) {
+            for (var i = 0; i < d.points.length; i++) {
+                points[i + d.startIndex] = d.points[i];
             }
-            lastPointIndex = points.length;
+        } else {
+            points = d.points;
         }
-        else{
-            lastPointIndex = 0;
-
-        }
-
+        lastPointIndex = points.length;
+      
         // redraw the <canvas> surfaces
         drawHelper.redraw();
     }, false);
