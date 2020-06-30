@@ -73,7 +73,9 @@ var createScene = function (_canvas) {
     function SendStateData(_position, _rotation)
     {
         if(params.open == "true")
-        {
+        {            
+            // 공유 데이터에 update
+            updateShared3DData (_position, _rotation);
             connection.send({
                 ModelState : {
                     position : _position,
@@ -111,24 +113,28 @@ let timeout = false;
 let delta = 400;
 
 let top_3d_button = $('#top_3d');
-let is3dViewer = false;
+// let is3dViewer = false;
 
 
 function _3DCanvasFunc(){
+top_3d_render_jthis = $("#top_3d");
     console.log("3d cansvasFunc!");
     console.log(top_3d_button);
-    top_3d_button.click(function () {
-        console.log(is3dViewer);
-        if (is3dViewer === false) {
+    top_3d_button.click(function () {        
           if(params.open == "true")
-          {
-            modelEnable(send=true);
-          }  
-          is3dViewer = true;
-
-        } else {
-            remove3DCanvas();
-            is3dViewer = false;
+          {  
+            const isViewer = classroomInfo.share3D.state;
+            if(false == isViewer)
+            {
+                modelEnable(send=true);
+            }
+            else
+            {
+                remove3DCanvas();                
+                connection.send({
+                    modelDisable : true
+                });
+            }          
         }
       });
       
@@ -157,7 +163,7 @@ function modelEnable(send)
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
     console.log(classroomInfo);
-    classroomInfo.share3D = true;
+    classroomInfo.share3D.state = true;
     // create 3d canvas on model enanbled      
     let _3d_canvas = document.createElement('canvas');
     _3d_canvas.setAttribute('id', 'renderCanvas');
@@ -192,6 +198,7 @@ function remove3DCanvas(){
     frame.document.getElementById("renderCanvas").remove();
     top_3d_button.addClass('top_3d_off');
     top_3d_button.removeClass('top_3d_on')    
+    classroomInfo.share3D.state = false;
 }
 
 function CanvasResize() {
@@ -209,4 +216,24 @@ function CanvasResize() {
 function set3DModelStateData(_newPosition, _newRotation) {
     newPosition = _newPosition;
     newRotation = _newRotation;
+}
+
+
+/*
+    data를 갱신
+*/
+function updateShared3DData (_pos, _rot) {
+    // data를 추가할 때, json으로 추가하면 된다.
+    classroomInfo.share3D.data = {
+        newPosition : _pos,
+        newRotation : _rot
+    }
+}
+/*
+    선생님의 화면과 동기화 시킨다
+*/
+function sync3DModel () {    
+    var data = classroomInfo.share3D.data;    
+    set3DModelStateData (data.newPosition, data.newRotation);
+    modelEnable (false);
 }

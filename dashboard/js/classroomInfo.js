@@ -2,7 +2,10 @@
 classroomInfo = {    
     allControl : false,
     shareScreen : false,
-    share3D : false,
+    share3D : {
+        state : false,
+        data : {}   // position, rotation 
+    },
     exam : false
     /*
         
@@ -22,15 +25,15 @@ classroomCommand = {
 classroomCommand.updateSyncRoom = function () {
 
     if(classroomInfo.allControl) {
-
+        allControllEnable(top_all_controll_jthis, classroomInfo.allControl, false);
     }
+    // else
 
     // if(classroomInfo.shareScreen) {
         
     // }
-
-    if(classroomInfo.share3D) {
-
+    if(classroomInfo.share3D.state) {                  
+        sync3DModel ();
     }
 };
 
