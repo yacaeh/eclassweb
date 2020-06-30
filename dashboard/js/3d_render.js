@@ -177,14 +177,6 @@ function modelEnable(jthis,visible, send)
     }
 }
 
-function CanvasResize() {
-    var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
-    var canvas = frame.document.getElementById("main-canvas")
-    var r = document.getElementsByClassName("lwindow")[0];
-    var rwidth = $(r).width();
-    _3dcanvas.attr("width", canvas.width - rwidth - 50);
-    _3dcanvas.attr("height", canvas.height - 60);
-}
 
 function set3DModelStateData(_newPosition, _newRotation) {
     newPosition = _newPosition;

@@ -62,8 +62,11 @@ function ScreenShare(){
     navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
       (stream) => {
         replaceScreenTrack(stream);
+        CanvasResize();
       },
       (error) => {
+        if(error == "DOMException: Permission denied")
+          console.log(error);
         alert('Please make sure to use Edge 17 or higher.');
       }
     );
@@ -1362,3 +1365,37 @@ $("#perbtn").click(function(){
     this.classList.toggle("on");
     this.classList.toggle("off");
 })
+
+
+window.addEventListener("resize", function() {
+  rtime = new Date();
+  if (timeout === false) {
+      timeout = true;
+      setTimeout(resizeend, delta);
+  }
+});
+
+
+function resizeend() {
+  if (new Date() - rtime < delta) {
+      setTimeout(resizeend, delta);
+  } else {
+      timeout = false;
+      CanvasResize();
+  }               
+}
+
+function CanvasResize() {
+  var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+  var canvas = frame.document.getElementById("main-canvas")
+  var r = document.getElementsByClassName("lwindow")[0];
+  var rwidth = $(r).width();
+
+  var x = canvas.width - rwidth - 50;
+  var y = canvas.height - 60;
+
+  _3dcanvas.attr("width", x);
+  _3dcanvas.attr("height", y);
+  $("#screen-viewer").width(x);
+  $("#screen-viewer").height(y);
+}
