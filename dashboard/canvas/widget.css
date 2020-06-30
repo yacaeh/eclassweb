@@ -237,7 +237,7 @@ a:hover {
 }
 .selected-shape {
     content: url(/dashboard/newimg/click_box.png);
-    background: #eeeeee!important;
+    background: #dde1e3!important;
 }
 /* surface */
 

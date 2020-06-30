@@ -12,7 +12,6 @@
   window.params = params;
 })();
 var connection = new RTCMultiConnection();
-console.log(connection);
 console.log('Connection!');
 
 // function printHarryPotter(){ console.log("Harry Potter!"); }
@@ -37,54 +36,71 @@ connection.autoCloseEntireSession = false;
 connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
-console.log(connection);
 
-// here goes canvas designer
-var designer = new CanvasDesigner();
+SetCanvasBtn('screen_share', ScreenShare);
+SetCanvasBtn('3d_view', _3DCanvasOnOff);
 
-// you can place widget.html anywhere
-designer.widgetHtmlURL = './canvas/widget.html';
-designer.widgetJsURL = './widget.js';
+function _3DCanvasOnOff(btn){
+    var visible = $(btn).hasClass('on');
+    if(params.open == "true")
+    {
+        modelEnable(top_3d_render_jthis,visible,true);
+    }
+}
 
-// setInterval(designer.clearCanvas, 1000)
+var lastStream ;
 
-designer.icons.pencil = '/dashboard/newimg/pen.png';
-designer.icons.marker = '/dashboard/newimg/pen2.png';
-designer.icons.eraser = '/dashboard/newimg/eraser.png';
-designer.icons.clearCanvas = '/dashboard/newimg/trash.png';
-designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
-designer.icons.on = '/dashboard/img/view_on.png';
-designer.icons.off = '/dashboard/img/view_off.png';
+function ScreenShare(btn){
+  var on = $(btn).hasClass("on")
 
-console.log(designer.icons);
+  if (!window.tempStream) {
+    alert('Screen sharing is not enabled.');
+    return;
+  }
 
-designer.addSyncListener(function (data) {
-  connection.send(data);
-});
+  if(!on){
+    lastStream.getTracks().forEach(track => track.stop());
+    connection.send({
+      hideMainVideo: true,
+    });
+    return false;
+  }
 
-designer.setTools({
-  pencil: true,
-  text: true,
-  image: true,
-  pdf: false,
-  eraser: true,
-  line: true,
-  arrow: false,
-  dragSingle: false,
-  dragMultiple: false,
-  arc: false,
-  rectangle: false,
-  quadratic: false,
-  bezier: false,
-  marker: true,
-  zoom: false,
-  lineWidth: false,
-  colorsPicker: false,
-  clearCanvas: true,
-  onoff: true,
-  code: false,
-  undo: true,
-});
+    screen_constraints = {
+      screen: true,
+      oneway: true,
+    };
+  
+    if (navigator.mediaDevices.getDisplayMedia) {
+      navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
+        (stream) => {
+          lastStream = stream;
+          replaceScreenTrack(stream, btn);
+          CanvasResize();
+        },
+        (error) => {
+          alert('Please make sure to use Edge 17 or higher.');
+        }
+      );
+    } else if (navigator.getDisplayMedia) {
+      navigator.getDisplayMedia(screen_constraints).then(
+        (stream) => {
+          replaceScreenTrack(stream, btn);
+        },
+        (error) => {
+          alert('Please make sure to use Edge 17 or higher.');
+        }
+      );
+    } else {
+      alert('getDisplayMedia API is not available in this browser.');
+    }
+
+
+
+
+}
+
+
 
 // here goes RTCMultiConnection
 
@@ -130,8 +146,6 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-  document.getElementById('top_attach-file').style.display = 'inline-block';
-  document.getElementById('top_share_screen').style.display = 'inline-block';
 
     // 접속시 방정보 동기화.
     if(connection.extra.roomOwner)
@@ -233,7 +247,6 @@ connection.onmessage = function (event) {
 
   //3d 모델링 Enable
   if (event.data.modelEnable) {
-
     var enable = event.data.modelEnable.enable;
     console.log("enable",enable);
     modelEnable(false);
@@ -294,6 +307,7 @@ connection.onstream = function (event) {
       video.volume = 0;
     }
     video.srcObject = event.stream;
+    console.log(evnet.stream);
     // $('#main-video').show();
   } else {
     // 타 사용자 캠 표시 막기
@@ -784,17 +798,15 @@ function currentScreenViewShare (_pid) {
     });
   }
 
-function replaceScreenTrack(stream) {
+function replaceScreenTrack(stream, btn) {
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
 
-  // connection.attachStreams.push(stream);
   connection.onstream({
     stream: stream,
     type: 'local',
     streamid: stream.id,
-    // mediaElement: video
   });
 
   // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
@@ -802,10 +814,14 @@ function replaceScreenTrack(stream) {
   classroomInfo.shareScreen = true;
 
   var screenTrackId = stream.getTracks()[0].id;
+
+
   addStreamStopListener(stream, function () {    
     connection.send({
       hideMainVideo: true,
     });
+    $(btn).removeClass("on");
+    $(btn).removeClass("selected-shape");
     // $('#main-video').hide();
     classroomInfo.shareScreen = false;
     window.sharedStream = null;
@@ -1493,3 +1509,37 @@ $("#perbtn").click(function(){
     this.classList.toggle("on");
     this.classList.toggle("off");
 })
+
+
+window.addEventListener("resize", function() {
+  rtime = new Date();
+  if (timeout === false) {
+      timeout = true;
+      setTimeout(resizeend, delta);
+  }
+});
+
+
+function resizeend() {
+  if (new Date() - rtime < delta) {
+      setTimeout(resizeend, delta);
+  } else {
+      timeout = false;
+      CanvasResize();
+  }               
+}
+
+function CanvasResize() {
+  var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+  var canvas = frame.document.getElementById("main-canvas")
+  var r = document.getElementsByClassName("lwindow")[0];
+  var rwidth = $(r).width();
+
+  var x = canvas.width - rwidth - 50;
+  var y = canvas.height - 60;
+
+  $("#screen-viewer").width(x);
+  $("#screen-viewer").height(y);
+
+  console.log(x);
+}

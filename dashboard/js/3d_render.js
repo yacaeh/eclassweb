@@ -117,6 +117,7 @@ let top_3d_button = $('#top_3d');
 
 
 function _3DCanvasFunc(){
+top_3d_render_jthis = $("#top_3d");
     console.log("3d cansvasFunc!");
     console.log(top_3d_button);
     top_3d_button.click(function () {        
