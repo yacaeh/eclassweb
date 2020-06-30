@@ -1538,8 +1538,8 @@ function CanvasResize() {
   var x = canvas.width - rwidth - 50;
   var y = canvas.height - 60;
 
-  _3dcanvas.attr("width", x);
-  _3dcanvas.attr("height", y);
   $("#screen-viewer").width(x);
   $("#screen-viewer").height(y);
+
+  console.log(x);
 }

@@ -117,10 +117,7 @@ let top_3d_button = $('#top_3d');
 
 
 function _3DCanvasFunc(){
-<<<<<<< HEAD
-
-    top_3d_render_jthis = $("#top_3d");
-=======
+top_3d_render_jthis = $("#top_3d");
     console.log("3d cansvasFunc!");
     console.log(top_3d_button);
     top_3d_button.click(function () {        
@@ -141,7 +138,6 @@ function _3DCanvasFunc(){
         }
       });
       
->>>>>>> 2743d86b87b007bb26fc7d6469d546be4071028a
 
     window.addEventListener("resize", function() {
         rtime = new Date();
@@ -193,8 +189,6 @@ function modelEnable(send)
     }
 }
 
-<<<<<<< HEAD
-=======
 function remove3DCanvas(){
     console.log("remove 3d!");
     frame = document
@@ -218,7 +212,6 @@ function CanvasResize() {
     _3dcanvas.width = canvas.width - rwidth - 50;
     _3dcanvas.height = canvas.height - 60;
 }
->>>>>>> 2743d86b87b007bb26fc7d6469d546be4071028a
 
 function set3DModelStateData(_newPosition, _newRotation) {
     newPosition = _newPosition;
