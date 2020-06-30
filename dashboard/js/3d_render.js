@@ -120,22 +120,9 @@ function _3DCanvasFunc(){
 top_3d_render_jthis = $("#top_3d");
     console.log("3d cansvasFunc!");
     console.log(top_3d_button);
-    top_3d_button.click(function () {        
-          if(params.open == "true")
-          {  
-            const isViewer = classroomInfo.share3D.state;
-            if(false == isViewer)
-            {
-                modelEnable(send=true);
-            }
-            else
-            {
-                remove3DCanvas();                
-                connection.send({
-                    modelDisable : true
-                });
-            }          
-        }
+    top_3d_button.click(function () {   
+
+
       });
       
 
