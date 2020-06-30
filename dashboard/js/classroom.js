@@ -1543,7 +1543,11 @@ function CanvasResize() {
 
   $("#screen-viewer").width(x);
   $("#screen-viewer").height(y);
-  frame.document.getElementById("renderCanvas").width = x;
-  frame.document.getElementById("renderCanvas").height = y;
+
+  var renderCanvas = frame.document.getElementById("renderCanvas");  
+  if(renderCanvas) {
+    renderCanvas.width = x;
+    renderCanvas.height = y;
+  }
   console.log(x);
 }

@@ -128,9 +128,10 @@ function resizeend() {
         canvasresize('temp-canvas');
         
         var renderCanvas = document.getElementById("renderCanvas");
-        renderCanvas.style.width = innerWidth;
-        renderCanvas.style.width = innerHeight;
-
+        if(renderCanvas) {            
+            renderCanvas.style.width = innerWidth;
+            renderCanvas.style.width = innerHeight;
+        }
 
         drawHelper.redraw();
         syncPoints(true);
@@ -1369,7 +1370,8 @@ function canvasresize(id){
         var py = point[1]
 
         var dist = Math.pow(x - px,2) + Math.pow(y - py,2);
-        if(dist < 250)
+        //if(dist < 250)
+        if(dist < 0.0002)
             return true;
         else return false;
     }
@@ -1384,10 +1386,14 @@ function canvasresize(id){
             var t = this;
             t.ismousedown = true;
 
+            const normalized = normalizePoint(x, y);
+            x =normalized[0];
+            y =normalized[1];
+
             t.prevX = x;
             t.prevY = y;
 
-            points.forEach(function(point,idx){
+            points.forEach(function(point,idx){       
                 var near = isNear(x,y,point[1]);
                 if(near){
                     for(var i = 0 ; i < pointHistory.length; i++){
@@ -1430,6 +1436,10 @@ function canvasresize(id){
                 y = e.pageY - canvas.offsetTop;
 
             var t = this;
+
+            const normalized = normalizePoint(x, y);
+            x = normalized[0];
+            y = normalized[1];
 
             if (t.ismousedown) {
                 points.forEach(function(point,idx){
