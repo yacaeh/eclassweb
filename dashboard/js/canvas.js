@@ -12,6 +12,8 @@ designer.icons.off = '/dashboard/img/view_off.png';
 designer.icons.screenShare = '/dashboard/newimg/screenshare.png';
 designer.icons.view3d = '/dashboard/newimg/3D.png';
 designer.icons.view3don = '/dashboard/newimg/3D.png';
+designer.icons.movie = '/dashboard/newimg/videolink.png';
+designer.icons.file = '/dashboard/newimg/openfile.png';
 
 designer.addSyncListener(function (data) {
   connection.send(data);
@@ -20,7 +22,7 @@ designer.addSyncListener(function (data) {
 designer.setTools({
   pencil: true,
   text: true,
-  image: true,
+  image: false,
   pdf: false,
   eraser: true,
   line: true,
@@ -41,6 +43,8 @@ designer.setTools({
   undo: true,
   screenShare: true,
   view3d: true,
+  movie: true,
+  file: true,
 });
 
 function SetCanvasBtn(btnid, callback){

@@ -5,6 +5,10 @@
     src: url(/dashboard/css/H2GTRE.TTF);
   }
 
+.texti{
+    cursor: text;
+}
+
 .slider_btn{
     width: 10%;
     left: -5px;

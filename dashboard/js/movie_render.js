@@ -9,25 +9,29 @@ function _Movie_Render_Button_Func()
     {
         top_movie_jthis.click(function(){
             //_3dcanvas.toggle();
-            var visible = urlform.style.display;
-        
-            console.log(visible);
-            
-            if(visible == "inline-block")
-            {
-                urlform.style.display = "none";
-                embedYoutubeContent(false,"", true);
-            }
-            else{
-                urlform.style.display = "inline-block";
-            }
+            Movie_Render_Button();
         })
+    }
+}
+
+function Movie_Render_Button(){
+    var visible = urlform.style.display;
+        
+    console.log(visible);
+    
+    if(visible == "inline-block")
+    {
+        urlform.style.display = "none";
+        embedYoutubeContent(false,"", true);
+    }
+    else{
+        urlform.style.display = "inline-block";
     }
 }
 
 function _Send_Moive_Video(_type, _url, _visible , _send)
 {
-    _Movie_Button_Enable(top_movie_jthis,_visible);
+    // _Movie_Button_Enable(top_movie_jthis,_visible);
 
     if (_send == true) {
         connection.send({
