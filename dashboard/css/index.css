@@ -16,7 +16,7 @@ body {
 
 header {
   border-bottom: 1px solid #95d4e7;
-  height: 50px;
+  height: 53px;
   margin-bottom: 20px;
   background-color: white;
 }
@@ -331,4 +331,75 @@ input[disabled], button[disabled] {
 
 #btn-join-hidden-room, #btn-create-room {
   width: 100%;
+}
+
+.btn-blue {
+  color: #ffffff;
+  background-color: #53a2e5;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing:1.5px;
+  padding: 0.8%;
+}
+
+.btn-blue:hover {
+  background-color: #4486bf;
+}
+
+.btn-mint {
+  color: #ffffff;
+  background-color: #18dbbe;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing:1.5px;
+  padding: 0.8%;
+}
+
+.btn-mint:hover {
+  background-color: #13b59c;
+}
+
+.login-header {
+  text-align: center;
+  padding: 1.5%;
+}
+
+.login-text {
+  margin-bottom: 0px;
+  color: #5f5f5f;
+  font-size: 15px;
+}
+
+.login-input {
+  margin-bottom: 3vh;
+  height: 30px;
+}
+
+.login-bottom-border {
+  border-bottom: 1px solid #b8b8b8;
+}
+
+.login-body {
+  background-color: #eff1f0;
+  padding: 6% 6% 4% 6%;
+}
+
+form .form-control:focus{
+  border: 0px;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(24,219,190,0.6);
+}
+
+form .form-control::-webkit-input-placeholder { 
+  color: #d4d4d4;
+}
+
+form .form-control::-moz-placeholder {
+  color: #d4d4d4;
+}
+form .form-control:-ms-input-placeholder {
+  color: #d4d4d4;
+}
+form .form-control:placeholder {
+  color: #d4d4d4;
 }
