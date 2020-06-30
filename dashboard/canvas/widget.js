@@ -1232,8 +1232,6 @@ function canvasresize(id){
         prevX: 0,
         prevY: 0,
         mousedown: function(e) {
-            console.log("pen down")            
-            console.log(canvas.offsetLeft, canvas.offsetTop)
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -1260,7 +1258,6 @@ function canvasresize(id){
         },
         mouseup: function(e) {        
             pointHistory.push(points.length);
-            console.log('pen up')
             this.ismousedown = false;
         },
         mousemove: function(e) {
