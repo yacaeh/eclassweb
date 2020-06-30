@@ -98,6 +98,19 @@ var timeout = false;
 var delta = 200;
 
 
+   
+function normalizePoint (x, y) {
+    return [x / canvas.width, y / canvas.height];
+}
+
+function resizePoint (point) {
+    const p0 = canvas.width * point[0];
+    const p1 = canvas.height * point[1];
+    const p2 = canvas.width * point[2];
+    const p3 = canvas.height * point[3];
+    return [p0, p1, p2, p3];
+}
+
 window.addEventListener("resize", function() {
     rtime = new Date();
     if (timeout === false) {
@@ -123,7 +136,6 @@ function resizeend() {
         syncPoints(true);
     }               
 }
-
 function canvasresize(id){
     var canv = find(id);
     canv.setAttribute('width', innerWidth);
@@ -495,6 +507,7 @@ function canvasresize(id){
 
     var marking = false;
     var lastmarkpos = undefined;
+    
 
     var drawHelper = {
         redraw: function() {
@@ -531,9 +544,14 @@ function canvasresize(id){
                     context.fillStyle = opt[2];
                     context.font = opt[7];
 
-                    context.moveTo(p[0], p[1]);
-                    context.lineTo(p[2], p[3]);
+                    const resizeP = resizePoint(p);
+
+                    context.moveTo(resizeP[0], resizeP[1]);
+                    context.lineTo(resizeP[2], resizeP[3]);
                     lastmarkpos = [p[2], p[3]];
+                    // context.moveTo(p[0], p[1]);
+                    // context.lineTo(p[2], p[3]);
+                    // lastmarkpos = [p[2], p[3]];
                 }
                 else{
                     if(marking){
@@ -541,9 +559,7 @@ function canvasresize(id){
                         context.stroke();
                     }
 
-                    if (point && point.length && this[point[0]]) {
-                        console.log(point[0]);
-                        console.log(point);
+                    if (point && point.length && this[point[0]]) {                    
                         this[point[0]](context, point[1], point[2]);
                     }
                 }
@@ -589,14 +605,11 @@ function canvasresize(id){
             }
         },
         line: function(context, point, options) {
-            const p0 = canvas.width * point[0];            
-            const p1 = canvas.height * point[1];
-            const p2 = canvas.width * point[2];
-            const p3 = canvas.height * point[3];
 
+            const p = resizePoint(point);
             context.beginPath();
-            context.moveTo(p0, p1);
-            context.lineTo(p2, p3);
+            context.moveTo(p[0], p[1]);
+            context.lineTo(p[2], p[3]);
             // context.beginPath();
             // context.moveTo(point[0], point[1]);
             // context.lineTo(point[2], point[3]);
@@ -604,15 +617,27 @@ function canvasresize(id){
             this.handleOptions(context, options);
         },
         marker: function(context, point, options) {
+
             context.beginPath();
             context.clearRect(0,0,innerWidth, innerHeight)
-
             for(var i = 0 ; i < point.length; i++){
                 var p = point[i];
-                context.moveTo(p[0], p[1]);
-                context.lineTo(p[2], p[3]);
+
+                const resizeP = resizePoint(p);
+
+                context.moveTo(resizeP[0], resizeP[1]);
+                context.lineTo(resizeP[2], resizeP[3]);
             }
             this.handleOptions(context, options);
+            // context.beginPath();
+            // context.clearRect(0,0,innerWidth, innerHeight)
+
+            // for(var i = 0 ; i < point.length; i++){
+            //     var p = point[i];
+            //     context.moveTo(p[0], p[1]);
+            //     context.lineTo(p[2], p[3]);
+            // }
+            // this.handleOptions(context, options);
         },
         
         text: function(context, point, options) {
@@ -1213,8 +1238,9 @@ function canvasresize(id){
             var t = this;
 
             // normlaize : 0 ~ 1
-            x = x / canvas.width;
-            y = y / canvas.height;;
+            const normalized = normalizePoint (x, y);
+            x = normalized[0];
+            y = normalized[1];
 
             t.prevX = x;
             t.prevY = y;
@@ -1240,20 +1266,17 @@ function canvasresize(id){
                 y = e.pageY - canvas.offsetTop;
 
             // normalize~
-            x = x / canvas.width;
-            y = y / canvas.height;;
+            const normalized = normalizePoint(x, y);
+            x = normalized[0];
+            y = normalized[1];
 
-            var t = this;
-            
-            var prevX = t.prevX;
-            var prevY = t.prevY;
-
+            var t = this;            
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-                pencilDrawHelper.line(tempContext, [prevX, prevY, x, y]);
+                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
 
-                points[points.length] = ['line', [prevX, prevY, x, y], pencilDrawHelper.getOptions()];
+                points[points.length] = ['line', [t.prevX, t.prevY, x, y], pencilDrawHelper.getOptions()];
 
                 t.prevX = x;
                 t.prevY = y;
@@ -1280,6 +1303,10 @@ function canvasresize(id){
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
+            const normalized = normalizePoint(x, y);
+            x = normalized[0];
+            y = normalized[1];
+
             var t = this;
             t.prevX = x;
             t.prevY = y;
@@ -1296,9 +1323,7 @@ function canvasresize(id){
 
             points[points.length] = ['marker', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
 
-            t.prevX = x;
-            t.prevY = y;
-
+            
             document.getElementById("marker-container").style.display = 'none';
         },
         mouseup: function(e) {
@@ -1310,6 +1335,10 @@ function canvasresize(id){
                 y = e.pageY - canvas.offsetTop;
 
             var t = this;
+
+            const normalized = normalizePoint(x, y);
+            x = normalized[0];
+            y = normalized[1];
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
