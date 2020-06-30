@@ -39,6 +39,8 @@ connection.maxParticipantsAllowed = 1000;
 
 SetCanvasBtn('screen_share', ScreenShare);
 SetCanvasBtn('3d_view', _3DCanvasOnOff);
+SetCanvasBtn('movie', Movie_Render_Button);
+SetCanvasBtn('file', LoadFile);
 
 function _3DCanvasOnOff(btn){
     var visible = $(btn).hasClass('on');
@@ -93,6 +95,8 @@ function ScreenShare(btn){
         },
         (error) => {
           alert('Please make sure to use Edge 17 or higher.');
+          $(btn).removeClass("on");
+          $(btn).removeClass("selected-shape");
         }
       );
     } else if (navigator.getDisplayMedia) {
@@ -101,6 +105,8 @@ function ScreenShare(btn){
           replaceScreenTrack(stream, btn);
         },
         (error) => {
+          $(btn).removeClass("on");
+          $(btn).removeClass("selected-shape");
           alert('Please make sure to use Edge 17 or higher.');
         }
       );
@@ -1269,8 +1275,8 @@ $(window).on('beforeunload', function () {
 // 소켓통신으로 제어 필요
 
 let isFileViewer = false;
-$('#top_pdf').click(function () {
-  console.log(isFileViewer);
+
+function LoadFile(){
   if (isFileViewer === false) {
     loadFileViewer();
     $('#canvas-controller').show();
@@ -1280,7 +1286,7 @@ $('#top_pdf').click(function () {
     $('#canvas-controller').hide();
     isFileViewer = false;
   }
-});
+}
 
 function unloadFileViewer() {
   let frame = document
