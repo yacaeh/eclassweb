@@ -5,6 +5,7 @@
     src: url(/dashboard/css/H2GTRE.TTF);
   }
 
+<<<<<<< HEAD
 @font-face{
 font-family: "나눔고딕";
 src: url(/dashboard/css/NanumBarunGothic.ttf);
@@ -16,6 +17,12 @@ src: url(/dashboard/css/NanumPen.ttf);
 }
 
 
+=======
+.texti{
+    cursor: text;
+}
+
+>>>>>>> fb2e9a7bbd28c91635e61d57a4bc9c922eda18f0
 .slider_btn{
     width: 10%;
     left: -5px;

@@ -22,7 +22,7 @@
   <script src="/dist/RTCMultiConnection.js"></script>
 </head>
 
-<body background="/dashboard/login_bg.png">
+<body background="/dashboard/img/new_login_bg.png">
   <header>
     <img class="logo" src="/dashboard/ai_icon.png" alt="RTCMultiConnection" />
     <div id="header-left-box">
@@ -169,45 +169,29 @@
   <section>
 
     <!-- Login Form -->
-    <div class="modal-dialog">
-      <div class="modal-content" style="margin-top: 25vh;">
-        <h4 class="modal-header">Login</h4>
-        <div class="modal-body">
-          <form>
+    <div class="modal-dialog" style="max-width: 430px;">
+      <div class="modal-content" style="margin-top: 20vh;">
+        <div class="login-header login-text login-bottom-border">로그인</div>
+        <div class="login-body login-bottom-border">
+          <form class="login-bottom-border">
             <div class="form-group">
-              <p><input type="text" class="form-control" id="txt-roomid" placeholder="Room Code"></p>
-              <p><input type="text" class="form-control" id="txt-user-name" placeholder="Name"></p>
-              <p><input type="text" class="form-control" id="txt-room-password" placeholder="Room Password"></p>
+              <label for="txt-roomid" class="login-text">방 번호</label>
+              <input type="text" class="form-control login-input" id="txt-roomid" placeholder="room number">
+              <label for="txt-roomid" class="login-text">이름</label>
+              <input type="text" class="form-control login-input" id="txt-user-name" placeholder="name">
+              <label for="txt-roomid" class="login-text">비밀번호</label>
+              <input type="text" class="form-control login-input" id="txt-room-password" placeholder="password">
             </div>
           </form>
+          <br>
           <div>
-            <p><button type="button" class="btn btn-primary" id="btn-join-hidden-room">Student</button></p>
-            <p><button type="button" class="btn btn-success" id="btn-create-room">Teacher</button></p>
-            <!--button id="btn-show-join-hidden-room" class="top-span btn btn-secondary" data-toggle="modal"
-            data-target="#joinRoomModel">Student</button-->
+            <p><button type="button" class="btn btn-blue" id="btn-join-hidden-room">STUDENT</button></p>
+            <button type="button" class="btn btn-mint" id="btn-create-room">TEACHER</button>
           </div>
         </div>
+        <div style="height: 10px;"></div>
       </div>
     </div>
-
-    <!--table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Room ID</th>
-          <th>Owner ID</th>
-          <th>Session</th>
-          <th>Extra</th>
-          <th>Participants</th>
-          <th>Join</th>
-        </tr>
-      </thead>
-      <tbody id="rooms-list">
-        <tr>
-          <td colspan=9>No active room found for this demo.</td>
-        </tr>
-      </tbody>
-    </table-->
   </section>
   <script src="/dashboard/js/index.js"></script>
 
