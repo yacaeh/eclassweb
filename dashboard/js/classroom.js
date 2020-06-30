@@ -42,10 +42,23 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 
 function _3DCanvasOnOff(btn){
     var visible = $(btn).hasClass('on');
+    console.log(visible);
+
     if(params.open == "true")
-    {
-        modelEnable(top_3d_render_jthis,visible,true);
-    }
+    {  
+      const isViewer = classroomInfo.share3D.state;
+      if(false == isViewer)
+      {
+          modelEnable(send=true);
+      }
+      else
+      {
+          remove3DCanvas();                
+          connection.send({
+              modelDisable : true
+          });
+      }          
+  }
 }
 
 var lastStream ;
@@ -362,11 +375,12 @@ function appendChatMessage(event, checkmark_id) {
 
     try {
         if(event.extra.roomOwner){
+          console.log("ASdasd");
+          
             var notice = document.getElementById("notice");
+            div.innerHTML = "<b>" + ConvertChatMsg(event.data.chatMessage) + "</b>";
 
-            var div2 = document.createElement('div');
-            div2.innerHTML = "<b>" + event.data.chatMessage + "</b>";
-            notice.appendChild(div2);
+            $(notice).append("<div> 선생님 : " + ConvertChatMsg(event.data.chatMessage) + "</div>");
             notice.scrollTop = notice.clientHeight;
             notice.scrollTop = notice.scrollHeight - notice.scrollTop;
 
@@ -377,8 +391,7 @@ function appendChatMessage(event, checkmark_id) {
     }
 
     if (event.data) {
-        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + event.data.chatMessage;
-
+        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
         if (event.data.checkmark_id) {
             connection.send({
                 checkmark: 'received',
@@ -386,8 +399,8 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b> 나 : </b>' + event;
-        div.style.background = '#cbffcb';
+      div.innerHTML = '<b> 나 : </b>' + ConvertChatMsg(event);
+      div.style.background = '#cbffcb';
     }
 
   conversationPanel.appendChild(div);
@@ -395,6 +408,23 @@ function appendChatMessage(event, checkmark_id) {
   conversationPanel.scrollTop = conversationPanel.clientHeight;
   conversationPanel.scrollTop =
     conversationPanel.scrollHeight - conversationPanel.scrollTop;
+}
+
+function ConvertChatMsg(_msg){
+  var div = document.createElement("span");
+  div.innerHTML = _msg;
+
+  var msg = $(div);
+  var a = msg.find("a")
+
+  if(a.length != 0){
+    console.log(div);
+    a.attr("target", "_blank");
+    return div.innerHTML;
+  }
+  else{
+    return _msg;
+  }
 }
 
 var keyPressTimer;
@@ -1537,9 +1567,6 @@ function CanvasResize() {
 
   var x = canvas.width - rwidth - 50;
   var y = canvas.height - 60;
-
-  console.log(x);
-  console.log(y);
 
   $("#screen-viewer").width(x);
   $("#screen-viewer").height(y);
