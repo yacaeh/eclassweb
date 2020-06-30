@@ -42,10 +42,23 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 
 function _3DCanvasOnOff(btn){
     var visible = $(btn).hasClass('on');
+    console.log(visible);
+
     if(params.open == "true")
-    {
-        modelEnable(top_3d_render_jthis,visible,true);
-    }
+    {  
+      const isViewer = classroomInfo.share3D.state;
+      if(false == isViewer)
+      {
+          modelEnable(send=true);
+      }
+      else
+      {
+          remove3DCanvas();                
+          connection.send({
+              modelDisable : true
+          });
+      }          
+  }
 }
 
 var lastStream ;
@@ -1537,9 +1550,6 @@ function CanvasResize() {
 
   var x = canvas.width - rwidth - 50;
   var y = canvas.height - 60;
-
-  console.log(x);
-  console.log(y);
 
   $("#screen-viewer").width(x);
   $("#screen-viewer").height(y);

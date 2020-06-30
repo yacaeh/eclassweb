@@ -2364,9 +2364,7 @@ function canvasresize(id){
             document.getElementById('3d_view').onclick = function() {
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
-                
             }
-
         }
 
         if (tools.view3d === true) {
@@ -2375,9 +2373,7 @@ function canvasresize(id){
         }
 
 
-
         function decoratePencil() {
-
             function hexToRGBA(h, alpha) {
                 return 'rgba(' + hexToRGB(h).join(',') + ',1)';
             }
