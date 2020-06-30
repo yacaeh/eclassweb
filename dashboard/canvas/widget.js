@@ -500,13 +500,12 @@ function canvasresize(id){
 
             for (i = 0; i < length; i++) {
                 point = points[i];
-
                 if(point[0] == "marker"){
                     if(!marking){
                         context.beginPath();
                         marking = true;
                     }   
-                    var p = point[1];
+                    var p = point[1];                                     
 
                     var now = [p[0], p[1]];
                     if(lastmarkpos != undefined && lastmarkpos[0] != now[0] && lastmarkpos[1] != now[1]){
@@ -538,6 +537,8 @@ function canvasresize(id){
                     }
 
                     if (point && point.length && this[point[0]]) {
+                        console.log(point[0]);
+                        console.log(point);
                         this[point[0]](context, point[1], point[2]);
                     }
                 }
@@ -583,9 +584,17 @@ function canvasresize(id){
             }
         },
         line: function(context, point, options) {
+            const p0 = canvas.width * point[0];            
+            const p1 = canvas.height * point[1];
+            const p2 = canvas.width * point[2];
+            const p3 = canvas.height * point[3];
+
             context.beginPath();
-            context.moveTo(point[0], point[1]);
-            context.lineTo(point[2], point[3]);
+            context.moveTo(p0, p1);
+            context.lineTo(p2, p3);
+            // context.beginPath();
+            // context.moveTo(point[0], point[1]);
+            // context.lineTo(point[2], point[3]);
             
             this.handleOptions(context, options);
         },
@@ -1192,11 +1201,15 @@ function canvasresize(id){
         prevX: 0,
         prevY: 0,
         mousedown: function(e) {
-            console.log("pen down")
+            console.log("pen down")            
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
             var t = this;
+
+            // normlaize : 0 ~ 1
+            x = x / canvas.width;
+            y = y / canvas.height;;
 
             t.prevX = x;
             t.prevY = y;
@@ -1208,11 +1221,8 @@ function canvasresize(id){
             tempContext.lineCap = 'round';
             pencilDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
 
-            points[points.length] = ['line', [t.prevX, t.prevY, x, y], pencilDrawHelper.getOptions()];
+            points[points.length] = ['line', [t.prevX, t.prevY, x, y], pencilDrawHelper.getOptions()];   
 
-            t.prevX = x;
-            t.prevY = y;
-            
             document.getElementById("pencil-container").style.display = 'none';
         },
         mouseup: function(e) {        
@@ -1224,13 +1234,21 @@ function canvasresize(id){
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
+            // normalize~
+            x = x / canvas.width;
+            y = y / canvas.height;;
+
             var t = this;
+            
+            var prevX = t.prevX;
+            var prevY = t.prevY;
+
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
+                pencilDrawHelper.line(tempContext, [prevX, prevY, x, y]);
 
-                points[points.length] = ['line', [t.prevX, t.prevY, x, y], pencilDrawHelper.getOptions()];
+                points[points.length] = ['line', [prevX, prevY, x, y], pencilDrawHelper.getOptions()];
 
                 t.prevX = x;
                 t.prevY = y;
@@ -3126,7 +3144,6 @@ function canvasresize(id){
             uid = event.data.uid;
         }
         
-        console.log(event.data);
         if(event.data.screenShare){
 
             callbacks.screenShare = event.data.screenShare;
