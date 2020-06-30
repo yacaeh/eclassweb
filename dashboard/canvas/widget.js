@@ -1475,8 +1475,7 @@ function canvasresize(id){
         text: '',
         selectedFontFamily: '나눔펜글씨',
         selectedFontSize: '48',
-        selectedFontColor: 'red',
-        lastFillStyle: '',
+        lastFillStyle: '#FF7373',
         onShapeSelected: function() {
 
             tempContext.canvas.style.cursor = 'text';
@@ -1593,7 +1592,7 @@ function canvasresize(id){
                 }
             } else if (!this.lastFillStyle.length) {
                 this.lastFillStyle = fillStyle;
-                fillStyle = 'black';
+                //fillStyle = 'black';
             }
             
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
@@ -1601,9 +1600,9 @@ function canvasresize(id){
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
             
             console.log(this.fontColorBox);
-            this.fontColorBox.style.display = show;
-            this.fontColorBox.style.left = this.x + 'px';
-            this.fontColorBox.style.top =  this.y -this.textInputBox.clientHeight -this.fontColorBox.clientHeight + 'px';
+            this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
+            this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 'px'; 
+            this.fontColorBox.style.top =  this.y - this.textInputBox.clientHeight + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -1657,11 +1656,12 @@ function canvasresize(id){
                 // child.style.fontSize = child.innerHTML + 'px';
             });
         },
-        eachColorBox: function(){
+        textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
+        eachFontColor: function(callback){
             function hexToRGBA(h, alpha) {
                 return 'rgba(' + hexToRGB(h).join(',') + ',1)';
             }
-
+            console.log("each font color!");
             var colors = [
                 ['FFFFFF', '006600', '000099', 'CC0000', '8C4600'],
                 ['CCCCCC', '00CC00', '6633CC', 'FF0000', 'B28500'],
@@ -1675,13 +1675,13 @@ function canvasresize(id){
                 fillStyleText = find('text-fill-style'),
                 textSelectedColor = find('text-selected-color'),
                 textSelectedColor2 = find('text-selected-color-2'),
-                canvas = context.canvas,
                 alpha = 0.2;
 
-            // START INIT PENCIL
-            textStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
+            // START INIT TEXT
+            this.textStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
             textSelectedColor.style.backgroundColor =
-                textSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
+            textSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
+            textColorsList.innerHTML = '';
 
             colors.forEach(function(colorRow) {
                 var row = '<tr>';
@@ -1698,7 +1698,7 @@ function canvasresize(id){
                 addEvent(td, 'mouseover', function() {
                     var elColor = td.getAttribute('data-color');
                     textSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor
+                    fillStyleText.value = elColor;
                 });
 
                 addEvent(td, 'click', function() {
@@ -1706,9 +1706,15 @@ function canvasresize(id){
                     textSelectedColor.style.backgroundColor =
                     textSelectedColor2.style.backgroundColor = '#' + elColor;
                     fillStyleText.value = elColor;
+                    this.lastFillStyle = '#' + elColor;
+                    console.log("this.LastFillStyle",this.lastFillStyle);
                     textColorContainer.style.display = 'none';
                 });
             })
+            addEvent(textSelectedColor, 'click', function() {
+                textColorContainer.style.display = 'block';
+            });
+
         },
         eachFontFamily: function(callback) {
             var childs = this.fontFamilyBox.querySelectorAll('li');
@@ -1739,9 +1745,10 @@ function canvasresize(id){
             });
         },
         onReturnKeyPressed: function() {
+            console.log(this.lastFillStyle);
             if (!textHandler.text || !textHandler.text.length) return;
             document.querySelector('.textInputUI').value = "";
-            var fontSize = parseInt(textHandler.selectedFontSize) || 15;
+            var fontSize = parseInt(textHandler.selectedFontSize) || 48;
             this.mousedown({
                 pageX: this.pageX,
                 // pageY: parseInt(tempContext.measureText(textHandler.text).height * 2) + 10
@@ -1753,7 +1760,7 @@ function canvasresize(id){
         textInputBox: document.querySelector('.textInputUI'),
         fontFamilyBox: document.querySelector('.fontSelectUl'),
         fontSizeBox: document.querySelector('.fontSizeUl'),
-        fontColorBox: document.getElementById('fontColorUI')
+        fontColorBox: document.querySelector('.fontColorUI')
     };
 
     var arcHandler = {
@@ -2728,7 +2735,6 @@ function canvasresize(id){
             document.getElementById('eraser-icon').style.display = 'block';
         }
 
-        let textStrokeStyle = '#' + document.getElementById('text-fill-style').value;
         function decorateText() {
             var context = getContext('text-icon');
 

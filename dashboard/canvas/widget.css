@@ -507,8 +507,11 @@ input:focus {
     color: white!important;
 }
 #marker-selected-color,
-#marker-selected-color-2, #pencil-selected-color,
-#pencil-selected-color-2 {
+#marker-selected-color-2, 
+#pencil-selected-color,
+#pencil-selected-color-2,
+#text-selected-color,
+#text-selected-color-2 {
     display: inline-block;
     vertical-align: middle;
     width: 20px;
@@ -516,33 +519,33 @@ input:focus {
     height: 20px;
     position: absolute;
 }
-#marker-fill-colors, #pencil-fill-colors {
+#marker-fill-colors, #pencil-fill-colors, #text-fill-colors {
     display: none;
 }
 #marker-color-container, #pencil-color-container {
     position: relative;
 }
-#marker-fill-colors, #pencil-fill-colors {
+#marker-fill-colors, #pencil-fill-colors, #text-fill-colors {
     left: 100%;
     top: -10px;
     width: 100px;
     padding: 10px;
 }
-#marker-fill-style, #pencil-fill-style {
+#marker-fill-style, #pencil-fill-style, #text-fill-style {
     width: 50px;
     display: inline-block;
 }
-#marker-colors-list, #pencil-colors-list {
+#marker-colors-list, #pencil-colors-list, #text-colors-list {
     margin: 10px auto;
     border-collapse: collapse;
 }
-#marker-colors-list td, #pencil-colors-list td {
+#marker-colors-list td, #pencil-colors-list td, #text-colors-list td {
     width: 15px;
     height: 15px;
     border: 1px solid black;
     padding: 0;
 }
-#marker-colors-list td:hover, #pencil-colors-list td:hover {
+#marker-colors-list td:hover, #pencil-colors-list, #text-colors-list td:hover {
     border: 1px solid white;
 }
 
