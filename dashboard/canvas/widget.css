@@ -1,14 +1,28 @@
 /* Muaz Khan (@muazkh/@WebRTCWeb) */
 
 @font-face{
-    font-family: "H2GTRE";
+    font-family: "HY중고딕";
     src: url(/dashboard/css/H2GTRE.TTF);
   }
 
+<<<<<<< HEAD
+@font-face{
+font-family: "나눔고딕";
+src: url(/dashboard/css/NanumBarunGothic.ttf);
+}
+
+@font-face{
+font-family: "나눔펜글씨";
+src: url(/dashboard/css/NanumPen.ttf);
+}
+
+
+=======
 .texti{
     cursor: text;
 }
 
+>>>>>>> fb2e9a7bbd28c91635e61d57a4bc9c922eda18f0
 .slider_btn{
     width: 10%;
     left: -5px;
@@ -500,8 +514,10 @@ input:focus {
     color: white!important;
 }
 #marker-selected-color,
-#marker-selected-color-2, #pencil-selected-color,
-#pencil-selected-color-2 {
+#marker-selected-color-2, 
+#pencil-selected-color,
+#pencil-selected-color-2,
+#text-selected-color {
     display: inline-block;
     vertical-align: middle;
     width: 20px;
@@ -509,7 +525,15 @@ input:focus {
     height: 20px;
     position: absolute;
 }
-#marker-fill-colors, #pencil-fill-colors {
+#text-selected-color-2 {
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    left: -25px;
+    height: 20px;
+    position: absolute;
+}
+#marker-fill-colors, #pencil-fill-colors, #text-fill-colors {
     display: none;
 }
 #marker-color-container, #pencil-color-container {
@@ -521,21 +545,27 @@ input:focus {
     width: 100px;
     padding: 10px;
 }
-#marker-fill-style, #pencil-fill-style {
+#text-fill-colors {
+    left: 220px;
+    top: -10px;
+    width: 100px;
+    padding: 10px;
+}
+#marker-fill-style, #pencil-fill-style, #text-fill-style {
     width: 50px;
     display: inline-block;
 }
-#marker-colors-list, #pencil-colors-list {
+#marker-colors-list, #pencil-colors-list, #text-colors-list {
     margin: 10px auto;
     border-collapse: collapse;
 }
-#marker-colors-list td, #pencil-colors-list td {
+#marker-colors-list td, #pencil-colors-list td, #text-colors-list td {
     width: 15px;
     height: 15px;
     border: 1px solid black;
     padding: 0;
 }
-#marker-colors-list td:hover, #pencil-colors-list td:hover {
+#marker-colors-list td:hover, #pencil-colors-list, #text-colors-list td:hover {
     border: 1px solid white;
 }
 
