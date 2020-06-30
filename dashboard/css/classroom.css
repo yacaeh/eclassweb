@@ -255,7 +255,12 @@ hr {
   content: url(/dashboard/img/top_3d_on.png);
 }
 
-#top_share_video{
+
+.top_share_video_on{
+  content: url(/dashboard/img/top_share_video_on.png);
+}
+
+.top_share_video_off{
   content: url(/dashboard/img/top_share_video_off.png);
 }
 #top_record_video{
@@ -564,13 +569,6 @@ hr {
   margin-right: 15px;
 }
 
-
-#renderCanvas{
-  position: absolute;
-  left: 45px;
-}
-
-
 input[type=radio] { display:none; }
 
 input[type=radio] + label { 
@@ -614,50 +612,17 @@ input[type="number"]:focus{
   border: #3ee1c9  solid 1px;
 }
 
-.exam-state-progress{
-  height: 5px;
+#urlform{
+  position: absolute;
+  width: 400px;
+  height: 100px;
+  background-color: white;
+  border: solid 1px black;
+  z-index: 100;
+  top:  100px;
+  left:  100px;
 }
-
-.exam-state-progress[value]{
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.exam-state-progress[value]::-webkit-progress-value {
-  background: #3ee1c9;
-}
-.exam-state-progress[value]::-webkit-progress-bar {
-  background: gray;
-}
-
-.exam-header{
-  font-weight:bold; 
-  background-color: white; 
-  text-align: center; 
-  border-bottom:gray solid 1px;
-}
-
-.exam-border-bottom{
-  border-bottom:gray solid 1px;
-}
-
-.exam-80-button{
-  width: 80%; 
-  margin:10%; 
-  font-weight:bold;
-}
-
-.exam-background{
-  background-color:#eff1f0; 
-  border-bottom:gray solid 1px;
-}
-
-.exam-overflow{
-  max-height: 50vh;
-  overflow-y: auto;
-}
-
-.text-center-bold{
-  text-align:center; 
-  font-weight:bold;
+#urlinput{
+  width: 100%;
+  height: auto;
 }
