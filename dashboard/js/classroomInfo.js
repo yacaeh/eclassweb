@@ -1,16 +1,17 @@
 
-classroomInfo = {    
+classroomInfo = {   
+    roomOpenTime : 0,       // 방을 처음 개설한 시간
     allControl : false,
     shareScreen : false,
     share3D : {
         state : false,
-        data : {
-            src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
-        }   // position, rotation 
+        data : { }   // position, rotation 
     },
     pdf : {
         state : false,
-        data : {}   // 어떤 pdf, 몇 페이지 등
+        data : {
+            src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
+        }   // 어떤 pdf, 몇 페이지 등
     },
     exam : false    
 };
@@ -19,9 +20,19 @@ classroomInfo = {
 classroomCommand = {
 };
 
+/*    
+
+*/
+classroomCommand.openRoom = function () {
+    var date = new Date();        
+    classroomInfo.roomOpenTime = date.getTime();
+    updateClassTime ();
+};
 
 
-classroomCommand.updateSyncRoom = function () {
+classroomCommand.updateSyncRoom = function () {    
+
+    classroomCommand.syncClassroomOpenTime ();
 
     if(classroomInfo.allControl) {
         allControllEnable(top_all_controll_jthis, classroomInfo.allControl, false);
@@ -192,3 +203,10 @@ classroomCommand.syncPdf = function () {
     }
 };
 
+
+/*
+    방 오픈 경과 시간 동기화
+*/
+classroomCommand.syncClassroomOpenTime =  function () {    
+    updateClassTime ();
+};
