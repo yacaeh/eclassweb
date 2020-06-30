@@ -3348,6 +3348,7 @@ function canvasresize(id){
     MakeTitlePop("undo", "작업 하나를 취소합니다");
     MakeTitlePop("clear_canvas", "캔버스를 비웁니다");
     MakeTitlePop("screen_share", "내 화면을 공유합니다");
+    MakeTitlePop("3d_view", "3D 모델을 공유합니다");
 
     SliderSetting("pencileslider", "pencil-stroke-style", 1, function(v){
         var pencilDrawHelper = clone(drawHelper);
