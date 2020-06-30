@@ -73,7 +73,7 @@
         globalAlpha = 1,
         globalCompositeOperation = 'source-over',
         lineCap = 'round',
-        font = '15px "Arial"',
+        font = '30px "나눔고딕"',
         lineJoin = 'round';
 
     function getContext(id) {
@@ -446,7 +446,8 @@ function canvasresize(id){
     }
 
     var copiedStuff = [],
-        isControlKeyPressed;
+        isControlKeyPressed,
+        isAltKeyPressed;
 
     // marker + pencil
     function hexToR(h) {
@@ -779,7 +780,7 @@ function canvasresize(id){
             else tempContext.fillStyle = 'rgba(255,85 ,154,.4)';
         
             if (p[0] === 'text') {
-                tempContext.font = "15px Verdana";
+                tempContext.font = "30px 나눔펜글씨";
                 tempContext.fillText(point[0], point[1], point[2]);
             }
 
@@ -1417,8 +1418,8 @@ function canvasresize(id){
 
     var textHandler = {
         text: '',
-        selectedFontFamily: 'HY중고딕',
-        selectedFontSize: '25',
+        selectedFontFamily: '나눔펜글씨',
+        selectedFontSize: '48',
         lastFillStyle: '',
         onShapeSelected: function() {
 
@@ -1499,19 +1500,6 @@ function canvasresize(id){
         },
         canvasInput:null,
         updateInput: function(){
-            // if (this.canvasInput !== null) {
-            //     document.getElementById('text-input').remove();
-            // }
-            
-            // this.canvasInput = document.createElement("INPUT");
-            // this.canvasInput.setAttribute("id", "text-input");
-            // this.canvasInput.setAttribute("placeholder", "글자를 입력하고 엔터를 누르세요.");
-            // this.canvasInput.setAttribute("type", "text");
-            // this.canvasInput.setAttribute("style","ime-mode:active");
-            // this.canvasInput.style.cssText =
-            // 'border: 5px solid black;width:40%;position:absolute;top:100px;margin-left:30%;z-index=999;height:50px';
-            // document.getElementsByTagName('body')[0].appendChild(this.canvasInput);
-            // document.getElementById("text-input").focus();
             document.querySelector(".textInputUI").focus();
             document.querySelector(".textInputUI").addEventListener('change', (event) => {
                 console.log("Change!");
@@ -1536,13 +1524,6 @@ function canvasresize(id){
             textHandler.x = e.pageX - canvas.offsetLeft - 5;
             textHandler.y = e.pageY - canvas.offsetTop + 10;
 
-            // if (typeof textHandler.blinkCursorInterval !== 'undefined') {
-            //     clearInterval(textHandler.blinkCursorInterval);
-            // }
-
-            // textHandler.blinkCursor();
-            // textHandler.blinkCursorInterval = setInterval(textHandler.blinkCursor, 700);
-
             this.showTextTools();
         },
         mouseup: function(e) {
@@ -1558,9 +1539,14 @@ function canvasresize(id){
                 this.lastFillStyle = fillStyle;
                 fillStyle = 'black';
             }
+            
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
+
+            this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
+            this.fontColorBox.style.left = this.x + 'px';
+            this.fontColorBox.style.top = this.y -this.textInputBox.clientHeight -this.fontColorBox.clientHeight + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -1572,7 +1558,7 @@ function canvasresize(id){
             this.fontFamilyBox.style.top = this.y + 'px';
         },
         showTextTools: function() {
-            if (!this.fontFamilyBox || !this.fontSizeBox || !this.textInputBox) return;
+            if (!this.fontFamilyBox || !this.fontSizeBox || !this.textInputBox || !this.fontColorBox) return;
 
             this.unselectAllFontFamilies();
             this.unselectAllFontSizes();
@@ -1641,10 +1627,12 @@ function canvasresize(id){
                 pageY: this.pageY + fontSize + 5
             });
             drawHelper.redraw();
+            this.showOrHideTextTools('hide');
         },
         textInputBox: document.querySelector('.textInputUI'),
         fontFamilyBox: document.querySelector('.fontSelectUl'),
-        fontSizeBox: document.querySelector('.fontSizeUl')
+        fontSizeBox: document.querySelector('.fontSizeUl'),
+        fontColorBox: document.getElementById('fontColorUI')
     };
 
     var arcHandler = {
@@ -3011,6 +2999,9 @@ function canvasresize(id){
         if (!isControlKeyPressed && keyCode === 17) {
             isControlKeyPressed = true;
         }
+        if (!isAltKeyPressed && keyCode === 18) {
+            isAltKeyPressed = true;
+        }
     }
 
     function isBackKey(e, keyCode) {
@@ -3061,7 +3052,7 @@ function canvasresize(id){
         }
 
         // Ctrl + t
-        if (isControlKeyPressed && keyCode === 84 && is.isText) {
+        if (isAltKeyPressed && keyCode === 84 && is.isText) {
             textHandler.showTextTools();
             return;
         }
@@ -3128,7 +3119,7 @@ function canvasresize(id){
 
         var inp = String.fromCharCode(keyCode);
         if (/[a-zA-Z0-9-_ !?|\/'",.=:;(){}\[\]`~@#$%^&*+-]/.test(inp)) {
-            textHandler.writeText(String.fromCharCode(keyCode));
+           // textHandler.writeText(String.fromCharCode(keyCode));
         }
     }
 
