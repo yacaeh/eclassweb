@@ -164,8 +164,11 @@ classroomCommand.sendClosePdf = function () {
 };
 
 classroomCommand.receivePdfMessage = function (_pdf) {  
-    classroomInfo.pdf = _pdf;
-    classroomCommand.syncPdf ();
+    let currentState = classroomInfo.pdf.state;
+    if(currentState != _pdf.state) {       
+        classroomInfo.pdf = _pdf;
+        classroomCommand.syncPdf ();
+    }
 };
 
 classroomCommand.openPdf = function () {
