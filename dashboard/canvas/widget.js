@@ -113,14 +113,19 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
+        
+        var renderCanvas = document.getElementById("renderCanvas");
+        renderCanvas.style.width = innerWidth;
+        renderCanvas.style.width = innerHeight;
+
+
         drawHelper.redraw();
         syncPoints(true);
     }               
 }
 
 function canvasresize(id){
-    var canv = find(id),
-    ctx = canv.getContext('2d');
+    var canv = find(id);
     canv.setAttribute('width', innerWidth);
     canv.setAttribute('height', innerHeight);
 }
