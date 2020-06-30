@@ -632,9 +632,10 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.attachStreams.push(tempStream);
     window.tempStream = tempStream;
 
-    SetTeacher();
+    SetTeacher(); 
+    classroomCommand.openRoom ();   
 
-    connection.extra.roomOwner = true;
+    connection.extra.roomOwner = true;    
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
         if (error === connection.errors.ROOM_NOT_AVAILABLE) {
@@ -937,12 +938,18 @@ $('#top_share_screen').click(function () {
   }
 });
 
-function ClassTime() {
-  var now = 0;
+let classTimeIntervalHandle;
+
+function updateClassTime () {
+  var now =  new Date().getTime() - classroomInfo.roomOpenTime;
+  now = parseInt(now / 1000);
+  
+  if(!classTimeIntervalHandle)  
+    classTimeIntervalHandle = setInterval(Sec, 1000);
+
   function Sec() {
     now++;
     var time = now;
-
     var hour = Math.floor(time / 3600);
     time %= 3600;
 
@@ -955,12 +962,7 @@ function ClassTime() {
 
     $('#current-day').text(hour + ':' + min + ':' + time);
   }
-  setInterval(Sec, 1000);
 }
-
-ClassTime();
-
-
 
 
 function SetTeacher(){
