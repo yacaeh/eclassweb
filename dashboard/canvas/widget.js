@@ -1543,10 +1543,11 @@ function canvasresize(id){
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
-
-            this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
+            
+            console.log(this.fontColorBox);
+            this.fontColorBox.style.display = show;
             this.fontColorBox.style.left = this.x + 'px';
-            this.fontColorBox.style.top = this.y -this.textInputBox.clientHeight -this.fontColorBox.clientHeight + 'px';
+            this.fontColorBox.style.top =  this.y -this.textInputBox.clientHeight -this.fontColorBox.clientHeight + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -2611,14 +2612,21 @@ function canvasresize(id){
             document.getElementById('eraser-icon').style.display = 'block';
         }
 
-
-
-
-
-
-
-        
+        let textStrokeStyle = '#' + document.getElementById('text-fill-style').value;
         function decorateText() {
+            function hexToRGBA(h, alpha) {
+                return 'rgba(' + hexToRGB(h).join(',') + ',1)';
+            }
+
+            var colors = [
+                ['FFFFFF', '006600', '000099', 'CC0000', '8C4600'],
+                ['CCCCCC', '00CC00', '6633CC', 'FF0000', 'B28500'],
+                ['666666', '66FFB2', '006DD9', 'FF7373', 'FF9933'],
+                ['333333', '26FF26', '6699FF', 'CC33FF', 'FFCC99'],
+                ['000000', 'CCFF99', 'BFDFFF', 'FFBFBF', 'FFFF33']
+            ];
+
+
             var context = getContext('text-icon');
 
             var image = new Image();
@@ -2627,6 +2635,47 @@ function canvasresize(id){
                 bindEvent(context, 'Text');
             };
             image.src = data_uris.text;
+
+            var textColorContainer = find('text-fill-colors'),
+                textColorsList = find("text-colors-list"),
+                fillStyleText = find('text-fill-style'),
+                textSelectedColor = find('text-selected-color'),
+                textSelectedColor2 = find('text-selected-color-2'),
+                canvas = context.canvas,
+                alpha = 0.2;
+
+            // START INIT PENCIL
+            textStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
+            textSelectedColor.style.backgroundColor =
+                textSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
+
+            colors.forEach(function(colorRow) {
+                var row = '<tr>';
+
+                colorRow.forEach(function(color) {
+                    row += '<td style="background-color:#' + color + '" data-color="' + color + '"></td>';
+                })
+                row += '</tr>';
+
+                textColorsList.innerHTML += row;
+            })
+
+            Array.prototype.slice.call(textColorsList.getElementsByTagName('td')).forEach(function(td) {
+                addEvent(td, 'mouseover', function() {
+                    var elColor = td.getAttribute('data-color');
+                    textSelectedColor2.style.backgroundColor = '#' + elColor;
+                    fillStyleText.value = elColor
+                });
+
+                addEvent(td, 'click', function() {
+                    var elColor = td.getAttribute('data-color');
+                    textSelectedColor.style.backgroundColor =
+                    textSelectedColor2.style.backgroundColor = '#' + elColor;
+                    fillStyleText.value = elColor;
+                    textColorContainer.style.display = 'none';
+                });
+            })
+
         }
 
         if (tools.text === true) {
@@ -3117,10 +3166,6 @@ function canvasresize(id){
 
         keyCode = e.which || e.keyCode || 0;
 
-        var inp = String.fromCharCode(keyCode);
-        if (/[a-zA-Z0-9-_ !?|\/'",.=:;(){}\[\]`~@#$%^&*+-]/.test(inp)) {
-           // textHandler.writeText(String.fromCharCode(keyCode));
-        }
     }
 
     addEvent(document, 'keypress', onkeypress);
