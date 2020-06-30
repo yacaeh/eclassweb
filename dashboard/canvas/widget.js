@@ -1417,7 +1417,7 @@ function canvasresize(id){
 
     var textHandler = {
         text: '',
-        selectedFontFamily: '나눔고딕',
+        selectedFontFamily: 'HY중고딕',
         selectedFontSize: '25',
         lastFillStyle: '',
         onShapeSelected: function() {
@@ -1431,9 +1431,9 @@ function canvasresize(id){
             this.showOrHideTextTools('hide');
             // tempContext.canvas.style.cursor = 'default';
 
-            if (typeof this.blinkCursorInterval !== 'undefined') {
-                clearInterval(this.blinkCursorInterval);
-            }
+            // if (typeof this.blinkCursorInterval !== 'undefined') {
+            //     clearInterval(this.blinkCursorInterval);
+            // }
         },
         getFillColor: function(color) {
             color = (color || fillStyle).toLowerCase();
@@ -1633,7 +1633,7 @@ function canvasresize(id){
         },
         onReturnKeyPressed: function() {
             if (!textHandler.text || !textHandler.text.length) return;
-            $('#jj_input23').val("");
+            document.querySelector('.textInputUI').value = "";
             var fontSize = parseInt(textHandler.selectedFontSize) || 15;
             this.mousedown({
                 pageX: this.pageX,

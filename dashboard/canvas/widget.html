@@ -186,16 +186,12 @@
     <div id="fade"></div>
 
     <!-- text font/family/color -->
-    <input class="textInputUI" type="text" placeholder="글자를 입력하고 엔터를 누르세요." style="ime-mode:active;display: none; position: absolute; top: 0; left: 0; width: 166px;height:50px;border: 5px solid black;">
+    <input class="textInputUI" type="text" placeholder="글자를 입력하고 엔터를 누르세요." style="ime-mode:active;display: none; position: absolute; top: 0; left: 0; width: 216px;height:50px;border: 5px solid black;">
     <ul class="fontSelectUl" style="display: none; position: absolute; top: 0; left: 0; width: 166px;">
-        <li>Arial</li>
-        <li>Arial Black</li>
-        <li>Comic Sans MS</li>
-        <li>Courier New</li>
-        <li>Georgia</li>
-        <li>Tahoma</li>
+        <li>HY중고딕</li>
+        <li>나눔고딕</li>
+        <li>나눔펜글씨</li>
         <li>Times New Roman</li>
-        <li>Trebuchet MS</li>
         <li>Verdana</li>
     </ul>
 
@@ -213,6 +209,18 @@
         <li>60</li>
         <li>72</li>
     </ul>
+    <span class="input-div" id='fontColorUI' style="display: none; position: absolute; top: 0; left: 0; width: 50px; text-align: center;">
+        <div id="text-selected-color"></div>
+        <div id="text-fill-colors" class='context-popup'>
+            <div class="top">
+                <div id="marker-selected-color-2"></div>
+                <input id="text-fill-style" type="text" value="FF7373">
+            </div>
+            <table id="text-colors-list">
+            </table>
+        </div>
+    </div>
+    </span>
 
     <!-- url-parameters -->
     <script>
