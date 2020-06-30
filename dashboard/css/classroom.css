@@ -225,11 +225,11 @@ hr {
 }
 
 .top_all_controll_on{
-  content: url(/dashboard/img/top_lock_on.png);
+  content: url(/dashboard/newimg/lock.png);
 }
 
 .top_all_controll_off{
-  content: url(/dashboard/img/top_unlock_off.png);
+  content: url(/dashboard/newimg/unlock.png);
 }
 
 #top_load_book{
@@ -237,11 +237,11 @@ hr {
 }
 
 #top_test{
-  content: url(/dashboard/img/top_test_off.png);
+  content: url(/dashboard/newimg/ex.png);
 }
 
 #top_alert{
-  content: url(/dashboard/img/top_alert_off.png);
+  content: url(/dashboard/newimg/alert.png);
 }
 
 #top_share_screen{
@@ -259,7 +259,7 @@ hr {
   content: url(/dashboard/img/top_share_video_off.png);
 }
 #top_record_video{
-  content: url(/dashboard/img/top_record_video_off.png);
+  content: url(/dashboard/newimg/record.png);
 }
 #top_pdf{
   content: url(/dashboard/img/pdf.png);
@@ -338,7 +338,7 @@ hr {
   font-weight: bold;
   text-align: end;
   margin-right: 5px;
-  margin-left: 80px;
+  margin-left: 84px;
 }
 
 .icons{
@@ -556,7 +556,12 @@ hr {
 }
 
 .divide{
-
+  border-left: 1px solid gray;
+  width: 1px;
+  height: 30px;
+  margin-top: 10px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 
