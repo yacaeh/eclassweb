@@ -211,6 +211,7 @@ html > body {
 input,
 button,
 select {
+    color:black;
     font: message-box;
 }
 
@@ -219,19 +220,19 @@ select {
     z-index:            2;
     top:                0px;
     left:               0px;
-    height:             32px;
+    height:             40px;
     width:              100%;
     overflow:           hidden;
 
     -webkit-box-shadow: 0px 1px 3px rgba(50, 50, 50, 0.75);
     -moz-box-shadow:    0px 1px 3px rgba(50, 50, 50, 0.75);
     box-shadow:         0px 1px 3px rgba(50, 50, 50, 0.75);
-
-    background-image:   url(images/texture.png), linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99));
+    background-color:#fff;
+    /* background-image:   url(images/texture.png), linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99));
     background-image:   url(images/texture.png), -webkit-linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99));
     background-image:   url(images/texture.png), -moz-linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99));
     background-image:   url(images/texture.png), -ms-linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99));
-    background-image:   url(images/texture.png), -o-linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99));
+    background-image:   url(images/texture.png), -o-linear-gradient(rgba(69, 69, 69, .95), rgba(82, 82, 82, .99)); */
 }
 
 #titlebar a, #aboutDialog a, #titlebar a:visited, #aboutDialog a:visited {
@@ -257,19 +258,19 @@ select {
     z-index:            2;
     bottom:             0px;
     left:               0px;
-    height:             32px;
+    height:             40px;
     width:              100%;
     overflow:           hidden;
 
-    -webkit-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.75);
+    /* -webkit-box-shadow: 0px -1px 3px rgba(50, 50, 50, 0.75);
     -moz-box-shadow:    0px -1px 3px rgba(50, 50, 50, 0.75);
-    box-shadow:         0px -1px 3px rgba(50, 50, 50, 0.75);
-
-    background-image:   url(images/texture.png), linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95));
+    box-shadow:         0px -1px 3px rgba(50, 50, 50, 0.75); */
+    background-color:#EFF1F0;
+    /* background-image:   url(images/texture.png), linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95));
     background-image:   url(images/texture.png), -webkit-linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95));
     background-image:   url(images/texture.png), -moz-linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95));
     background-image:   url(images/texture.png), -ms-linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95));
-    background-image:   url(images/texture.png), -o-linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95));
+    background-image:   url(images/texture.png), -o-linear-gradient(rgba(82, 82, 82, .99), rgba(69, 69, 69, .95)); */
 }
 
 #toolbar {
@@ -524,7 +525,7 @@ html[dir='rtl'] .dropdownToolbarButton {
     padding:                            2px 6px 2px;
     border:                             1px solid transparent;
     border-radius:                      2px;
-    color:                              hsl(0, 0%, 95%);
+    color:                              black;
     font-size:                          12px;
     line-height:                        14px;
     -webkit-user-select:                none;
@@ -642,7 +643,7 @@ html[dir='rtl'] .splitToolbarButtonSeparator {
     -moz-appearance:    none; /* in the future this might matter, see bugzilla bug #649849 */
     min-width:          140px;
     font-size:          12px;
-    color:              hsl(0, 0%, 95%);
+    color:              black;
     margin:             0;
     padding:            0;
     border:             none;
@@ -667,22 +668,22 @@ html[dir='rtl'] .dropdownToolbarButton {
 
 .toolbarButton.fullscreen::before {
     display: inline-block;
-    content: url(images/toolbarButton-fullscreen.png);
+    content: url(images/fullscreen.png);
 }
 
 .toolbarButton.presentation::before {
     display: inline-block;
-    content: url(images/toolbarButton-presentation.png);
+    content: url(images/presentation.png);
 }
 
 .toolbarButton.download::before {
     display: inline-block;
-    content: url(images/toolbarButton-download.png);
+    content: url(images/download.png);
 }
 
 .toolbarButton.print::before {
     display: inline-block;
-    content: url(images/toolbarButton-print.png);
+    content: url(images/print.png);
 }
 
 .toolbarButton.about {
@@ -699,7 +700,7 @@ html[dir='rtl'] .dropdownToolbarButton {
 
 .toolbarButton.zoomOut::before {
     display: inline-block;
-    content: url(images/toolbarButton-zoomOut.png);
+    content: url(images/zoomOut.png);
 }
 
 .toolbarButton.zoomIn::before {
@@ -709,15 +710,16 @@ html[dir='rtl'] .dropdownToolbarButton {
 
 .toolbarButton.pageUp::before {
     display: inline-block;
-    content: url(images/toolbarButton-pageUp.png);
+    content: url(images/prev.png);
 }
 
 .toolbarButton.pageDown::before {
     display: inline-block;
-    content: url(images/toolbarButton-pageDown.png);
+    content: url(images/next.png);
 }
 
 .toolbarField.pageNumber {
+    color:black;
     min-width:  16px;
     text-align: right;
     width:      40px;
@@ -735,7 +737,7 @@ html[dir='rtl'] .dropdownToolbarButton {
     border-color:                    hsla(0, 0%, 0%, .32) hsla(0, 0%, 0%, .38) hsla(0, 0%, 0%, .42);
     box-shadow:                      0 1px 0 hsla(0, 0%, 0%, .05) inset,
                                      0 1px 0 hsla(0, 0%, 100%, .05);
-    color:                           hsl(0, 0%, 95%);
+    color:                           black;
     font-size:                       12px;
     line-height:                     14px;
     outline-style:                   none;
@@ -766,7 +768,7 @@ html[dir='rtl'] .dropdownToolbarButton {
     margin:              4px 2px 4px 0;
     border:              1px solid transparent;
     border-radius:       2px;
-    color:               hsl(0, 0%, 85%);
+    color:               #707070;
     font-size:           12px;
     line-height:         14px;
     text-align:          left;
@@ -788,7 +790,7 @@ html[dir='rtl'] .dropdownToolbarButton {
 
     text-align:       center;
 
-    background-color: #888;
+    background-color: #EFF1F0;
     background-image: url(images/texture.png);
 }
 

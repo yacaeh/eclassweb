@@ -284,7 +284,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.showNextPage = function () {
-        window.top.showNextPage();
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.showNextPage();
         self.showPage(currentPage + 1);
     };
 
@@ -293,7 +294,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.showPreviousPage = function () {
-        window.top.showPreviousPage();
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.showPreviousPage();
         self.showPage(currentPage - 1);
     };
 
@@ -421,6 +423,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.zoomOut = function () {
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.zoomOut();
         // 10 % decrement
         var newScale = (self.getZoomLevel() / kDefaultScaleDelta).toFixed(2);
         newScale     = Math.max(kMinScale, newScale);
@@ -432,6 +436,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.zoomIn = function () {
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.zoomIn();
         // 10 % increment
         var newScale = (self.getZoomLevel() * kDefaultScaleDelta).toFixed(2);
         newScale     = Math.min(kMaxScale, newScale);
