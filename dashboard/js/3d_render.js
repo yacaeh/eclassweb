@@ -1,16 +1,17 @@
 
 
 
-var canvas = document.getElementById("renderCanvas"); // Get the canvas element
-var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 
 
 
 var newPosition;
 var newRotation;
 /******* Add the create scene function ******/
-var createScene = function () {
-    var scene = new BABYLON.Scene(engine);
+var createScene = function (_canvas) {
+    let canvas = _canvas; // Get the canvas element
+
+    let engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+        var scene = new BABYLON.Scene(engine);
 
     // Add a camera to the scene and attach it to the canvas
     var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0, 0, 0), scene);
@@ -72,7 +73,9 @@ var createScene = function () {
     function SendStateData(_position, _rotation)
     {
         if(params.open == "true")
-        {
+        {            
+            // 공유 데이터에 update
+            updateShared3DData (_position, _rotation);
             connection.send({
                 ModelState : {
                     position : _position,
@@ -88,50 +91,40 @@ var createScene = function () {
     //     scene.createDefaultCameraOrLight(true);
     //     scene.activeCamera.attachControl(canvas, false);
     //     scene.activeCamera.alpha += Math.PI; // camera +180°
-    //     console.log("testssss z z z z z z");
+    //     //console.log("testssss z z z z z z");
     // });
-
-    return scene;
+    //console.log("Create 3D!");
+    // Register a render loop to repeatedly render the scene
+    engine.runRenderLoop(function () {
+        scene.render();
+    });
+    
+    // Watch for browser/canvas resize events
+    window.addEventListener("resize", function () {
+        engine.resize();
+    });
 };
 /******* End of the create scene function ******/
 
-var scene = createScene(); //Call the createScene function
+let frame;
+let _3dcanvas;
+let rtime;
+let timeout = false;
+let delta = 400;
+
+let top_3d_button = $('#top_3d');
+// let is3dViewer = false;
 
 
-
-console.log("Create 3D!");
-// Register a render loop to repeatedly render the scene
-engine.runRenderLoop(function () {
-    scene.render();
-});
-
-// Watch for browser/canvas resize events
-window.addEventListener("resize", function () {
-    engine.resize();
-});
-
-
-
-var _3dcanvas =  $("#renderCanvas");
-var rtime;
-var timeout = false;
-var delta = 400;
-
-var top_3d_render_jthis;
 function _3DCanvasFunc(){
-    top_3d_render_jthis = $("#top_3d");
-    top_3d_render_jthis.click(function(){
-        //_3dcanvas.toggle();
-        var visible = _3dcanvas.is(':visible');
-       
-    
-        if(params.open == "true")
-        {
-            modelEnable(top_3d_render_jthis,!visible,true);
-        }
-    })
+top_3d_render_jthis = $("#top_3d");
+    //console.log("3d cansvasFunc!");
+    //console.log(top_3d_button);
+    top_3d_button.click(function () {   
 
-    
+
+      });
+      
 
     window.addEventListener("resize", function() {
         rtime = new Date();
@@ -151,38 +144,83 @@ function _3DCanvasFunc(){
     }
 }
 
-function modelEnable(jthis,visible, send)
+function modelEnable(send)
 {
-    classroomInfo.share3D = visible;
-    if (visible) {
-        _3dcanvas.show();
-        //_3dcanvas.style.display = 'inline-block';
-        CanvasResize();
-        jthis.addClass('top_3d_on');
-        jthis.removeClass('top_3d_off')
-    }
-    else {
-        _3dcanvas.hide();
-        jthis.addClass('top_3d_off');
-        jthis.removeClass('top_3d_on')
-    }
+    frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    //console.log(classroomInfo);
+    classroomInfo.share3D.state = true;
+    // create 3d canvas on model enanbled      
+    let _3d_canvas = document.createElement('canvas');
+    _3d_canvas.setAttribute('id', 'renderCanvas');
+    _3d_canvas.style.cssText = 'position:absolute';
+    
+    frame.document
+    .getElementsByClassName('design-surface')[0]
+    .appendChild(_3d_canvas);
+    frame.document.getElementById("main-canvas").style.zIndex = "1";
+    frame.document.getElementById("temp-canvas").style.zIndex = "2";
+    frame.document.getElementById("tool-box").style.zIndex = "3";
+    _3d_canvas = frame.document.getElementById("renderCanvas"); 
+    _3dcanvas = _3d_canvas;
+    createScene(_3d_canvas); //Call the createScene function
+    //_3dcanvas.style.display = 'inline-block';
+    CanvasResize();
+    top_3d_button.addClass('top_3d_on');
+    top_3d_button.removeClass('top_3d_off')
     if (send == true) {
         connection.send({
-            modelEnable: { enable: visible }
+            modelEnable: { enable: true }
         });
     }
 }
 
+function remove3DCanvas(){
+    //console.log("remove 3d!");
+    frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    
+    frame.document.getElementById("renderCanvas").remove();
+    top_3d_button.addClass('top_3d_off');
+    top_3d_button.removeClass('top_3d_on')    
+    classroomInfo.share3D.state = false;
+}
+
 function CanvasResize() {
-    var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
-    var canvas = frame.document.getElementById("main-canvas")
+    //console.log(_3dcanvas);
+    _3dcanvas = frame.document.getElementById("renderCanvas")
+    
+    var canvas = frame.document.getElementById("main-canvas");
     var r = document.getElementsByClassName("lwindow")[0];
     var rwidth = $(r).width();
-    _3dcanvas.attr("width", canvas.width - rwidth - 50);
-    _3dcanvas.attr("height", canvas.height - 60);
+    
+    _3dcanvas.width = canvas.width - rwidth - 50;
+    _3dcanvas.height = canvas.height - 60;
 }
 
 function set3DModelStateData(_newPosition, _newRotation) {
     newPosition = _newPosition;
     newRotation = _newRotation;
+}
+
+
+/*
+    data를 갱신
+*/
+function updateShared3DData (_pos, _rot) {
+    // data를 추가할 때, json으로 추가하면 된다.
+    classroomInfo.share3D.data = {
+        newPosition : _pos,
+        newRotation : _rot
+    }
+}
+/*
+    선생님의 화면과 동기화 시킨다
+*/
+function sync3DModel () {    
+    var data = classroomInfo.share3D.data;    
+    set3DModelStateData (data.newPosition, data.newRotation);
+    modelEnable (false);
 }

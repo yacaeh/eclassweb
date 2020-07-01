@@ -4,214 +4,209 @@
 <html lang="en" dir="ltr">
 
 <head>
-    <link rel="stylesheet" href="/dashboard/css/classroom.css">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title id="class-title">E클래스 000 반 00 수업</title>
-    <meta name="description"
-        content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
+  <link rel="stylesheet" href="/dashboard/css/classroom.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title id="class-title">E클래스 000 반 00 수업</title>
+  <meta name="description"
+    content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
 
-    <link rel="shortcut icon" href="/dashboard/logo.png">
+  <link rel="shortcut icon" href="/dashboard/logo.png">
 
-    <script src="/dashboard/js/jquery.min.js"></script>
-    <script src="/dashboard/js/jquery-ui.min.js"></script>
-    <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
-    <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
-    <script src="/dist/RTCMultiConnection.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/node_modules/fbr/FileBufferReader.js"></script>
-    <script src="/dashboard/js/xlsx.full.min.js"></script>
-    <script src="/dashboard/js/FileSaver.min.js"></script>
+  <script src="/dashboard/js/jquery.min.js"></script>
+  <script src="/dashboard/js/jquery-ui.min.js"></script>
+  <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
+  <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
+  <script src="/dist/RTCMultiConnection.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/node_modules/fbr/FileBufferReader.js"></script>
+  <script src="/dashboard/js/xlsx.full.min.js"></script>
+  <script src="/dashboard/js/FileSaver.min.js"></script>
 
-    <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
-    <script src="/node_modules/canvas-designer/canvas-designer-widget.js"></script>
-    <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
-    <script src="/dashboard/js/emojionearea.min.js"></script>
-    <script src="/dashboard/js/examObj.js"></script>
-    <script src="/dashboard/js/classroomInfo.js"></script>
-    <script src="/dashboard/js/all_controll.js"></script>
-    <script defer src="/dashboard/js/classroom.js"></script>
+  <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
+  <script src="/dashboard/canvas/canvas-designer-widget.js"></script>
+  <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
+  <script src="/dashboard/js/emojionearea.min.js"></script>
+  <script src="/dashboard/js/examObj.js"></script>
+  <script src="/dashboard/js/classroomInfo.js"></script>
+  <script src="/dashboard/js/all_controll.js"></script>
+  <script src="/dashboard/js/canvas.js"></script>
+  <script src="/dashboard/js/movie_render.js"></script>
+  <script defer src="/dashboard/js/classroom.js"></script>
 </head>
 
 <body>
 
-  <div id="urlform">
-    <input id="urlinput" type="text" placeholder="URL 입력">
+  <div id="urlform" style="display: none;">
+    <input id="urlinput" onkeyup="_Movie_Render_key_event();" type="text" placeholder="URL 입력">
   </div>
 
-    <header id="header">
-        <img id="icon_exit">
-        <img id="top_logo">
+  <header id="header">
+    <img id="icon_exit">
+    <img id="top_logo">
 
-        <span id="my-name"></span>
-        <span id="session-id"></span>
+    <span id="my-name"></span>
+    <span id="session-id"></span>
 
-        <div class="icons">
-            <img class="top_icon" id="top_attach-file">
-            <img class="top_icon top_all_controll_off" id="top_all_controll">
-            <img class="top_icon" id="top_load_book">
-            <img class="top_icon" id="top_test" >
-            <img class="top_icon" id="top_alert">
-            <img class="top_icon" id="top_share_screen"> 
-            <img class="top_icon top_3d_off" id="top_3d">
-            <img class="top_icon" id="top_pdf">
-            <img class="top_icon" id="top_share_video">
-            <img class="top_icon" id="top_record_video">
+    <div class="icons">
+      <img class="top_icon top_all_controll_off" id="top_all_controll">
+      <img class="top_icon" id="top_test">
+      <img class="top_icon" id="top_alert">
+      <img class="top_icon" id="top_attach-file">
 
-            <!-- <span class="top_icon divide"></span> -->
-
-
-            <!-- -------------------------------------------------- -->
-            <img class="top_icon view_type-on view_type" id="top_student">
-            <img class="top_icon view_type" id="top_camera">
-            <!-- -------------------------------------------------- -->
+      <img class="divide">
+      <!-- -------------------------------------------------- -->
+      <img class="top_icon view_type-on view_type" id="top_student">
+      <img class="top_icon view_type" id="top_camera">
+      <img class="top_icon" id="top_record_video">
+      <!-- -------------------------------------------------- -->
 
 
 
-            <span class="time">
-                <span id="current-day"></span></br>
-                <span id="current-time"></span>
-            </span>
-        </div>
-
-    </header>
-
-    <article id="article">
-        <div id="widget-container"></div>
-        <canvas id="renderCanvas" style="display: none;"></canvas>
-
-        <video id="screen-viewer" controls playsinline autoplay></video>
-        <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
-            <div class="stuname">이름</div>
-            <div class="status" >접속중</div>
-            <div class="line" ></div>
-            <div class="permission">권한주기 <span id="perbtn" class="perbtn off"><span class="circle"></span> </span> </div>
-            <div class="line" ></div>
-            <div class="out">내보내기</div>
-        </div>
-        
-        <div class="lwindow">
-
-
-            <div class="for_teacher" style="display: none;">
-                <span class="nos">
-                    <span id="nos"></span>
-                    <img src="/dashboard/newimg/student.png">
-                </span>
-
-                <div id="student_list">
-
-
-                </div>
-            </div>
-            <!-- View Student  -->
-            <!-- View Cam -->
-            <video style="display: none;"  id="main-video" controls playsinline autoplay></video>
-
-            <div id="exam-board">
-              <div id="exam-teacher-menu" style="display: none;">
-                <!-- 시험 만들기 -->
-                <div id="exam-setting-bar">
-                  <div class="exam-border-bottom" style="background-color: white; text-align: center; border-bottom:gray solid 1px;">문제출제</div>
-                  <div style="display: flex; background-color: #eff1f0; border-bottom:gray solid 1px;">
-                    <label style="flex: 1.5; text-align: center; margin-top: 12px;" for="exam-question-count">문항수</label>
-                    <input style="flex: 1.2; padding: 0px; margin: 5px 2px 5px 5px; text-align: center; "
-                      id="exam-question-count" class="form-control" type="number">
-                    <label style="flex: 2; text-align: right; margin-top: 12px; margin-right: 10px;"
-                      for="exam-time">시간</label>
-                    <input style="flex: 1.2; padding: 0px; margin: 5px;  text-align: center; " id="exam-time"
-                      class="form-control" type="text" placeholder="(분)">
-                    <button style="flex: 1.5; padding: 0px; margin: 8px 20px 8px 50px;" id="exam-setting-apply"
-                      class="btn btn-exam"><b>적용</b></button>
-                  </div>
-      
-                  <div id="exam-qustion-list" class="exam-border-bottom exam-overflow">
-                  </div>
-                  <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
-                  <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
-                </div>
-                <!-- 정답률 표시 -->
-                <div id="exam-state" style="display: none;">
-                </div>
-              </div>
-              <div id="exam-omr" style="display: none;">
-              </div>
-            </div>
-
-
-
-            <div id="notice">
-
-            </div>
-
-            <!-- Conversation Panel -->
-            <div class="conversation-panel">
-                <div id="conversation-panel"></div>
-                <div id="key-press">
-                    <span id="key-press-span"></span>
-                    <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
-                </div>
-                <textarea id="txt-chat-message"></textarea>
-            </div>
-
-            <canvas id="temp-stream-canvas"></canvas>
-            </div>
-    </article>
-
-    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
-    <!--pdf controller-->
-    <div id="canvas-controller">
-      <div class="upper_controller">
-        <label> File Name </label>
-        <button id="close-pdf"> V </button>
-      </div>
-      <div class="thumbnail_list">
-        <div class="thumbnail">
-          <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
-        </div>
-        <div class="thumbnail">
-          <img class="thum_img_selected" src="/dashboard/newimg/thumb.jpg">
-        </div>
-        <div class="thumbnail">
-          <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
-        </div>
-        <div class="thumbnail">
-          <img class="thum_img"   src="/dashboard/newimg/thumb.jpg">
-        </div>
-        
-      </div>
-      <div class="bottom_controller">
-        <button id="viewer_start"> << </button>
-        <button id="prev"> < </button>
-        <button id="next"> > </button>
-        <button id="viewer_end"> >> </button>
-      </div>
+      <span class="time">
+        <span id="current-day"></span></br>
+        <span id="current-time"></span>
+      </span>
     </div>
 
-    <script src="/dashboard/js/babylon.js"></script>
-    <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
-    <script src="/dashboard/js/pep.js"></script>
+  </header>
 
-    <script src = /dashboard/js/3d_render.js></script>
+  <article id="article">
+    <div id="widget-container"></div>
+    <div id="edunetContent" style="left: 3%; width: 77%; height: 95%; position: absolute; display: none;"></div>
+    <video id="screen-viewer" controls playsinline autoplay></video>
+    <div id="student-menu" style="display: none;" class="student-menu shadow-5">
+      <div class="stuname">이름</div>
+      <div class="status">접속중</div>
+      <div class="line"></div>
+      <div class="permission">권한주기 <span id="perbtn" class="perbtn off"><span class="circle"></span> </span> </div>
+      <div class="line"></div>
+      <div class="out">내보내기</div>
+    </div>
 
-    <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="alert-title">Alert</h5>
-            </div>
-            <div class="modal-body">
-              <div id="alert-message" style="text-align: center; margin-top: 10px; margin-bottom: 10px;"></div>
-            </div>
-    
-            <div class="modal-footer">
-                <button style="margin-right: 10%; width: 45%;" class="btn btn-info btn-alert-yes">Yes</button>
-              <button style="width: 45%;" class="btn btn-danger btn-alert-no">No</button>
-            </div>
-          </div>
+    <div class="lwindow">
+
+
+      <div class="for_teacher" style="display: none;">
+        <span class="nos">
+          <span id="nos"></span>
+          <img src="/dashboard/newimg/student.png">
+        </span>
+
+        <div id="student_list">
+
+
         </div>
       </div>
-    
+      <!-- View Student  -->
+      <!-- View Cam -->
+      <video style="display: none;" id="main-video" controls playsinline autoplay></video>
+
+      <div id="exam-board">
+        <div id="exam-teacher-menu" style="display: none;">
+          <!-- 시험 만들기 -->
+          <div id="exam-setting-bar">
+            <div class="exam-border-bottom"
+              style="background-color: white; text-align: center; border-bottom:gray solid 1px;">문제출제</div>
+            <div style="display: flex; background-color: #eff1f0; border-bottom:gray solid 1px;">
+              <label style="flex: 1.5; text-align: center; margin-top: 12px;" for="exam-question-count">문항수</label>
+              <input style="flex: 1.2; padding: 0px; margin: 5px 2px 5px 5px; text-align: center; "
+                id="exam-question-count" class="form-control" type="number">
+              <label style="flex: 2; text-align: right; margin-top: 12px; margin-right: 10px;"
+                for="exam-time">시간</label>
+              <input style="flex: 1.2; padding: 0px; margin: 5px;  text-align: center; " id="exam-time"
+                class="form-control" type="text" placeholder="(분)">
+              <button style="flex: 1.5; padding: 0px; margin: 8px 20px 8px 50px;" id="exam-setting-apply"
+                class="btn btn-exam"><b>설정</b></button>
+            </div>
+
+            <div id="exam-qustion-list" class="exam-border-bottom exam-overflow">
+            </div>
+            <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
+            <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
+          </div>
+          <!-- 정답률 표시 -->
+          <div id="exam-state" style="display: none;">
+          </div>
+        </div>
+        <div id="exam-omr" style="display: none;">
+        </div>
+      </div>
+
+
+
+      <div id="notice">
+
+      </div>
+
+      <!-- Conversation Panel -->
+      <div class="conversation-panel">
+        <div id="conversation-panel"></div>
+        <div id="key-press">
+          <span id="key-press-span"></span>
+          <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
+        </div>
+        <textarea id="txt-chat-message"></textarea>
+      </div>
+
+      <canvas id="temp-stream-canvas"></canvas>
+    </div>
+  </article>
+
+  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <!--pdf controller-->
+  <div id="canvas-controller">
+    <div class="upper_controller">
+      <label> File Name </label>
+      <button id="close-pdf"> V </button>
+    </div>
+    <div class="thumbnail_list">
+      <div class="thumbnail">
+        <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+      </div>
+      <div class="thumbnail">
+        <img class="thum_img_selected" src="/dashboard/newimg/thumb.jpg">
+      </div>
+      <div class="thumbnail">
+        <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+      </div>
+      <div class="thumbnail">
+        <img class="thum_img" src="/dashboard/newimg/thumb.jpg">
+      </div>
+
+    </div>
+    <div class="bottom_controller">
+      <button id="viewer_start">
+        << </button>
+          <button id="prev">
+            < </button>
+              <button id="next"> > </button>
+              <button id="viewer_end"> >> </button>
+    </div>
+  </div>
+
+  <script src="/dashboard/js/babylon.js"></script>
+  <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
+  <script src="/dashboard/js/pep.js"></script>
+
+  <script src=/dashboard/js/3d_render.js></script>
+
+  <!--alert-->
+  <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
+    <div id="alert-dialog">
+      <div id="alert-header"><span id="alert-title">알림</span></div>
+      <div id="alert-body">
+        <div id="alert-content">
+          
+        </div>
+        <div id="alert-btns">
+          <button class="btn btn-alert-yes" style="padding-top: 0;">예</button>
+          <button class="btn btn-alert-no" style="padding-top: 0;">아니요</button>
+        </div>
+      </div>
+      <div id="alert-footer"></div>
+    </div>
+  </div>
 </body>
 
 

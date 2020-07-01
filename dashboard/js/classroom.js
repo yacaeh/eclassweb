@@ -12,7 +12,6 @@
   window.params = params;
 })();
 var connection = new RTCMultiConnection();
-console.log(connection);
 console.log('Connection!');
 
 // function printHarryPotter(){ console.log("Harry Potter!"); }
@@ -37,54 +36,90 @@ connection.autoCloseEntireSession = false;
 connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
-console.log(connection);
 
-// here goes canvas designer
-var designer = new CanvasDesigner();
+SetCanvasBtn('screen_share', ScreenShare);
+SetCanvasBtn('3d_view', _3DCanvasOnOff);
+SetCanvasBtn('movie', Movie_Render_Button);
+SetCanvasBtn('file', LoadFile);
 
-// you can place widget.html anywhere
-designer.widgetHtmlURL = './canvas/widget.html';
-designer.widgetJsURL = './widget.js';
+function _3DCanvasOnOff(btn){
+    var visible = $(btn).hasClass('on');
+    console.log(visible);
 
-// setInterval(designer.clearCanvas, 1000)
+    if(params.open == "true")
+    {  
+      const isViewer = classroomInfo.share3D.state;
+      if(false == isViewer)
+      {
+          modelEnable(send=true);
+      }
+      else
+      {
+          remove3DCanvas();                
+          connection.send({
+              modelDisable : true
+          });
+      }          
+  }
+}
 
-designer.icons.pencil = '/dashboard/newimg/pen.png';
-designer.icons.marker = '/dashboard/newimg/pen2.png';
-designer.icons.eraser = '/dashboard/newimg/eraser.png';
-designer.icons.clearCanvas = '/dashboard/newimg/trash.png';
-designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
-designer.icons.on = '/dashboard/img/view_on.png';
-designer.icons.off = '/dashboard/img/view_off.png';
+var lastStream ;
 
-console.log(designer.icons);
+function ScreenShare(btn){
+  var on = $(btn).hasClass("on")
 
-designer.addSyncListener(function (data) {
-  connection.send(data);
-});
+  if (!window.tempStream) {
+    alert('Screen sharing is not enabled.');
+    return;
+  }
 
-designer.setTools({
-  pencil: true,
-  text: true,
-  image: true,
-  pdf: false,
-  eraser: true,
-  line: true,
-  arrow: false,
-  dragSingle: false,
-  dragMultiple: false,
-  arc: false,
-  rectangle: false,
-  quadratic: false,
-  bezier: false,
-  marker: true,
-  zoom: false,
-  lineWidth: false,
-  colorsPicker: false,
-  clearCanvas: true,
-  onoff: true,
-  code: false,
-  undo: true,
-});
+  if(!on){
+    lastStream.getTracks().forEach(track => track.stop());
+    connection.send({
+      hideMainVideo: true,
+    });
+    return false;
+  }
+
+    screen_constraints = {
+      screen: true,
+      oneway: true,
+    };
+  
+    if (navigator.mediaDevices.getDisplayMedia) {
+      navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
+        (stream) => {
+          lastStream = stream;
+          replaceScreenTrack(stream, btn);
+          CanvasResize();
+        },
+        (error) => {
+          alert('Please make sure to use Edge 17 or higher.');
+          $(btn).removeClass("on");
+          $(btn).removeClass("selected-shape");
+        }
+      );
+    } else if (navigator.getDisplayMedia) {
+      navigator.getDisplayMedia(screen_constraints).then(
+        (stream) => {
+          replaceScreenTrack(stream, btn);
+        },
+        (error) => {
+          $(btn).removeClass("on");
+          $(btn).removeClass("selected-shape");
+          alert('Please make sure to use Edge 17 or higher.');
+        }
+      );
+    } else {
+      alert('getDisplayMedia API is not available in this browser.');
+    }
+
+
+
+
+}
+
+
 
 // here goes RTCMultiConnection
 
@@ -130,12 +165,10 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-  document.getElementById('top_attach-file').style.display = 'inline-block';
-  document.getElementById('top_share_screen').style.display = 'inline-block';
 
-  // 접속시 방정보 동기화.
-  if (connection.extra.roomOwner)
-    classroomCommand.sendsyncRoomInfo();
+    // 접속시 방정보 동기화.
+    if(connection.extra.roomOwner)
+        classroomCommand.sendsyncRoomInfo (event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -147,7 +180,8 @@ connection.onclose = connection.onerror = connection.onleave = function (
 
 connection.onmessage = function (event) {
   if (event.data.showMainVideo) {
-    // $('#main-video').show();
+      classroomInfo.shareScreen = true;
+          // $('#main-video').show();
     $('#screen-viewer').css({
       top: $('#widget-container').offset().top,
       left: $('#widget-container').offset().left,
@@ -161,9 +195,14 @@ connection.onmessage = function (event) {
   if (event.data.hideMainVideo) {
     // $('#main-video').hide();
     $('#screen-viewer').hide();
+    classroomInfo.shareScreen = false;    
     return;
   }
 
+    if(event.data.roomSync) {
+        classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
+        return;
+    };
 
   if (event.data.typing === false) {
     $('#key-press').hide().find('span').html('');
@@ -189,19 +228,16 @@ connection.onmessage = function (event) {
   }
 
 
-  if (null != event.data.allControl) {
-    if (/*!checkRoomOwner()*/true) {
-      classroomInfo.allControl = event.data.allControl;
+  if (null != event.data.allControl) { 
+    classroomInfo.allControl = event.data.allControl;
+    if (event.data.allControl) {
+      // 제어 하기    
+      allControllEnable(top_all_controll_jthis, true, false);
+    }
+    else {
+      // 제어 풀기
+      allControllEnable(top_all_controll_jthis, false, false);
 
-      if (event.data.allControl) {
-        // 제어 하기    
-        allControllEnable(top_all_controll_jthis, true, false);
-      }
-      else {
-        // 제어 풀기
-        allControllEnable(top_all_controll_jthis, false, false);
-
-      }
     }
     return;
   }
@@ -224,20 +260,25 @@ connection.onmessage = function (event) {
 
 
   if (event.data.roomSync) {
-    console.log('event.data.roomSync');;
     classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
     return;
   };
 
+  if(event.data.pdf) {    
+    classroomCommand.receivePdfMessage (event.data.pdf);
+    return;
+  }  
+
   //3d 모델링 Enable
   if (event.data.modelEnable) {
-    console.log(event.data.modelEnable);
-
-
     var enable = event.data.modelEnable.enable;
-    modelEnable(top_3d_render_jthis, enable, false);
+    modelEnable(false);
     return;
+  }
 
+  if (event.data.modelDisable) {
+    remove3DCanvas ();
+    return;
   }
 
   if (event.data === 'plz-sync-points') {
@@ -248,12 +289,25 @@ connection.onmessage = function (event) {
 
   //3d 모델링 상대값
   if (event.data.ModelState) {
-    console.log(event.data.ModelState);
-
+    //console.log(event.data.ModelState);
     set3DModelStateData(
       event.data.ModelState.position,
       event.data.ModelState.rotation
     );
+    return;
+  }
+
+  //동영상 공유
+  if (event.data.MoiveURL) {
+    console.log(event.data.MoiveURL);
+
+    var moveURL = event.data.MoiveURL;
+    if(moveURL.type == "YOUTUBE")
+      embedYoutubeContent(moveURL.enable, moveURL.url, false);
+    else if(moveURL.type == "VIDEO")
+      VideoEdunetContent(moveURL.enable, moveURL.url, false);
+    else
+      iframeEdunetContent(moveURL.enable, moveURL.url, false)
     return;
   }
 
@@ -263,9 +317,10 @@ connection.onmessage = function (event) {
 // extra code
 connection.onstream = function (event) {
   console.log('onstream!');
-  if (event.stream.isScreen && !event.stream.canvasStream) {
+  if (event.stream.isScreen && !event.stream.canvasStream) {      
     $('#screen-viewer').get(0).srcObject = event.stream;
-    $('#screen-viewer').hide();
+    if(!classroomInfo.shareScreen)
+      $('#screen-viewer').hide();
   } else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
     video.setAttribute('data-streamid', event.streamid);
@@ -275,6 +330,7 @@ connection.onstream = function (event) {
       video.volume = 0;
     }
     video.srcObject = event.stream;
+    console.log(evnet.stream);
     // $('#main-video').show();
   } else {
     // 타 사용자 캠 표시 막기
@@ -329,11 +385,12 @@ function appendChatMessage(event, checkmark_id) {
 
     try {
         if(event.extra.roomOwner){
+          console.log("ASdasd");
+          
             var notice = document.getElementById("notice");
+            div.innerHTML = "<b>" + ConvertChatMsg(event.data.chatMessage) + "</b>";
 
-            var div2 = document.createElement('div');
-            div2.innerHTML = "<b>" + event.data.chatMessage + "</b>";
-            notice.appendChild(div2);
+            $(notice).append("<div> 선생님 : " + ConvertChatMsg(event.data.chatMessage) + "</div>");
             notice.scrollTop = notice.clientHeight;
             notice.scrollTop = notice.scrollHeight - notice.scrollTop;
 
@@ -344,8 +401,7 @@ function appendChatMessage(event, checkmark_id) {
     }
 
     if (event.data) {
-        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + event.data.chatMessage;
-
+        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
         if (event.data.checkmark_id) {
             connection.send({
                 checkmark: 'received',
@@ -353,8 +409,8 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-        div.innerHTML = '<b> 나 : </b>' + event;
-        div.style.background = '#cbffcb';
+      div.innerHTML = '<b> 나 : </b>' + ConvertChatMsg(event);
+      div.style.background = '#cbffcb';
     }
 
   conversationPanel.appendChild(div);
@@ -362,6 +418,23 @@ function appendChatMessage(event, checkmark_id) {
   conversationPanel.scrollTop = conversationPanel.clientHeight;
   conversationPanel.scrollTop =
     conversationPanel.scrollHeight - conversationPanel.scrollTop;
+}
+
+function ConvertChatMsg(_msg){
+  var div = document.createElement("span");
+  div.innerHTML = _msg;
+
+  var msg = $(div);
+  var a = msg.find("a")
+
+  if(a.length != 0){
+    console.log(div);
+    a.attr("target", "_blank");
+    return div.innerHTML;
+  }
+  else{
+    return _msg;
+  }
 }
 
 var keyPressTimer;
@@ -559,9 +632,10 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.attachStreams.push(tempStream);
     window.tempStream = tempStream;
 
-    SetTeacher();
+    SetTeacher(); 
+    classroomCommand.openRoom ();   
 
-    connection.extra.roomOwner = true;
+    connection.extra.roomOwner = true;    
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
         if (error === connection.errors.ROOM_NOT_AVAILABLE) {
@@ -690,7 +764,9 @@ function addStreamStopListener(stream, callback) {
   });
 }
 
+
 function replaceTrack(videoTrack, screenTrackId) {
+
   if (!videoTrack) return;
   if (videoTrack.readyState === 'ended') {
     alert(
@@ -700,50 +776,97 @@ function replaceTrack(videoTrack, screenTrackId) {
     return;
   }
   connection.getAllParticipants().forEach(function (pid) {
-    var peer = connection.peers[pid].peer;
-    if (!peer.getSenders) return;
-    var trackToReplace = videoTrack;
-    peer.getSenders().forEach(function (sender) {
-      if (!sender || !sender.track) return;
-      if (screenTrackId) {
-        if (trackToReplace && sender.track.id === screenTrackId) {
-          sender.replaceTrack(trackToReplace);
-          trackToReplace = null;
-        }
-        return;
-      }
-
-      if (sender.track.id !== tempStream.getTracks()[0].id) return;
-      if (sender.track.kind === 'video' && trackToReplace) {
+    replaceTrackToPeer (pid, videoTrack, screenTrackId);   
+  });
+}
+/*
+    Peer당 replaceTrack
+*/
+function replaceTrackToPeer (pid, videoTrack, screenTrackId) {
+  if(!connection.peers[pid])
+  {
+    console.error('connection peer error');
+    return;
+  }
+  var peer = connection.peers[pid].peer;
+  if (!peer.getSenders) return;
+  var trackToReplace = videoTrack;
+  peer.getSenders().forEach(function (sender) {            
+    if (!sender || !sender.track) return;
+    if (screenTrackId) {
+      if (trackToReplace && sender.track.id === screenTrackId) {
         sender.replaceTrack(trackToReplace);
         trackToReplace = null;
       }
-    });
+      return;
+    }
+
+    if (sender.track.id !== tempStream.getTracks()[0].id) return;
+    if (sender.track.kind === 'video' && trackToReplace) {
+      sender.replaceTrack(trackToReplace);
+      trackToReplace = null;
+    }
   });
 }
 
-function replaceScreenTrack(stream) {
+
+/*
+   특정 유저에게 스크린공유를 걸어준다.
+*/
+function currentScreenViewShare (_pid) {
+  let stream = window.shareStream;
+  if(!stream) {
+      console.error('stream not found');
+      return;
+  }
+
+  //  선생님만 할 수 있게..
+  if(!connection.extra.roomOwner)
+    return;
+
+    // var remoteUserId = _pid;
+    // var videoTrack = stream.getVideoTracks()[0];
+    // connection.replaceTrack(videoTrack, remoteUserId);    
+    const pid = _pid;
+    stream.getTracks().forEach(function (track) {
+        if (track.kind === 'video' && track.readyState === 'live') {
+            replaceTrackToPeer (pid, track);
+        }
+    });
+
+    connection.send({
+      showMainVideo: true,
+    });
+  }
+
+function replaceScreenTrack(stream, btn) {
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
 
-  // connection.attachStreams.push(stream);
   connection.onstream({
     stream: stream,
     type: 'local',
     streamid: stream.id,
-    // mediaElement: video
   });
 
+  // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
+  window.shareStream = stream;  
+  classroomInfo.shareScreen = true;
+
   var screenTrackId = stream.getTracks()[0].id;
-  addStreamStopListener(stream, function () {
+
+
+  addStreamStopListener(stream, function () {    
     connection.send({
       hideMainVideo: true,
     });
-
+    $(btn).removeClass("on");
+    $(btn).removeClass("selected-shape");
     // $('#main-video').hide();
-    $('#screen-viewer').hide();
-    $('#top_share_screen').show();
+    classroomInfo.shareScreen = false;
+    window.sharedStream = null;
+    hideScreenViewerUI();
     replaceTrack(tempStream.getTracks()[0], screenTrackId);
   });
 
@@ -757,7 +880,13 @@ function replaceScreenTrack(stream) {
     showMainVideo: true,
   });
 
+  showScreenViewerUI ();
   // $('#main-video').show();
+}
+
+
+
+function showScreenViewerUI () {
   $('#screen-viewer').css({
     top: $('#widget-container').offset().top,
     left: $('#widget-container').offset().left,
@@ -766,6 +895,14 @@ function replaceScreenTrack(stream) {
   });
   $('#screen-viewer').show();
 }
+
+
+function hideScreenViewerUI () {
+  $('#screen-viewer').hide();
+  $('#top_share_screen').show();
+}
+
+
 
 $('#top_share_screen').click(function () {
   if (!window.tempStream) {
@@ -801,12 +938,18 @@ $('#top_share_screen').click(function () {
   }
 });
 
-function ClassTime() {
-  var now = 0;
+let classTimeIntervalHandle;
+
+function updateClassTime () {
+  var now =  new Date().getTime() - classroomInfo.roomOpenTime;
+  now = parseInt(now / 1000);
+  
+  if(!classTimeIntervalHandle)  
+    classTimeIntervalHandle = setInterval(Sec, 1000);
+
   function Sec() {
     now++;
     var time = now;
-
     var hour = Math.floor(time / 3600);
     time %= 3600;
 
@@ -819,12 +962,7 @@ function ClassTime() {
 
     $('#current-day').text(hour + ':' + min + ':' + time);
   }
-  setInterval(Sec, 1000);
 }
-
-ClassTime();
-
-
 
 
 function SetTeacher(){
@@ -924,26 +1062,31 @@ $('#exam-add-question').click(function () {
   $('#exam-question-count').val(m_QuesCount);
 });
 
-// 시험 시작, 종료
+// 시험 시작, 종료 버튼 이벤트
 $('#exam-start').click(function () {
-  if (!examObj.checkAnswerChecked()) {
-    //  TODO : 모든 문제에 대한 답 작성 하라는 알림
-    console.log('빠진 답');
+
+  if(m_QuesCount <= 0 ) {
+    alert('답안지를 먼저 작성해야 합니다');        
+    return;    
+  }
+  //const questionCount = $('#exam-question-count').val();  
+  if (!examObj.checkAnswerChecked(m_QuesCount)) {
+    alert('문제애 대한 모든 답을 선택해야 합니다');    
     return;
   }
 
-  if (isNaN($('#exam-time').val())) {
-    // TODO : 시간 설정하라고 알림
-    $('#exam-start').click();
+  const examTime = $('#exam-time').val();
+  if(examTime <= 0 || isNaN(examTime)) {
+    alert('시간 설정이 잘못 되었습니다.');    
     return;
-  } else {
-    m_ExamTime = parseInt($('#exam-time').val() * 60);
-  }
+  };
+
+  m_ExamTime = parseInt($('#exam-time').val() * 60);  
 
   var answerList = getQuestionAnswerList();
 
   examObj.examAnswer = answerList;
-  examObj.sendExamStart(parseInt(m_ExamTime / 60));
+  examObj.sendExamStart(m_QuesCount, parseInt(m_ExamTime / 60));
 
   $('#exam-setting-bar').hide();
   showExamStateForm();
@@ -951,6 +1094,7 @@ $('#exam-start').click(function () {
   $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
   m_ExamTimerInterval = setInterval(function () {
     m_ExamTime--;
+    examObj.updateExameTimer (m_ExamTime);
     $('#exam-teacher-timer').html(parseInt(m_ExamTime / 60) + ":" + m_ExamTime % 60);
     if (m_ExamTime <= 0)
       $('#exam-start').click();
@@ -962,7 +1106,6 @@ function finishExam() {
   $('#exam-time').val(parseInt(m_ExamTime / 60))
   $('#exam-setting-bar').show();
   $('#exam-state').html("");
-  console.log(123);
   examObj.sendExamEnd();
 }
 
@@ -1097,6 +1240,7 @@ function setStudentOMR(quesCount, examTime) {
 function submitOMR() {
   if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
     // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
+    alert('아직 답안지 작성이 완료 안되었습니다');
     return;
   }
 
@@ -1118,6 +1262,7 @@ function stopQuestionOMR () {
 
 // 학생 정답 표시
 function markStudent(num, check, answer) {
+  console.log(check);
   if (check === answer) {
     $(`#exam-question-${num}`).css('background-color', 'lightgreen');
   }
@@ -1153,25 +1298,30 @@ $(window).on('beforeunload', function () {
 // 소켓통신으로 제어 필요
 
 let isFileViewer = false;
-$('#top_pdf').click(function () {
-  console.log(isFileViewer);
+
+function LoadFile(){
+  if(!connection.extra.roomOwner) return;
+  
   if (isFileViewer === false) {
     loadFileViewer();
     $('#canvas-controller').show();
     isFileViewer = true;
+    classroomCommand.sendOpenPdf ();
   } else {
     unloadFileViewer();
     $('#canvas-controller').hide();
     isFileViewer = false;
+    classroomCommand.sendClosePdf ();
   }
-});
+}
 
 function unloadFileViewer() {
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
-  frame.document.getElementById("main-canvas").style.zIndex = "1";
-  frame.document.getElementById("temp-canvas").style.zIndex = "1";
+    frame.document.getElementById("main-canvas").style.zIndex = "1";
+    frame.document.getElementById("temp-canvas").style.zIndex = "2";
+    frame.document.getElementById("tool-box").style.zIndex = "3";
 
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
@@ -1183,12 +1333,12 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://localhost:9001/ViewerJS/#../dashboard/files/test.pdf'
+    'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
-    'border: 1px solid black;height:1024px;direction: ltr;margin-left:0%;width:60%;';
+    'border: 1px solid black;height:1024px;direction: ltr;margin-left:5%;width:60%;';
   fileViewer.setAttribute('allowFullScreen', '');
   let frame = document
     .getElementById('widget-container')
@@ -1203,135 +1353,9 @@ function loadFileViewer() {
   frame.document.getElementById("tool-box").style.zIndex = "3";
 }
 
-function loadPDF() {
-  var oriPdfCanvas = document.createElement('canvas');
-  oriPdfCanvas.setAttribute('id', 'the-canvas');
-  oriPdfCanvas.style.cssText =
-    'border: 1px solid black;min-height:900px;max-height:900px;direction: ltr;margin-left:20%;width: 40%;';
-  var frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-
-  frame.document
-    .getElementsByClassName('design-surface')[0]
-    .appendChild(oriPdfCanvas);
-  const pdfCanvas = frame.document.getElementById('the-canvas');
-  // If absolute URL from the remote server is provided, configure the CORS
-  // header on that server.
-  var url = 'test2.pdf';
-
-  // Loaded via <script> tag, create shortcut to access PDF.js exports.
-  var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-  // The workerSrc property shall be specified.
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-  var pdfDoc = null,
-    pageNum = 1,
-    pageRendering = false,
-    pageNumPending = null,
-    scale = 1,
-    canvas = pdfCanvas, //document.getElementById('the-canvas'),
-    ctx = canvas.getContext('2d');
-
-  /**
-   * Get page info from document, resize canvas accordingly, and render page.
-   * @param num Page number.
-   */
-  function renderPage(num) {
-    pageRendering = true;
-    // Using promise to fetch the page
-    pdfDoc.getPage(num).then(function (page) {
-      var viewport = page.getViewport({ scale: scale });
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      // Render PDF page into canvas context
-      var renderContext = {
-        canvasContext: ctx,
-        viewport: viewport,
-      };
-      var renderTask = page.render(renderContext);
-
-      // Wait for rendering to finish
-      renderTask.promise.then(function () {
-        pageRendering = false;
-        if (pageNumPending !== null) {
-          // New page rendering is pending
-          renderPage(pageNumPending);
-          pageNumPending = null;
-        }
-        pdfCanvas.style.zIndex = +1;
-        //   document.getElementById('the-canvas').style.zIndex = +1;
-      });
-    });
-
-    // Update page counters
-    document.getElementById('page_num').textContent = num;
-  }
-
-  /**
-   * If another page rendering in progress, waits until the rendering is
-   * finised. Otherwise, executes rendering immediately.
-   */
-  function queueRenderPage(num) {
-    if (pageRendering) {
-      pageNumPending = num;
-    } else {
-      renderPage(num);
-    }
-  }
-
-  /**
-   * Displays previous page.
-   */
-  function onPrevPage() {
-    if (pageNum <= 1) {
-      return;
-    }
-    pageNum--;
-    queueRenderPage(pageNum);
-  }
-  document.getElementById('prev').addEventListener('click', onPrevPage);
-
-  /**
-   * Displays next page.
-   */
-  function onNextPage() {
-    if (pageNum >= pdfDoc.numPages) {
-      return;
-    }
-    pageNum++;
-    queueRenderPage(pageNum);
-  }
-  document.getElementById('next').addEventListener('click', onNextPage);
-
-  function closePDF() {
-    console.log('close!');
-    console.log(pdfDoc);
-    $('#canvas-controller').hide();
-    pdfCanvas.remove();
-  }
-  document.getElementById('close-pdf').addEventListener('click', closePDF);
-
-  /**
-   * Asynchronously downloads PDF.
-   */
-  pdfjsLib.getDocument(url).promise.then(function (pdfDoc_) {
-    pdfDoc = pdfDoc_;
-    document.getElementById('page_count').textContent = pdfDoc.numPages;
-
-    // Initial/first page rendering
-    renderPage(pageNum);
-  });
-  document.addEventListener('webviewerloaded', function () {
-    PDFViewerApplicationOptions.set('printResolution', 300);
-  });
-}
-
 _3DCanvasFunc();
 _AllCantrallFunc();
+_Movie_Render_Button_Func();
 
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {
@@ -1360,7 +1384,7 @@ function alertBox(message, title, callback_yes, callback_no) {
     });
 
   $('#alert-title').html(title || '알림');
-  $('#alert-message').html(message);
+  $('#alert-content').html(message);
   $('#alert-box').fadeIn(300);
 }
 
@@ -1531,3 +1555,42 @@ $("#perbtn").click(function(){
     this.classList.toggle("on");
     this.classList.toggle("off");
 })
+
+
+window.addEventListener("resize", function() {
+  rtime = new Date();
+  if (timeout === false) {
+      timeout = true;
+      setTimeout(resizeend, delta);
+  }
+});
+
+
+function resizeend() {
+  if (new Date() - rtime < delta) {
+      setTimeout(resizeend, delta);
+  } else {
+      timeout = false;
+      CanvasResize();
+  }               
+}
+
+function CanvasResize() {
+  var frame = document.getElementById("widget-container").getElementsByTagName('iframe')[0].contentWindow;
+  var canvas = frame.document.getElementById("main-canvas")
+  var r = document.getElementsByClassName("lwindow")[0];
+  var rwidth = $(r).width();
+
+  var x = canvas.width - rwidth - 50;
+  var y = canvas.height - 60;
+
+  $("#screen-viewer").width(x);
+  $("#screen-viewer").height(y);
+
+  var renderCanvas = frame.document.getElementById("renderCanvas");  
+  if(renderCanvas) {
+    renderCanvas.width = x;
+    renderCanvas.height = y;
+  }
+  console.log(x);
+}
