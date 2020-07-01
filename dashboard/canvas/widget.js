@@ -2464,7 +2464,7 @@ function canvasresize(id){
         }
 
         var toolBox = find('tool-box');
-        toolBox.style.height = (innerHeight) + 'px'; // -toolBox.offsetTop - 77
+        toolBox.style.height = 1920 + 'px'; // -toolBox.offsetTop - 77
 
 
         function decorateUndo() {
@@ -2742,14 +2742,15 @@ function canvasresize(id){
 
 
                 hideContainers();
-                //console.log('Marker Click')
+                // console.log('Marker Click') 
+                console.log(strokeStyleText.style.display);
+                console.log(strokeStyleText.value);
+
                 document.getElementById("temp-canvas").className = "";
                 document.getElementById("temp-canvas").classList.add("marker");
 
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                markerContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
-
                 fillStyleText.focus();
             });
 
@@ -3040,13 +3041,12 @@ function canvasresize(id){
     })();
 
     function hideContainers() {
-        var colorsContainer = find('colors-container'),
+        var 
             markerContainer = find('marker-container'),
             markerColorContainer = find('marker-fill-colors'),
             pencilContainer = find('pencil-container'),
             pencilColorContainer = find('pencil-fill-colors');
 
-            colorsContainer.style.display =
             markerColorContainer.style.display =
             markerContainer.style.display =
             pencilColorContainer.style.display =
@@ -3572,7 +3572,7 @@ function canvasresize(id){
     MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
     MakeTitlePop("file", "파일을 불러옵니다");
 
-    SliderSetting("pencileslider", "pencil-stroke-style", 1, function(v){
+    SliderSetting("pencileslider", "pencil-stroke-style", 10, function(v){
         var pencilDrawHelper = clone(drawHelper);
         pencilDrawHelper.getOptions = function() {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
@@ -3580,7 +3580,7 @@ function canvasresize(id){
         pencilLineWidth = v;
     });
 
-    SliderSetting("markerslider", "marker-stroke-style", 1, function(v){
+    SliderSetting("markerslider", "marker-stroke-style", 16, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
             return [markerLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
@@ -3594,6 +3594,9 @@ function MakeTitlePop(element, contents){
     var pop = document.getElementById("titlebox");
 
     ele.addEventListener("mouseover", function(){
+        if(this.classList.contains("off"))
+            return false;
+
         pop.style.display = 'block';
         var rect = ele.getBoundingClientRect();
         var y= rect.y;
@@ -3618,11 +3621,15 @@ function SliderSetting(element, targetinput, defaultv, callback){
 
     Set(defaultv);
     function Set(v){
+        var parent = sliderval.parentElement;
+        console.log(parent.style.display = 'block');
+        console.log(parent.getBoundingClientRect());
+
         var ratio = v / maxSlider;
         var sliderWidth = slider.getBoundingClientRect().width;
-        back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
-        bar.style.left = '-7.5px';
-        // bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+        // back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
+        back.style.width = (ratio * sliderWidth) + 'px';
+        bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
         callback(v);
     }

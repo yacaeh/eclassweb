@@ -116,6 +116,7 @@ function ScreenShare(btn){
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
+          console.log(stream);
           isSharingScreen = true;
           lastStream = stream;
           replaceScreenTrack(stream, btn);
@@ -358,7 +359,6 @@ connection.onstream = function (event) {
       video.volume = 0;
     }
     video.srcObject = event.stream;
-    console.log(evnet.stream);
     // $('#main-video').show();
   } else {
     // 타 사용자 캠 표시 막기
@@ -413,15 +413,10 @@ function appendChatMessage(event, checkmark_id) {
 
     try {
         if(event.extra.roomOwner){
-          console.log("ASdasd");
-          
-            var notice = document.getElementById("notice");
-            div.innerHTML = "<b>" + ConvertChatMsg(event.data.chatMessage) + "</b>";
-
-            $(notice).append("<div> 선생님 : " + ConvertChatMsg(event.data.chatMessage) + "</div>");
+            var notice = document.getElementById("noticewindow");
+            $(notice).append("<div> <font color='#C63EE8'> 선생님 </font> : " + ConvertChatMsg(event.data.chatMessage) + "</div>");
             notice.scrollTop = notice.clientHeight;
             notice.scrollTop = notice.scrollHeight - notice.scrollTop;
-
         }
     }
     catch{
@@ -429,7 +424,12 @@ function appendChatMessage(event, checkmark_id) {
     }
 
     if (event.data) {
-        div.innerHTML = '<b>' + (event.extra.userFullName || event.userid) + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
+      var id = (event.extra.userFullName || event.userid);
+      if(event.extra.roomOwner == true){
+          id += "(선생님)";
+      }
+
+        div.innerHTML = '<b>' + id + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
         if (event.data.checkmark_id) {
             connection.send({
                 checkmark: 'received',
@@ -437,8 +437,17 @@ function appendChatMessage(event, checkmark_id) {
             });
         }
     } else {
-      div.innerHTML = '<b> 나 : </b>' + ConvertChatMsg(event);
-      div.style.background = '#cbffcb';
+      div.innerHTML = '<b> <font color="#3E93E8"> 나 </font>: </b>' + ConvertChatMsg(event);
+      
+      
+      if(params.open === 'true' || params.open === true){
+        var notice = document.getElementById("noticewindow");
+        $(notice).append("<div> <font color='#C63EE8'> 선생님 </font> : " + ConvertChatMsg(event) + "</div>");
+        notice.scrollTop = notice.clientHeight;
+        notice.scrollTop = notice.scrollHeight - notice.scrollTop;
+      }
+
+      // div.style.background = '#cbffcb';
     }
 
   conversationPanel.appendChild(div);
@@ -475,6 +484,8 @@ $('#txt-chat-message').emojioneArea({
   autocomplete: true,
   inline: true,
   hidePickerOnBlur: true,
+  placeholder: '메세지를 입력하세요',
+
   events: {
     focus: function () {
       $('.emojionearea-category')
@@ -1007,18 +1018,18 @@ function SetStudent() {
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
   $('#main-video').show();
+  $(".for_teacher").show();
+
   //$("#top_all_controll").hide();
 }
 
 SelectViewType();
 
 function SetStudentList(){
-    $("#student_list").empty();
-
-    console.log(connection.getAllParticipants());
+  $("#student_list").empty();
 
     if(connection.getAllParticipants().length == 0){
-        $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
+        // $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')?
     }
     else {
         connection.getAllParticipants().forEach(function(pid) {
@@ -1473,43 +1484,78 @@ $('#top_alert').click(function () {
 });
 
 
-var nowPermission = undefined;
+var nowClassPermission = undefined;
+var nowMicPermission = undefined;
 var nowSelectStudent = undefined;
 
+$(window).click(function(e){
+  if(document.getElementById("student-menu") .contains(e.target))
+      return false;
+  
+  if($(e.target).hasClass('student'))
+      return false;
+
+  if( $("#student-menu").show() )
+      $("#student-menu").hide();
+})
 
 $(".student").click(function(e){
     var menu = document.getElementById("student-menu");
     nowSelectStudent = e.target;
-    
     var name = e.target.dataset.name;
     var pid = e.target.dataset.id;
 
-    $("#perbtn").clearQueue();
-    $("#perbtn > .circle").clearQueue();
+    $("#classP").clearQueue();
+    $("#classP > .circle").clearQueue();
 
-    console.log(e.target.dataset.permission);
-
-    if(e.target.dataset.permission == "true"){
-        $("#perbtn").css({
+    if(e.target.dataset.classPermission == "true"){
+        $("#classP").css({
             'background-color' : "#18dbbe"
         })
-        $("#perbtn > .circle").css({
-            left: "20px"
+        $("#classP > .circle").css({
+            left: "22px"
         })
-        $("#perbtn").addClass("on");
-        $("#perbtn").removeClass("off");
-        
+        $("#classP").addClass("on");
+        $("#classP").removeClass("off");
     }
     else{
-        $("#perbtn").css({
+        $("#classP").css({
             'background-color' : "gray"
         })
-        $("#perbtn > .circle").css({
+        $("#classP > .circle").css({
             left: "2px"
         })
-        $("#perbtn").addClass("off");
-        $("#perbtn").removeClass("on");
+        $("#classP").addClass("off");
+        $("#classP").removeClass("on");
     }
+
+
+    $("#micP").clearQueue();
+    $("#micP > .circle").clearQueue();
+
+    if(e.target.dataset.micPermission == "true"){
+        $("#micP").css({
+            'background-color' : "#18dbbe"
+        })
+        $("#micP > .circle").css({
+            left: "22px"
+        })
+        $("#micP").addClass("on");
+        $("#micP").removeClass("off");
+    }
+    else{
+        $("#micP").css({
+            'background-color' : "gray"
+        })
+        $("#micP > .circle").css({
+            left: "2px"
+        })
+        $("#micP").addClass("off");
+        $("#micP").removeClass("on");
+    }
+
+
+
 
     $(menu).css({
         left: e.clientX,
@@ -1523,20 +1569,8 @@ $(".student").click(function(e){
     menu.getElementsByClassName("stuname")[0].innerHTML = name;
 })
 
-$(window).click(function(e){
-    if(document.getElementById("student-menu") .contains(e.target))
-        return false;
-    
-    if($(e.target).hasClass('student'))
-        return false;
-
-    if( $("#student-menu").show() )
-        $("#student-menu").hide();
-})
-
 
 function OnClickStudent(div){
-    
     div.click(function(e){
         var menu = document.getElementById("student-menu");
         nowSelectStudent = e.target;
@@ -1544,89 +1578,151 @@ function OnClickStudent(div){
         var name = e.target.dataset.name;
         var pid = e.target.dataset.id;
     
+        console.log(e.target.id);
+
+
         $("#perbtn").clearQueue();
         $("#perbtn > .circle").clearQueue();
-    
-        console.log(e.target.dataset.permission);
-    
-        if(e.target.dataset.permission == "true"){
-            $("#perbtn").css({
-                'background-color' : "#18dbbe"
-            })
-            $("#perbtn > .circle").css({
-                left: "20px"
-            })
-            $("#perbtn").addClass("on");
-            $("#perbtn").removeClass("off");
-            
-        }
-        else{
-            $("#perbtn").css({
-                'background-color' : "gray"
-            })
-            $("#perbtn > .circle").css({
-                left: "2px"
-            })
-            $("#perbtn").addClass("off");
-            $("#perbtn").removeClass("on");
-        }
-    
-        $(menu).css({
-            left: e.clientX,
-            top : e.clientY
-        })
-    
-        if(!$("#student-menu").is(':visible')){
-            $( "#student-menu" ).show( "blind", {}, 150, function(){});
-        }
-    
-        menu.getElementsByClassName("stuname")[0].innerHTML = name;
+        
+        if(e.target.dataset.classPermission == "true"){
+          $("#classP").css({
+              'background-color' : "#18dbbe"
+          })
+          $("#classP > .circle").css({
+              left: "22px"
+          })
+          $("#classP").addClass("on");
+          $("#classP").removeClass("off");
+      }
+      else{
+          $("#classP").css({
+              'background-color' : "gray"
+          })
+          $("#classP > .circle").css({
+              left: "2px"
+          })
+          $("#classP").addClass("off");
+          $("#classP").removeClass("on");
+      }
+  
+  
+      $("#micP").clearQueue();
+      $("#micP > .circle").clearQueue();
+  
+      if(e.target.dataset.micPermission == "true"){
+          $("#micP").css({
+              'background-color' : "#18dbbe"
+          })
+          $("#micP > .circle").css({
+              left: "22px"
+          })
+          $("#micP").addClass("on");
+          $("#micP").removeClass("off");
+      }
+      else{
+          $("#micP").css({
+              'background-color' : "gray"
+          })
+          $("#micP > .circle").css({
+              left: "2px"
+          })
+          $("#micP").addClass("off");
+          $("#micP").removeClass("on");
+      }
+  
+  
+  
+  
+      $(menu).css({
+          left: e.clientX,
+          top : e.clientY
+      })
+  
+      if(!$("#student-menu").is(':visible')){
+          $( "#student-menu" ).show( "blind", {}, 150, function(){});
+      }
+  
+      menu.getElementsByClassName("stuname")[0].innerHTML = name;
     })
 }
 
-$("#perbtn").click(function(){
+$(".perbtn").click(function(){
     var circle = this.getElementsByClassName("circle")[0];
     var name = nowSelectStudent.dataset.name;
     var pid = nowSelectStudent.dataset.id;
 
-    console.log(nowPermission);
+    console.log(this.id);
 
-    if(this.classList.contains("off")){
-        console.log(nowPermission != undefined);
-        
-        if(nowPermission != undefined){
-            alert("이미 다른 학생에게 권한이 있습니다.");
-            return false;
-        }
-        
-        nowPermission = pid;
-        nowSelectStudent.dataset.permission = true
+  if (this.id == "classP") {
+    if (this.classList.contains("off")) {
+      console.log(nowClassPermission != undefined);
 
-        $(this).animate({
-            'background-color' : "#18dbbe"
-        }, 'fast')
-        $(circle).animate({
-            left: "20px"
-        }, 'fast')    
+      if (nowClassPermission != undefined) {
+        alert("이미 다른 학생에게 권한이 있습니다.");
+        return false;
+      }
 
-        $(nowSelectStudent).find(".bor").show();
+      nowClassPermission = pid;
+      nowSelectStudent.dataset.classPermission = true
+
+      $(this).animate({
+        'background-color': "#18dbbe"
+      }, 'fast')
+      $(circle).animate({
+        left: "22px"
+      }, 'fast')
+
+      $(nowSelectStudent).find(".bor").show();
     }
     else {
-        nowPermission = undefined;
-        nowSelectStudent.dataset.permission = false;
+      nowClassPermission = undefined;
+      nowSelectStudent.dataset.classPermission = false;
 
-        $(this).animate({
-            'background-color' : "gray"
-        }, 'fast')
-        $(circle).animate({
-            left: "2px"
-        },'fast')     
-        $(nowSelectStudent).find(".bor").hide();
-
-
+      $(this).animate({
+        'background-color': "gray"
+      }, 'fast')
+      $(circle).animate({
+        left: "2px"
+      }, 'fast')
+      $(nowSelectStudent).find(".bor").hide();
     }
-    this.classList.toggle("on");
-    this.classList.toggle("off");
+  }
+  else if (this.id == "micP") {
+    if (this.classList.contains("off")) {
+      console.log(nowMicPermission != undefined);
+
+      if (nowMicPermission != undefined) {
+        alert("이미 다른 학생에게 권한이 있습니다.");
+        return false;
+      }
+
+      nowMicPermission = pid;
+      nowSelectStudent.dataset.micPermission = true
+
+      $(this).animate({
+        'background-color': "#18dbbe"
+      }, 'fast')
+      $(circle).animate({
+        left: "22px"
+      }, 'fast')
+
+      // $(nowSelectStudent).find(".bor").show();
+    }
+    else {
+      nowMicPermission = undefined;
+      nowSelectStudent.dataset.micPermission = false;
+      $(this).animate({
+        'background-color': "gray"
+      }, 'fast')
+      $(circle).animate({
+        left: "2px"
+      }, 'fast')
+      // $(nowSelectStudent).find(".bor").hide();
+    }
+  }
+
+  this.classList.toggle("on");
+  this.classList.toggle("off");
 })
 
 
@@ -1667,6 +1763,39 @@ function CanvasResize() {
   }
   console.log(x);
 }
+
+document.getElementById("collapse").addEventListener("click", function(){
+  var notice = document.getElementById("notice");
+  if(notice.classList.contains("on")){
+    $("#notice").animate({
+      height : "8%",
+      borderBottom: '0px solid gray'
+    })
+    $(".conversation-panel").animate({
+      height : '88%'
+    });
+    console.log(this.children[0])
+    notice.children[0].style.borderBottom = '0px solid #ffffff'
+    this.children[0].style.transform = 'rotate(0deg)';
+  }
+
+  else{
+    $("#notice").animate({
+      height : "50%",
+      borderBottom: '0px solid gray'
+    })
+    $(".conversation-panel").animate({
+      height : '48%'
+    });
+    notice.children[0].style.borderBottom = '1px solid #B8B8B8'
+    this.children[0].style.transform = 'rotate(180deg)';
+
+
+  }
+
+  notice.classList.toggle("off");
+  notice.classList.toggle("on");
+})
 
 function test(){
   console.log("test from iframe");
