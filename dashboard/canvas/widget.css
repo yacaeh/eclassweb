@@ -704,11 +704,12 @@ input:focus {
     content: url(/dashboard/img/eraser.png);
 }
 
-/* .off{
+ .off{
+     background: rgba(204,204,204,0)!important;
 }
 
 .off:hover{
     box-shadow: none;
     border-radius: 0px;
     background: rgba(204,204,204,1);
-} */
+}
