@@ -422,6 +422,22 @@ hr {
   content: url(/dashboard/newimg/cam.png);
 }
 
+#next{
+  content: url(/dashboard/newimg/next.png);
+}
+
+#prev{
+  content: url(/dashboard/newimg/prev.png);
+}
+
+#fullscreen{
+  content: url(/dashboard/newimg/fullscreen.png);
+}
+
+#presentation{
+  content: url(/dashboard/newimg/presentation.png);
+}
+
 
 #session-id{
   position: absolute;
@@ -833,52 +849,6 @@ hr {
 .student .name .alert_wait{
   background-color: yellow;
 }
-
-#canvas-controller{
-  border: 1px solid;
-  box-shadow: 1px 2px #999999;
-  min-height: 90%;
-  width:150px;  
-
-  right:20%;
-  position: absolute;; 
-  z-index: 0;
-  display:none;
-}
-
-.upper_controller{
-  border:1px solid;
-}
-
-.bottom_controller{
-  border:1px solid;
-  position: absolute;
-  bottom: 10px;
-}
-
-.thumbnail_list{
-  display: flex;
-  margin-top: 40px;
-  flex-direction: column;
-  flex-wrap: wrap;  
-}
-
-.thumbnail{
-  margin-left:15px;
-  padding-bottom:50px;  
-}
-
-.thum_img_selected{
-  box-shadow: 5px 5px 10px #3ee1c9;
-  width:100px;
-  height:140px;
-}      
-
-.thum_img{
-  box-shadow: 5px 5px 10px #999;
-  width:100px;
-  height:140px;
-}      
 
 .no_student{
   width: 100%;

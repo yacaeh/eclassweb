@@ -1385,7 +1385,7 @@ function loadFileViewer() {
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
-    'border: 1px solid black;height:1024px;direction: ltr;margin-left:5%;width:60%;';
+    'border: 1px solid black;height:1124px;direction: ltr;margin-left:2%;width:78%;';
   fileViewer.setAttribute('allowFullScreen', '');
   let frame = document
     .getElementById('widget-container')
@@ -1398,64 +1398,42 @@ function loadFileViewer() {
   frame.document.getElementById("main-canvas").style.zIndex = "1";
   frame.document.getElementById("temp-canvas").style.zIndex = "2";
   frame.document.getElementById("tool-box").style.zIndex = "3";
-  initFileViewerController();
-  // setTimeout(()=> initFileViewerController(),5000);
 }
 
-function initFileViewerController(){
-  let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-  let fileViewer = frame.document.getElementById('file-viewer');
-  console.log(fileViewer);
-  
-  fileViewer.addEventListener("load", function() {
-    console.log("Load!");
-    let fullscreen = document.getElementById('fullscreen');
-    fullscreen.onclick = function() {
-      fileViewer.contentWindow.document.getElementById('fullscreen').click();
-    }
-    let presentation = document.getElementById('presentation');
-    presentation.onclick = function() {
-      fileViewer.contentWindow.document.getElementById('presentation').click();
-    }
-    let nextButton = document.getElementById('next');
-    nextButton.onclick = function() {
+function showPage(n){
+  console.log(n);
+  if(connection.extra.roomOwner || !classroomInfo.allControl) 
+    classroomCommand.sendPDFCmd('page');
+}
 
-      if(connection.extra.roomOwner || !classroomInfo.allControl) 
-      {
-        fileViewer.contentWindow.document.getElementById('next').click();
-        classroomCommand.sendPDFCmd('next');
-      }
-    }
-    let prevButton = document.getElementById('prev');
-    prevButton.onclick = function() {
-      
-      if(connection.extra.roomOwner || !classroomInfo.allControl) 
-      {
-        fileViewer.contentWindow.document.getElementById('previous').click();
-        classroomCommand.sendPDFCmd('prev');
-      }
-    }
-    let firstPage = document.getElementById('first_page');
-    firstPage.onclick = function() {
-      fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-      fileJQuery.scrollTop();
-      classroomCommand.sendPDFCmd('first-page');
-    }
-    let lastPage = document.getElementById('last_page');
-    lastPage.onclick = function() {
-      fileViewer.contentWindow.viewerPlugin.showPage(1);
-      classroomCommand.sendPDFCmd('last-page');
-    }
-    console.log(fileViewer.contentDocument);
-    fileViewer.contentWindow.onscroll = function (e) {console.log(e)};
-    fileViewer.contentDocument.addEventListener('scroll', function(event) {
-      console.log(event);
-    }, false);
-  
-  });
+function showNextPage(){
+  if(connection.extra.roomOwner || !classroomInfo.allControl) 
+    classroomCommand.sendPDFCmd('next');
+}
 
+function showPreviousPage(){
+  if(connection.extra.roomOwner || !classroomInfo.allControl) 
+    classroomCommand.sendPDFCmd('prev');
+}
+
+// function toggleFullScreen(){
+//   if(connection.extra.roomOwner || !classroomInfo.allControl) 
+//     classroomCommand.sendPDFCmd('fullscreen');
+// }
+
+// function togglePresentationMode(){
+//   if(connection.extra.roomOwner || !classroomInfo.allControl) 
+//     classroomCommand.sendPDFCmd('presentation');
+// }
+
+function zoomIn(){
+  if(connection.extra.roomOwner || !classroomInfo.allControl) 
+    classroomCommand.sendPDFCmd('zoomIn');
+}
+
+function zoomOut(){
+  if(connection.extra.roomOwner || !classroomInfo.allControl) 
+    classroomCommand.sendPDFCmd('zoomOut');
 }
 
 
@@ -1791,3 +1769,7 @@ document.getElementById("collapse").addEventListener("click", function(){
   notice.classList.toggle("off");
   notice.classList.toggle("on");
 })
+
+function test(){
+  console.log("test from iframe");
+}
