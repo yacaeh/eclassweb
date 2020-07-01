@@ -1374,20 +1374,32 @@ function initFileViewerController(){
     }
     let nextButton = document.getElementById('next');
     nextButton.onclick = function() {
-      fileViewer.contentWindow.document.getElementById('next').click();
+
+      if(connection.extra.roomOwner || !classroomInfo.allControl) 
+      {
+        fileViewer.contentWindow.document.getElementById('next').click();
+        classroomCommand.sendPDFCmd('next');
+      }
     }
     let prevButton = document.getElementById('prev');
     prevButton.onclick = function() {
-      fileViewer.contentWindow.document.getElementById('previous').click();
+      
+      if(connection.extra.roomOwner || !classroomInfo.allControl) 
+      {
+        fileViewer.contentWindow.document.getElementById('previous').click();
+        classroomCommand.sendPDFCmd('prev');
+      }
     }
     let firstPage = document.getElementById('first_page');
     firstPage.onclick = function() {
       fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
       fileJQuery.scrollTop();
+      classroomCommand.sendPDFCmd('first-page');
     }
     let lastPage = document.getElementById('last_page');
     lastPage.onclick = function() {
       fileViewer.contentWindow.viewerPlugin.showPage(1);
+      classroomCommand.sendPDFCmd('last-page');
     }
     console.log(fileViewer.contentDocument);
     fileViewer.contentWindow.onscroll = function (e) {console.log(e)};
