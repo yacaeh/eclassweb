@@ -14,6 +14,7 @@ designer.icons.view3d = '/dashboard/newimg/3D.png';
 designer.icons.view3don = '/dashboard/newimg/3D.png';
 designer.icons.movie = '/dashboard/newimg/videolink.png';
 designer.icons.file = '/dashboard/newimg/openfile.png';
+designer.icons.text = '/dashboard/newimg/text.png';
 
 designer.addSyncListener(function (data) {
   connection.send(data);

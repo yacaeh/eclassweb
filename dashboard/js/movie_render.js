@@ -14,17 +14,24 @@ function _Movie_Render_Button_Func()
     }
 }
 
-function Movie_Render_Button(){
+function Movie_Render_Button(btn){
+    if(!isSharingMovie && checkSharing()){
+      removeOnSelect(btn);
+      return;
+    }
+  
     var visible = urlform.style.display;
         
     console.log(visible);
     
     if(visible == "inline-block")
     {
+        isSharingMovie = false;
         urlform.style.display = "none";
         embedYoutubeContent(false,"", true);
     }
     else{
+        isSharingMovie = true;
         urlform.style.display = "inline-block";
     }
 }
