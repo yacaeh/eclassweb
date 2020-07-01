@@ -1355,7 +1355,66 @@ function loadFileViewer() {
   frame.document.getElementById("main-canvas").style.zIndex = "1";
   frame.document.getElementById("temp-canvas").style.zIndex = "2";
   frame.document.getElementById("tool-box").style.zIndex = "3";
+  initFileViewerController();
+  // setTimeout(()=> initFileViewerController(),5000);
 }
+
+function initFileViewerController(){
+  let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+  let fileViewer = frame.document.getElementById('file-viewer');
+  console.log(fileViewer);
+  
+  fileViewer.addEventListener("load", function() {
+    console.log("Load!");
+    let fullscreen = document.getElementById('fullscreen');
+    fullscreen.onclick = function() {
+      fileViewer.contentWindow.document.getElementById('fullscreen').click();
+    }
+    let presentation = document.getElementById('presentation');
+    presentation.onclick = function() {
+      fileViewer.contentWindow.document.getElementById('presentation').click();
+    }
+    let nextButton = document.getElementById('next');
+    nextButton.onclick = function() {
+
+      if(connection.extra.roomOwner || !classroomInfo.allControl) 
+      {
+        fileViewer.contentWindow.document.getElementById('next').click();
+        classroomCommand.sendPDFCmd('next');
+      }
+    }
+    let prevButton = document.getElementById('prev');
+    prevButton.onclick = function() {
+      
+      if(connection.extra.roomOwner || !classroomInfo.allControl) 
+      {
+        fileViewer.contentWindow.document.getElementById('previous').click();
+        classroomCommand.sendPDFCmd('prev');
+      }
+    }
+    let firstPage = document.getElementById('first_page');
+    firstPage.onclick = function() {
+      fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
+      fileJQuery.scrollTop();
+      classroomCommand.sendPDFCmd('first-page');
+    }
+    let lastPage = document.getElementById('last_page');
+    lastPage.onclick = function() {
+      fileViewer.contentWindow.viewerPlugin.showPage(1);
+      classroomCommand.sendPDFCmd('last-page');
+    }
+    console.log(fileViewer.contentDocument);
+    fileViewer.contentWindow.onscroll = function (e) {console.log(e)};
+    fileViewer.contentDocument.addEventListener('scroll', function(event) {
+      console.log(event);
+    }, false);
+  
+  });
+
+}
+
 
 _3DCanvasFunc();
 _AllCantrallFunc();

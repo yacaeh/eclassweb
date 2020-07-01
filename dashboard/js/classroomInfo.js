@@ -187,11 +187,53 @@ classroomCommand.sendClosePdf = function () {
     });
 };
 
+classroomCommand.sendPDFCmd = function (_cmd) {
+    if(!connection.extra.roomOwner) return;    
+    if(!classroomInfo.allControl) return;
+
+    connection.send ({
+        pdf : {
+            cmd : _cmd
+        }
+    });
+}
+
+classroomCommand.updatePDFCmd = function (_cmd) {
+
+    let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    let fileViewer = frame.document.getElementById('file-viewer');
+    if(!fileViewer)  return;
+
+    switch(_cmd)
+    {
+        case "first-page" :            
+            fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
+            fileJQuery.scrollTop();
+            break;
+        case 'next' :
+            fileViewer.contentWindow.document.getElementById('next').click();
+            break;
+        case 'prev' :
+            fileViewer.contentWindow.document.getElementById('previous').click();
+            break;
+        case 'last-page' :
+            fileViewer.contentWindow.viewerPlugin.showPage(1);
+            break;
+    }
+}
+
+
 classroomCommand.receivePdfMessage = function (_pdf) {  
-    let currentState = classroomInfo.pdf.state;
-    if(currentState != _pdf.state) {       
-        classroomInfo.pdf = _pdf;
-        classroomCommand.syncPdf ();
+    if(_pdf.cmd) {
+        classroomCommand.updatePDFCmd (_pdf.cmd);
+    }else   {
+        let currentState = classroomInfo.pdf.state;
+        if(currentState != _pdf.state) {       
+            classroomInfo.pdf = _pdf;
+            classroomCommand.syncPdf ();
+        }
     }
 };
 
