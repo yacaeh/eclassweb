@@ -1384,7 +1384,7 @@ function alertBox(message, title, callback_yes, callback_no) {
     });
 
   $('#alert-title').html(title || '알림');
-  $('#alert-message').html(message);
+  $('#alert-content').html(message);
   $('#alert-box').fadeIn(300);
 }
 
