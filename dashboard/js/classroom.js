@@ -1015,7 +1015,7 @@ function SetStudent() {
     connection.extra.userFullName + '(' + params.sessionid + ')'
   );
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
-  // $('.for_teacher').hide();
+  $('.for_teacher').hide();
   $('#main-video').show();
   $(".for_teacher").show();
 
@@ -1759,3 +1759,36 @@ function CanvasResize() {
   }
   console.log(x);
 }
+
+document.getElementById("collapse").addEventListener("click", function(){
+  var notice = document.getElementById("notice");
+  if(notice.classList.contains("on")){
+    $("#notice").animate({
+      height : "8%",
+      borderBottom: '0px solid gray'
+    })
+    $(".conversation-panel").animate({
+      height : '88%'
+    });
+    console.log(this.children[0])
+    notice.children[0].style.borderBottom = '0px solid #ffffff'
+    this.children[0].style.transform = 'rotate(0deg)';
+  }
+
+  else{
+    $("#notice").animate({
+      height : "50%",
+      borderBottom: '0px solid gray'
+    })
+    $(".conversation-panel").animate({
+      height : '48%'
+    });
+    notice.children[0].style.borderBottom = '1px solid #B8B8B8'
+    this.children[0].style.transform = 'rotate(180deg)';
+
+
+  }
+
+  notice.classList.toggle("off");
+  notice.classList.toggle("on");
+})

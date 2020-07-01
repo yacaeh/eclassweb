@@ -192,13 +192,24 @@ button[disabled] {
   border-top: 1px solid #B8B8B8;
 }
 
-#notice > .btn{
+#notice > #collapse{
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  align-content: center;
+  display: inline-grid;
+  text-align: center;
+  cursor: pointer;
+  height: 30px;
+}
+
+#notice > #collapse > .btn{
   position: absolute;
   left: calc(50% - 14px);
   padding: 0px;
   margin: 0px;
-  cursor: pointer;
   bottom: 5px;
+  transform: rotate(180deg);
 }
 
 #conversation-panel {

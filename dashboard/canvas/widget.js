@@ -2464,7 +2464,7 @@ function canvasresize(id){
         }
 
         var toolBox = find('tool-box');
-        toolBox.style.height = (innerHeight) + 'px'; // -toolBox.offsetTop - 77
+        toolBox.style.height = 1920 + 'px'; // -toolBox.offsetTop - 77
 
 
         function decorateUndo() {
@@ -3571,7 +3571,7 @@ function canvasresize(id){
     MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
     MakeTitlePop("file", "파일을 불러옵니다");
 
-    SliderSetting("pencileslider", "pencil-stroke-style", 1, function(v){
+    SliderSetting("pencileslider", "pencil-stroke-style", 10, function(v){
         var pencilDrawHelper = clone(drawHelper);
         pencilDrawHelper.getOptions = function() {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
@@ -3579,7 +3579,7 @@ function canvasresize(id){
         pencilLineWidth = v;
     });
 
-    SliderSetting("markerslider", "marker-stroke-style", 1, function(v){
+    SliderSetting("markerslider", "marker-stroke-style", 16, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
             return [markerLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
