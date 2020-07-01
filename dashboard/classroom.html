@@ -35,38 +35,40 @@
     <script defer src="/dashboard/js/classroom.js"></script>
 </head>
 
-<body>
+<body oncontextmenu="return false" ondragstart="return false">
 
   <div id="urlform" style="display: none;">
-    <input id="urlinput" onkeyup="_Movie_Render_key_event();" type="text" placeholder="URL 입력">
+    <span class="name">동영상</span>
+    <span class="back"></span>
+    <input id="urlinput" onkeyup="_Movie_Render_key_event();" type="text" placeholder="URL을 입력하세요">
   </div>
 
     <header id="header">
         <img id="icon_exit">
-        <img id="top_logo">
+        <img style="display: none;" id="top_logo">
 
         <span id="my-name"></span>
         <span id="session-id"></span>
 
         <div class="icons">
-          <img class="top_icon top_all_controll_off" id="top_all_controll">
-          <img class="top_icon" id="top_test" >
-          <img class="top_icon" id="top_alert">
-          <img class="top_icon" id="top_attach-file">
-          
-          <img class="divide">
-          <!-- -------------------------------------------------- -->
-          <img class="top_icon view_type-on view_type" id="top_student">
-          <img class="top_icon view_type" id="top_camera">
-          <img class="top_icon" id="top_record_video">
-          <!-- -------------------------------------------------- -->
+          <span class="controll">
+            <img class="top_icon top_all_controll_off" id="top_all_controll">
+            <img class="top_icon" id="top_test" >
+            <img class="top_icon" id="top_alert">
+            <img style="display: none;" class="top_icon" id="top_attach-file">
+          </span>
 
+          <span class="feature">
+            <img class="divide">
+            <img class="top_icon view_type-on view_type" id="top_student">
+            <img class="top_icon view_type" id="top_camera">
+            <img class="top_icon" id="top_record_video">
+          </span>
 
-
-            <span class="time">
-                <span id="current-day"></span></br>
-                <span id="current-time"></span>
-            </span>
+          <span class="time">
+              <span id="current-day"></span></br>
+              <span id="current-time"></span>
+          </span>
         </div>
 
     </header>
@@ -78,28 +80,36 @@
         <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
             <div class="stuname">이름</div>
             <div class="status" >접속중</div>
-            <div class="line" ></div>
-            <div class="permission">권한주기 <span id="perbtn" class="perbtn off"><span class="circle"></span> </span> </div>
-            <div class="line" ></div>
-            <div class="out">내보내기</div>
+            <div class="line1" ></div>
+            <div class="permission">수업권한 <span id="classP" class="perbtn off"><span class="circle"></span> </span> </div>
+            <div class="mic">마이크 <span id="micP" class="perbtn off"><span class="circle"></span> </span> </div>
+            <div class="line2" ></div>
+            <div class="out">
+              <img src="/dashboard/newimg/getout.png">
+              <span class="outtext">내보내기</span>
+              
+            </div>
         </div>
         
         <div class="lwindow">
-
-
             <div class="for_teacher" style="display: none;">
                 <span class="nos">
-                    <span id="nos"></span>
-                    <img src="/dashboard/newimg/student.png">
+                  <span class="now_selected_student">
+                    <span class="name">지이잉</span>
+                    <span class="status_img"></span>
+                    <span class="status_text">접속중</span>
+                  </span>
+                  <span class="nos_student_text" id="nos">0</span>
+                  <img class="nos_student_icon" src="/dashboard/newimg/student2.png">
                 </span>
 
                 <div id="student_list">
-
-
-                </div>
+                  <span data-id="gg9zb3ixd5" data-name="t2352234" class="student"><span class="bor"></span> <span class="name"><span class="alert alert_wait"></span>t2352234</span></span>
+                  <span data-id="gg9zb3ixd5" data-name="t2352234" class="student"><span class="bor"></span> <span class="name"><span class="alert alert_wait"></span>t2352234</span></span>
+                  <span data-id="gg9zb3ixd5" data-name="t2352234" class="student"><span class="bor"></span> <span class="name"><span class="alert alert_wait"></span>t2352234</span></span>
+                  <span data-id="gg9zb3ixd5" data-name="t2352234" class="student"><span class="bor"></span> <span class="name"><span class="alert alert_wait"></span>t2352234</span></span>
             </div>
-            <!-- View Student  -->
-            <!-- View Cam -->
+            </div>
             <video style="display: none;"  id="main-video" controls playsinline autoplay></video>
 
             <div id="exam-board">
@@ -134,18 +144,25 @@
 
 
 
-            <div id="notice">
+            <div class="chatting">
 
-            </div>
+              <div id="notice">
+                <span class="text">선생님 채팅</span>
+                <div id="noticewindow"></div>
+                <img class="btn" src="/dashboard/newimg/openchat.png">
+              </div>
+  
+              <div class="chatbackground"></div>
+              <!-- Conversation Panel -->
+              <div class="conversation-panel">
+                  <div id="conversation-panel"></div>
+                  <div id="key-press">
+                      <span id="key-press-span"></span>
+                      <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
+                  </div>
+                  <textarea id="txt-chat-message"></textarea>
+              </div>
 
-            <!-- Conversation Panel -->
-            <div class="conversation-panel">
-                <div id="conversation-panel"></div>
-                <div id="key-press">
-                    <span id="key-press-span"></span>
-                    <img src="https://www.webrtc-experiment.com/images/key-press.gif" id="key-press-image">
-                </div>
-                <textarea id="txt-chat-message"></textarea>
             </div>
 
             <canvas id="temp-stream-canvas"></canvas>

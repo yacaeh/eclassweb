@@ -2956,13 +2956,12 @@ function canvasresize(id){
     })();
 
     function hideContainers() {
-        var colorsContainer = find('colors-container'),
+        var 
             markerContainer = find('marker-container'),
             markerColorContainer = find('marker-fill-colors'),
             pencilContainer = find('pencil-container'),
             pencilColorContainer = find('pencil-fill-colors');
 
-            colorsContainer.style.display =
             markerColorContainer.style.display =
             markerContainer.style.display =
             pencilColorContainer.style.display =
@@ -3510,6 +3509,9 @@ function MakeTitlePop(element, contents){
     var pop = document.getElementById("titlebox");
 
     ele.addEventListener("mouseover", function(){
+        if(this.classList.contains("off"))
+            return false;
+
         pop.style.display = 'block';
         var rect = ele.getBoundingClientRect();
         var y= rect.y;
