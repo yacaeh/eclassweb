@@ -104,6 +104,19 @@
 
     <!-- colors selector -->
 
+    <section id="colors-container" class="context-popup colors-container">
+        <div class="input-div">
+            <label for="stroke-style">Stroke Style:</label>
+            <input id="stroke-style" type="color" value="#6c96c8">
+        </div>
+
+        <div class="input-div">
+            <label for="fill-style">Fill Style:</label>
+            <input id="fill-style" type="color" value="#ffffff">
+        </div>
+
+        <div id="colors-done" class="btn-007">Done</div>
+    </section>
     <section id="marker-container" class="context-popup colors-container">
         <input style="display: none;" id="sliderval" type="number" class="sliderval inputbox">
         <span id="markerslider" class="slider-front">
@@ -152,18 +165,14 @@
     <!-- fade -->
 
     <div id="fade"></div>
-
+    <div id="textInputContainer" style="z-index:99999999;">
     <!-- text font/family/color -->
-
+    <input class="textInputUI" type="text" placeholder="글자를 입력하고 엔터를 누르세요." style="ime-mode:active;display: none; position: absolute; top: 0; left: 0; width: 216px;height:50px;border: 5px solid black;">
     <ul class="fontSelectUl" style="display: none; position: absolute; top: 0; left: 0; width: 166px;">
-        <li>Arial</li>
-        <li>Arial Black</li>
-        <li>Comic Sans MS</li>
-        <li>Courier New</li>
-        <li>Georgia</li>
-        <li>Tahoma</li>
+        <li>HY중고딕</li>
+        <li>나눔고딕</li>
+        <li>나눔펜글씨</li>
         <li>Times New Roman</li>
-        <li>Trebuchet MS</li>
         <li>Verdana</li>
     </ul>
 
@@ -180,8 +189,22 @@
         <li>48</li>
         <li>60</li>
         <li>72</li>
+        <li>80</li>
+        <li>90</li>
+        <li>150</li>
     </ul>
-
+    <span class="fontColorUI colors-container input-div" style="display: none; position: absolute; top: 0; left: 0; text-align: center;z-index:999;">
+        <div id="text-selected-color"></div>
+        <div id="text-fill-colors" class='context-popup'>
+            <div class="top">
+                <div id="text-selected-color-2"></div>
+                <input id="text-fill-style" type="text" value="000000">
+            </div>
+            <table id="text-colors-list">
+            </table>
+        </div>
+    </span>
+    </div>
     <!-- url-parameters -->
     <script>
         (function() {

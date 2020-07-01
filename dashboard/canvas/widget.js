@@ -73,7 +73,7 @@
         globalAlpha = 1,
         globalCompositeOperation = 'source-over',
         lineCap = 'round',
-        font = '15px "Arial"',
+        font = '30px "나눔고딕"',
         lineJoin = 'round';
 
     function getContext(id) {
@@ -452,7 +452,8 @@ function canvasresize(id){
     }
 
     var copiedStuff = [],
-        isControlKeyPressed;
+        isControlKeyPressed,
+        isAltKeyPressed;
 
     // marker + pencil
     function hexToR(h) {
@@ -505,11 +506,11 @@ function canvasresize(id){
 
     var drawHelper = {
         redraw: function() {
+            //console.log(textHandler.lastFillStyle);
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
 
             var i, point, length = points.length;
-
             for (i = 0; i < length; i++) {
                 point = points[i];
                 if(point[0] == "marker"){
@@ -537,7 +538,6 @@ function canvasresize(id){
                     context.strokeStyle = opt[1];
                     context.fillStyle = opt[2];
                     context.font = opt[7];
-
                     const resizeP = resizePoint(p);
 
                     context.moveTo(resizeP[0], resizeP[1]);
@@ -547,6 +547,11 @@ function canvasresize(id){
                     // context.lineTo(p[2], p[3]);
                     // lastmarkpos = [p[2], p[3]];
                 }
+                // else if(point[0] == "text"){
+                //     console.log("Else Text!");
+                //     context.fillStyle = textHandler.lastFillStyle;
+                //     console.log(context.fillStyle);
+                // }                
                 else{
                     if(marking){
                         marking = !marking;
@@ -556,6 +561,7 @@ function canvasresize(id){
                     if (point && point.length && this[point[0]]) {                    
                         this[point[0]](context, point[1], point[2]);
                     }
+
                 }
                 // else warn
             }
@@ -563,7 +569,6 @@ function canvasresize(id){
                 marking = !marking;
                 context.stroke();
             }
-
         },
         getOptions: function(opt) {
             opt = opt || {};
@@ -807,7 +812,7 @@ function canvasresize(id){
             else tempContext.fillStyle = 'rgba(255,85 ,154,.4)';
         
             if (p[0] === 'text') {
-                tempContext.font = "15px Verdana";
+                tempContext.font = "30px 나눔펜글씨";
                 tempContext.fillText(point[0], point[1], point[2]);
             }
 
@@ -1400,8 +1405,8 @@ function canvasresize(id){
                             var sliced = points.slice(pre,numofpoint);
                             
                             points.splice(pre, numofpoint);
-                            console.log(sliced);
-                            console.log(pointHistory)
+                            //console.log(sliced);
+                            //console.log(pointHistory)
 
                             pointHistory.splice(i,1);
                             for(var z = i ; z < pointHistory.length; z++){
@@ -1419,7 +1424,7 @@ function canvasresize(id){
             });
         },
         mouseup: function(e) {
-            console.log("Eraser Up")
+            //console.log("Eraser Up")
             this.ismousedown = false;
         },
         mousemove: function(e) {
@@ -1465,9 +1470,9 @@ function canvasresize(id){
 
     var textHandler = {
         text: '',
-        selectedFontFamily: 'Arial',
-        selectedFontSize: '15',
-        lastFillStyle: '',
+        selectedFontFamily: '나눔펜글씨',
+        selectedFontSize: '48',
+        lastFillStyle: 'black',
         onShapeSelected: function() {
             document.getElementById("temp-canvas").className = "";
             document.getElementById("temp-canvas").classList.add("texti");
@@ -1477,11 +1482,6 @@ function canvasresize(id){
         onShapeUnSelected: function() {
             this.text = '';
             this.showOrHideTextTools('hide');
-
-
-            if (typeof this.blinkCursorInterval !== 'undefined') {
-                clearInterval(this.blinkCursorInterval);
-            }
         },
         getFillColor: function(color) {
             color = (color || fillStyle).toLowerCase();
@@ -1530,7 +1530,7 @@ function canvasresize(id){
         getOptions: function() {
             var options = {
                 font: textHandler.selectedFontSize + 'px "' + textHandler.selectedFontFamily + '"',
-                fillStyle: textHandler.getFillColor(),
+                fillStyle: this.lastFillStyle,
                 strokeStyle: '#6c96c8',
                 globalCompositeOperation: 'source-over',
                 globalAlpha: 1,
@@ -1543,9 +1543,20 @@ function canvasresize(id){
         },
         appendPoints: function() {
             var options = textHandler.getOptions();
+            //console.log(options);
             points[points.length] = ['text', ['"' + textHandler.text + '"', textHandler.x, textHandler.y], drawHelper.getOptions(options)];
         },
+        canvasInput:null,
+        updateInput: function(){
+            document.querySelector(".textInputUI").focus();
+            document.querySelector(".textInputUI").addEventListener('change', (event) => {
+                //console.log("Change!");
+                textHandler.text = event.target.value;
+            });
+        },
         mousedown: function(e) {
+            //console.log("mouse down!");
+            this.updateInput();
             if (!is.isText) return;
 
             if (textHandler.text.length) {
@@ -1561,16 +1572,10 @@ function canvasresize(id){
             textHandler.x = e.pageX - canvas.offsetLeft - 5;
             textHandler.y = e.pageY - canvas.offsetTop + 10;
 
-            if (typeof textHandler.blinkCursorInterval !== 'undefined') {
-                clearInterval(textHandler.blinkCursorInterval);
-            }
-
-            textHandler.blinkCursor();
-            textHandler.blinkCursorInterval = setInterval(textHandler.blinkCursor, 700);
-
             this.showTextTools();
         },
-        mouseup: function(e) {},
+        mouseup: function(e) {
+        },
         mousemove: function(e) {},
         showOrHideTextTools: function(show) {
             if (show === 'hide') {
@@ -1579,9 +1584,18 @@ function canvasresize(id){
                     this.lastFillStyle = '';
                 }
             } else if (!this.lastFillStyle.length) {
-                this.lastFillStyle = fillStyle;
-                fillStyle = 'black';
+                this.lastFillStyle = textHandler.lastFillStyle;
+                //fillStyle = 'black';
             }
+            
+            this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
+            this.textInputBox.style.left = this.x + 'px';
+            this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
+            this.textInputContainer.style.position = 'relative';
+
+            this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
+            this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 30+'px'; 
+            this.fontColorBox.style.top =  this.y - this.textInputBox.clientHeight + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -1593,7 +1607,7 @@ function canvasresize(id){
             this.fontFamilyBox.style.top = this.y + 'px';
         },
         showTextTools: function() {
-            if (!this.fontFamilyBox || !this.fontSizeBox) return;
+            if (!this.fontFamilyBox || !this.fontSizeBox || !this.textInputBox || !this.fontColorBox) return;
 
             this.unselectAllFontFamilies();
             this.unselectAllFontSizes();
@@ -1623,6 +1637,77 @@ function canvasresize(id){
                 };
                 // child.style.fontSize = child.innerHTML + 'px';
             });
+            this.eachFontColor(function(child) {
+                child.onclick = function(e) {
+                    e.preventDefault();
+
+                    textHandler.showOrHideTextTools('hide');
+
+                    textHandler.selectedFontColor = this.innerHTML;
+                    this.className = 'font-color-selected';
+                };
+                // child.style.fontSize = child.innerHTML + 'px';
+            });
+        },
+        textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
+        eachFontColor: function(callback){
+            function hexToRGBA(h, alpha) {
+                return 'rgba(' + hexToRGB(h).join(',') + ',1)';
+            }
+            //console.log("each font color!");
+            var colors = [
+                ['FFFFFF', '006600', '000099', 'CC0000', '8C4600'],
+                ['CCCCCC', '00CC00', '6633CC', 'FF0000', 'B28500'],
+                ['666666', '66FFB2', '006DD9', 'FF7373', 'FF9933'],
+                ['333333', '26FF26', '6699FF', 'CC33FF', 'FFCC99'],
+                ['000000', 'CCFF99', 'BFDFFF', 'FFBFBF', 'FFFF33']
+            ];
+
+            var textColorContainer = find('text-fill-colors'),
+                textColorsList = find("text-colors-list"),
+                fillStyleText = find('text-fill-style'),
+                textSelectedColor = find('text-selected-color'),
+                textSelectedColor2 = find('text-selected-color-2'),
+                alpha = 0.2;
+
+            // START INIT TEXT
+            this.textStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
+            textSelectedColor.style.backgroundColor =
+            textSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
+            textColorsList.innerHTML = '';
+
+            colors.forEach(function(colorRow) {
+                var row = '<tr>';
+
+                colorRow.forEach(function(color) {
+                    row += '<td style="background-color:#' + color + '" data-color="' + color + '"></td>';
+                })
+                row += '</tr>';
+
+                textColorsList.innerHTML += row;
+            })
+
+            Array.prototype.slice.call(textColorsList.getElementsByTagName('td')).forEach(function(td) {
+                addEvent(td, 'mouseover', function() {
+                    var elColor = td.getAttribute('data-color');
+                    textSelectedColor2.style.backgroundColor = '#' + elColor;
+                    fillStyleText.value = elColor;
+                });
+
+                addEvent(td, 'click', function() {
+                    var elColor = td.getAttribute('data-color');
+                    textSelectedColor.style.backgroundColor =
+                    textSelectedColor2.style.backgroundColor = '#' + elColor;
+                    fillStyleText.value = elColor;
+                    textHandler.lastFillStyle = hexToRGBA(fillStyleText.value, alpha);
+                    //console.log("this.LastFillStyle",textHandler.lastFillStyle);
+                    textColorContainer.style.display = 'none';
+                });
+            })
+            addEvent(textSelectedColor, 'click', function() {
+                textColorContainer.style.display = 'block';
+            });
+
         },
         eachFontFamily: function(callback) {
             var childs = this.fontFamilyBox.querySelectorAll('li');
@@ -1653,17 +1738,23 @@ function canvasresize(id){
             });
         },
         onReturnKeyPressed: function() {
+            //console.log(this.lastFillStyle);
             if (!textHandler.text || !textHandler.text.length) return;
-            var fontSize = parseInt(textHandler.selectedFontSize) || 15;
+            document.querySelector('.textInputUI').value = "";
+            var fontSize = parseInt(textHandler.selectedFontSize) || 48;
             this.mousedown({
                 pageX: this.pageX,
                 // pageY: parseInt(tempContext.measureText(textHandler.text).height * 2) + 10
                 pageY: this.pageY + fontSize + 5
             });
             drawHelper.redraw();
+            this.showOrHideTextTools('hide');
         },
+        textInputBox: document.querySelector('.textInputUI'),
         fontFamilyBox: document.querySelector('.fontSelectUl'),
-        fontSizeBox: document.querySelector('.fontSizeUl')
+        fontSizeBox: document.querySelector('.fontSizeUl'),
+        fontColorBox: document.querySelector('.fontColorUI'),
+        textInputContainer:document.getElementById('textInputContainer')
     };
 
     var arcHandler = {
@@ -2127,7 +2218,7 @@ function canvasresize(id){
     };
 
     var icons = {};
-    console.log(params)
+    //console.log(params)
     if (params.icons) {
         try {
             icons = JSON.parse(params.icons);
@@ -2350,7 +2441,7 @@ function canvasresize(id){
                 }
 
                 if (this.id === 'eraserIcon') {
-                    console.log("Eraser click");
+                    //console.log("Eraser click");
 
                     if(this.classList.contains('off'))
                     return false;
@@ -2544,7 +2635,7 @@ function canvasresize(id){
 
             addEvent(canvas, 'click', function() {
                 hideContainers();
-                console.log('Pencil Click');
+                //console.log('Pencil Click');
                 if(this.classList.contains('off'))
                 return false;
                 document.getElementById("temp-canvas").className = "";
@@ -2651,7 +2742,7 @@ function canvasresize(id){
 
 
                 hideContainers();
-                console.log('Marker Click')
+                //console.log('Marker Click')
                 document.getElementById("temp-canvas").className = "";
                 document.getElementById("temp-canvas").classList.add("marker");
 
@@ -2695,13 +2786,6 @@ function canvasresize(id){
             document.getElementById('eraserIcon').style.display = 'block';
         }
 
-
-
-
-
-
-
-        
         function decorateText() {
             var context = getContext('textIcon');
 
@@ -3108,6 +3192,9 @@ function canvasresize(id){
         if (!isControlKeyPressed && keyCode === 17) {
             isControlKeyPressed = true;
         }
+        if (!isAltKeyPressed && keyCode === 18) {
+            isAltKeyPressed = true;
+        }
     }
 
     function isBackKey(e, keyCode) {
@@ -3158,13 +3245,13 @@ function canvasresize(id){
         }
 
         // Ctrl + t
-        if (isControlKeyPressed && keyCode === 84 && is.isText) {
+        if (isAltKeyPressed && keyCode === 84 && is.isText) {
             textHandler.showTextTools();
             return;
         }
 
         if (keyCode === 90 && e.ctrlKey) {
-            console.log('zxczxc')
+            //console.log('zxczxc')
             if (points.length) {
                 var idx = pointHistory.length - 2;
 
@@ -3223,10 +3310,6 @@ function canvasresize(id){
 
         keyCode = e.which || e.keyCode || 0;
 
-        var inp = String.fromCharCode(keyCode);
-        if (/[a-zA-Z0-9-_ !?|\/'",.=:;(){}\[\]`~@#$%^&*+-]/.test(inp)) {
-            textHandler.writeText(String.fromCharCode(keyCode));
-        }
     }
 
     addEvent(document, 'keypress', onkeypress);
@@ -3347,7 +3430,8 @@ function canvasresize(id){
         if (!event.data.canvasDesignerSyncData) return;
 
         // drawing is shared here (array of points)
-        var d = event.data.canvasDesignerSyncData;
+        var d = event.data.canvasDesignerSyncData;        
+        if(!d.points) return;
             
         if (d.startIndex !== 0) {
             for (var i = 0; i < d.points.length; i++) {

@@ -42,30 +42,56 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 
-function _3DCanvasOnOff(btn){
-    var visible = $(btn).hasClass('on');
-    console.log(visible);
+var isSharingScreen = false;
+var isSharing3D = false;
+var isSharingMovie = false;
+var isSharingFile = false;
 
-    if(params.open == "true")
-    {  
-      const isViewer = classroomInfo.share3D.state;
-      if(false == isViewer)
-      {
-          modelEnable(send=true);
-      }
-      else
-      {
-          remove3DCanvas();                
-          connection.send({
-              modelDisable : true
-          });
-      }          
+function checkSharing(){
+  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile;
+}
+
+function removeOnSelect(btn){
+  alert("동시에 여러 기능을 공유할 수 없습니다");
+  $(btn).removeClass("on");
+  $(btn).removeClass("selected-shape");
+}
+
+function _3DCanvasOnOff(btn){
+  if(!isSharing3D && checkSharing()){
+    removeOnSelect(btn);
+    return;
+  }
+
+  var visible = $(btn).hasClass('on');
+  console.log(visible);
+
+  if(params.open == "true")
+  {  
+    const isViewer = classroomInfo.share3D.state;
+    if(false == isViewer)
+    {
+      isSharing3D = true;
+      modelEnable(send=true);
+    }
+    else
+    {
+      isSharing3D = false;
+      remove3DCanvas();                
+      connection.send({
+          modelDisable : true
+      });
+    }          
   }
 }
 
-var lastStream ;
 
 function ScreenShare(btn){
+  if(!isSharingScreen && checkSharing()){
+    removeOnSelect(btn);
+    return;
+  }
+
   var on = $(btn).hasClass("on")
 
   if (!window.tempStream) {
@@ -74,6 +100,7 @@ function ScreenShare(btn){
   }
 
   if(!on){
+    isSharingScreen = false;
     lastStream.getTracks().forEach(track => track.stop());
     connection.send({
       hideMainVideo: true,
@@ -89,6 +116,7 @@ function ScreenShare(btn){
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
+          isSharingScreen = true;
           lastStream = stream;
           replaceScreenTrack(stream, btn);
           CanvasResize();
@@ -264,10 +292,14 @@ connection.onmessage = function (event) {
     return;
   };
 
+  if(event.data.pdf) {    
+    classroomCommand.receivePdfMessage (event.data.pdf);
+    return;
+  }  
+
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     var enable = event.data.modelEnable.enable;
-    console.log("enable",enable);
     modelEnable(false);
     return;
   }
@@ -638,9 +670,10 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.attachStreams.push(tempStream);
     window.tempStream = tempStream;
 
-    SetTeacher();
+    SetTeacher(); 
+    classroomCommand.openRoom ();   
 
-    connection.extra.roomOwner = true;
+    connection.extra.roomOwner = true;    
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
         if (error === connection.errors.ROOM_NOT_AVAILABLE) {
@@ -868,6 +901,7 @@ function replaceScreenTrack(stream, btn) {
     });
     $(btn).removeClass("on");
     $(btn).removeClass("selected-shape");
+    isSharingScreen = false;
     // $('#main-video').hide();
     classroomInfo.shareScreen = false;
     window.sharedStream = null;
@@ -943,12 +977,18 @@ $('#top_share_screen').click(function () {
   }
 });
 
-function ClassTime() {
-  var now = 0;
+let classTimeIntervalHandle;
+
+function updateClassTime () {
+  var now =  new Date().getTime() - classroomInfo.roomOpenTime;
+  now = parseInt(now / 1000);
+  
+  if(!classTimeIntervalHandle)  
+    classTimeIntervalHandle = setInterval(Sec, 1000);
+
   function Sec() {
     now++;
     var time = now;
-
     var hour = Math.floor(time / 3600);
     time %= 3600;
 
@@ -961,12 +1001,7 @@ function ClassTime() {
 
     $('#current-day').text(hour + ':' + min + ':' + time);
   }
-  setInterval(Sec, 1000);
 }
-
-ClassTime();
-
-
 
 
 function SetTeacher(){
@@ -1305,15 +1340,26 @@ $(window).on('beforeunload', function () {
 
 let isFileViewer = false;
 
-function LoadFile(){
+function LoadFile(btn){
+  if(!isSharingFile && checkSharing()){
+    removeOnSelect(btn);
+    return;
+  }
+  
+  if(!connection.extra.roomOwner) return;
+  
   if (isFileViewer === false) {
+    isSharingFile = true;
     loadFileViewer();
     $('#canvas-controller').show();
     isFileViewer = true;
+    classroomCommand.sendOpenPdf ();
   } else {
+    isSharingFile = false;
     unloadFileViewer();
     $('#canvas-controller').hide();
     isFileViewer = false;
+    classroomCommand.sendClosePdf ();
   }
 }
 
@@ -1353,7 +1399,66 @@ function loadFileViewer() {
   frame.document.getElementById("main-canvas").style.zIndex = "1";
   frame.document.getElementById("temp-canvas").style.zIndex = "2";
   frame.document.getElementById("tool-box").style.zIndex = "3";
+  initFileViewerController();
+  // setTimeout(()=> initFileViewerController(),5000);
 }
+
+function initFileViewerController(){
+  let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+  let fileViewer = frame.document.getElementById('file-viewer');
+  console.log(fileViewer);
+  
+  fileViewer.addEventListener("load", function() {
+    console.log("Load!");
+    let fullscreen = document.getElementById('fullscreen');
+    fullscreen.onclick = function() {
+      fileViewer.contentWindow.document.getElementById('fullscreen').click();
+    }
+    let presentation = document.getElementById('presentation');
+    presentation.onclick = function() {
+      fileViewer.contentWindow.document.getElementById('presentation').click();
+    }
+    let nextButton = document.getElementById('next');
+    nextButton.onclick = function() {
+
+      if(connection.extra.roomOwner || !classroomInfo.allControl) 
+      {
+        fileViewer.contentWindow.document.getElementById('next').click();
+        classroomCommand.sendPDFCmd('next');
+      }
+    }
+    let prevButton = document.getElementById('prev');
+    prevButton.onclick = function() {
+      
+      if(connection.extra.roomOwner || !classroomInfo.allControl) 
+      {
+        fileViewer.contentWindow.document.getElementById('previous').click();
+        classroomCommand.sendPDFCmd('prev');
+      }
+    }
+    let firstPage = document.getElementById('first_page');
+    firstPage.onclick = function() {
+      fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
+      fileJQuery.scrollTop();
+      classroomCommand.sendPDFCmd('first-page');
+    }
+    let lastPage = document.getElementById('last_page');
+    lastPage.onclick = function() {
+      fileViewer.contentWindow.viewerPlugin.showPage(1);
+      classroomCommand.sendPDFCmd('last-page');
+    }
+    console.log(fileViewer.contentDocument);
+    fileViewer.contentWindow.onscroll = function (e) {console.log(e)};
+    fileViewer.contentDocument.addEventListener('scroll', function(event) {
+      console.log(event);
+    }, false);
+  
+  });
+
+}
+
 
 _3DCanvasFunc();
 _AllCantrallFunc();
@@ -1386,7 +1491,7 @@ function alertBox(message, title, callback_yes, callback_no) {
     });
 
   $('#alert-title').html(title || '알림');
-  $('#alert-message').html(message);
+  $('#alert-content').html(message);
   $('#alert-box').fadeIn(300);
 }
 

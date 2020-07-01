@@ -91,9 +91,9 @@ var createScene = function (_canvas) {
     //     scene.createDefaultCameraOrLight(true);
     //     scene.activeCamera.attachControl(canvas, false);
     //     scene.activeCamera.alpha += Math.PI; // camera +180°
-    //     console.log("testssss z z z z z z");
+    //     //console.log("testssss z z z z z z");
     // });
-    console.log("Create 3D!");
+    //console.log("Create 3D!");
     // Register a render loop to repeatedly render the scene
     engine.runRenderLoop(function () {
         scene.render();
@@ -118,8 +118,8 @@ let top_3d_button = $('#top_3d');
 
 function _3DCanvasFunc(){
 top_3d_render_jthis = $("#top_3d");
-    console.log("3d cansvasFunc!");
-    console.log(top_3d_button);
+    //console.log("3d cansvasFunc!");
+    //console.log(top_3d_button);
     top_3d_button.click(function () {   
 
 
@@ -149,7 +149,7 @@ function modelEnable(send)
     frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
-    console.log(classroomInfo);
+    //console.log(classroomInfo);
     classroomInfo.share3D.state = true;
     // create 3d canvas on model enanbled      
     let _3d_canvas = document.createElement('canvas');
@@ -177,7 +177,7 @@ function modelEnable(send)
 }
 
 function remove3DCanvas(){
-    console.log("remove 3d!");
+    //console.log("remove 3d!");
     frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
@@ -189,7 +189,7 @@ function remove3DCanvas(){
 }
 
 function CanvasResize() {
-    console.log(_3dcanvas);
+    //console.log(_3dcanvas);
     _3dcanvas = frame.document.getElementById("renderCanvas")
     
     var canvas = frame.document.getElementById("main-canvas");
