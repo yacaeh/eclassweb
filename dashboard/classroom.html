@@ -155,14 +155,15 @@
 
     <!--pdf controller-->
     <div id="canvas-controller">
-      <button id="fullscreen">풀스크린</button>
-      <button id="presentation">프리젠테이션</button>
-      <button id="first_page"> 첫페이지 </button>
-      <button id="prev"> 이전 </button>
-      <button id="next"> 다음 </button>
-      <button id="last_page"> 마지막 페이지 </button>
+      <div class="upper_controller">
+        <img class="top_icon" id="presentation">
+        <img class="top_icon" id="fullscreen">
+      </div>
+      <div class="bottom_controller">
+        <img class="top_icon bottom-button" id="prev">
+        <img class="top_icon bottom-button" id="next">
+      </div>
     </div>
-  </div>
 
   <script src="/dashboard/js/babylon.js"></script>
   <script src="/dashboard/js/babylonjs.loaders.min.js"></script>

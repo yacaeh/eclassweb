@@ -1380,20 +1380,20 @@ function initFileViewerController(){
     prevButton.onclick = function() {
       fileViewer.contentWindow.document.getElementById('previous').click();
     }
-    let firstPage = document.getElementById('first_page');
-    firstPage.onclick = function() {
-      fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-      fileJQuery.scrollTop();
-    }
-    let lastPage = document.getElementById('last_page');
-    lastPage.onclick = function() {
-      fileViewer.contentWindow.viewerPlugin.showPage(1);
-    }
-    console.log(fileViewer.contentDocument);
-    fileViewer.contentWindow.onscroll = function (e) {console.log(e)};
-    fileViewer.contentDocument.addEventListener('scroll', function(event) {
-      console.log(event);
-    }, false);
+    // let firstPage = document.getElementById('first_page');
+    // firstPage.onclick = function() {
+    //   fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
+    //   fileJQuery.scrollTop();
+    // }
+    // let lastPage = document.getElementById('last_page');
+    // lastPage.onclick = function() {
+    //   fileViewer.contentWindow.viewerPlugin.showPage(1);
+    // }
+    // console.log(fileViewer.contentDocument);
+    // fileViewer.contentWindow.onscroll = function (e) {console.log(e)};
+    // fileViewer.contentDocument.addEventListener('scroll', function(event) {
+    //   console.log(event);
+    // }, false);
   
   });
 
