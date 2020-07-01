@@ -2742,14 +2742,15 @@ function canvasresize(id){
 
 
                 hideContainers();
-                //console.log('Marker Click')
+                // console.log('Marker Click') 
+                console.log(strokeStyleText.style.display);
+                console.log(strokeStyleText.value);
+
                 document.getElementById("temp-canvas").className = "";
                 document.getElementById("temp-canvas").classList.add("marker");
 
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                markerContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) + 'px';
-
                 fillStyleText.focus();
             });
 
@@ -3620,11 +3621,15 @@ function SliderSetting(element, targetinput, defaultv, callback){
 
     Set(defaultv);
     function Set(v){
+        var parent = sliderval.parentElement;
+        console.log(parent.style.display = 'block');
+        console.log(parent.getBoundingClientRect());
+
         var ratio = v / maxSlider;
         var sliderWidth = slider.getBoundingClientRect().width;
-        back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
-        bar.style.left = '-7.5px';
-        // bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+        // back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
+        back.style.width = (ratio * sliderWidth) + 'px';
+        bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
         callback(v);
     }

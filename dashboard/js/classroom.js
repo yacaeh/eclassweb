@@ -116,6 +116,7 @@ function ScreenShare(btn){
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
+          console.log(stream);
           isSharingScreen = true;
           lastStream = stream;
           replaceScreenTrack(stream, btn);
@@ -1025,12 +1026,10 @@ function SetStudent() {
 SelectViewType();
 
 function SetStudentList(){
-    $("#student_list").empty();
-
-    console.log(connection.getAllParticipants());
+  $("#student_list").empty();
 
     if(connection.getAllParticipants().length == 0){
-        $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')
+        // $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')?
     }
     else {
         connection.getAllParticipants().forEach(function(pid) {

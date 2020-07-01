@@ -214,7 +214,6 @@ button[disabled] {
 
 #conversation-panel {
   text-align: left;
-  top: -10px;
   overflow: auto;
   width: 100%;
   bottom: 50px;
@@ -534,7 +533,7 @@ hr {
 
 .student-menu > .stuname{
   position: absolute;
-  width: 42px;
+  width: 80px;
   height: 18px;
   left: 14px;
   top: 13px;
@@ -762,6 +761,8 @@ hr {
   background: #B8B8B8;
   top: 50px;
   position: absolute;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
 }
 
 .student{
@@ -810,14 +811,13 @@ hr {
 }
 
 .student .name .alert{
-  top: 5px;
-  width: 10px;
-  height: 10px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
   left: 5px;
   position: absolute;
   border-radius: 10px;
-
-  padding:0;
+  padding: 0;
   margin-bottom: 0;
   border: 0px solid transparent;
 }
