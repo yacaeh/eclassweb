@@ -23,16 +23,22 @@ classroomCommand = {
 /*    
 
 */
-classroomCommand.openRoom = function () {
-    var date = new Date();        
-    classroomInfo.roomOpenTime = date.getTime();
-    updateClassTime ();
+
+classroomCommand.joinRoom = function () {
+    // var date = new Date();        
+    // classroomInfo.roomOpenTime = date.getTime();  
+    // updateClassTime ();    
+    connection.socket.emit ('update-room-info', (_info) => {
+        console.error('update-room-oinfo');
+        console.error(_info);
+        classroomInfo = _info;
+        updateClassTime ();
+        classroomCommand.updateSyncRoom ();
+    });
 };
 
 
 classroomCommand.updateSyncRoom = function () {    
-
-    classroomCommand.syncClassroomOpenTime ();
 
     if(classroomInfo.allControl) {
         allControllEnable(top_all_controll_jthis, classroomInfo.allControl, false);
@@ -51,31 +57,31 @@ classroomCommand.updateSyncRoom = function () {
     }
 };
 
-classroomCommand.sendsyncRoomInfo = function (_data) {
-    /*
-        방에 학생이 들어오면, 현재 방 상태 정보를 동기화 시키기 위해
-        방상태 정보를 보낸다.
-    */
-    connection.send ({
-        roomSync : {
-            userid : _data.userid,
-            info : classroomInfo
-        }
-    });
+// classroomCommand.sendsyncRoomInfo = function (_data) {
+//     /*
+//         방에 학생이 들어오면, 현재 방 상태 정보를 동기화 시키기 위해
+//         방상태 정보를 보낸다.
+//     */
+//     connection.send ({
+//         roomSync : {
+//             userid : _data.userid,
+//             info : classroomInfo
+//         }
+//     });
 
-    // shareScreen은 선생님이 해당 학생한테 공유 해줘야 한다. 
-    if(classroomInfo.shareScreen) {
-        classroomCommand.syncScreenShare (_data.userid);
-    };
-};
+//     // shareScreen은 선생님이 해당 학생한테 공유 해줘야 한다. 
+//     if(classroomInfo.shareScreen) {
+//         classroomCommand.syncScreenShare (_data.userid);
+//     };
+// };
 
-classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {  
-    console.log(_syncRoom);
-    if(_syncRoom.userid == connection.userid) {              
-        classroomInfo = _syncRoom.info;
-        classroomCommand.updateSyncRoom ();
-    }
-};
+// classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {  
+//     console.log(_syncRoom);
+//     if(_syncRoom.userid == connection.userid) {              
+//         classroomInfo = _syncRoom.info;
+//         classroomCommand.updateSyncRoom ();
+//     }
+// };
 
 
 classroomCommand.sendAlert = function (callback) {    

@@ -166,9 +166,9 @@ connection.onopen = function (event) {
   }
 
 
-    // 접속시 방정보 동기화.
-    if(connection.extra.roomOwner)
-        classroomCommand.sendsyncRoomInfo (event);
+    // // 접속시 방정보 동기화.
+    // if(connection.extra.roomOwner)
+    //     classroomCommand.sendsyncRoomInfo (event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -199,10 +199,10 @@ connection.onmessage = function (event) {
     return;
   }
 
-    if(event.data.roomSync) {
-        classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
-        return;
-    };
+    // if(event.data.roomSync) {
+    //     classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
+    //     return;
+    // };
 
   if (event.data.typing === false) {
     $('#key-press').hide().find('span').html('');
@@ -633,7 +633,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     window.tempStream = tempStream;
 
     SetTeacher(); 
-    classroomCommand.openRoom ();   
 
     connection.extra.roomOwner = true;    
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
@@ -644,6 +643,9 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         }
         alert(error);
       }
+
+
+      classroomCommand.joinRoom ();
 
       connection.socket.on('disconnect', function () {
         location.reload();
@@ -713,6 +715,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           }
           alert(error);
         }
+
+        classroomCommand.joinRoom ();
 
         connection.socket.on('disconnect', function () {
           console.log('disconnect Class!');

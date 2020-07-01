@@ -582,7 +582,23 @@ module.exports = exports = function(socket, config) {
                         maxParticipantsAllowed: parseInt(params.maxParticipantsAllowed || 1000) || 1000,
                         owner: userid, // this can change if owner leaves and if control shifts
                         participants: [userid],
-                        extra: {}, // usually owner's extra-data
+                        extra: {},
+                        info : {
+                            roomOpenTime : new Date().getTime(),    // 현재 시간 저장
+                            allControl : false,
+                            shareScreen : false,
+                            share3D : {
+                                state : false,
+                                data : {}                                
+                            },
+                            pdf : {
+                                state : false,
+                                data : {
+                                    src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'                                    
+                                }
+                            },
+                            exam : false
+                        }, // usually owner's extra-data
                         socketMessageEvent: '',
                         socketCustomEvent: '',
                         identifier: '',
@@ -838,9 +854,9 @@ module.exports = exports = function(socket, config) {
             }
 
             // append this user into participants list
-            appendToRoom(arg.sessionid, socket.userid);
+            appendToRoom(arg.sessionid, socket.userid);            
 
-            try {
+            try {               
                 // override owner & session
                 if (enableScalableBroadcast === true) {
                     if (Object.keys(listOfRooms[arg.sessionid]).length == 1) {
@@ -856,17 +872,9 @@ module.exports = exports = function(socket, config) {
                     listOfRooms[arg.sessionid].socketCustomEvent = listOfUsers[socket.userid].socketCustomEvent;
                     listOfRooms[arg.sessionid].maxParticipantsAllowed = parseInt(params.maxParticipantsAllowed || 1000) || 1000;
 
-                    // // custom code
-                    // listOfRooms[arg.sessionid].roomInfo = {
-                    //     allControl : false,
-                    //     shareScreen :false,
-                    //     share3D = false
-                    // };
-
-
                     if(arg.identifier && arg.identifier.toString().length) {
                         listOfRooms[arg.sessionid].identifier = arg.identifier;
-                    }
+                    }  
 
                     try {
                         if (typeof arg.password !== 'undefined' && arg.password.toString().length) {
@@ -876,7 +884,7 @@ module.exports = exports = function(socket, config) {
                     } catch (e) {
                         pushLogs(config, 'open-room.password', e);
                     }
-                }
+                }               
 
                 // admin info are shared only with /admin/
                 listOfUsers[socket.userid].socket.admininfo = {
@@ -891,7 +899,7 @@ module.exports = exports = function(socket, config) {
                 pushLogs(config, 'open-room', e);
             }
 
-            sendToAdmin();
+            sendToAdmin();     
 
             try {
                 callback(true);
@@ -1024,26 +1032,87 @@ module.exports = exports = function(socket, config) {
             sendToAdmin();
         });
 
+        /*
+            Custom Code
+        */
+       
 
-    /*
-        socket.join을 사용하지 않기 때문에, room 브로드캐스트를 사용할 수 없음.            
+        socket.on ('update-room-info', function(success, error) {
+           
+            call_getRoom(room => {
+                success(room.info);
+            }, error => {
+                error(error);
+            });
+        });
 
-        socket.on ('teacherToStudents', (arg, callback) => {            
-            broadcastInRoom('teacherToStudents', arg);
-            callback('success call');
+  
+
+        socket.on ('all-control',function(success, error) {
+            
+            call_getRoom(room => {
+                room.info.allControl = !room.info.allControl;
+                success(room.info.allControl);
+            }, error => {
+                error(error);
+            });
+        });
+
+        socket.on ('share-screen', function(callback) {
+            
+            call_getRoom(room => {
+                room.info.shareScreen = !room.info.shareScreen;
+                success(room.info.shareScreen);
+            }, error => {
+                error(error);
+            });
+        });
+
+        socket.on ('share-3D', function(args, callback){
+            let room = getRoomWithErroCallback(callback);
+            if(room) {
+
+            }
+        });
+
+        socket.on('share-pdf', function(args, callback){
+            let room = getRoomWithErroCallback(callback);
+            if(room) {
+
+            }
+        });
+
+        socket.on('exam', function(args, callback) {
+
+            
         });
 
 
-        function getRoom () {
-            var user = getUser ();
-            if(user.error)            
-                return user.error;
-                                
-            var room = listOfRooms[user.roomid];
-            if(!room) return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };
-            if(room.owner !== user.userid) return { error : CONST_STRINGS.ROOM_PERMISSION_DENIED };
 
+
+        //--------------------------------------------------------------------------------//
+
+
+        function call_getRoom (success, error) {
+            let room = getRoom();
+            if(room.error) {
+                error({error : room.error});
+                return;
+            }
+            success (room);
+        };
+
+
+        function getRoom () {
+            const roomId = getRoomId();                                
+            var room = listOfRooms[roomId];
+            if(!room) return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
             return room;
+        };
+
+
+        function getRoomId () {
+            return socket.admininfo.sessionid;
         };
 
         function getUser () {                     
@@ -1052,7 +1121,17 @@ module.exports = exports = function(socket, config) {
             if(!user.roomid) return { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };
             if(!socket.admininfo) return { error : CONST_STRINGS.INVALID_SOCKET };
             return user;
-        }       
+        } ;    
+
+
+
+    /*
+        socket.join을 사용하지 않기 때문에, room 브로드캐스트를 사용할 수 없음.            
+
+        socket.on ('teacherToStudents', (arg, callback) => {            
+            broadcastInRoom('teacherToStudents', arg);
+            callback('success call');
+        });
 
 
         function getRoomNumber () {
