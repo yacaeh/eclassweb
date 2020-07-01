@@ -513,38 +513,6 @@ hr {
   background-color: yellow;
 }
 
-#canvas-controller{
-  position: relative; 
-  display:none;
-  z-index: 999999;
-  left:5%;
-  width:75%;
-  height:100%;
-}
-
-.upper_controller{
-  position: absolute;
-  background-color: #FFFFFF;
-  width:100%;
-  margin: auto;
-}
-
-.bottom_controller{
-  position: fixed;
-  width:100%;
-  background-color: #EFF1F0;
-  left:5%;
-  width:75%;
-  bottom: 0px;
-  margin: auto;
-}
-
-.bottom-button {
-  display:inline-block;
-  margin:5px 20px;
-  padding:5px;
-}
-
 .no_student{
   width: 100%;
   text-align: center;

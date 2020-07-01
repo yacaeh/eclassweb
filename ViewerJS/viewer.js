@@ -276,6 +276,7 @@ function Viewer( viewerPlugin, parameters ) {
 
         currentPage                                 = n;
         document.getElementById('pageNumber').value = currentPage;
+        window.top.showPage(n);
     };
 
     /**
@@ -283,6 +284,7 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.showNextPage = function () {
+        window.top.showNextPage();
         self.showPage(currentPage + 1);
     };
 
@@ -291,6 +293,7 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.showPreviousPage = function () {
+        window.top.showPreviousPage();
         self.showPage(currentPage - 1);
     };
 
