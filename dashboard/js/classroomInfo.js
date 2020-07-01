@@ -95,13 +95,18 @@ classroomCommand.sendAlert = function (callback) {
 
 classroomCommand.receivAlert = function () {
     var alertTimeHandler;    
-    alertBox("알림이 도착하였습니다", "알림", () => {
+    alertBox("<progress max='100' value='100' class='alert-progress exam-state-progress'></progress>", "알림", () => {
         response ('yes');
     }, () => {
         response ('no');
     });        
 
     alertTimeHandler = setTimeout (noResponse, 5000);
+
+    decreaseProgress = setInterval(function(){
+        var progressVal = $(".alert-progress").val() - (10 / 5000 * 100);
+        $(".alert-progress").val(progressVal)
+    },10);
 
     function response (yesOrno) {
         connection.send({                
@@ -110,10 +115,12 @@ classroomCommand.receivAlert = function () {
                 response : yesOrno
             }
         }); 
+        clearInterval(decreaseProgress);
         clearTimeout(alertTimeHandler);   
     }
     
     function noResponse () {
+        clearInterval(decreaseProgress);
         clearTimeout(alertTimeHandler);         
         $('#alert-box').fadeOut(300);       
     };
