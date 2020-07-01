@@ -42,30 +42,56 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 
-function _3DCanvasOnOff(btn){
-    var visible = $(btn).hasClass('on');
-    console.log(visible);
+var isSharingScreen = false;
+var isSharing3D = false;
+var isSharingMovie = false;
+var isSharingFile = false;
 
-    if(params.open == "true")
-    {  
-      const isViewer = classroomInfo.share3D.state;
-      if(false == isViewer)
-      {
-          modelEnable(send=true);
-      }
-      else
-      {
-          remove3DCanvas();                
-          connection.send({
-              modelDisable : true
-          });
-      }          
+function checkSharing(){
+  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile;
+}
+
+function removeOnSelect(btn){
+  alert("동시에 여러 기능을 공유할 수 없습니다");
+  $(btn).removeClass("on");
+  $(btn).removeClass("selected-shape");
+}
+
+function _3DCanvasOnOff(btn){
+  if(!isSharing3D && checkSharing()){
+    removeOnSelect(btn);
+    return;
+  }
+
+  var visible = $(btn).hasClass('on');
+  console.log(visible);
+
+  if(params.open == "true")
+  {  
+    const isViewer = classroomInfo.share3D.state;
+    if(false == isViewer)
+    {
+      isSharing3D = true;
+      modelEnable(send=true);
+    }
+    else
+    {
+      isSharing3D = false;
+      remove3DCanvas();                
+      connection.send({
+          modelDisable : true
+      });
+    }          
   }
 }
 
-var lastStream ;
 
 function ScreenShare(btn){
+  if(!isSharingScreen && checkSharing()){
+    removeOnSelect(btn);
+    return;
+  }
+
   var on = $(btn).hasClass("on")
 
   if (!window.tempStream) {
@@ -74,6 +100,7 @@ function ScreenShare(btn){
   }
 
   if(!on){
+    isSharingScreen = false;
     lastStream.getTracks().forEach(track => track.stop());
     connection.send({
       hideMainVideo: true,
@@ -89,6 +116,7 @@ function ScreenShare(btn){
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
+          isSharingScreen = true;
           lastStream = stream;
           replaceScreenTrack(stream, btn);
           CanvasResize();
@@ -863,6 +891,7 @@ function replaceScreenTrack(stream, btn) {
     });
     $(btn).removeClass("on");
     $(btn).removeClass("selected-shape");
+    isSharingScreen = false;
     // $('#main-video').hide();
     classroomInfo.shareScreen = false;
     window.sharedStream = null;
@@ -1299,15 +1328,22 @@ $(window).on('beforeunload', function () {
 
 let isFileViewer = false;
 
-function LoadFile(){
+function LoadFile(btn){
+  if(!isSharingFile && checkSharing()){
+    removeOnSelect(btn);
+    return;
+  }
+  
   if(!connection.extra.roomOwner) return;
   
   if (isFileViewer === false) {
+    isSharingFile = true;
     loadFileViewer();
     $('#canvas-controller').show();
     isFileViewer = true;
     classroomCommand.sendOpenPdf ();
   } else {
+    isSharingFile = false;
     unloadFileViewer();
     $('#canvas-controller').hide();
     isFileViewer = false;
