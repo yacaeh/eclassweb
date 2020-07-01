@@ -1338,7 +1338,7 @@ function loadFileViewer() {
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
-    'border: 1px solid black;height:1124px;direction: ltr;margin-left:2%;width:78%;';
+    'border: 1px solid black;height:1024px;direction: ltr;margin-left:2%;width:78%;';
   fileViewer.setAttribute('allowFullScreen', '');
   let frame = document
     .getElementById('widget-container')
