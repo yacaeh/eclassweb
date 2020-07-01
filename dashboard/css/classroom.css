@@ -625,7 +625,7 @@ input[type="number"]:focus{
   background: #3ee1c9;
 }
 .exam-state-progress[value]::-webkit-progress-bar {
-  background: gray;
+  background: #a8a8a8;
 }
 
 .exam-header{
@@ -672,4 +672,74 @@ input[type="number"]:focus{
 #urlinput{
   width: 100%;
   height: auto;
+}
+
+#alert-dialog {
+  position: absolute;
+  width: 450px;
+  height: 148px;
+  background: #FFFFFF;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  top:40%;
+  left:50%;
+  margin: -74px 0 0 -225px;
+}
+
+#alert-header {
+  height: 35px;
+  border-bottom: 1px solid #B8B8B8;
+  text-align: center;
+  font-size: 15px;
+  line-height: 35px;
+  color: #707070;
+}
+
+#alert-body {
+  height: 100px;
+  background: #EFF1F0;
+  border-bottom: 1px solid #B8B8B8;
+}
+
+#alert-content {
+  text-align: center;
+  height: 57px;
+  line-height: 48px;
+  color: #707070;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.alert-progress {
+  vertical-align: middle;
+  width: 406px;
+  height: 5px;
+}
+
+.btn-alert-yes {
+  width: 179px;
+  height: 28px;
+  background: #18DBBE;
+  border-radius: 3px;
+  color: white;
+}
+
+.btn-alert-yes:hover {
+  background: #13B59C;
+}
+
+.btn-alert-no {
+  width: 179px;
+  height: 28px;
+  background: #FF5959;
+  border-radius: 3px;
+  color: white;
+}
+
+.btn-alert-no:hover {
+  background: #D84B4B;
+}
+
+#alert-btns {
+  margin-left: 39px;
 }
