@@ -41,6 +41,7 @@ SetCanvasBtn('screen_share', ScreenShare);
 SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
+SetCanvasBtn('epub', LoadFile);
 
 var isSharingScreen = false;
 var isSharing3D = false;
