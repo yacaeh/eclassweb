@@ -27,7 +27,8 @@ classroomCommand = {
         connection.socket.emit ('update-room-info', (_info) => {        
             classroomInfo = _info;
             updateClassTime ();
-            this.updateSyncRoom ();
+            if(connection.extra.roomOwner)
+                this.updateSyncRoom ();
         });
     },
 
@@ -42,7 +43,21 @@ classroomCommand = {
         if(classroomInfo.shareScreen) {
             classroomCommand.syncScreenShare (_data.userid);
         };
+        
+        // 로컬에서만 사용하는 데이터를 동기화 시켜 준다.
+        // 학생들은 선생님한테 룸 정보를 받아서, 선생님 정보를 동기화 시켜준다.
+        // 선생님이 로컬에서만 저장하는 데이터만 있을 수 있기 때문..
+        connection.send({
+            roomInfo : classroomInfo
+        });
+
     },    
+
+    //  학생들은 여기에서 선생님 화면과 동기화 시켜준다.
+    onReceiveRoomInfo : function (_info) {
+        classroomInfo = _info;
+        this.updateSyncRoom ();
+    },
 
     /*
         현재 방 상태에 따라 동기화를 해준다.

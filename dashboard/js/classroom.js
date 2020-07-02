@@ -72,15 +72,17 @@ function _3DCanvasOnOff(btn){
     if(false == isViewer)
     {
       isSharing3D = true;
-      modelEnable(send=true);
+      //modelEnable(send=true);
+      setShared3DStateServer (true);
     }
     else
     {
       isSharing3D = false;
-      remove3DCanvas();                
-      connection.send({
-          modelDisable : true
-      });
+      setShared3DStateServer (false);
+      // remove3DCanvas();                
+      // connection.send({
+      //     modelDisable : true
+      // });
     }          
   }
 }
@@ -251,6 +253,11 @@ connection.onmessage = function (event) {
   }
 
 
+  if(event.data.roomInfo) {
+    classroomCommand.onReceiveRoomInfo (event.data.roomInfo);
+    return;
+  }
+
   if (null != event.data.allControl) { 
     setAllControlValue (event.data.allControl);
     return;
@@ -286,7 +293,8 @@ connection.onmessage = function (event) {
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     var enable = event.data.modelEnable.enable;
-    modelEnable(false);
+    setShared3DStateLocal (enable);
+    //modelEnable(false);
     return;
   }
 

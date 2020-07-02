@@ -1081,18 +1081,22 @@ module.exports = exports = function(socket, config) {
             });
         });
 
-        socket.on ('toggle-share-3D', function(args, callback){
-            let room = getRoomWithErroCallback(callback);
-            if(room) {
-
-            }
+        socket.on ('toggle-share-3D', function(_callback){
+            call_getRoom(room => {
+                room.info.share3D.state = !room.info.share3D.state;
+                callBackPackingData (true, room.info.share3D.state, _callback);
+            }, e => {
+                callBackPackingData(false, e, _callback);
+            });
         });
 
         socket.on('toggle-share-pdf', function(args, callback){
-            let room = getRoomWithErroCallback(callback);
-            if(room) {
-
-            }
+            call_getRoom(room => {
+                room.info.share3D == !room.info.share3D;
+                callBackPackingData (true, room.info.share3D, _callback);
+            }, e => {
+                callBackPackingData(false, e, _callback);
+            });
         });
 
         socket.on('exam', function(args, callback) {
