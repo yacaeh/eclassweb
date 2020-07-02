@@ -244,6 +244,7 @@ button[disabled] {
   border-bottom: 1px solid #121010;
   padding-bottom: 1px;
   top: 50px;
+  left: 1px;
 }
 
 hr {
@@ -343,6 +344,7 @@ hr {
 .emojionearea.emojionearea-inline{
   bottom: 6px;
   position: absolute!important;
+  right: 5px;
 }
 
 .for_teacher{
@@ -368,6 +370,7 @@ hr {
   padding-bottom: 8px;
   right: 0px;
   height: 48%;
+  overflow: inherit!important;
 }
 
 .top_all_controll_on{
@@ -445,12 +448,21 @@ hr {
   color: #828282;
   width: 300px;
   left: calc(50% - 300px / 2);
-  top: 18px;
-  font-size: 12px;
+  font-size: 19px;
   font-family: Roboto;
   font-style: normal;
-  line-height: 14px;
+  line-height: 50px;
   font-weight: bold;
+}
+
+#current-time{
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 50px;
+  color: #707070;
+  vertical-align: middle;
 }
 
 #icon_exit{
@@ -508,7 +520,7 @@ hr {
   font-weight: bold;
   text-align: end;
   margin-right: 5px;
-  margin-left: 84px;
+  height: 50px;
 }
 
 .icons{
@@ -734,16 +746,18 @@ hr {
 }
 
 .feature{
-  width: 354px;
+  width: 234px;
   height: 50px;
   position: absolute;
-  right: 0px;
+  display: none;
+  right: 120px;
 }
 
 .controll{
   position: absolute;
   right: 360px;
   height: 50px;
+  display: none;
 }
 
 .nos > .now_selected_student > .status_img{

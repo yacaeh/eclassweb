@@ -704,11 +704,36 @@ input:focus {
     content: url(/dashboard/img/eraser.png);
 }
 
-/* .off{
+ .off{
+     background: rgba(204,204,204,0)!important;
 }
 
 .off:hover{
     box-shadow: none;
     border-radius: 0px;
     background: rgba(204,204,204,1);
-} */
+}
+
+.color_template{
+    position: absolute;
+    top: 30px;
+    left: 8px;
+    width: 150px;
+    height: 16px;
+    display: grid;
+    grid-template-columns: repeat(7, 16px);
+    grid-column-gap: 9px;
+}
+
+.color{
+    background-color: aqua;
+    /* outline: solid 2px black; */
+    border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.4);
+    box-shadow: 0 0 0pt 1.5pt #c4c4c4;
+    cursor: pointer;
+}
+
+.color_template > .on {
+    box-shadow: 0 0 0pt 1.5pt #FFFFFF, 0px 5px 10px rgba(0, 0, 0, 0.3);
+}
