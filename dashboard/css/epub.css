@@ -36,21 +36,30 @@
   width: 50px;
   height: 50px;
   cursor: pointer;
+
 }
 
 
 #prev {
   position: absolute;
   top :50%;
-  left:150px;
+  left:50px;
   display: inline-block;
+  background-image: url("/dashboard/img/prev.png");
+  background-size: cover;
+  width:100px;
+  height:100px;
   }
 
 #next {
   position: absolute;
   top :50%;
-  right:500px;
+  right:350px;
   display: inline-block;
+  background-image: url("/dashboard/img/next.png");
+  background-size: cover;
+  width:100px;
+  height:100px;
 }
 
 #toc {
