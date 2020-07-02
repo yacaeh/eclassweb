@@ -737,3 +737,25 @@ input:focus {
 .color_template > .on {
     box-shadow: 0 0 0pt 1.5pt #FFFFFF, 0px 5px 10px rgba(0, 0, 0, 0.3);
 }
+
+.textInputUI,
+.fontSelectUl,
+.fontColorUI,
+.fontSizeUl{
+    z-index: 10000000;
+}
+.tooltip{
+    z-index: 100;
+    position: absolute;
+    left: 28px;
+    top: 100px;
+    background-color: black;
+    color: white;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 18px;
+    border-radius: 7px;
+    font-weight: bold;
+    font-size: 14px;
+}

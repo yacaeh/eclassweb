@@ -55,6 +55,9 @@ classroomCommand.updateSyncRoom = function () {
     if(classroomInfo.pdf.state) {
         classroomCommand.openPdf ();
     }
+    if(classroomInfo.epub.state) {
+        classroomCommand.openEpub ();
+    }
 };
 
 classroomCommand.sendsyncRoomInfo = function (_data) {

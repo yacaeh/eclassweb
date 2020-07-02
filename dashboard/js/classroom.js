@@ -1011,25 +1011,37 @@ SelectViewType();
 function SetStudentList() {
   $('#student_list').empty();
 
-  if (connection.getAllParticipants().length == 0) {
+  if(connection.getAllParticipants().length == 0){
     // $("#student_list").append('<span class="no_student"> 접속한 학생이 없습니다 </span>')?
-  } else {
-    connection.getAllParticipants().forEach(function (pid) {
-      var name = getFullName(pid);
-      var div = $(
-        ' <span data-id="' +
-          pid +
-          '" data-name="' +
-          name +
-          '" class="student">\
-                <span class="bor"></span> \
-                <span class="name"><span class="alert alert_wait"></span>' +
-          name +
-          '</span></span>'
-      );
-      OnClickStudent(div, pid, name);
-      $('#student_list').append(div);
+  }
+  else {
+    var isOutCPms = true;
+    var isOutMPms = true;
+
+    connection.getAllParticipants().forEach(function(pid) {
+      var name = getFullName(pid)
+      var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
+        <span class="bor"></span> \
+        <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
+      OnClickStudent(div,pid,name);
+      $("#student_list").append(div);
+
+      /* 사라진 권한을 다시 준다  */
+      if(pid === nowClassPermission){
+        isOutCPms = false;
+        $(`[data-id='${pid}']`).attr('data-class-Permission', true);
+        $(`[data-id='${pid}']`).find(".bor").show();
+      }
+      if(pid === nowMicPermission){
+        isOutMPms = false;
+        $(`[data-id='${pid}']`).attr('data-mic-Permission', true);
+      }
     });
+
+    if(isOutCPms)
+      nowClassPermission = undefined;
+    if(isOutMPms)
+      nowMicPermission = undefined;
   }
 }
 
@@ -1751,15 +1763,17 @@ function OnClickStudent(div) {
   });
 }
 
-$('.perbtn').click(function () {
-  var circle = this.getElementsByClassName('circle')[0];
+$(".perbtn").click(function(){
+  var circle = this.getElementsByClassName("circle")[0];
   var name = nowSelectStudent.dataset.name;
   var pid = nowSelectStudent.dataset.id;
 
   console.log(this.id);
 
-  if (this.id == 'classP') {
-    if (this.classList.contains('off')) {
+  // 수업 권한
+  if (this.id == "classP") {
+    // 수업권한 주기
+    if (this.classList.contains("off")) {
       console.log(nowClassPermission != undefined);
 
       if (nowClassPermission != undefined) {
@@ -1769,6 +1783,31 @@ $('.perbtn').click(function () {
 
       nowClassPermission = pid;
       nowSelectStudent.dataset.classPermission = true;
+      // 마이크 권한 가져오기
+      // 마이크 권한이 이미 있을 때
+      
+      
+      // 마이크 권한이 다른사람에게 있을 때 빼았는다
+      if(nowMicPermission !== pid){
+        if(nowMicPermission === undefined){
+          nowMicPermission = pid;
+        }
+        else{
+          $(`[data-id='${nowMicPermission}']`).attr('data-mic-Permission', false);
+        }
+        $('#micP').animate({
+          'background-color': "#18dbbe"
+        }, 'fast')
+        $('#micP').children('.circle').animate({
+          left: "22px"
+        }, 'fast')
+
+        $('#micP').toggleClass("on");
+        $('#micP').toggleClass("off");
+
+        nowMicPermission = pid;
+        nowSelectStudent.dataset.micPermission = true;
+      }
 
       $(this).animate(
         {
@@ -1783,8 +1822,24 @@ $('.perbtn').click(function () {
         'fast'
       );
 
-      $(nowSelectStudent).find('.bor').show();
-    } else {
+      $(nowSelectStudent).find(".bor").show();
+    }
+    // 수업권한 빼았기
+    else {
+     // 마이크 권한도 같이 뺐기
+      if(nowMicPermission == nowClassPermission){
+        $('#micP').animate({
+          'background-color': "gray"
+        }, 'fast')
+        $('#micP').children('.circle').animate({
+          left: "2px"
+        }, 'fast')
+        nowMicPermission = undefined;
+        nowSelectStudent.dataset.micPermission = false;
+        
+        $('#micP').toggleClass("on");
+        $('#micP').toggleClass("off");
+      }
       nowClassPermission = undefined;
       nowSelectStudent.dataset.classPermission = false;
 
@@ -1802,8 +1857,11 @@ $('.perbtn').click(function () {
       );
       $(nowSelectStudent).find('.bor').hide();
     }
-  } else if (this.id == 'micP') {
-    if (this.classList.contains('off')) {
+  }
+  // 마이크 권한
+  else if (this.id == "micP") {
+    // 마이크 권한 주기
+    if (this.classList.contains("off")) {
       console.log(nowMicPermission != undefined);
 
       if (nowMicPermission != undefined) {
@@ -1828,7 +1886,9 @@ $('.perbtn').click(function () {
       );
 
       // $(nowSelectStudent).find(".bor").show();
-    } else {
+    }
+    // 마이크 권한 빼았기
+    else {
       nowMicPermission = undefined;
       nowSelectStudent.dataset.micPermission = false;
       $(this).animate(

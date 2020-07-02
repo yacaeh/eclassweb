@@ -701,7 +701,6 @@ function canvasresize(id){
         },
         mousedown: function(e) {
             if (isControlKeyPressed) {
-                copy();
                 paste();
                 isControlKeyPressed = false;
             }
@@ -1591,7 +1590,7 @@ function canvasresize(id){
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
-            this.textInputContainer.style.position = 'relative';
+            // this.textInputContainer.style.position = 'relative';
 
             this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 30+'px'; 
@@ -1648,6 +1647,8 @@ function canvasresize(id){
                 };
                 // child.style.fontSize = child.innerHTML + 'px';
             });
+            document.getElementsByClassName("textInputUI")[0].focus();
+
         },
         textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
         eachFontColor: function(callback){
@@ -3162,11 +3163,6 @@ function canvasresize(id){
             return;
         }
 
-        // Ctrl + t
-        if (isAltKeyPressed && keyCode === 84 && is.isText) {
-            textHandler.showTextTools();
-            return;
-        }
 
         if (keyCode === 90 && e.ctrlKey) {
             //console.log('zxczxc')
@@ -3477,17 +3473,18 @@ function canvasresize(id){
 
 
     var shortCut = [
-        {"onoff-icon" : "q"},
-        {"pencilIcon" : "w"},
-        {"markerIcon" : "e"},
-        {"eraserIcon" : "r"},
-        {"textIcon" : "t"},
+        {"onoff-icon" : "a"},
+        {"pencilIcon" : "q"},
+        {"markerIcon" : "w"},
+        {"eraserIcon" : "e"},
+        {"textIcon" : "r"},
         {"undo" : "z"},
         {"clearCanvas" : "x"},
         {"screen_share" : "1"},
         {"3d_view" : "2"},
         {"movie" : "3"},
         {"file" : "4"},
+        {"epub" : "5"},
     ]
 
     SetShortcut(shortCut);
@@ -3584,6 +3581,12 @@ function SetShortcut(shortCut){
 
             shortCut.forEach(function(cut){
                 if(key.key == Object.values(cut)){
+                    if(Object.keys(cut) == "screen_share"){
+                        RemoveTooltip();
+                        altdown = false;
+                    }
+
+
                     document.getElementById(Object.keys(cut)).click();
                 }
             });
@@ -3597,6 +3600,10 @@ function SetShortcut(shortCut){
                 altdown = false;
             }
         }
+    })
+    
+    window.addEventListener("focusout" ,function(){
+        console.log("!!");
     })
 
     function MakeTooltip(shortcut){
