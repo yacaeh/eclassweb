@@ -701,7 +701,6 @@ function canvasresize(id){
         },
         mousedown: function(e) {
             if (isControlKeyPressed) {
-                copy();
                 paste();
                 isControlKeyPressed = false;
             }
@@ -1648,6 +1647,8 @@ function canvasresize(id){
                 };
                 // child.style.fontSize = child.innerHTML + 'px';
             });
+            document.getElementsByClassName("textInputUI")[0].focus();
+
         },
         textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
         eachFontColor: function(callback){
@@ -3477,17 +3478,18 @@ function canvasresize(id){
 
 
     var shortCut = [
-        {"onoff-icon" : "q"},
-        {"pencilIcon" : "w"},
-        {"markerIcon" : "e"},
-        {"eraserIcon" : "r"},
-        {"textIcon" : "t"},
+        {"onoff-icon" : "a"},
+        {"pencilIcon" : "q"},
+        {"markerIcon" : "w"},
+        {"eraserIcon" : "e"},
+        {"textIcon" : "r"},
         {"undo" : "z"},
         {"clearCanvas" : "x"},
         {"screen_share" : "1"},
         {"3d_view" : "2"},
         {"movie" : "3"},
         {"file" : "4"},
+        {"epub" : "5"},
     ]
 
     SetShortcut(shortCut);
@@ -3584,6 +3586,12 @@ function SetShortcut(shortCut){
 
             shortCut.forEach(function(cut){
                 if(key.key == Object.values(cut)){
+                    if(Object.keys(cut) == "screen_share"){
+                        RemoveTooltip();
+                        altdown = false;
+                    }
+
+
                     document.getElementById(Object.keys(cut)).click();
                 }
             });
@@ -3597,6 +3605,10 @@ function SetShortcut(shortCut){
                 altdown = false;
             }
         }
+    })
+    
+    window.addEventListener("focusout" ,function(){
+        console.log("!!");
     })
 
     function MakeTooltip(shortcut){
