@@ -1486,7 +1486,9 @@ function loadEpubViewer() {
     // console.log(toc);
   });
 
+  
   var next = document.getElementById('next');
+  next.style.display = 'block';
   next.addEventListener(
     'click',
     function () {
@@ -1496,6 +1498,7 @@ function loadEpubViewer() {
   );
 
   var prev = document.getElementById('prev');
+  prev.style.display = 'block';
   prev.addEventListener(
     'click',
     function () {
@@ -1521,6 +1524,12 @@ function loadEpubViewer() {
 }
 
 function unloadEpubViewer() {
+  var prev = document.getElementById('prev');
+  prev.style.display = 'none';
+
+  var next = document.getElementById('next');
+  next.style.display = 'none';
+
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
