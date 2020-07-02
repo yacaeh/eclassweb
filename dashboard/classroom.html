@@ -32,6 +32,7 @@
   <script src="/dashboard/js/all_controll.js"></script>
   <script src="/dashboard/js/canvas.js"></script>
   <script src="/dashboard/js/movie_render.js"></script>
+  <script src="/dashboard/js/screen_recoder.js"></script>
   <script defer src="/dashboard/js/classroom.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
   <script src="/dashboard/js/epub.min.js"></script>
@@ -39,6 +40,7 @@
 </head>
 
 <body oncontextmenu="return false" ondragstart="return false">
+<a id="downloadLink" type="video/webm" style="display: none"></a>
 
   <div id="urlform" style="display: none;">
     <span class="name">동영상</span>
@@ -68,8 +70,12 @@
           </span>
 
           <span class="time">
-              <span id="current-time"></span></br>
-              <!-- <span id="current-time"></span> -->
+              <span id="current-time"></span>
+              <span id="recording-time">
+                <img src="/dashboard/newimg/recording.png" style="
+                      margin-right: 7px;
+                      margin-bottom: 2px;">
+                <span class="text">0:00:00</span>
           </span>
         </div>
 
