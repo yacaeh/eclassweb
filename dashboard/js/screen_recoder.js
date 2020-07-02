@@ -95,16 +95,12 @@ class sc {
         };
 
         this.desktopStream.addEventListener('inactive', e => {
-            console.log(this);
-
-            console.log(e);
             if(e.type == "inactive"){
                 this._stopCapturing();
             }
         });
 
         this.voiceStream.addEventListener('inactive', e => {
-            console.log(e);
             if(e.type == "inactive"){
                 this._stopCapturing();
             }
@@ -118,10 +114,7 @@ class sc {
         if(this.rec.state == "inactive"){
             return false;
         }
-
         this.rec.stop();
-        console.log(this.stream);
-        console.log(this.stream.getTracks());
         this.desktopStream.getAudioTracks().forEach(s => s.stop());
         this.stream.getTracks().forEach(s => s.stop())
         this.stream = null;
@@ -145,7 +138,62 @@ var screen_recorder = new sc();
     // -----------------------------------------------------
 
 
+function ScreenShare(btn) {
+  if (!isSharingScreen && checkSharing()) {
+    removeOnSelect(btn);
+    return;
+  }
 
+  var on = $(btn).hasClass('on');
+
+  console.log(classroomInfo)
+  if (connection.userid != classroomInfo.nowClassPermission && !window.tempStream) {
+    alert('Screen sharing is not enabled.');
+    return;
+  }
+
+  if (!on) {
+    isSharingScreen = false;
+    lastStream.getTracks().forEach((track) => track.stop());
+    connection.send({
+      hideMainVideo: true,
+    });
+    return false;
+  }
+
+  screen_constraints = {
+    screen: true,
+    oneway: true,
+  };
+
+  if (navigator.mediaDevices.getDisplayMedia) {
+    navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
+      (stream) => {
+        console.log(stream);
+        isSharingScreen = true;
+        lastStream = stream;
+        replaceScreenTrack(stream, btn);
+        CanvasResize();
+      },
+      (error) => {
+        $(btn).removeClass('on');
+        $(btn).removeClass('selected-shape');
+      }
+    );
+  } else if (navigator.getDisplayMedia) {
+    navigator.getDisplayMedia(screen_constraints).then(
+      (stream) => {
+        replaceScreenTrack(stream, btn);
+      },
+      (error) => {
+        $(btn).removeClass('on');
+        $(btn).removeClass('selected-shape');
+      }
+    );
+  } else {
+    alert('getDisplayMedia API is not available in this browser.');
+  }
+}
 
 
 
