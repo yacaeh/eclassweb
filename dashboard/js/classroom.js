@@ -1437,6 +1437,30 @@ function zoomOut(){
 }
 
 
+
+function loadXMLDoc(url) {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      getEpubXMLFile(this);
+    }
+  };
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
+}
+
+function getEpubXMLFile(xml) {
+  var x, i, xmlDoc, txt;
+  xmlDoc = xml.responseXML;
+  txt = "";
+  x = xmlDoc.getElementsByTagName("tocitem");
+  for (i = 0; i< x.length; i++) {
+    txt += x[i].childNodes[0].nodeValue + "<br>";
+  }
+  document.getElementById("demo").innerHTML = txt;
+}
+
+
 _3DCanvasFunc();
 _AllCantrallFunc();
 _Movie_Render_Button_Func();
