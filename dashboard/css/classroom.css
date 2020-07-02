@@ -1121,8 +1121,8 @@ input[type="number"]:focus{
 }
 
 #top_record_video.on {
-  animation-duration: 1s;
   animation-name: record;
+  animation-duration: 1s;
   animation-iteration-count: infinite;
 }
 

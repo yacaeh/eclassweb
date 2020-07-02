@@ -36,12 +36,18 @@ class sc {
     }
 
     static _startScreenCapture() {
+  
+        var constraints = {video: {
+            mediaSource: "screen", 
+            width: 1280, 
+            height: 720}};
+
         if (navigator.getDisplayMedia) {
-            return navigator.getDisplayMedia({ video: true });
+            return navigator.getDisplayMedia(constraints);
         } else if (navigator.mediaDevices.getDisplayMedia) {
-            return navigator.mediaDevices.getDisplayMedia({ video: true, mandatory: { chromeMediaSource: 'tab' } });
+            return navigator.mediaDevices.getDisplayMedia(constraints);
         } else {
-            return navigator.mediaDevices.getUserMedia({ video: { mediaSource: 'screen' } });
+            return navigator.mediaDevices.getUserMedia(constraints);
         }
     }
 
