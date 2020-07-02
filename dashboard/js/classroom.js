@@ -1009,6 +1009,8 @@ function SetTeacher(){
     $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
+    $(".controll").show();
+    $(".feature").show();
 }
 
 function SetStudent() {
@@ -1019,6 +1021,8 @@ function SetStudent() {
   $('.for_teacher').hide();
   $('#main-video').show();
   $(".for_teacher").show();
+  $(".controll").remove();
+  $(".feature").remove();
 
   //$("#top_all_controll").hide();
 }
@@ -1750,7 +1754,7 @@ function CanvasResize() {
   var r = document.getElementsByClassName("lwindow")[0];
   var rwidth = $(r).width();
 
-  var x = canvas.width - rwidth - 50;
+  var x = canvas.width - rwidth - 55;
   var y = canvas.height - 60;
 
   $("#screen-viewer").width(x);
