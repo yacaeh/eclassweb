@@ -1048,34 +1048,47 @@ module.exports = exports = function(socket, config) {
 
   
 
-        socket.on ('all-control',function(success, error) {
-            
+        socket.on ('toggle-all-control',function(success, error) {
+
+            // check room owner
+            //call_getRoom_only_roomOwner
+
             call_getRoom(room => {
                 room.info.allControl = !room.info.allControl;
                 success(room.info.allControl);
-            }, error => {
-                error(error);
+            }, e => {
+                error(e);
             });
         });
 
-        socket.on ('share-screen', function(callback) {
-            
+
+      
+
+        socket.on ('set-share-screen', function(_state, _callback) {
             call_getRoom(room => {
-                room.info.shareScreen = !room.info.shareScreen;
-                success(room.info.shareScreen);
-            }, error => {
-                error(error);
+                //  현재 상태가 같으면... 리턴
+                if(room.info.shareScreen == _state)
+                {
+                    callBackPackingData (false, 'same state', _callback);
+                    if(error)
+                        error('same state');
+                    return;
+                }
+                room.info.shareScreen = _state;
+                callBackPackingData(true, room.info.shareScreen, _callback);
+            }, e => {
+                callBackPackingData(false, e, _callback);
             });
         });
 
-        socket.on ('share-3D', function(args, callback){
+        socket.on ('toggle-share-3D', function(args, callback){
             let room = getRoomWithErroCallback(callback);
             if(room) {
 
             }
         });
 
-        socket.on('share-pdf', function(args, callback){
+        socket.on('toggle-share-pdf', function(args, callback){
             let room = getRoomWithErroCallback(callback);
             if(room) {
 
@@ -1091,7 +1104,27 @@ module.exports = exports = function(socket, config) {
 
 
         //--------------------------------------------------------------------------------//
+        function callBackPackingData (_result, _data, _callBack) {
+            if(_result) {
+                _callBack ({
+                    result : _result,
+                    data : _data
+                });
+            }
+            else
+             {
+                callBack ({
+                    result : _result,
+                    error : _data
+                });
 
+             }
+        }
+
+        function call_getRoom_only_roomOwner (success, error) {
+
+            
+        };
 
         function call_getRoom (success, error) {
             let room = getRoom();

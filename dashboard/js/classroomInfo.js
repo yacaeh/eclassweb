@@ -17,71 +17,51 @@ classroomInfo = {
 };
 
 
-classroomCommand = {
-};
+classroomCommand = {    
+    
+    /*    
+        처음 방에 접속 했을 때, 호출
+        방 동기화를 해준다.
+    */
+    joinRoom : function () {  
+        connection.socket.emit ('update-room-info', (_info) => {        
+            classroomInfo = _info;
+            updateClassTime ();
+            this.updateSyncRoom ();
+        });
+    },
 
-/*    
-
-*/
-
-classroomCommand.joinRoom = function () {
-    // var date = new Date();        
-    // classroomInfo.roomOpenTime = date.getTime();  
-    // updateClassTime ();    
-    connection.socket.emit ('update-room-info', (_info) => {
-        console.error('update-room-oinfo');
-        console.error(_info);
-        classroomInfo = _info;
-        updateClassTime ();
-        classroomCommand.updateSyncRoom ();
-    });
-};
-
-
-classroomCommand.updateSyncRoom = function () {    
-
-    if(classroomInfo.allControl) {
-        allControllEnable(top_all_controll_jthis, classroomInfo.allControl, false);
-    }
-    // else
-
-    // if(classroomInfo.shareScreen) {
+    /*
+        session 연결이 되었을 때 호출
+        스크린공유는 방장이 공유를 걸어줘야 한다.
+    */
+    onConnectionSession : function (_data) {
+        if(!connection.extra.roomOwner) return;
         
-    // }
-    if(classroomInfo.share3D.state) {                  
-        sync3DModel ();
-    }
+        //  shareScreen은 선생님이 연결을 해주어야 한다.
+        if(classroomInfo.shareScreen) {
+            classroomCommand.syncScreenShare (_data.userid);
+        };
+    },    
 
-    if(classroomInfo.pdf.state) {
-        classroomCommand.openPdf ();
+    /*
+        현재 방 상태에 따라 동기화를 해준다.
+    */
+    updateSyncRoom : function () {    
+
+        if(classroomInfo.allControl) {
+            updateControlView(false);
+        }
+        
+        if(classroomInfo.share3D.state) {                  
+            sync3DModel ();
+        }
+
+        if(classroomInfo.pdf.state) {
+            classroomCommand.openPdf ();
+        }
     }
 };
-
-// classroomCommand.sendsyncRoomInfo = function (_data) {
-//     /*
-//         방에 학생이 들어오면, 현재 방 상태 정보를 동기화 시키기 위해
-//         방상태 정보를 보낸다.
-//     */
-//     connection.send ({
-//         roomSync : {
-//             userid : _data.userid,
-//             info : classroomInfo
-//         }
-//     });
-
-//     // shareScreen은 선생님이 해당 학생한테 공유 해줘야 한다. 
-//     if(classroomInfo.shareScreen) {
-//         classroomCommand.syncScreenShare (_data.userid);
-//     };
-// };
-
-// classroomCommand.receiveSyncRoomInfo = function (_syncRoom) {  
-//     console.log(_syncRoom);
-//     if(_syncRoom.userid == connection.userid) {              
-//         classroomInfo = _syncRoom.info;
-//         classroomCommand.updateSyncRoom ();
-//     }
-// };
 
 
 classroomCommand.sendAlert = function (callback) {    
@@ -158,7 +138,24 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
+/*
+    공유 스크린 설정
+*/
+classroomCommand.setShareScreenServer = function (_state, success, error) {    
+    
+    classroomCommand.setShareScreenLocal (_state);
 
+    connection.socket.emit('set-share-screen', _state, result => {  
+        if(result.result)
+            success ();
+        else 
+            error (result.error);
+    });
+};
+
+classroomCommand.setShareScreenLocal = function (_state) {
+    classroomInfo.shareScreen = _state;
+};
 /*
     Screen share
  */

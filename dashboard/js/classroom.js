@@ -165,10 +165,8 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-
-    // // 접속시 방정보 동기화.
-    // if(connection.extra.roomOwner)
-    //     classroomCommand.sendsyncRoomInfo (event);
+  //  session 연결 완료
+  classroomCommand.onConnectionSession (event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -180,7 +178,7 @@ connection.onclose = connection.onerror = connection.onleave = function (
 
 connection.onmessage = function (event) {
   if (event.data.showMainVideo) {
-      classroomInfo.shareScreen = true;
+    classroomCommand.setShareScreenLocal (true);
           // $('#main-video').show();
     $('#screen-viewer').css({
       top: $('#widget-container').offset().top,
@@ -195,14 +193,10 @@ connection.onmessage = function (event) {
   if (event.data.hideMainVideo) {
     // $('#main-video').hide();
     $('#screen-viewer').hide();
-    classroomInfo.shareScreen = false;    
+    classroomCommand.setShareScreenLocal (false);
     return;
   }
 
-    // if(event.data.roomSync) {
-    //     classroomCommand.receiveSyncRoomInfo (event.data.roomSync);
-    //     return;
-    // };
 
   if (event.data.typing === false) {
     $('#key-press').hide().find('span').html('');
@@ -229,16 +223,7 @@ connection.onmessage = function (event) {
 
 
   if (null != event.data.allControl) { 
-    classroomInfo.allControl = event.data.allControl;
-    if (event.data.allControl) {
-      // 제어 하기    
-      allControllEnable(top_all_controll_jthis, true, false);
-    }
-    else {
-      // 제어 풀기
-      allControllEnable(top_all_controll_jthis, false, false);
-
-    }
+    setAllControlValue (event.data.allControl);
     return;
   }
 
@@ -844,6 +829,9 @@ function currentScreenViewShare (_pid) {
   }
 
 function replaceScreenTrack(stream, btn) {
+  
+  classroomCommand.setShareScreenServer (true, result => {
+
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
@@ -856,22 +844,21 @@ function replaceScreenTrack(stream, btn) {
 
   // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
   window.shareStream = stream;  
-  classroomInfo.shareScreen = true;
-
   var screenTrackId = stream.getTracks()[0].id;
 
-
   addStreamStopListener(stream, function () {    
-    connection.send({
-      hideMainVideo: true,
+
+    classroomCommand.setShareScreenServer(false, () => {
+      connection.send({
+        hideMainVideo: true,
+      });
+      $(btn).removeClass("on");
+      $(btn).removeClass("selected-shape");
+      // $('#main-video').hide();
+      window.sharedStream = null;
+      hideScreenViewerUI();
+      replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
-    $(btn).removeClass("on");
-    $(btn).removeClass("selected-shape");
-    // $('#main-video').hide();
-    classroomInfo.shareScreen = false;
-    window.sharedStream = null;
-    hideScreenViewerUI();
-    replaceTrack(tempStream.getTracks()[0], screenTrackId);
   });
 
   stream.getTracks().forEach(function (track) {
@@ -885,6 +872,9 @@ function replaceScreenTrack(stream, btn) {
   });
 
   showScreenViewerUI ();
+
+  });
+
   // $('#main-video').show();
 }
 

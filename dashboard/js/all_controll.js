@@ -1,17 +1,17 @@
 
+var top_all_controll_jthis;
 
-function allControllEnable(jthis, b, send)
+
+function updateControlView(send)
 {
-    classroomInfo.allControl = b;
-
     if(classroomInfo.allControl)
     {
-        jthis.addClass('top_all_controll_on');
-        jthis.removeClass('top_all_controll_off')
+        top_all_controll_jthis.addClass('top_all_controll_on');
+        top_all_controll_jthis.removeClass('top_all_controll_off')
     }
     else{
-        jthis.addClass('top_all_controll_off');
-        jthis.removeClass('top_all_controll_on')
+        top_all_controll_jthis.addClass('top_all_controll_off');
+        top_all_controll_jthis.removeClass('top_all_controll_on')
     }
 
     if(send == true)
@@ -21,7 +21,12 @@ function allControllEnable(jthis, b, send)
 }
 
 
-var top_all_controll_jthis;
+function setAllControlValue (_state, _send) {
+    classroomInfo.allControl = _state;
+    updateControlView (_send);
+}
+
+
 
 function _AllCantrallFunc() {
 
@@ -29,14 +34,11 @@ function _AllCantrallFunc() {
     if(params.open == "true")
     {
         top_all_controll_jthis.click(function(){
-            //_3dcanvas.toggle();
-            
-
-            allControllEnable(top_all_controll_jthis, !classroomInfo.allControl, true);
-
+            connection.socket.emit('toggle-all-control', (changeControl) => {
+                setAllControlValue (changeControl, true);
+            });
         })
     }
-
 }
 
 
