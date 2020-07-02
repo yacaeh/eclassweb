@@ -1424,6 +1424,7 @@ function zoomOut() {
 }
 
 isEpubViewer = false;
+
 function LoadEpub(btn) {
   if (!isSharingEpub && checkSharing()) {
     removeOnSelect(btn);
@@ -1447,24 +1448,15 @@ function LoadEpub(btn) {
   }
 }
 
-
 function loadEpubViewer() {
+  console.log("Load Epub viewer");
   let epubViewer = document.createElement('div');
   epubViewer.setAttribute('id', 'epub-viewer');
+  epubViewer.setAttribute('class', 'spread');
+  epubViewer.style.cssText = "width: 78%;height: 1024px;box-shadow: 0 0 4px #ccc;border-radius: 5px;padding: 0;position: relative;margin: 10px 3%;background: white url('/dashboard/img/loading.gif') center center no-repeat;";
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
-  // Create new link Element 
-
-  var head = frame.document.getElementsByTagName('HEAD')[0];  
-  var link = document.createElement('link'); 
-    // set the attributes for link element  
-    link.rel = 'stylesheet';  
-    link.type = 'text/css'; 
-    link.href = 'https://localhost:9001/dashboard/css/epub.css';  
-    head.appendChild(link);  
-
-  // Append link element to HTML head 
 
   frame.document
     .getElementsByClassName('design-surface')[0]
@@ -1476,7 +1468,6 @@ function loadEpubViewer() {
   var book = ePub(
     'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
   );
-  let viewer = document.getElementById('viewer');
   var rendition = book.renderTo(epubViewer, {
     manager: 'continuous',
     flow: 'paginated',
@@ -1488,7 +1479,6 @@ function loadEpubViewer() {
   var displayed = rendition.display();
 
   displayed.then(function (renderer) {
-    // -- do stuff
   });
 
   // Navigation loaded

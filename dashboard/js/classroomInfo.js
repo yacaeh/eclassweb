@@ -271,7 +271,7 @@ classroomCommand.syncPdf = function () {
 };
 
 classroomCommand.sendOpenEpub = function () {
-    .epub.state = true;
+    classroomInfo.epub.state = true;
     connection.send({
         epub : classroomInfo.epub
     });
