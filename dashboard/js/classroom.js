@@ -254,7 +254,7 @@ connection.onmessage = function (event) {
 
 
   if(event.data.roomInfo) {
-    classroomCommand.onReceiveRoomInfo (event.data.roomInfo);
+    classroomCommand.onReceiveRoomInfo (event.data);
     return;
   }
 
@@ -286,7 +286,7 @@ connection.onmessage = function (event) {
   };
 
   if(event.data.pdf) {    
-    classroomCommand.receivePdfMessage (event.data.pdf);
+    classroomCommand.updatePDFCmd (event.data.pdf);
     return;
   }  
 
@@ -1350,20 +1350,33 @@ function LoadFile(btn){
   }
   
   if(!connection.extra.roomOwner) return;
+
+  classroomCommand.togglePdfStateServer ((state) => {
+    if(state) 
+    {
+      isSharingFile = true;
+      isFileViewer = true;
+    }
+    else
+    {
+      isSharingFile = false;
+      isFileViewer = false;
+    }
+  }) 
   
-  if (isFileViewer === false) {
-    isSharingFile = true;
-    loadFileViewer();
-    $('#canvas-controller').show();
-    isFileViewer = true;
-    classroomCommand.sendOpenPdf ();
-  } else {
-    isSharingFile = false;
-    unloadFileViewer();
-    $('#canvas-controller').hide();
-    isFileViewer = false;
-    classroomCommand.sendClosePdf ();
-  }
+  // if (isFileViewer === false) {
+  //   isSharingFile = true;
+  //   loadFileViewer();
+  //   $('#canvas-controller').show();
+  //   isFileViewer = true;
+  //   classroomCommand.sendOpenPdf ();
+  // } else {
+  //   isSharingFile = false;
+  //   unloadFileViewer();
+  //   $('#canvas-controller').hide();
+  //   isFileViewer = false;
+  //   classroomCommand.sendClosePdf ();
+  // }
 }
 
 function unloadFileViewer() {
@@ -1404,20 +1417,26 @@ function loadFileViewer() {
   frame.document.getElementById("tool-box").style.zIndex = "3";
 }
 
-function showPage(n){
-  console.log(n);
+
+// Pdf가 처음 로딩이 다 되었는지 확인.
+// 로딩이 다 된 후에 페이지 동기화
+function pdfOnLoaded () {
+  classroomCommand.pdfOnLoaded ();
+}
+
+function showPage(n){  ;
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
-    classroomCommand.sendPDFCmd('page');
+    classroomCommand.setPdfPage(n);
 }
 
 function showNextPage(){
-  if(connection.extra.roomOwner || !classroomInfo.allControl) 
-    classroomCommand.sendPDFCmd('next');
+  // if(connection.extra.roomOwner || !classroomInfo.allControl) 
+  //   classroomCommand.sendPDFCmd('next');
 }
 
 function showPreviousPage(){
-  if(connection.extra.roomOwner || !classroomInfo.allControl) 
-    classroomCommand.sendPDFCmd('prev');
+  // if(connection.extra.roomOwner || !classroomInfo.allControl) 
+  //   classroomCommand.sendPDFCmd('prev');
 }
 
 // function toggleFullScreen(){

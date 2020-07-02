@@ -2,6 +2,8 @@
 var top_all_controll_jthis;
 
 
+var onAllControll = function () {};
+
 function updateControlView(send)
 {
     if(classroomInfo.allControl)
@@ -44,6 +46,16 @@ function _AllCantrallFunc() {
 
 function SendAllControll(b)
 {
+    if(b) {
+        // true면 방의 정보를 다시 보낸다.
+
+    }
+    else
+    {
+        // false 면 일반 값만 보낸다.
+
+    }
+
     connection.send({
         allControl: b
     });

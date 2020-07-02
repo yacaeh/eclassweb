@@ -592,10 +592,8 @@ module.exports = exports = function(socket, config) {
                                 data : {}                                
                             },
                             pdf : {
-                                state : false,
-                                data : {
-                                    src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'                                    
-                                }
+                                state : false
+                                // src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'                                
                             },
                             exam : false
                         }, // usually owner's extra-data
@@ -1090,10 +1088,10 @@ module.exports = exports = function(socket, config) {
             });
         });
 
-        socket.on('toggle-share-pdf', function(args, callback){
+        socket.on('toggle-share-pdf', function(_callback){
             call_getRoom(room => {
-                room.info.share3D == !room.info.share3D;
-                callBackPackingData (true, room.info.share3D, _callback);
+                room.info.pdf.state = !room.info.pdf.state;
+                callBackPackingData (true, room.info.pdf.state, _callback);
             }, e => {
                 callBackPackingData(false, e, _callback);
             });
@@ -1109,6 +1107,9 @@ module.exports = exports = function(socket, config) {
 
         //--------------------------------------------------------------------------------//
         function callBackPackingData (_result, _data, _callBack) {
+            try {
+            if(!_callBack)  return;
+
             if(_result) {
                 _callBack ({
                     result : _result,
@@ -1117,12 +1118,17 @@ module.exports = exports = function(socket, config) {
             }
             else
              {
-                callBack ({
+                _callBack ({
                     result : _result,
                     error : _data
                 });
 
              }
+            }
+            catch (e)
+            {       
+                console.error(`callback error ${e}`);         
+            }
         }
 
         function call_getRoom_only_roomOwner (success, error) {
@@ -1141,7 +1147,8 @@ module.exports = exports = function(socket, config) {
 
 
         function getRoom () {
-            const roomId = getRoomId();                                
+            const roomId = getRoomId();    
+            if(null == roomId) return { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
             var room = listOfRooms[roomId];
             if(!room) return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
             return room;
@@ -1149,7 +1156,9 @@ module.exports = exports = function(socket, config) {
 
 
         function getRoomId () {
-            return socket.admininfo.sessionid;
+            if(socket.admininfo)
+                return socket.admininfo.sessionid;
+            return null;
         };
 
         function getUser () {                     
