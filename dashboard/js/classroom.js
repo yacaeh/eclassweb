@@ -1000,7 +1000,7 @@ function updateClassTime () {
 
     if (time < 10) time = '0' + time;
 
-    $('#current-day').text(hour + ':' + min + ':' + time);
+    $('#current-time').text(hour + ':' + min + ':' + time);
   }
 }
 
