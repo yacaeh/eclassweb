@@ -1,40 +1,17 @@
-body {
-  margin: 0;
-  background: #fafafa;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #333;
-
+#viewer{
+  top:0;
+  left:0;
   position: absolute;
-  height: 100%;
-  width: 100%;
-  min-height: 800px;
 }
-
-#title {
-  width: 78%;
-  min-height: 18px;
-  margin: 10px auto;
-  text-align: center;
-  font-size: 16px;
-  color: #E2E2E2;
-  font-weight: 400;
-}
-
-#title:hover {
-  color: #777;
-}
-
 #viewer.spreads {
   width: 78%;
-  left:2%;
-  height: 600px;
+  height: 1024px;
   box-shadow: 0 0 4px #ccc;
   border-radius: 5px;
   padding: 0;
   position: relative;
-  margin: 10px auto;
-  background: white url('ajax-loader.gif') center center no-repeat;
-  top: calc(50vh - 400px);
+  margin: 10px 3%;
+  background: white url('/dashboard/img/loading.gif') center center no-repeat;
 }
 
 #viewer.spreads .epub-view > iframe {
@@ -46,7 +23,7 @@ body {
   width: 800px;
   margin: 0 auto;
   position: relative;
-  background: url('ajax-loader.gif') center center no-repeat;
+  background: url('/dashboard/img/loading.gif') center center no-repeat;
   box-shadow: 0 0 4px #ccc;
   padding: 20px;
   background: white;
@@ -55,13 +32,25 @@ body {
 #viewer.scrolled .epub-view > iframe {
     background: white;
 }
-
-#prev {
-  left: 0;
+.epub_button{
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
 }
 
+
+#prev {
+  position: absolute;
+  top :50%;
+  left:150px;
+  display: inline-block;
+  }
+
 #next {
-  right: 0;
+  position: absolute;
+  top :50%;
+  right:500px;
+  display: inline-block;
 }
 
 #toc {
@@ -89,11 +78,13 @@ body {
   }
 
   #prev {
-    left: 140px;
-  }
+    display: inline-block;
+    content: url(images/prev.png);
+    }
 
   #next {
-    right: 140px;
+    display: inline-block;
+    content: url(images/next.png);
   }
 }
 
@@ -129,8 +120,8 @@ body {
 }
 
 #book-wrapper {
-  width: 480px;
-  height: 640px;
+  width: 80%;
+  height: 1024px;
   overflow: hidden;
   border: 1px solid #ccc;
   margin: 28px auto;
@@ -140,8 +131,8 @@ body {
 }
 
 #book-viewer {
-  width: 480px;
-  height: 660px;
+  width: 80%;
+  height: 1024px;
   margin: -30px auto;
   -moz-box-shadow:      inset 10px 0 20px rgba(0,0,0,.1);
   -webkit-box-shadow:   inset 10px 0 20px rgba(0,0,0,.1);
