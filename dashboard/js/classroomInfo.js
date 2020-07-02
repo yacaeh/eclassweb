@@ -13,6 +13,12 @@ classroomInfo = {
         page : 1
        // 어떤 pdf, 몇 페이지 등
     },
+    epub : {
+        state : false,
+        data : {
+            src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
+        }   // 어떤 pdf, 몇 페이지 등
+    },
     exam : false    
 };
 
@@ -72,11 +78,9 @@ classroomCommand = {
     onReceiveRoomInfo : function (_info) {        
         if(_info.userid == connection.userid) {
             classroomInfo = _info.roomInfo;
-            console.log(classroomInfo.pdf.page);
             this.updateSyncRoom ();
         }
     },    
-
 
     /*
         현재 방 상태에 따라 동기화를 해준다.
@@ -87,6 +91,7 @@ classroomCommand = {
             updateControlView(false);
         }
         
+    // }
         if(classroomInfo.share3D.state) {                  
             sync3DModel ();
         }
@@ -94,18 +99,18 @@ classroomCommand = {
         if(classroomInfo.pdf.state) {
             classroomCommand.syncPdf ();
         }
+        if(classroomInfo.epub.state) {
+            classroomCommand.openEpub ();
+        }
     },
-
-
     sendSynchronizationBroadcast : function () {
 
-        connection.send ();
+        // connection.send ();
     },
 
     onSynchronizationBroadcast : function (_roomInfo) {
 
     }
-
 };
 
 
@@ -226,9 +231,9 @@ classroomCommand.togglePdfStateServer = function (_success, _error) {
         {
             classroomCommand.setPdfStateLocal(result.data);
             if(result.data)                
-                classroomCommand.sendPDFCmd ('open');
+                classroomCommand.sendPDFCmdOnlyTeacher ('open');
             else
-                classroomCommand.sendPDFCmd ('close');
+                classroomCommand.sendPDFCmdOnlyTeacher ('close');
                 
             if(_success)
                 _success(result.data)
@@ -253,16 +258,25 @@ classroomCommand.setPdfStateLocal = function (_state) {
 classroomCommand.setPdfPage = function (_page) {    
 
     classroomInfo.pdf.page = _page;
-
-    if(connection.extra.roomOwner)
-        classroomCommand.sendPDFCmd ('page', _page);
+    classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
 }
 
 
-classroomCommand.sendPDFCmd = function (_cmd, _data) {
+classroomCommand.sendPDFCmdOnlyTeacher = function (_cmd, _data) {
+    if(!connection.extra.roomOwner) return;  
+
+    classroomCommand.sendPDFCmd(_cmd, _data);
+}
+
+classroomCommand.sendPDFCmdAllControlOnlyTeacher = function(_cmd, _data) {
     if(!connection.extra.roomOwner) return;    
     if(!classroomInfo.allControl) return;
 
+    classroomCommand.sendPDFCmd(_cmd, _data);
+}
+
+classroomCommand.sendPDFCmd = function (_cmd, _data) {
+    
     connection.send ({
         pdf : {
             cmd : _cmd,
@@ -316,10 +330,7 @@ classroomCommand.updatePDFCmd = function (_pdf) {
             case 'zoomOut' :
                 fileViewer.contentWindow.document.getElementById('zoomOut').click();
                 break;
-            case 'page' :            
-            
-                console.log('load page');
-                console.log(_pdf.data);
+            case 'page' :                        
                 const page = _pdf.data;
                 classroomInfo.pdf.page = page;  
                 var e = new Event("change");
@@ -351,6 +362,88 @@ classroomCommand.pdfOnLoaded = function () {
         cmd : 'page',
         data : classroomInfo.pdf.page
     });
+}
+/*
+    Epub
+*/
+
+classroomCommand.receiveEpubMessage = function (_epub) {  
+    if(_epub.cmd) {
+        classroomCommand.updateEpubCmd (_epub.cmd);
+    }else   {
+        let currentState = classroomInfo.epub.state;
+        if(currentState != _epub.state) {       
+            classroomInfo.epub = _epub;
+            classroomCommand.syncEpub ();
+        }
+    }
+};
+
+classroomCommand.sendOpenEpub = function () {
+    classroomInfo.epub.state = true;
+    connection.send({
+        epub : classroomInfo.epub
+    });
+};
+
+classroomCommand.sendCloseEpub = function () {
+    classroomInfo.epub.state = false;
+    connection.send({
+        epub : {
+            state : false
+        }
+    });
+};
+
+classroomCommand.openEpub = function () {
+    loadEpubViewer ();
+    $('#canvas-controller').show();
+};
+
+classroomCommand.closeEpub = function () {
+    unloadEpubViewer();
+    $('#canvas-controller').hide();
+}
+
+classroomCommand.sendEpubCmd = function (_cmd) {
+    if(!connection.extra.roomOwner) return;    
+    if(!classroomInfo.allControl) return;
+
+    connection.send ({
+        epub : {
+            cmd : _cmd
+        }
+    });
+}
+
+classroomCommand.updateEpubCmd = function (_cmd) {
+
+    let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    let epubViewer = frame.document.getElementById('epub-viewer');
+    if(!epubViewer)  return;
+
+    switch(_cmd)
+    {
+        case 'next' :
+            document.getElementById('next').click();
+            break;
+        case 'prev' :
+            document.getElementById('prev').click();
+            break;
+    }
+}
+
+classroomCommand.syncEpub = function () {    
+    if(classroomInfo.epub.state) {
+        // open
+        classroomCommand.openEpub ();
+    }
+    else {
+        // close        
+        classroomCommand.closeEpub ();     
+    }
 };
 
 

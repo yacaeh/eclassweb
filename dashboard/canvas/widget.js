@@ -701,7 +701,6 @@ function canvasresize(id){
         },
         mousedown: function(e) {
             if (isControlKeyPressed) {
-                copy();
                 paste();
                 isControlKeyPressed = false;
             }
@@ -1282,7 +1281,7 @@ function canvasresize(id){
     }
 
     var pencilLineWidth = document.getElementById('pencil-stroke-style').value,
-        pencilStrokeStyle = '#' + document.getElementById('pencil-fill-style').value;
+        pencilStrokeStyle = '#000000';
 
     var pencilDrawHelper = clone(drawHelper);
 
@@ -1352,7 +1351,7 @@ function canvasresize(id){
     }
 
     var markerLineWidth = document.getElementById('marker-stroke-style').value,
-        markerStrokeStyle = '#' + document.getElementById('marker-fill-style').value,
+        markerStrokeStyle = '#F12A2A',
         markerGlobalAlpha = 0.7;
 
     var markerDrawHelper = clone(drawHelper);
@@ -1591,7 +1590,7 @@ function canvasresize(id){
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
-            this.textInputContainer.style.position = 'relative';
+            // this.textInputContainer.style.position = 'relative';
 
             this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 30+'px'; 
@@ -1648,6 +1647,8 @@ function canvasresize(id){
                 };
                 // child.style.fontSize = child.innerHTML + 'px';
             });
+            document.getElementsByClassName("textInputUI")[0].focus();
+
         },
         textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
         eachFontColor: function(callback){
@@ -2258,6 +2259,7 @@ function canvasresize(id){
         view3d : icons.view3d || '',
         movie : icons.movie || '',
         file : icons.file,
+        epub : icons.epub,
     };
 
 
@@ -2569,14 +2571,6 @@ function canvasresize(id){
                 return 'rgba(' + hexToRGB(h).join(',') + ',1)';
             }
 
-            var colors = [
-                ['FFFFFF', '006600', '000099', 'CC0000', '8C4600'],
-                ['CCCCCC', '00CC00', '6633CC', 'FF0000', 'B28500'],
-                ['666666', '66FFB2', '006DD9', 'FF7373', 'FF9933'],
-                ['333333', '26FF26', '6699FF', 'CC33FF', 'FFCC99'],
-                ['000000', 'CCFF99', 'BFDFFF', 'FFBFBF', 'FFFF33']
-            ];
-
             var context = getContext('pencilIcon');
 
             var image = new Image();
@@ -2587,49 +2581,16 @@ function canvasresize(id){
             image.src = data_uris.pencilIcon;
 
             var pencilContainer = find('pencil-container'),
-                pencilColorContainer = find('pencil-fill-colors'),
                 strokeStyleText = find('pencil-stroke-style'),
-                pencilColorsList = find("pencil-colors-list"),
                 fillStyleText = find('pencil-fill-style'),
-                pencilSelectedColor = find('pencil-selected-color'),
-                pencilSelectedColor2 = find('pencil-selected-color-2'),
                 btnPencilDone = find('pencil-done'),
                 canvas = context.canvas,
                 alpha = 0.2;
 
             // START INIT PENCIL
-            pencilStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
-            pencilSelectedColor.style.backgroundColor =
-                pencilSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
+            pencilStrokeStyle = hexToRGBA("#000000", alpha)
 
-            colors.forEach(function(colorRow) {
-                var row = '<tr>';
 
-                colorRow.forEach(function(color) {
-                    row += '<td style="background-color:#' + color + '" data-color="' + color + '"></td>';
-                })
-                row += '</tr>';
-
-                pencilColorsList.innerHTML += row;
-            })
-
-            Array.prototype.slice.call(pencilColorsList.getElementsByTagName('td')).forEach(function(td) {
-                addEvent(td, 'mouseover', function() {
-                    var elColor = td.getAttribute('data-color');
-                    pencilSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor
-                });
-
-                addEvent(td, 'click', function() {
-                    var elColor = td.getAttribute('data-color');
-                    pencilSelectedColor.style.backgroundColor =
-                    pencilSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor;
-                    pencilContainer.style.display = 'none';
-                    pencilColorContainer.style.display = 'none';
-                    btnPencilDone.click();
-                });
-            })
 
             // END INIT PENCIL
 
@@ -2644,19 +2605,12 @@ function canvasresize(id){
                 pencilContainer.style.display = 'block';
                 pencilContainer.style.top = (canvas.offsetTop) + 'px';
                 pencilContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) - 2 + 'px';
-
-                fillStyleText.focus();
             });
 
             addEvent(btnPencilDone, 'click', function() {
                 pencilContainer.style.display = 'none';
-                pencilColorContainer.style.display = 'none';
                 pencilLineWidth = strokeStyleText.value;
                 pencilStrokeStyle = hexToRGBA(fillStyleText.value, alpha);
-            });
-
-            addEvent(pencilSelectedColor, 'click', function() {
-                pencilColorContainer.style.display = 'block';
             });
         }
 
@@ -2670,13 +2624,7 @@ function canvasresize(id){
             function hexToRGBA(h, alpha) {
                 return 'rgba(' + hexToRGB(h).join(',') + ',' + alpha + ')';
             }
-            var colors = [
-                ['FFFFFF', '006600', '000099', 'CC0000', '8C4600'],
-                ['CCCCCC', '00CC00', '6633CC', 'FF0000', 'B28500'],
-                ['666666', '66FFB2', '006DD9', 'FF7373', 'FF9933'],
-                ['333333', '26FF26', '6699FF', 'CC33FF', 'FFCC99'],
-                ['000000', 'CCFF99', 'BFDFFF', 'FFBFBF', 'FFFF33']
-            ];
+         
 
             var context = getContext('markerIcon');
 
@@ -2688,83 +2636,38 @@ function canvasresize(id){
             image.src = data_uris.markerIcon;
 
             var markerContainer = find('marker-container'),
-                markerColorContainer = find('marker-fill-colors'),
                 strokeStyleText = find('marker-stroke-style'),
-                markerColorsList = find("marker-colors-list"),
                 fillStyleText = find('marker-fill-style'),
-                markerSelectedColor = find('marker-selected-color'),
-                markerSelectedColor2 = find('marker-selected-color-2'),
                 btnMarkerDone = find('marker-done'),
                 canvas = context.canvas,
                 alpha = 0.2;
 
             // START INIT MARKER
-            markerStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
-
-            markerSelectedColor.style.backgroundColor =
-                markerSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
-
-            colors.forEach(function(colorRow) {
-                var row = '<tr>';
-
-                colorRow.forEach(function(color) {
-                    row += '<td style="background-color:#' + color + '" data-color="' + color + '"></td>';
-                })
-                row += '</tr>';
-
-                markerColorsList.innerHTML += row;
-            })
-
-            Array.prototype.slice.call(markerColorsList.getElementsByTagName('td')).forEach(function(td) {
-                addEvent(td, 'mouseover', function() {
-                    var elColor = td.getAttribute('data-color');
-                    markerSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor
-                });
-
-                addEvent(td, 'click', function() {
-                    var elColor = td.getAttribute('data-color');
-                    markerSelectedColor.style.backgroundColor =
-                        markerSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor;
-
-                    markerContainer.style.display = 'none';
-                    markerColorContainer.style.display = 'none';
-                    document.getElementById("marker-done").click();
-                });
-            })
+            markerStrokeStyle = hexToRGBA("#F12A2A", alpha)
+     
+        
 
             // END INIT MARKER
 
             addEvent(canvas, 'click', function() {
                 if(this.classList.contains('off'))
                     return false;
-
-
                 hideContainers();
-                // console.log('Marker Click') 
-                console.log(strokeStyleText.style.display);
-                console.log(strokeStyleText.value);
-
                 document.getElementById("temp-canvas").className = "";
                 document.getElementById("temp-canvas").classList.add("marker");
 
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
-                fillStyleText.focus();
             });
 
             addEvent(btnMarkerDone, 'click', function() {
                 markerContainer.style.display = 'none';
-                markerColorContainer.style.display = 'none';
 
                 markerLineWidth = strokeStyleText.value;
                 markerStrokeStyle = hexToRGBA(fillStyleText.value, alpha);
             });
 
-            addEvent(markerSelectedColor, 'click', function() {
-                markerColorContainer.style.display = 'block';
-            });
+    
         }
 
         if (tools.marker === true) {
@@ -2885,6 +2788,26 @@ function canvasresize(id){
             document.getElementById('screen_share').style.display = 'block';
         }
 
+        function decoratEpub() {
+            var context = getContext('epub');
+
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.epub;
+
+            document.getElementById('epub').onclick = function() {
+                this.classList.toggle("on");
+                this.classList.toggle("selected-shape");
+            }
+        }
+
+        if (tools.clearCanvas === true) {
+            decoratEpub();
+            document.getElementById('epub').style.display = 'block';
+        }
+
         function decorateonoff(){
             var context = getContext('onoff-icon');
 
@@ -2897,7 +2820,7 @@ function canvasresize(id){
             
             document.querySelector('#onoff-icon').onclick = function() {
                 this.classList.toggle("on");
-                this.classList.toggle("off");
+                // this.classList.toggle("off");
 
                 var isOn = this.classList.contains("on");
                 
@@ -3043,13 +2966,8 @@ function canvasresize(id){
     function hideContainers() {
         var 
             markerContainer = find('marker-container'),
-            markerColorContainer = find('marker-fill-colors'),
-            pencilContainer = find('pencil-container'),
-            pencilColorContainer = find('pencil-fill-colors');
-
-            markerColorContainer.style.display =
+            pencilContainer = find('pencil-container');
             markerContainer.style.display =
-            pencilColorContainer.style.display =
             pencilContainer.style.display = 'none';
     }
 
@@ -3245,11 +3163,6 @@ function canvasresize(id){
             return;
         }
 
-        // Ctrl + t
-        if (isAltKeyPressed && keyCode === 84 && is.isText) {
-            textHandler.showTextTools();
-            return;
-        }
 
         if (keyCode === 90 && e.ctrlKey) {
             //console.log('zxczxc')
@@ -3558,19 +3471,42 @@ function canvasresize(id){
         })
     }
 
+
+    var shortCut = [
+        {"onoff-icon" : "a"},
+        {"pencilIcon" : "q"},
+        {"markerIcon" : "w"},
+        {"eraserIcon" : "e"},
+        {"textIcon" : "r"},
+        {"undo" : "z"},
+        {"clearCanvas" : "x"},
+        {"screen_share" : "1"},
+        {"3d_view" : "2"},
+        {"movie" : "3"},
+        {"file" : "4"},
+        {"epub" : "5"},
+    ]
+
+    SetShortcut(shortCut);
+
+
     MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
     MakeTitlePop("pencilIcon", "연필");
     MakeTitlePop("markerIcon", "마커");
     MakeTitlePop("eraserIcon", "지우개");
     MakeTitlePop("textIcon", "글자를 적습니다");
-    MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
-    MakeTitlePop("image-icon", "이미지를 불러옵니다");
-    // MakeTitlePop("pdf-icon", "PDF파일을 불러옵니다");
     MakeTitlePop("undo", "작업 하나를 취소합니다");
+    MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
+
     MakeTitlePop("screen_share", "내 화면을 공유합니다");
     MakeTitlePop("3d_view", "3D 모델을 공유합니다");
     MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
     MakeTitlePop("file", "파일을 불러옵니다");
+    MakeTitlePop("epub", "E-Pub을 불러옵니다");
+
+    MakeTitlePop("image-icon", "이미지를 불러옵니다");
+
+    var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
 
     SliderSetting("pencileslider", "pencil-stroke-style", 10, function(v){
         var pencilDrawHelper = clone(drawHelper);
@@ -3583,11 +3519,111 @@ function canvasresize(id){
     SliderSetting("markerslider", "marker-stroke-style", 16, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
-            return [markerLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+            return [markerLineWidth, markerStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
         }
         markerLineWidth = v;
     });
+
+    ColorSetting('pencil-container', penColors);
+    ColorSetting('marker-container', penColors);
+
+    function ColorSetting(_container, colors){
+        var container = document.getElementById(_container);
+        var template = container.getElementsByClassName("color_template")[0];
+        var divs = [];
+
+        function hexToRGBA(h, alpha) {
+            return 'rgba(' + hexToRGB(h).join(',') + ',' + alpha + ')';
+        }
+        
+        colors.forEach(function(color){
+            var div = document.createElement("div");
+            div.dataset.color = color;
+            div.className = "color";
+            div.style.backgroundColor = color;
+            divs.push(div);
+            template.appendChild(div);
+        });
+
+        for(var i= 0 ; i < divs.length; i++){
+            divs[i].addEventListener("click", function(){
+                var nowColor = this.dataset.color;
+                divs.forEach(element => element.classList.remove("on"));
+                this.classList.add("on");
+                if(_container == "pencil-container"){
+                    pencilStrokeStyle = nowColor;
+                }
+                else if(_container == "marker-container"){
+                    markerStrokeStyle = hexToRGBA(nowColor, 0.4);
+                }
+            })
+        }
+    }
+
+
 })();
+
+// -----------------------------------------------------------------------
+
+
+function SetShortcut(shortCut){
+    var altdown = false;
+    var tooltips = [];
+
+    document.addEventListener("keydown", function(key){
+        if(key.altKey){
+            if(!altdown){
+                MakeTooltip(shortCut);
+                altdown = true;
+            }
+
+            key.preventDefault();
+
+            shortCut.forEach(function(cut){
+                if(key.key == Object.values(cut)){
+                    if(Object.keys(cut) == "screen_share"){
+                        RemoveTooltip();
+                        altdown = false;
+                    }
+
+
+                    document.getElementById(Object.keys(cut)).click();
+                }
+            });
+        }
+    })
+
+    document.addEventListener("keyup", function(key){
+        if(key.key == "Alt"){
+            if(altdown){
+                RemoveTooltip();
+                altdown = false;
+            }
+        }
+    })
+    
+    window.addEventListener("focusout" ,function(){
+        console.log("!!");
+    })
+
+    function MakeTooltip(shortcut){
+        shortcut.forEach(function(cut){
+            var btn = document.getElementById(Object.keys(cut));
+            var top = btn.getBoundingClientRect().top;
+            var div = document.createElement("div");
+            div.className = "tooltip";
+            div.innerHTML = Object.values(cut)[0];
+            div.style.top = top + 15 + 'px';
+            tooltips.push(div);
+            document.body.appendChild(div);
+        });
+    }
+
+    function RemoveTooltip(){
+        tooltips.forEach(element => document.body.removeChild(element));
+        tooltips = [] ;
+    }
+}
 
 function MakeTitlePop(element, contents){
     var ele = document.getElementById(element);
@@ -3673,7 +3709,6 @@ function SliderSetting(element, targetinput, defaultv, callback){
         if(e.target == bar){
             return false;
         }
-
         var ratio = mousex / sliderWidth;
         ratio = Math.min(Math.max(0, ratio), 1);
         back.style.width = (ratio * sliderWidth) + 'px';
