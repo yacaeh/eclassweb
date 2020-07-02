@@ -370,6 +370,7 @@ hr {
   padding-bottom: 8px;
   right: 0px;
   height: 48%;
+  overflow: inherit!important;
 }
 
 .top_all_controll_on{
