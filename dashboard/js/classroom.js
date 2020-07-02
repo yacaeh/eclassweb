@@ -143,15 +143,10 @@ function ScreenShare(btn){
     } else {
       alert('getDisplayMedia API is not available in this browser.');
     }
-
-
-
-
 }
 
 
 
-// here goes RTCMultiConnection
 
 connection.chunkSize = 16000;
 connection.enableFileSharing = true;
@@ -1804,4 +1799,45 @@ document.getElementById("collapse").addEventListener("click", function(){
 
 function test(){
   console.log("test from iframe");
+}
+
+
+document.getElementById("top_record_video").addEventListener("click", function () {
+  if (!this.classList.contains("on")) {
+    screen_recorder._startCapturing();
+  }
+  else {
+    screen_recorder._stopCapturing();
+    this.classList.remove("on");
+  }
+})
+
+
+function RecordingStart(){
+  var now = 0;
+  var recordingTime = document.getElementById("recording-time");
+  document.getElementById("current-time").style.lineHeight = "18px";
+  recordingTime.style.display = 'block';
+
+  function timer(){
+    now += 1;
+    var time = now;
+    var hour = Math.floor(time / 3600);
+    time %= 3600;
+  
+    var min = Math.floor(time / 60);
+    time %= 60;
+  
+    if (min < 10) min = '0' + min;
+  
+    if (time < 10) time = '0' + time;
+
+    recordingTime.innerHTML = hour + ':' + min + ':' + time;  
+  }
+  setInterval(timer, 1000);
+}
+
+
+function RecodingStop(){
+  
 }

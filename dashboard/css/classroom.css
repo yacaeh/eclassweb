@@ -413,7 +413,7 @@ hr {
   content: url(/dashboard/img/top_share_video_off.png);
 }
 #top_record_video{
-  content: url(/dashboard/newimg/record.png);
+  content: url(/dashboard/newimg/recordoff.png);
 }
 #top_pdf{
   content: url(/dashboard/img/pdf.png);
@@ -460,9 +460,22 @@ hr {
   font-style: normal;
   font-weight: bold;
   font-size: 12px;
-  line-height: 50px;
   color: #707070;
   vertical-align: middle;
+  line-height: 36px;
+  position: relative;
+}
+
+#recording-time{
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 12px;
+  color: red;
+  vertical-align: middle;
+  line-height: 18px;
+  position: relative;
+  display: none;
 }
 
 #icon_exit{
@@ -520,7 +533,11 @@ hr {
   font-weight: bold;
   text-align: end;
   margin-right: 5px;
-  height: 50px;
+  height: 36px;
+  display: inline-grid;
+  position: absolute;
+  top: 10px;
+  right: 3px;
 }
 
 .icons{
@@ -1101,4 +1118,20 @@ input[type="number"]:focus{
 
 #alert-btns {
   margin-left: 39px;
+}
+
+#top_record_video.on {
+  animation-duration: 1s;
+  animation-name: record;
+  animation-iteration-count: infinite;
+}
+
+@keyframes record{
+  from{
+    content: url(/dashboard/newimg/recordoff.png);
+  }
+  
+  to{
+    content: url(/dashboard/newimg/record.png);
+  }
 }
