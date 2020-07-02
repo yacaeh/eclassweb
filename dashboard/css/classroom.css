@@ -447,11 +447,10 @@ hr {
   color: #828282;
   width: 300px;
   left: calc(50% - 300px / 2);
-  top: 18px;
-  font-size: 12px;
+  font-size: 19px;
   font-family: Roboto;
   font-style: normal;
-  line-height: 14px;
+  line-height: 50px;
   font-weight: bold;
 }
 
