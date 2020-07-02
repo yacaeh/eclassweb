@@ -216,7 +216,19 @@ classroomCommand.updatePDFCmd = function (_cmd) {
             fileViewer.contentWindow.document.getElementById('previous').click();
             break;
         case 'last-page' :
-            fileViewer.contentWindow.viewerPlugin.showPage(1);
+            fileViewer.contentWindow.document.getElementById('previous').click();
+            break;
+        case 'fullscreen' :
+            fileViewer.contentWindow.document.getElementById('fullscreen').click();
+            break;
+        case 'presentation' :
+            fileViewer.contentWindow.document.getElementById('presentation').click();
+            break;
+        case 'zoomIn' :
+            fileViewer.contentWindow.document.getElementById('zoomIn').click();
+            break;
+        case 'zoomOut' :
+            fileViewer.contentWindow.document.getElementById('zoomOut').click();
             break;
     }
 }

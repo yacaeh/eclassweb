@@ -15,7 +15,8 @@
     <link href="widget.css" rel="stylesheet">
 </head>
 
-<body>
+<body oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+
     <section class="design-surface">
         <canvas id="temp-canvas" class="pen"></canvas>
         <canvas id="main-canvas"></canvas>
@@ -56,6 +57,7 @@
 
     <section id="titlebox">
         <span id="titletext">설명입니다</span>
+        <span class="sq"></span>
     </section>
 
     <!-- pdf -->
