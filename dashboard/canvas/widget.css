@@ -739,6 +739,7 @@ input:focus {
 }
 
 .tooltip{
+    z-index: 100;
     position: absolute;
     left: 28px;
     top: 100px;

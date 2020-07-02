@@ -3477,11 +3477,11 @@ function canvasresize(id){
 
 
     var shortCut = [
-        {"onoff-icon" : "q"},
-        {"pencilIcon" : "w"},
-        {"markerIcon" : "e"},
-        {"eraserIcon" : "r"},
-        {"textIcon" : "t"},
+        {"onoff-icon" : "a"},
+        {"pencilIcon" : "q"},
+        {"markerIcon" : "w"},
+        {"eraserIcon" : "e"},
+        {"textIcon" : "r"},
         {"undo" : "z"},
         {"clearCanvas" : "x"},
         {"screen_share" : "1"},
@@ -3585,6 +3585,12 @@ function SetShortcut(shortCut){
 
             shortCut.forEach(function(cut){
                 if(key.key == Object.values(cut)){
+                    if(Object.keys(cut) == "screen_share"){
+                        RemoveTooltip();
+                        altdown = false;
+                    }
+
+
                     document.getElementById(Object.keys(cut)).click();
                 }
             });
@@ -3598,6 +3604,10 @@ function SetShortcut(shortCut){
                 altdown = false;
             }
         }
+    })
+    
+    window.addEventListener("focusout" ,function(){
+        console.log("!!");
     })
 
     function MakeTooltip(shortcut){
