@@ -701,7 +701,6 @@ function canvasresize(id){
         },
         mousedown: function(e) {
             if (isControlKeyPressed) {
-                copy();
                 paste();
                 isControlKeyPressed = false;
             }
@@ -1648,6 +1647,8 @@ function canvasresize(id){
                 };
                 // child.style.fontSize = child.innerHTML + 'px';
             });
+            document.getElementsByClassName("textInputUI")[0].focus();
+
         },
         textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
         eachFontColor: function(callback){
