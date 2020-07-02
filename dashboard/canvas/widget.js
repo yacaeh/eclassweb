@@ -2798,7 +2798,7 @@ function canvasresize(id){
             
             document.querySelector('#onoff-icon').onclick = function() {
                 this.classList.toggle("on");
-                this.classList.toggle("off");
+                // this.classList.toggle("off");
 
                 var isOn = this.classList.contains("on");
                 
