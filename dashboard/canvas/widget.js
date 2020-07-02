@@ -3488,6 +3488,7 @@ function canvasresize(id){
         {"3d_view" : "2"},
         {"movie" : "3"},
         {"file" : "4"},
+        {"epub" : "5"},
     ]
 
     SetShortcut(shortCut);
