@@ -28,9 +28,9 @@
         <canvas class="draw" id="pencilIcon" width="28" height="28" ></canvas>
         <canvas class="draw" id="markerIcon" width="28" height="28" ></canvas>
         <canvas class="i draw" id="eraserIcon" width="28" height="28" ></canvas>
+        <canvas class="i draw" id="textIcon" width="28" height="28"></canvas>
         <canvas class="i draw" id="undo" width="28" height="28"></canvas>
         <canvas class="i draw" id="clearCanvas" width="28" height="28" ></canvas>
-        <canvas class="i draw" id="textIcon" width="28" height="28"></canvas>
         
         <div class="tooldivide"></div>
         
@@ -39,6 +39,7 @@
         <canvas class="i"  id="3d_view" width="28" height="28" ></canvas>
         <canvas class="i"  id="movie" width="28" height="28"></canvas>
         <canvas class="i"  id="file" width="28" height="28"></canvas>
+        <canvas class="i"  id="epub" width="28" height="28"></canvas>
 
         <canvas class="i" id="image-icon" width="28" height="28"></canvas>
 
@@ -117,48 +118,27 @@
 
         <div id="colors-done" class="btn-007">Done</div>
     </section>
+
     <section id="marker-container" class="context-popup colors-container">
         <input style="display: none;" id="sliderval" type="number" class="sliderval inputbox">
+        <div class="color_template"></div>
         <span id="markerslider" class="slider-front">
             <span class="slider-back"></span>
             <span class="slider_btn"></span>
         </span>
         <input class="svalue" id="marker-stroke-style">
-        <span class="input-div" id='marker-color-container'>
-            <div id="marker-selected-color"></div>
-            <div id="marker-fill-colors" class='context-popup'>
-                <div class="top">
-                    <div id="marker-selected-color-2"></div>
-                    <input id="marker-fill-style" type="text" value="FF7373">
-                </div>
-                <table id="marker-colors-list">
-                </table>
-            </div>
-        </div>
-        </span>
         <div id="marker-done" style="display: none;" class="btn-007">선택</div>
     </section>
 
     <section id="pencil-container" class="context-popup colors-container">
         <input style="display: none;" id="sliderval" type="number" class="sliderval inputbox">
+        <div class="color_template"></div> 
         <span id="pencileslider" class="slider-front">
             <span class="slider-back"></span>
             <span class="slider_btn"></span>
         </span>
         <input class="svalue" id="pencil-stroke-style">
-        <span class="input-div" id='pencil-color-container'>
-            <div id="pencil-selected-color"></div>
-            <div id="pencil-fill-colors" class='context-popup'>
-                <div class="top">
-                    <div id="pencil-selected-color-2"></div>
-                    <input id="pencil-fill-style" type="text" value="6699FF">
-                </div>
-                <table id="pencil-colors-list">
-                </table>
-            </div>
-        </div>
-        </span>
-        <div id="pencil-done" style="display: none;" class="btn-007">선택</div>
+        <div class="done" id="pencil-done" style="display: none;" class="btn-007">선택</div>
     </section>
 
   

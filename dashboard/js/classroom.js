@@ -41,14 +41,16 @@ SetCanvasBtn('screen_share', ScreenShare);
 SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
+SetCanvasBtn('epub', LoadEpub);
 
 var isSharingScreen = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
+var isSharingEpub = false;
 
 function checkSharing() {
-  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile;
+  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
 }
 
 function removeOnSelect(btn) {
@@ -972,16 +974,17 @@ function updateClassTime() {
 
     if (time < 10) time = '0' + time;
 
-    $('#current-day').text(hour + ':' + min + ':' + time);
+    $('#current-time').text(hour + ':' + min + ':' + time);
   }
 }
 
-function SetTeacher() {
-  $('#session-id').text(
-    connection.extra.userFullName + ' (' + params.sessionid + ')'
-  );
-  $('#my-name').remove();
-  $('.for_teacher').show();
+
+function SetTeacher(){
+    $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
+    $("#my-name").remove();
+    $(".for_teacher").show();
+    $(".controll").show();
+    $(".feature").show();
 }
 
 function SetStudent() {
@@ -991,7 +994,9 @@ function SetStudent() {
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
   $('#main-video').show();
-  $('.for_teacher').show();
+  $(".for_teacher").show();
+  $(".controll").remove();
+  $(".feature").remove();
 
   //$("#top_all_controll").hide();
 }
@@ -1417,18 +1422,67 @@ function zoomOut() {
   if (connection.extra.roomOwner || !classroomInfo.allControl)
     classroomCommand.sendPDFCmd('zoomOut');
 }
-loadEpub();
-function loadEpub() {
+
+isEpubViewer = false;
+function LoadEpub(btn) {
+  if (!isSharingEpub && checkSharing()) {
+    removeOnSelect(btn);
+    return;
+  }
+
+  if (!connection.extra.roomOwner) return;
+
+  if (isEpubViewer === false) {
+    isSharingEpub = true;
+    loadEpubViewer();
+    $('#canvas-controller').show();
+    isEpubViewer = true;
+    classroomCommand.sendOpenEpub();
+  } else {
+    isSharingEpub = false;
+    unloadEpubViewer();
+    $('#canvas-controller').hide();
+    isEpubViewer = false;
+    classroomCommand.sendCloseEpub();
+  }
+}
+
+
+function loadEpubViewer() {
+  let epubViewer = document.createElement('div');
+  epubViewer.setAttribute('id', 'epub-viewer');
+  let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+  // Create new link Element 
+
+  var head = frame.document.getElementsByTagName('HEAD')[0];  
+  var link = document.createElement('link'); 
+    // set the attributes for link element  
+    link.rel = 'stylesheet';  
+    link.type = 'text/css'; 
+    link.href = 'https://localhost:9001/dashboard/css/epub.css';  
+    head.appendChild(link);  
+
+  // Append link element to HTML head 
+
+  frame.document
+    .getElementsByClassName('design-surface')[0]
+    .appendChild(epubViewer);
+  frame.document.getElementById('main-canvas').style.zIndex = '1';
+  frame.document.getElementById('temp-canvas').style.zIndex = '2';
+  frame.document.getElementById('tool-box').style.zIndex = '3';
+
   var book = ePub(
     'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
   );
   let viewer = document.getElementById('viewer');
-  var rendition = book.renderTo(viewer, {
+  var rendition = book.renderTo(epubViewer, {
     manager: 'continuous',
     flow: 'paginated',
     width: '100%',
     height: 1024,
-    snap: true,
+    snap: true
   });
 
   var displayed = rendition.display();
@@ -1476,6 +1530,8 @@ function loadEpub() {
   document.addEventListener('keyup', keyListener, false);
 }
 
+function unloadEpubViewer() {
+}
 _3DCanvasFunc();
 _AllCantrallFunc();
 _Movie_Render_Button_Func();
@@ -1792,7 +1848,7 @@ function CanvasResize() {
   var r = document.getElementsByClassName('lwindow')[0];
   var rwidth = $(r).width();
 
-  var x = canvas.width - rwidth - 50;
+  var x = canvas.width - rwidth - 55;
   var y = canvas.height - 60;
 
   $('#screen-viewer').width(x);

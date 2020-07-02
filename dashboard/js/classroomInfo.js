@@ -13,6 +13,12 @@ classroomInfo = {
             src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
         }   // 어떤 pdf, 몇 페이지 등
     },
+    epub : {
+        state : false,
+        data : {
+            src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
+        }   // 어떤 pdf, 몇 페이지 등
+    },
     exam : false    
 };
 
@@ -264,6 +270,31 @@ classroomCommand.syncPdf = function () {
     }
 };
 
+classroomCommand.sendOpenEpub = function () {
+    .epub.state = true;
+    connection.send({
+        epub : classroomInfo.epub
+    });
+};
+
+classroomCommand.sendCloseEpub = function () {
+    classroomInfo.epub.state = false;
+    connection.send({
+        epub : {
+            state : false
+        }
+    });
+};
+
+classroomCommand.openEpub = function () {
+    loadEpubViewer ();
+    $('#canvas-controller').show();
+};
+
+classroomCommand.closeEpub = function () {
+    unloadEpubViewer();
+    $('#canvas-controller').hide();
+}
 
 /*
     방 오픈 경과 시간 동기화
