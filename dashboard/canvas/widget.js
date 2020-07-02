@@ -1590,7 +1590,7 @@ function canvasresize(id){
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
-            this.textInputContainer.style.position = 'relative';
+            // this.textInputContainer.style.position = 'relative';
 
             this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 30+'px'; 
@@ -3163,11 +3163,6 @@ function canvasresize(id){
             return;
         }
 
-        // Ctrl + t
-        if (isAltKeyPressed && keyCode === 84 && is.isText) {
-            textHandler.showTextTools();
-            return;
-        }
 
         if (keyCode === 90 && e.ctrlKey) {
             //console.log('zxczxc')
