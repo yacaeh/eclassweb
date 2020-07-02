@@ -282,6 +282,11 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if (event.data.epub) {
+    classroomCommand.receiveEpubMessage(event.data.epub);
+    return;
+  }
+
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     var enable = event.data.modelEnable.enable;
@@ -1493,6 +1498,7 @@ function loadEpubViewer() {
     'click',
     function () {
       rendition.next();
+      showNextEpubPage();
     },
     false
   );
@@ -1503,6 +1509,7 @@ function loadEpubViewer() {
     'click',
     function () {
       rendition.prev();
+      showPreviousEpubPage();
     },
     false
   );
@@ -1511,11 +1518,13 @@ function loadEpubViewer() {
     // Left Key
     if ((e.keyCode || e.which) == 37) {
       rendition.prev();
+      showPreviousEpubPage();
     }
 
     // Right Key
     if ((e.keyCode || e.which) == 39) {
       rendition.next();
+      showNextEpubPage();
     }
   };
 
@@ -1540,6 +1549,17 @@ function unloadEpubViewer() {
   let epubViewer = frame.document.getElementById('epub-viewer');
   epubViewer.remove();
 }
+
+function showNextEpubPage() {
+  if (connection.extra.roomOwner || !classroomInfo.allControl)
+    classroomCommand.sendEpubCmd('next');
+}
+
+function showPreviousEpubPage() {
+  if (connection.extra.roomOwner || !classroomInfo.allControl)
+    classroomCommand.sendEpubCmd('prev');
+}
+
 _3DCanvasFunc();
 _AllCantrallFunc();
 _Movie_Render_Button_Func();

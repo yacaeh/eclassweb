@@ -270,6 +270,22 @@ classroomCommand.syncPdf = function () {
     }
 };
 
+/*
+    Epub
+*/
+
+classroomCommand.receiveEpubMessage = function (_epub) {  
+    if(_epub.cmd) {
+        classroomCommand.updateEpubCmd (_epub.cmd);
+    }else   {
+        let currentState = classroomInfo.epub.state;
+        if(currentState != _epub.state) {       
+            classroomInfo.epub = _epub;
+            classroomCommand.syncEpub ();
+        }
+    }
+};
+
 classroomCommand.sendOpenEpub = function () {
     classroomInfo.epub.state = true;
     connection.send({
@@ -295,6 +311,48 @@ classroomCommand.closeEpub = function () {
     unloadEpubViewer();
     $('#canvas-controller').hide();
 }
+
+classroomCommand.sendEpubCmd = function (_cmd) {
+    if(!connection.extra.roomOwner) return;    
+    if(!classroomInfo.allControl) return;
+
+    connection.send ({
+        epub : {
+            cmd : _cmd
+        }
+    });
+}
+
+classroomCommand.updateEpubCmd = function (_cmd) {
+
+    let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+    let epubViewer = frame.document.getElementById('epub-viewer');
+    if(!epubViewer)  return;
+
+    switch(_cmd)
+    {
+        case 'next' :
+            document.getElementById('next').click();
+            break;
+        case 'prev' :
+            document.getElementById('prev').click();
+            break;
+    }
+}
+
+classroomCommand.syncEpub = function () {    
+    if(classroomInfo.epub.state) {
+        // open
+        classroomCommand.openEpub ();
+    }
+    else {
+        // close        
+        classroomCommand.closeEpub ();     
+    }
+};
+
 
 /*
     방 오픈 경과 시간 동기화
