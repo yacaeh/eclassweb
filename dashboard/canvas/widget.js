@@ -2258,6 +2258,7 @@ function canvasresize(id){
         view3d : icons.view3d || '',
         movie : icons.movie || '',
         file : icons.file,
+        epub : icons.epub,
     };
 
 
@@ -2784,6 +2785,26 @@ function canvasresize(id){
         if (tools.clearCanvas === true) {
             decorateScreenShare();
             document.getElementById('screen_share').style.display = 'block';
+        }
+
+        function decoratEpub() {
+            var context = getContext('epub');
+
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.epub;
+
+            document.getElementById('epub').onclick = function() {
+                this.classList.toggle("on");
+                this.classList.toggle("selected-shape");
+            }
+        }
+
+        if (tools.clearCanvas === true) {
+            decoratEpub();
+            document.getElementById('epub').style.display = 'block';
         }
 
         function decorateonoff(){
@@ -3454,22 +3475,41 @@ function canvasresize(id){
         })
     }
 
+
+    var shortCut = [
+        {"onoff-icon" : "q"},
+        {"pencilIcon" : "w"},
+        {"markerIcon" : "e"},
+        {"eraserIcon" : "r"},
+        {"textIcon" : "t"},
+        {"undo" : "z"},
+        {"clearCanvas" : "x"},
+        {"screen_share" : "1"},
+        {"3d_view" : "2"},
+        {"movie" : "3"},
+        {"file" : "4"},
+    ]
+
+    SetShortcut(shortCut);
+
+
     MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
     MakeTitlePop("pencilIcon", "연필");
     MakeTitlePop("markerIcon", "마커");
     MakeTitlePop("eraserIcon", "지우개");
     MakeTitlePop("textIcon", "글자를 적습니다");
-    MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
-    MakeTitlePop("image-icon", "이미지를 불러옵니다");
-    // MakeTitlePop("pdf-icon", "PDF파일을 불러옵니다");
     MakeTitlePop("undo", "작업 하나를 취소합니다");
+    MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
+
     MakeTitlePop("screen_share", "내 화면을 공유합니다");
     MakeTitlePop("3d_view", "3D 모델을 공유합니다");
     MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
     MakeTitlePop("file", "파일을 불러옵니다");
+    MakeTitlePop("epub", "E-Pub을 불러옵니다");
+
+    MakeTitlePop("image-icon", "이미지를 불러옵니다");
 
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
-
 
     SliderSetting("pencileslider", "pencil-stroke-style", 10, function(v){
         var pencilDrawHelper = clone(drawHelper);
@@ -3528,6 +3568,55 @@ function canvasresize(id){
 
 // -----------------------------------------------------------------------
 
+
+function SetShortcut(shortCut){
+    var altdown = false;
+    var tooltips = [];
+
+    document.addEventListener("keydown", function(key){
+        if(key.altKey){
+            if(!altdown){
+                MakeTooltip(shortCut);
+                altdown = true;
+            }
+
+            key.preventDefault();
+
+            shortCut.forEach(function(cut){
+                if(key.key == Object.values(cut)){
+                    document.getElementById(Object.keys(cut)).click();
+                }
+            });
+        }
+    })
+
+    document.addEventListener("keyup", function(key){
+        if(key.key == "Alt"){
+            if(altdown){
+                RemoveTooltip();
+                altdown = false;
+            }
+        }
+    })
+
+    function MakeTooltip(shortcut){
+        shortcut.forEach(function(cut){
+            var btn = document.getElementById(Object.keys(cut));
+            var top = btn.getBoundingClientRect().top;
+            var div = document.createElement("div");
+            div.className = "tooltip";
+            div.innerHTML = Object.values(cut)[0];
+            div.style.top = top + 15 + 'px';
+            tooltips.push(div);
+            document.body.appendChild(div);
+        });
+    }
+
+    function RemoveTooltip(){
+        tooltips.forEach(element => document.body.removeChild(element));
+        tooltips = [] ;
+    }
+}
 
 function MakeTitlePop(element, contents){
     var ele = document.getElementById(element);
