@@ -740,10 +740,10 @@ input:focus {
 
 .textInputUI,
 .fontSelectUl,
+.fontColorUI,
 .fontSizeUl{
     z-index: 10000000;
 }
-
 .tooltip{
     z-index: 100;
     position: absolute;
