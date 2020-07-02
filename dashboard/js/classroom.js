@@ -1531,6 +1531,15 @@ function loadEpubViewer() {
 }
 
 function unloadEpubViewer() {
+  let frame = document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow;
+  frame.document.getElementById('main-canvas').style.zIndex = '1';
+  frame.document.getElementById('temp-canvas').style.zIndex = '2';
+  frame.document.getElementById('tool-box').style.zIndex = '3';
+
+  let epubViewer = frame.document.getElementById('epub-viewer');
+  epubViewer.remove();
 }
 _3DCanvasFunc();
 _AllCantrallFunc();
