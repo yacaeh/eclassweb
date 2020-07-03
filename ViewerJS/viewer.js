@@ -134,8 +134,10 @@ function Viewer( viewerPlugin, parameters ) {
             viewerPlugin.onScroll();
         }
         if ( viewerPlugin.getPageInView ) {
-            pageNumber = viewerPlugin.getPageInView();
+            pageNumber = viewerPlugin.getPageInView();            
             if ( pageNumber ) {
+                if(pageNumber != currentPage)
+                    self.showPage (pageNumber);
                 currentPage                                 = pageNumber;
                 document.getElementById('pageNumber').value = pageNumber;
             }
@@ -241,7 +243,7 @@ function Viewer( viewerPlugin, parameters ) {
                 }
             }
 
-            initialized                                   = true;
+            
             pages                                         = getPages();
             document.getElementById('numPages').innerHTML = 'of ' + pages.length;
 
@@ -255,6 +257,9 @@ function Viewer( viewerPlugin, parameters ) {
             // Doesn't work in older browsers: document.getElementById('loading-document').remove();
             var loading = document.getElementById('loading-document');
             loading.parentNode.removeChild(loading);
+            
+            window.top.pdfOnLoaded ();
+            initialized                                   = true;
         };
 
         viewerPlugin.initialize(canvasContainer, url);
@@ -276,7 +281,9 @@ function Viewer( viewerPlugin, parameters ) {
 
         currentPage                                 = n;
         document.getElementById('pageNumber').value = currentPage;
-        window.top.showPage(n);
+
+        if(initialized)
+            window.top.showPage(n);
     };
 
     /**
@@ -545,7 +552,7 @@ function Viewer( viewerPlugin, parameters ) {
             setButtonClickHandler('previousPage', self.showPreviousPage);
             setButtonClickHandler('nextPage', self.showNextPage);
 
-            document.getElementById('pageNumber').addEventListener('change', function () {
+            document.getElementById('pageNumber').addEventListener('change', function () {                                               
                 self.showPage(this.value);
             });
 
@@ -607,14 +614,14 @@ function Viewer( viewerPlugin, parameters ) {
                         case 37: // left arrow
                         case 38: // up arrow
                         case 80: // key 'p'
-                            self.showPreviousPage();
+                           self.showPreviousPage();
                             break;
                         case 13: // enter
                         case 34: // pageDown
                         case 39: // right arrow
                         case 40: // down arrow
                         case 78: // key 'n'
-                            self.showNextPage();
+                           self.showNextPage();
                             break;
                         case 32: // space
                             shiftKey ? self.showPreviousPage() : self.showNextPage();

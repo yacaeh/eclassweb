@@ -72,14 +72,18 @@ function _3DCanvasOnOff(btn) {
     const isViewer = classroomInfo.share3D.state;
     if (false == isViewer) {
       isSharing3D = true;
-      modelEnable((send = true));
-    } else {
-      isSharing3D = false;
-      remove3DCanvas();
-      connection.send({
-        modelDisable: true,
-      });
+      //modelEnable(send=true);
+      setShared3DStateServer (true);
     }
+    else
+    {
+      isSharing3D = false;
+      setShared3DStateServer (false);
+      // remove3DCanvas();                
+      // connection.send({
+      //     modelDisable : true
+      // });
+    }          
   }
 }
 
@@ -128,8 +132,8 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-  // 접속시 방정보 동기화.
-  if (connection.extra.roomOwner) classroomCommand.sendsyncRoomInfo(event);
+  //  session 연결 완료
+  classroomCommand.onConnectionSession (event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -166,8 +170,8 @@ connection.onmessage = function (event) {
 
 
   if (event.data.showMainVideo) {
-    classroomInfo.shareScreen = true;
-    // $('#main-video').show();
+    classroomCommand.setShareScreenLocal (true);
+          // $('#main-video').show();
     $('#screen-viewer').css({
       top: $('#widget-container').offset().top,
       left: $('#widget-container').offset().left,
@@ -181,14 +185,10 @@ connection.onmessage = function (event) {
   if (event.data.hideMainVideo) {
     // $('#main-video').hide();
     $('#screen-viewer').hide();
-    classroomInfo.shareScreen = false;
+    classroomCommand.setShareScreenLocal (false);
     return;
   }
 
-  if (event.data.roomSync) {
-    classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
-    return;
-  }
 
   if (event.data.chatMessage) {
     appendChatMessage(event);
@@ -200,15 +200,14 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (null != event.data.allControl) {
-    classroomInfo.allControl = event.data.allControl;
-    if (event.data.allControl) {
-      // 제어 하기
-      allControllEnable(top_all_controll_jthis, true, false);
-    } else {
-      // 제어 풀기
-      allControllEnable(top_all_controll_jthis, false, false);
-    }
+
+  if(event.data.roomInfo) {
+    classroomCommand.onReceiveRoomInfo (event.data);
+    return;
+  }
+
+  if (event.data.allControl) { 
+      onAllControlValue (event.data.allControl);
     return;
   }
 
@@ -228,13 +227,8 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data.roomSync) {
-    classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
-    return;
-  }
-
-  if (event.data.pdf) {
-    classroomCommand.receivePdfMessage(event.data.pdf);
+  if(event.data.pdf) {    
+    classroomCommand.updatePDFCmd (event.data.pdf);
     return;
   }
 
@@ -246,7 +240,8 @@ connection.onmessage = function (event) {
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     var enable = event.data.modelEnable.enable;
-    modelEnable(false);
+    setShared3DStateLocal (enable);
+    //modelEnable(false);
     return;
   }
 
@@ -598,8 +593,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.attachStreams.push(tempStream);
     window.tempStream = tempStream;
 
-    SetTeacher();
-    classroomCommand.openRoom();
+    SetTeacher(); 
 
     connection.extra.roomOwner = true;
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
@@ -610,6 +604,9 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         }
         alert(error);
       }
+
+
+      classroomCommand.joinRoom ();
 
       connection.socket.on('disconnect', function () {
         location.reload();
@@ -682,6 +679,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           }
           alert(error);
         }
+
+        classroomCommand.joinRoom ();
 
         connection.socket.on('disconnect', function () {
           console.log('disconnect Class!');
@@ -804,6 +803,9 @@ function currentScreenViewShare(_pid) {
 }
 
 function replaceScreenTrack(stream, btn) {
+  
+  classroomCommand.setShareScreenServer (true, result => {
+
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
@@ -815,23 +817,25 @@ function replaceScreenTrack(stream, btn) {
   });
 
   // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
-  window.shareStream = stream;
-  classroomInfo.shareScreen = true;
-
+  window.shareStream = stream;  
   var screenTrackId = stream.getTracks()[0].id;
 
-  addStreamStopListener(stream, function () {
-    connection.send({
-      hideMainVideo: true,
+  addStreamStopListener(stream, function () {    
+
+    classroomCommand.setShareScreenServer(false, () => {
+      connection.send({
+        hideMainVideo: true,
+      });
+      $(btn).removeClass("on");
+      $(btn).removeClass("selected-shape");
+      isSharingScreen = false;
+      // $('#main-video').hide();
+      classroomInfo.shareScreen = false;
+      window.sharedStream = null;
+      hideScreenViewerUI();
+      replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
-    $(btn).removeClass('on');
-    $(btn).removeClass('selected-shape');
-    isSharingScreen = false;
-    // $('#main-video').hide();
-    classroomInfo.shareScreen = false;
-    window.sharedStream = null;
-    hideScreenViewerUI();
-    replaceTrack(tempStream.getTracks()[0], screenTrackId);
+  
   });
 
   stream.getTracks().forEach(function (track) {
@@ -844,7 +848,10 @@ function replaceScreenTrack(stream, btn) {
     showMainVideo: true,
   });
 
-  showScreenViewerUI();
+  showScreenViewerUI ();
+
+  });
+
   // $('#main-video').show();
 }
 
@@ -1264,25 +1271,41 @@ function LoadFile(btn) {
     removeOnSelect(btn);
     return;
   }
+  
+  if(!connection.extra.roomOwner) return;
 
-  if (!connection.extra.roomOwner) return;
-
-  if (isFileViewer === false) {
-    isSharingFile = true;
-    loadFileViewer();
-    $('#canvas-controller').show();
-    isFileViewer = true;
-    classroomCommand.sendOpenPdf();
-  } else {
-    isSharingFile = false;
-    unloadFileViewer();
-    $('#canvas-controller').hide();
-    isFileViewer = false;
-    classroomCommand.sendClosePdf();
-  }
+  classroomCommand.togglePdfStateServer ((state) => {
+    // if(state) 
+    // {
+    //   isSharingFile = true;
+    //   isFileViewer = true;
+    // }
+    // else
+    // {
+    //   isSharingFile = false;
+    //   isFileViewer = false;
+    // }
+  }) 
+  
+  // if (isFileViewer === false) {
+  //   isSharingFile = true;
+  //   loadFileViewer();
+  //   $('#canvas-controller').show();
+  //   isFileViewer = true;
+  //   classroomCommand.sendOpenPdf ();
+  // } else {
+  //   isSharingFile = false;
+  //   unloadFileViewer();
+  //   $('#canvas-controller').hide();
+  //   isFileViewer = false;
+  //   classroomCommand.sendClosePdf ();
+  // }
 }
 
 function unloadFileViewer() {
+  isSharingFile = false;
+  isFileViewer = false;
+
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
@@ -1296,6 +1319,9 @@ function unloadFileViewer() {
 
 function loadFileViewer() {
   console.log('loadFileViewer');
+  isSharingFile = true;
+  isFileViewer = true;
+
   let fileViewer = document.createElement('iframe');
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
@@ -1319,20 +1345,26 @@ function loadFileViewer() {
   frame.document.getElementById('tool-box').style.zIndex = '3';
 }
 
-function showPage(n) {
-  console.log(n);
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendPDFCmd('page');
+
+// Pdf가 처음 로딩이 다 되었는지 확인.
+// 로딩이 다 된 후에 페이지 동기화
+function pdfOnLoaded () {
+  classroomCommand.pdfOnLoaded ();
 }
 
-function showNextPage() {
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendPDFCmd('next');
+function showPage(n){  ;
+  if(connection.extra.roomOwner || !classroomInfo.allControl) 
+    classroomCommand.setPdfPage(n);
 }
 
-function showPreviousPage() {
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendPDFCmd('prev');
+function showNextPage(){
+  // if(connection.extra.roomOwner || !classroomInfo.allControl) 
+  //   classroomCommand.sendPDFCmd('next');
+}
+
+function showPreviousPage(){
+  // if(connection.extra.roomOwner || !classroomInfo.allControl) 
+  //   classroomCommand.sendPDFCmd('prev');
 }
 
 // function toggleFullScreen(){
@@ -1346,13 +1378,11 @@ function showPreviousPage() {
 // }
 
 function zoomIn() {
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendPDFCmd('zoomIn');
+    classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomIn');
 }
 
 function zoomOut() {
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendPDFCmd('zoomOut');
+    classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomOut');
 }
 
 isEpubViewer = false;
