@@ -2,8 +2,6 @@
 var top_all_controll_jthis;
 
 
-var onAllControll = function () {};
-
 function updateControlView(send)
 {
     if(classroomInfo.allControl)
@@ -24,15 +22,15 @@ function updateControlView(send)
 
 
 function onAllControlValue (_allControl) {    
-    classroomInfo.allControl = _allControl.state;    
-    console.log(classroomInfo);     
+    classroomInfo.allControl = _allControl.state;  
     if(classroomInfo.allControl) {        
         //  전체제어하기가 걸리게 되면, 현재 상태와 동기화 시킨다.
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
     else
     {
-        updateControlView (false);   
+        classroomCommand.updateSyncRoom ();
+        // updateControlView (false);   
     }
 }
 
