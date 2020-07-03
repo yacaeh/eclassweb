@@ -133,8 +133,6 @@ connection.onopen = function (event) {
 
   // 접속시 방정보 동기화.
   if (connection.extra.roomOwner) {
-    classroomCommand.sendsyncRoomInfo(event);
-    console.log(classroomInfo);
     mute();
   }
 
@@ -1588,12 +1586,8 @@ $(".perbtn").click(function(){
   var name = nowSelectStudent.dataset.name;
   var pid = nowSelectStudent.dataset.id;
 
-  console.log(this.id);
-
   if (this.id == "classP") {
     if (this.classList.contains("off")) {
-      console.log(classroomInfo.nowClassPermission != undefined);
-
       if (classroomInfo.nowClassPermission != undefined) {
         alert('이미 다른 학생에게 권한이 있습니다.');
         return false;
@@ -1824,7 +1818,9 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid != classroomInfo.nowMicPermission)
+    console.log(e);
+
+    if (e.userid != classroomInfo.nowMicPermission )
       if(!e.extra.roomOwner) {
       console.log(e.userid,"MUTE")
       e.stream.mute("audio");
@@ -1834,7 +1830,7 @@ function mute() {
 
 function unmute(id) {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid == id) {
+    if (e.userid == id && e.type != "local") {
       console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
