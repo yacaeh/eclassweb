@@ -219,8 +219,13 @@ function updateShared3DData (_pos, _rot) {
     선생님의 화면과 동기화 시킨다
 */
 function sync3DModel () {                
-    var data = classroomInfo.share3D.data;    
-    setShared3DStateLocal (classroomInfo.share3D.state);
+    var data = classroomInfo.share3D.data;   
+        
+    if(classroomInfo.share3D.state != isSharing3D) {
+        isSharing3D = classroomInfo.share3D.state
+        setShared3DStateLocal (classroomInfo.share3D.state);;
+    }
+    
     set3DModelStateData (data.newPosition, data.newRotation);
 }
 
@@ -246,8 +251,8 @@ function setShared3DStateServer (_state) {
 function setShared3DStateLocal (_state) {
     
     classroomInfo.share3D.state = _state;
-    if(_state) {        
-        modelEnable ();        
+    if(_state) {                
+            modelEnable ();        
     }
     else  {
         remove3DCanvas ();
