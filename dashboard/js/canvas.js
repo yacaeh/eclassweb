@@ -58,6 +58,7 @@ function SetCanvasBtn(btnid, callback){
             .getElementById('widget-container')
             .getElementsByTagName('iframe')[0].contentWindow;
             var btn = frame.document.getElementById(btnid);
+            if(btn)
             btn.addEventListener("click", function(){
                 callback(btn);
             })
