@@ -1326,14 +1326,14 @@ function unloadFileViewer() {
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
 }
-function loadFileViewer() {
-  console.log('loadFileViewer');
 
-  
+
+function loadFileViewer() {
   fileUploadModal('파일을 올리거나 선택하세요.', function(e){
     console.log(e);
   });
-
+  
+  console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
 
@@ -1959,53 +1959,6 @@ function loadFileInput(){
   }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
       console.log('File Batch Uploaded', preview, config, tags, extraData);
   });
-});
-
-}
-
-
-function fileFond(){
-  FilePond.setOptions({
-    server: 'https://files.primom.co.kr'
-});
-FilePond.registerPlugin(
-  // register the Image Crop plugin with FilePond
-  FilePondPluginImageCrop,
-  FilePondPluginImagePreview,
-  FilePondPluginImageResize,
-  FilePondPluginImageTransform
-);
-
-const inputElement = document.querySelector('input[type="file"]');
-const pond = FilePond.create(inputElement, {
-  // add the Image Crop default aspect ratio
-  imageCropAspectRatio: 1,
-  imageResizeTargetWidth: 256,
-  imageResizeMode: 'contain',
-  imageTransformVariants: {
-    thumb_medium_: transforms => {
-      transforms.resize.size.width = 512;
-
-      // this will be a landscape crop
-      transforms.crop.aspectRatio = .5;
-
-      return transforms;
-    },
-    thumb_small_: transforms => {
-      transforms.resize.size.width = 64;
-      return transforms;
-    }
-  },
-  onaddfile: (err, fileItem) => {
-    console.log(err, fileItem.getMetadata('resize'));
-  },
-  onpreparefile: (fileItem, outputFiles) => {
-    outputFiles.forEach(output => {
-      const img = new Image();
-      img.src = URL.createObjectURL(output.file);
-      document.body.appendChild(img);
-    })
-  }
 });
 
 }
