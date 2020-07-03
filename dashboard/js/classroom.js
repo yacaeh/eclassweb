@@ -123,13 +123,19 @@ connection.onopen = function (event) {
   console.log('onopen!');
 
   SetStudentList();
-  mute();
 
   connection.onUserStatusChanged(event);
   if (designer.pointsLength <= 0) {
     setTimeout(function () {
       connection.send('plz-sync-points');
     }, 1000);
+  }
+
+  // 접속시 방정보 동기화.
+  if (connection.extra.roomOwner) {
+    classroomCommand.sendsyncRoomInfo(event);
+    console.log(classroomInfo);
+    mute();
   }
 
   //  session 연결 완료
@@ -146,21 +152,11 @@ connection.onclose = connection.onerror = connection.onleave = function (
 connection.onmessage = function (event) {
 
   if(event.data.unmute){
-    var id = event.data.unmute;
-    connection.streamEvents.selectAll().forEach(function(e){
-      if(e.type == "remote" && id == e.userid){
-        e.stream.unmute("audio");
-      }
-    });
-
+    unmute(event.data.unmute);
   }
 
-  if(event.data == "mute"){
-    connection.streamEvents.selectAll().forEach(function(e){
-      if(e.type == "remote" && event.userid != e.userid){
-        e.stream.mute("audio");
-      }
-    });
+  if(event.data.mute){
+    mute();
   }
 
   if(event.data.permissionChanged){
@@ -189,6 +185,12 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if (event.data.roomSync) {
+    classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
+    mute()
+    console.log(classroomInfo)
+    return;
+  }
 
   if (event.data.chatMessage) {
     appendChatMessage(event);
@@ -284,6 +286,11 @@ connection.onmessage = function (event) {
 // extra code
 connection.onstream = function (event) {
   console.log('onstream!');
+
+  if(params.open === 'true' || params.open === true){
+    mute();
+  }
+
   if (event.stream.isScreen && !event.stream.canvasStream) {
     $('#screen-viewer').get(0).srcObject = event.stream;
     if (!classroomInfo.shareScreen) 
@@ -931,6 +938,9 @@ function SetStudent() {
 SelectViewType();
 
 function SetStudentList() {
+  if(!connection.extra.roomOwner)
+    return;
+
   $('#student_list').empty();
 
   if(connection.getAllParticipants().length == 0){
@@ -1708,10 +1718,10 @@ $(".perbtn").click(function(){
   this.classList.toggle('off');
 
   if(this.classList.contains("on")){
-    unmute(classroomInfo.nowMicPermission);
+    SendUnmute(classroomInfo.nowMicPermission);
   }
   else{
-    mute();
+    SendMute();
   }
 
   connection.send({
@@ -1802,19 +1812,30 @@ document.getElementById("top_record_video").addEventListener("click", function (
   }
 })
 
+function SendMute(){
+  mute()
+  connection.send({mute : 'on'})
+}
+
+function SendUnmute(id){
+  unmute(id);
+  connection.send({ 'unmute': id })
+}
+
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.type == "remote") {
+    if (e.userid != classroomInfo.nowMicPermission)
+      if(!e.extra.roomOwner) {
+      console.log(e.userid,"MUTE")
       e.stream.mute("audio");
     }
   });
-  connection.send('mute')
 }
 
 function unmute(id) {
-  connection.send({ 'unmute': id })
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.type == "remote" && e.userid == id) {
+    if (e.userid == id) {
+      console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
   });
