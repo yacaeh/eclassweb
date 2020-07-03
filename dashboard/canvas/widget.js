@@ -511,8 +511,13 @@ function canvasresize(id){
             context.clearRect(0, 0, innerWidth, innerHeight);
 
             var i, point, length = points.length;
-            for (i = 0; i < length; i++) {
-                point = points[i];
+            var _this = this;
+            points.forEach(function(point){
+                if(point == null){
+                    console.error(points);
+                    return false;
+                }
+                
                 if(point[0] == "marker"){
                     if(!marking){
                         context.beginPath();
@@ -527,7 +532,8 @@ function canvasresize(id){
                     }
 
                     if( p[0] == p[2] && p[1] == p[3] )
-                        continue;
+                        return false;
+
                         
                     var opt = point[2];
                     context.globalAlpha = opt[3];
@@ -558,13 +564,14 @@ function canvasresize(id){
                         context.stroke();
                     }
 
-                    if (point && point.length && this[point[0]]) {                    
-                        this[point[0]](context, point[1], point[2]);
+                    if (point && point.length && _this[point[0]]) {                    
+                        _this[point[0]](context, point[1], point[2]);
                     }
 
                 }
                 // else warn
-            }
+            });
+
             if(marking){
                 marking = !marking;
                 context.stroke();
@@ -1404,15 +1411,11 @@ function canvasresize(id){
                             var sliced = points.slice(pre,numofpoint);
                             
                             points.splice(pre, numofpoint);
-                            //console.log(sliced);
-                            //console.log(pointHistory)
 
                             pointHistory.splice(i,1);
                             for(var z = i ; z < pointHistory.length; z++){
                                 pointHistory[z] -= numofpoint;
                             }
-                            
-
 
                             drawHelper.redraw();
                             syncPoints(true);
@@ -3576,18 +3579,18 @@ function SetShortcut(shortCut){
                 MakeTooltip(shortCut);
                 altdown = true;
             }
-
             key.preventDefault();
-
             shortCut.forEach(function(cut){
                 if(key.key == Object.values(cut)){
                     if(Object.keys(cut) == "screen_share"){
                         RemoveTooltip();
                         altdown = false;
                     }
-
-
-                    document.getElementById(Object.keys(cut)).click();
+                    try{
+                        document.getElementById(Object.keys(cut)).click();
+                    }
+                    catch{
+                    }
                 }
             });
         }
@@ -3603,19 +3606,25 @@ function SetShortcut(shortCut){
     })
     
     window.addEventListener("focusout" ,function(){
-        console.log("!!");
     })
 
     function MakeTooltip(shortcut){
         shortcut.forEach(function(cut){
-            var btn = document.getElementById(Object.keys(cut));
-            var top = btn.getBoundingClientRect().top;
-            var div = document.createElement("div");
-            div.className = "tooltip";
-            div.innerHTML = Object.values(cut)[0];
-            div.style.top = top + 15 + 'px';
-            tooltips.push(div);
-            document.body.appendChild(div);
+            try {
+                var btn = document.getElementById(Object.keys(cut));
+                var top = btn.getBoundingClientRect().top;
+                var div = document.createElement("div");
+                div.className = "tooltip";
+                div.innerHTML = Object.values(cut)[0];
+                div.style.top = top + 15 + 'px';
+                tooltips.push(div);
+                document.body.appendChild(div);
+            }
+            catch{
+                return false;
+            }
+
+
         });
     }
 
