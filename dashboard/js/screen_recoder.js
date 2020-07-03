@@ -148,7 +148,8 @@ function ScreenShare(btn) {
 
   console.log(classroomInfo)
   if (connection.userid != classroomInfo.nowClassPermission && !window.tempStream) {
-    alert('Screen sharing is not enabled.');
+    alert('화면 공유 권한이 없습니다');
+    $(btn).removeClass("on selected-shape")
     return;
   }
 

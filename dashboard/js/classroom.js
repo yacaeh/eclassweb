@@ -664,9 +664,11 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            alert(
-              'This room does not exist. Please either create it or wait for moderator to enter in the room.'
-            );
+            // alert(
+              // 'This room does not exist. Please either create it or wait for moderator to enter in the room.'
+            // );
+            location.reload();
+
             return;
           }
           if (error === connection.errors.ROOM_FULL) {
@@ -848,7 +850,6 @@ function replaceScreenTrack(stream, btn) {
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
-  
   });
 
   stream.getTracks().forEach(function (track) {
@@ -959,8 +960,9 @@ function SetStudentList() {
     connection.getAllParticipants().forEach(function(pid) {
       var name = getFullName(pid)
       var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
-        <span class="bor"></span> \
-        <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
+                    <img src="/dashboard/newimg/exit.png"> \
+                    <span class="bor"></span> \
+                    <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
       OnClickStudent(div,pid,name);
       $("#student_list").append(div);
 
@@ -1594,12 +1596,8 @@ $(".perbtn").click(function(){
   var name = nowSelectStudent.dataset.name;
   var pid = nowSelectStudent.dataset.id;
 
-  console.log(this.id);
-
   if (this.id == "classP") {
     if (this.classList.contains("off")) {
-      console.log(classroomInfo.nowClassPermission != undefined);
-
       if (classroomInfo.nowClassPermission != undefined) {
         alert('이미 다른 학생에게 권한이 있습니다.');
         return false;

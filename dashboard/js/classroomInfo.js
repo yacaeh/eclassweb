@@ -520,6 +520,9 @@ classroomCommand.syncClassroomOpenTime =  function () {
 
 // 학생 pdf 페이지가 바뀔 때 호출 된다. 
 classroomStudentsWatchInfo.onPdfPage =  function (student) {
+    var id = student.userid;
+    var page = student.pdfViewPage;
+
     console.log(student);
 }
 
