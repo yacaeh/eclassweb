@@ -513,8 +513,8 @@ function canvasresize(id){
             var i, point, length = points.length;
             var _this = this;
             points.forEach(function(point){
+
                 if(point == null){
-                    console.error(points);
                     return false;
                 }
                 
@@ -533,7 +533,6 @@ function canvasresize(id){
 
                     if( p[0] == p[2] && p[1] == p[3] )
                         return false;
-
                         
                     var opt = point[2];
                     context.globalAlpha = opt[3];
@@ -549,22 +548,16 @@ function canvasresize(id){
                     context.moveTo(resizeP[0], resizeP[1]);
                     context.lineTo(resizeP[2], resizeP[3]);
                     lastmarkpos = [p[2], p[3]];
-                    // context.moveTo(p[0], p[1]);
-                    // context.lineTo(p[2], p[3]);
-                    // lastmarkpos = [p[2], p[3]];
                 }
-                // else if(point[0] == "text"){
-                //     console.log("Else Text!");
-                //     context.fillStyle = textHandler.lastFillStyle;
-                //     console.log(context.fillStyle);
-                // }                
+                  
                 else{
                     if(marking){
                         marking = !marking;
                         context.stroke();
+                        context.beginPath();
                     }
-
-                    if (point && point.length && _this[point[0]]) {                    
+                    
+                    if (point && point.length && _this[point[0]] ) {                    
                         _this[point[0]](context, point[1], point[2]);
                     }
 
@@ -611,15 +604,10 @@ function canvasresize(id){
             }
         },
         line: function(context, point, options) {
-
             const p = resizePoint(point);
             context.beginPath();
             context.moveTo(p[0], p[1]);
             context.lineTo(p[2], p[3]);
-            // context.beginPath();
-            // context.moveTo(point[0], point[1]);
-            // context.lineTo(point[2], point[3]);
-            
             this.handleOptions(context, options);
         },
         marker: function(context, point, options) {
@@ -635,15 +623,6 @@ function canvasresize(id){
                 context.lineTo(resizeP[2], resizeP[3]);
             }
             this.handleOptions(context, options);
-            // context.beginPath();
-            // context.clearRect(0,0,innerWidth, innerHeight)
-
-            // for(var i = 0 ; i < point.length; i++){
-            //     var p = point[i];
-            //     context.moveTo(p[0], p[1]);
-            //     context.lineTo(p[2], p[3]);
-            // }
-            // this.handleOptions(context, options);
         },
         
         text: function(context, point, options) {
@@ -1495,7 +1474,6 @@ function canvasresize(id){
             return color;
         },
         writeText: function(keyPressed, isBackKeyPressed) {
-            
             if (!is.isText) return;
 
             if (isBackKeyPressed) {
