@@ -4,17 +4,24 @@
 */
 classroomStudentsWatchInfo = { 
     
-    students = {},
+    students : {},
+    onPdfPage : function(student) {},       // pdf page 호출 되는 이벤트
+    onEpubPage : function(student) {},  
+
 
 
     setPdfPage : function (_userid, _page) {
-        let student = this.getStudent (_userid);
+        var student = this.getStudent (_userid);
         student.pdfViewPage = _page;
+
+        this.onPdfPage (student);
     },
 
     setEpubPage : function (_userid, _page) {
-        let student = this.getStudent (_userid);
+        var student = this.getStudent (_userid);
         student.epubViewPage = _page;
+
+        onEpubPage (student);
     },
     
     getPdfPage : function (_userid) {
@@ -28,15 +35,17 @@ classroomStudentsWatchInfo = {
     },    
 
     getStudent : function (_userid) {
-        if(null != students[_userid]) {
-            let student = {
+        if(null == this.students[_userid]) {
+            var student = {
                 userid : _userid,
             }
             this.students[_userid] = student;
         }
-        return students[_userid];
+        return this.students[_userid];
     },
 
+
+    // 방에서 학생이 나가면 삭제를 해야 한다.
     removeStudent : function (_userid) {
 
     },
