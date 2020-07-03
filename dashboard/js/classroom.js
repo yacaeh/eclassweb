@@ -197,7 +197,7 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points') {
+  if (event.data === 'plz-sync-points'  && connection.extra.roomOwner) {
     designer.sync();
     return;
   }
@@ -252,11 +252,6 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points') {
-    designer.sync();
-    return;
-  }
-
   //3d 모델링 상대값
   if (event.data.ModelState) {
     //console.log(event.data.ModelState);
@@ -279,8 +274,9 @@ connection.onmessage = function (event) {
     else iframeEdunetContent(moveURL.enable, moveURL.url, false);
     return;
   }
-
-  designer.syncData(event.data);
+  if(!connection.extra.roomOwner){
+    designer.syncData(event.data);
+  }
 };
 
 // extra code
@@ -1328,6 +1324,12 @@ function unloadFileViewer() {
 }
 function loadFileViewer() {
   console.log('loadFileViewer');
+
+  
+  fileUploadModal('파일을 올리거나 선택하세요.', function(e){
+    console.log(e);
+  });
+
   isSharingFile = true;
   isFileViewer = true;
 
@@ -1841,3 +1843,111 @@ function unmute(id) {
   });
 }
 
+function fileUploadModal(message, callback) {
+  console.log(message);
+  $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(true);
+  });
+
+  $('#btn-confirm-close').html('취소');
+
+  $('.btn-confirm-close').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(false);
+  });
+
+  $('#confirm-message').html('    <input id="kv-explorer" type="file" multiple>');
+  $('#confirm-title').html('파일 관리자');
+  $('#confirm-box-topper').show();
+
+  $('#confirm-box').modal({
+      backdrop: 'static',
+      keyboard: false
+  });
+  loadFileInput();
+
+}
+
+function loadFileInput(){
+
+  $(document).ready(function () {
+    $("#test-upload").fileinput({
+        'theme': 'fas',
+        'showPreview': true,
+        'language': 'kr',
+        'allowedFileExtensions': ['*'],
+        'fileType': "any",
+        'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
+        'elErrorContainer': '#errorBlock'
+    });
+    $("#kv-explorer").fileinput({
+        'theme': 'explorer-fas',
+        'uploadUrl': 'https://files.primom.co.kr',
+        overwriteInitial: false,
+        initialPreviewAsData: true,
+        initialPreview: [
+            "https://files.primom.co.kr/test.pdf",
+            "https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
+            "https://files.primom.co.kr/small.mp4"
+        ],
+        initialPreviewConfig: [
+            {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
+            {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
+            {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
+        ]
+    });
+});
+
+}
+
+
+function fileFond(){
+  FilePond.setOptions({
+    server: 'https://files.primom.co.kr'
+});
+FilePond.registerPlugin(
+  // register the Image Crop plugin with FilePond
+  FilePondPluginImageCrop,
+  FilePondPluginImagePreview,
+  FilePondPluginImageResize,
+  FilePondPluginImageTransform
+);
+
+const inputElement = document.querySelector('input[type="file"]');
+const pond = FilePond.create(inputElement, {
+  // add the Image Crop default aspect ratio
+  imageCropAspectRatio: 1,
+  imageResizeTargetWidth: 256,
+  imageResizeMode: 'contain',
+  imageTransformVariants: {
+    thumb_medium_: transforms => {
+      transforms.resize.size.width = 512;
+
+      // this will be a landscape crop
+      transforms.crop.aspectRatio = .5;
+
+      return transforms;
+    },
+    thumb_small_: transforms => {
+      transforms.resize.size.width = 64;
+      return transforms;
+    }
+  },
+  onaddfile: (err, fileItem) => {
+    console.log(err, fileItem.getMetadata('resize'));
+  },
+  onpreparefile: (fileItem, outputFiles) => {
+    outputFiles.forEach(output => {
+      const img = new Image();
+      img.src = URL.createObjectURL(output.file);
+      document.body.appendChild(img);
+    })
+  }
+});
+
+}
