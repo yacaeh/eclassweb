@@ -133,8 +133,6 @@ connection.onopen = function (event) {
 
   // 접속시 방정보 동기화.
   if (connection.extra.roomOwner) {
-    classroomCommand.sendsyncRoomInfo(event);
-    console.log(classroomInfo);
     mute();
   }
 
@@ -197,8 +195,14 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points'  && connection.extra.roomOwner) {
+  if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
     designer.sync();
+    return;
+  }
+
+  if (event.data.studentCmd)  {
+    if(connection.extra.roomOwner)
+      classroomCommand.onStudentCommand (event.data.studentCmd);
     return;
   }
 
@@ -1590,12 +1594,8 @@ $(".perbtn").click(function(){
   var name = nowSelectStudent.dataset.name;
   var pid = nowSelectStudent.dataset.id;
 
-  console.log(this.id);
-
   if (this.id == "classP") {
     if (this.classList.contains("off")) {
-      console.log(classroomInfo.nowClassPermission != undefined);
-
       if (classroomInfo.nowClassPermission != undefined) {
         alert('이미 다른 학생에게 권한이 있습니다.');
         return false;
@@ -1826,7 +1826,9 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid != classroomInfo.nowMicPermission)
+    console.log(e);
+
+    if (e.userid != classroomInfo.nowMicPermission )
       if(!e.extra.roomOwner) {
       console.log(e.userid,"MUTE")
       e.stream.mute("audio");
@@ -1836,7 +1838,7 @@ function mute() {
 
 function unmute(id) {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid == id) {
+    if (e.userid == id && e.type != "local") {
       console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
@@ -1861,7 +1863,7 @@ function fileUploadModal(message, callback) {
       callback(false);
   });
 
-  $('#confirm-message').html('    <input id="kv-explorer" type="file" multiple>');
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="kv-explorer" type="file" multiple></form>');
   $('#confirm-title').html('파일 관리자');
   $('#confirm-box-topper').show();
 
@@ -1887,20 +1889,76 @@ function loadFileInput(){
     });
     $("#kv-explorer").fileinput({
         'theme': 'explorer-fas',
-        'uploadUrl': 'https://files.primom.co.kr',
+        'language': 'kr',
+        'uploadUrl': 'https://files.primom.co.kr:1443/upload',
+        fileActionSettings : {
+          showZoom : false,
+        },
+          
+          
         overwriteInitial: false,
         initialPreviewAsData: true,
         initialPreview: [
-            "https://files.primom.co.kr/test.pdf",
-            "https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
-            "https://files.primom.co.kr/small.mp4"
+            // "https://files.primom.co.kr/test.pdf",
+            // "https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
+            // "https://files.primom.co.kr/small.mp4"
         ],
         initialPreviewConfig: [
-            {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
-            {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
-            {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
-        ]
-    });
+            // {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
+            // {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
+            // {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
+        ],
+        preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
+        previewFileIconSettings: { // configure your icon file extensions
+       'doc': '<i class="fas fa-file-word text-primary"></i>',
+       'xls': '<i class="fas fa-file-excel text-success"></i>',
+       'ppt': '<i class="fas fa-file-powerpoint text-danger"></i>',
+       'pdf': '<i class="fas fa-file-pdf text-danger"></i>',
+       'zip': '<i class="fas fa-file-archive text-muted"></i>',
+       'htm': '<i class="fas fa-file-code text-info"></i>',
+       'txt': '<i class="fas fa-file-text text-info"></i>',
+       'mov': '<i class="fas fa-file-video text-warning"></i>',
+       'mp3': '<i class="fas fa-file-audio text-warning"></i>',
+       // note for these file types below no extension determination logic 
+       // has been configured (the keys itself will be used as extensions)
+       'jpg': '<i class="fas fa-file-image text-danger"></i>', 
+       'gif': '<i class="fas fa-file-image text-muted"></i>', 
+       'png': '<i class="fas fa-file-image text-primary"></i>'    
+   },
+   previewFileExtSettings: { // configure the logic for determining icon file extensions
+       'doc': function(ext) {
+           return ext.match(/(doc|docx)$/i);
+       },
+       'xls': function(ext) {
+           return ext.match(/(xls|xlsx)$/i);
+       },
+       'ppt': function(ext) {
+           return ext.match(/(ppt|pptx)$/i);
+       },
+       'zip': function(ext) {
+           return ext.match(/(zip|rar|tar|gzip|gz|7z)$/i);
+       },
+       'htm': function(ext) {
+           return ext.match(/(htm|html)$/i);
+       },
+       'txt': function(ext) {
+           return ext.match(/(txt|ini|csv|java|php|js|css)$/i);
+       },
+       'mov': function(ext) {
+           return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
+       },
+       'mp3': function(ext) {
+           return ext.match(/(mp3|wav)$/i);
+       }
+   }
+    }).on('fileuploaded', function(event, previewId, index, fileId) {
+      console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
+      console.log(previewId.response);
+  }).on('fileuploaderror', function(event, data, msg) {
+      console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
+  }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
+      console.log('File Batch Uploaded', preview, config, tags, extraData);
+  });
 });
 
 }
