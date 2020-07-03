@@ -360,7 +360,7 @@ classroomCommand.syncPdf = function () {
         if(isFileViewer)
         {
             //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
-            pdfOnLoaded();           
+            classroomCommand.pdfOnLoaded ();      
         }
         else {
             // open
@@ -385,6 +385,25 @@ classroomCommand.pdfOnLoaded = function () {
         cmd : 'page',
         data : classroomInfo.pdf.page
     });
+
+    // 학생이 아닐 경우
+    if(!connection.extra.roomOwner)
+        pdfViewerLock (classroomInfo.allControl);
+    
+    function pdfViewerLock(_lock) {
+        let frame = document
+        .getElementById('widget-container')
+        .getElementsByTagName('iframe')[0].contentWindow;
+        let fileViewer = frame.document.getElementById('file-viewer');
+        let viewer = fileViewer.contentWindow.document.getElementById("viewer")    
+        console.log(fileViewer);                        
+        if(_lock) {
+            viewer.style.pointerEvents = 'none';
+        }
+        else{
+            viewer.style.pointerEvents = '';
+        }
+    }
 }
 
 /*
