@@ -1316,7 +1316,6 @@ function unloadFileViewer() {
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
 }
-
 function loadFileViewer() {
   console.log('loadFileViewer');
   isSharingFile = true;
@@ -1326,7 +1325,7 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'
+    'https://'+window.location.host+'/ViewerJS/#https://files.primom.co.kr/test.pdf'
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
