@@ -202,6 +202,12 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if (event.data.studentCmd)  {
+    if(connection.extra.roomOwner)
+      classroomCommand.onStudentCommand (event.data.studentCmd);
+    return;
+  }
+
 
   if(event.data.roomInfo) {
     classroomCommand.onReceiveRoomInfo (event.data);

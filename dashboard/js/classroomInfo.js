@@ -15,6 +15,7 @@ classroomInfo = {
     },
     epub : {
         state : false,
+        page : 1,
         data : {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
@@ -208,6 +209,8 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
+
+
 /*
     공유 스크린 설정
 */
@@ -268,9 +271,24 @@ classroomCommand.setPdfStateLocal = function (_state) {
     }
 }
 
+/*
+    학생들한테 오는 메시지 처리.
+*/
+classroomCommand.onStudentCommand = function (_cmd) {    
+    switch(_cmd.cmd) {
+        case 'pdf-page' :
+            classroomStudentsWatchInfo.setPdfPage (_cmd.from, _cmd.data);
+            break;
+    }
+}
+
 classroomCommand.setPdfPage = function (_page) {    
     classroomInfo.pdf.page = _page;
-    classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
+    if(connection.extra.roomOwner)
+        classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
+    else {
+        studentCommand.sendPdfPage (_page);
+    }
 }
 
 
@@ -377,6 +395,7 @@ classroomCommand.syncPdf = function () {
     }
 };
 
+
 classroomCommand.pdfOnLoaded = function () {
     if(!classroomInfo.pdf.page)
         classroomInfo.pdf.page = 1;
@@ -386,9 +405,11 @@ classroomCommand.pdfOnLoaded = function () {
         data : classroomInfo.pdf.page
     });
 
-    // 학생이 아닐 경우
-    if(!connection.extra.roomOwner)
+    // 학생인 경우만 처리
+    if(!connection.extra.roomOwner) {                
+        studentCommand.sendPdfPage (classroomInfo.pdf.page);
         pdfViewerLock (classroomInfo.allControl);
+    }
     
     function pdfViewerLock(_lock) {
         let frame = document
@@ -495,3 +516,53 @@ classroomCommand.syncEpub = function () {
 classroomCommand.syncClassroomOpenTime =  function () {    
     updateClassTime ();
 };
+
+
+// 학생 pdf 페이지가 바뀔 때 호출 된다. 
+classroomStudentsWatchInfo.onPdfPage =  function (student) {
+    console.log(student);
+}
+
+
+//--------------------------------------------------------------------------------//
+
+teacherCommand =  {
+
+
+}
+
+
+studentCommand = {
+
+    sendStudentToTeachCmd : function (_cmd, _data) {
+        if(connection.extra.roomOwner)  return;    
+        connection.send ({
+            studentCmd : {
+                from : connection.userid,
+                cmd : _cmd,
+                data : _data
+            }        
+        })
+    },
+
+    sendPdfPage : function (_page) {        
+        this.sendStudentToTeachCmd ('pdf-page', _page);
+    },
+}
+
+
+/*
+    학생이 선생님한테 보내는 메시지    
+*/
+// classroomCommand.sendStudentToTeachCmd = function (_cmd, _data) {
+//     if(connection.extra.roomOwner)  return;
+
+//     connection.send ({
+//         studentCmd : {
+//             from : connection.userid,
+//             cmd : _cmd,
+//             data : _data
+//         }        
+//     })
+// }
+
