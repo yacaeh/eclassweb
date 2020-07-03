@@ -133,8 +133,6 @@ connection.onopen = function (event) {
 
   // 접속시 방정보 동기화.
   if (connection.extra.roomOwner) {
-    classroomCommand.sendsyncRoomInfo(event);
-    console.log(classroomInfo);
     mute();
   }
 
@@ -192,7 +190,7 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points') {
+  if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
     designer.sync();
     return;
   }
@@ -258,11 +256,6 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points') {
-    designer.sync();
-    return;
-  }
-
   //3d 모델링 상대값
   if (event.data.ModelState) {
     //console.log(event.data.ModelState);
@@ -285,8 +278,9 @@ connection.onmessage = function (event) {
     else iframeEdunetContent(moveURL.enable, moveURL.url, false);
     return;
   }
-
-  designer.syncData(event.data);
+  if(!connection.extra.roomOwner){
+    designer.syncData(event.data);
+  }
 };
 
 // extra code
@@ -1818,7 +1812,9 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid != classroomInfo.nowMicPermission)
+    console.log(e);
+
+    if (e.userid != classroomInfo.nowMicPermission )
       if(!e.extra.roomOwner) {
       console.log(e.userid,"MUTE")
       e.stream.mute("audio");
@@ -1828,7 +1824,7 @@ function mute() {
 
 function unmute(id) {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid == id) {
+    if (e.userid == id && e.type != "local") {
       console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
