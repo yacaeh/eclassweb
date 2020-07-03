@@ -250,8 +250,8 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (null != event.data.allControl) { 
-    setAllControlValue (event.data.allControl);
+  if (event.data.allControl) { 
+      onAllControlValue (event.data.allControl);
     return;
   }
 
@@ -268,11 +268,6 @@ connection.onmessage = function (event) {
   if (event.data.exam) {
     // 시험치기..
     examObj.receiveExamData(event.data.exam);
-    return;
-  }
-
-  if (event.data.roomSync) {
-    classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
     return;
   }
 
@@ -1365,16 +1360,16 @@ function LoadFile(btn) {
   if(!connection.extra.roomOwner) return;
 
   classroomCommand.togglePdfStateServer ((state) => {
-    if(state) 
-    {
-      isSharingFile = true;
-      isFileViewer = true;
-    }
-    else
-    {
-      isSharingFile = false;
-      isFileViewer = false;
-    }
+    // if(state) 
+    // {
+    //   isSharingFile = true;
+    //   isFileViewer = true;
+    // }
+    // else
+    // {
+    //   isSharingFile = false;
+    //   isFileViewer = false;
+    // }
   }) 
   
   // if (isFileViewer === false) {
@@ -1393,6 +1388,9 @@ function LoadFile(btn) {
 }
 
 function unloadFileViewer() {
+  isSharingFile = false;
+  isFileViewer = false;
+
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
@@ -1406,6 +1404,9 @@ function unloadFileViewer() {
 
 function loadFileViewer() {
   console.log('loadFileViewer');
+  isSharingFile = true;
+  isFileViewer = true;
+
   let fileViewer = document.createElement('iframe');
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(

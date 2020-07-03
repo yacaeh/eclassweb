@@ -23,9 +23,17 @@ function updateControlView(send)
 }
 
 
-function setAllControlValue (_state, _send) {
-    classroomInfo.allControl = _state;
-    updateControlView (_send);
+function onAllControlValue (_allControl) {    
+    classroomInfo.allControl = _allControl.state;    
+    console.log(classroomInfo);     
+    if(classroomInfo.allControl) {        
+        //  전체제어하기가 걸리게 되면, 현재 상태와 동기화 시킨다.
+        classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
+    }
+    else
+    {
+        updateControlView (false);   
+    }
 }
 
 
@@ -37,7 +45,9 @@ function _AllCantrallFunc() {
     {
         top_all_controll_jthis.click(function(){
             connection.socket.emit('toggle-all-control', (changeControl) => {
-                setAllControlValue (changeControl, true);
+                classroomInfo.allControl = changeControl;
+                updateControlView (true);        
+                //setAllControlValueWithSend (changeControl);
             });
         })
     }
@@ -48,15 +58,20 @@ function SendAllControll(b)
 {
     if(b) {
         // true면 방의 정보를 다시 보낸다.
-
+        connection.send({
+            allControl: {
+                state : b,
+                roomInfo : classroomInfo
+            }
+        });
     }
     else
     {
         // false 면 일반 값만 보낸다.
-
+        connection.send({
+            allControl:  {
+                state : b
+            }
+        });
     }
-
-    connection.send({
-        allControl: b
-    });
 }

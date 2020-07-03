@@ -23,9 +23,12 @@ classroomInfo = {
 };
 
 classroomInfoLocal = {
-    pdf : {
-        init : false
-    }
+    allControl : false,
+    shareScreen : false,
+    share3D : false,
+    pdf : false,
+    epub : false,
+    exam : false  
 };
 
 
@@ -77,10 +80,22 @@ classroomCommand = {
     //  학생들은 여기에서 선생님 화면과 동기화 시켜준다.
     onReceiveRoomInfo : function (_info) {        
         if(_info.userid == connection.userid) {
-            classroomInfo = _info.roomInfo;
+            classroomInfo = _info.roomInfo;    
+            this.copyGlobalToLocal ();        
             this.updateSyncRoom ();
         }
-    },    
+    },
+    
+    
+    //  Global Data를 Local에 Copy.
+    copyGlobalToLocal : function() {
+        classroomInfoLocal.allControl = classroomInfo.allControl;
+        classroomInfoLocal.shareScreen = classroomInfo.shareScreen;
+        classroomInfoLocal.share3D = classroomInfo.share3D;
+        classroomInfoLocal.pdf = classroomInfo.pdf;
+        classroomInfoLocal.epub = classroomInfo.epub;
+        classroomInfoLocal.exam = classroomInfo.exam;
+    },
 
     /*
         현재 방 상태에 따라 동기화를 해준다.
@@ -89,9 +104,7 @@ classroomCommand = {
 
         if(classroomInfo.allControl) {
             updateControlView(false);
-        }
-        
-    // }
+        }        
         if(classroomInfo.share3D.state) {                  
             sync3DModel ();
         }
@@ -103,13 +116,18 @@ classroomCommand = {
             classroomCommand.openEpub ();
         }
     },
-    sendSynchronizationBroadcast : function () {
 
+
+    /*
+        동기화 메시지..
+    */
+    sendSynchronizationBroadcast : function () {
         // connection.send ();
     },
 
-    onSynchronizationBroadcast : function (_roomInfo) {
-
+    onSynchronizationClassRoom : function (_roomInfo) {
+        classroomInfo = _roomInfo;        
+        this.updateSyncRoom ();
     }
 };
 
@@ -217,10 +235,6 @@ classroomCommand.syncScreenShare = function (_userid) {
 };
 
 
-
-
-
-
 /*
     PDF
 */
@@ -231,7 +245,7 @@ classroomCommand.togglePdfStateServer = function (_success, _error) {
         {
             classroomCommand.setPdfStateLocal(result.data);
             if(result.data)                
-                classroomCommand.sendPDFCmdOnlyTeacher ('open');
+                classroomCommand.sendPDFCmdOnlyTeacher ('open', {page : classroomInfo.pdf.page});
             else
                 classroomCommand.sendPDFCmdOnlyTeacher ('close');
                 
@@ -254,9 +268,7 @@ classroomCommand.setPdfStateLocal = function (_state) {
     }
 }
 
-
 classroomCommand.setPdfPage = function (_page) {    
-
     classroomInfo.pdf.page = _page;
     classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
 }
@@ -289,6 +301,8 @@ classroomCommand.updatePDFCmd = function (_pdf) {
     const cmd = _pdf.cmd;
 
     if(cmd == 'open') {
+        console.log(_pdf);
+        classroomInfo.pdf.page = _pdf.data.page;
         classroomCommand.setPdfStateLocal (true);
         return;
     }
@@ -343,14 +357,23 @@ classroomCommand.updatePDFCmd = function (_pdf) {
 
 classroomCommand.syncPdf = function () {    
     if(classroomInfo.pdf.state) {
-        // open
-        loadFileViewer ();
-        $('#canvas-controller').show();
+        if(isFileViewer)
+        {
+            //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
+            pdfOnLoaded();           
+        }
+        else {
+            // open
+            loadFileViewer ();
+            $('#canvas-controller').show();
+        }
     }
     else {
         // close        
-        unloadFileViewer();
-        $('#canvas-controller').hide();
+        if(isFileViewer) {
+            unloadFileViewer();
+            $('#canvas-controller').hide();
+        }
     }
 };
 
@@ -363,10 +386,10 @@ classroomCommand.pdfOnLoaded = function () {
         data : classroomInfo.pdf.page
     });
 }
+
 /*
     Epub
 */
-
 classroomCommand.receiveEpubMessage = function (_epub) {  
     if(_epub.cmd) {
         classroomCommand.updateEpubCmd (_epub.cmd);
