@@ -195,7 +195,7 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points') {
+  if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
     designer.sync();
     return;
   }
@@ -250,11 +250,6 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data === 'plz-sync-points') {
-    designer.sync();
-    return;
-  }
-
   //3d 모델링 상대값
   if (event.data.ModelState) {
     //console.log(event.data.ModelState);
@@ -277,8 +272,9 @@ connection.onmessage = function (event) {
     else iframeEdunetContent(moveURL.enable, moveURL.url, false);
     return;
   }
-
-  designer.syncData(event.data);
+  if(!connection.extra.roomOwner){
+    designer.syncData(event.data);
+  }
 };
 
 // extra code
