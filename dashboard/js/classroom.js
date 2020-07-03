@@ -1326,7 +1326,13 @@ function unloadFileViewer() {
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
 }
+
+
 function loadFileViewer() {
+  fileUploadModal('파일을 올리거나 선택하세요.', function(e){
+    console.log(e);
+  });
+  
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
@@ -1839,3 +1845,120 @@ function unmute(id) {
   });
 }
 
+function fileUploadModal(message, callback) {
+  console.log(message);
+  $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(true);
+  });
+
+  $('#btn-confirm-close').html('취소');
+
+  $('.btn-confirm-close').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(false);
+  });
+
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="kv-explorer" type="file" multiple></form>');
+  $('#confirm-title').html('파일 관리자');
+  $('#confirm-box-topper').show();
+
+  $('#confirm-box').modal({
+      backdrop: 'static',
+      keyboard: false
+  });
+  loadFileInput();
+
+}
+
+function loadFileInput(){
+
+  $(document).ready(function () {
+    $("#test-upload").fileinput({
+        'theme': 'fas',
+        'showPreview': true,
+        'language': 'kr',
+        'allowedFileExtensions': ['*'],
+        'fileType': "any",
+        'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
+        'elErrorContainer': '#errorBlock'
+    });
+    $("#kv-explorer").fileinput({
+        'theme': 'explorer-fas',
+        'language': 'kr',
+        'uploadUrl': 'https://files.primom.co.kr:1443/upload',
+        fileActionSettings : {
+          showZoom : false,
+        },
+          
+          
+        overwriteInitial: false,
+        initialPreviewAsData: true,
+        initialPreview: [
+            // "https://files.primom.co.kr/test.pdf",
+            // "https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
+            // "https://files.primom.co.kr/small.mp4"
+        ],
+        initialPreviewConfig: [
+            // {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
+            // {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
+            // {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
+        ],
+        preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
+        previewFileIconSettings: { // configure your icon file extensions
+       'doc': '<i class="fas fa-file-word text-primary"></i>',
+       'xls': '<i class="fas fa-file-excel text-success"></i>',
+       'ppt': '<i class="fas fa-file-powerpoint text-danger"></i>',
+       'pdf': '<i class="fas fa-file-pdf text-danger"></i>',
+       'zip': '<i class="fas fa-file-archive text-muted"></i>',
+       'htm': '<i class="fas fa-file-code text-info"></i>',
+       'txt': '<i class="fas fa-file-text text-info"></i>',
+       'mov': '<i class="fas fa-file-video text-warning"></i>',
+       'mp3': '<i class="fas fa-file-audio text-warning"></i>',
+       // note for these file types below no extension determination logic 
+       // has been configured (the keys itself will be used as extensions)
+       'jpg': '<i class="fas fa-file-image text-danger"></i>', 
+       'gif': '<i class="fas fa-file-image text-muted"></i>', 
+       'png': '<i class="fas fa-file-image text-primary"></i>'    
+   },
+   previewFileExtSettings: { // configure the logic for determining icon file extensions
+       'doc': function(ext) {
+           return ext.match(/(doc|docx)$/i);
+       },
+       'xls': function(ext) {
+           return ext.match(/(xls|xlsx)$/i);
+       },
+       'ppt': function(ext) {
+           return ext.match(/(ppt|pptx)$/i);
+       },
+       'zip': function(ext) {
+           return ext.match(/(zip|rar|tar|gzip|gz|7z)$/i);
+       },
+       'htm': function(ext) {
+           return ext.match(/(htm|html)$/i);
+       },
+       'txt': function(ext) {
+           return ext.match(/(txt|ini|csv|java|php|js|css)$/i);
+       },
+       'mov': function(ext) {
+           return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
+       },
+       'mp3': function(ext) {
+           return ext.match(/(mp3|wav)$/i);
+       }
+   }
+    }).on('fileuploaded', function(event, previewId, index, fileId) {
+      console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
+      console.log(previewId.response);
+  }).on('fileuploaderror', function(event, data, msg) {
+      console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
+  }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
+      console.log('File Batch Uploaded', preview, config, tags, extraData);
+  });
+});
+
+}
