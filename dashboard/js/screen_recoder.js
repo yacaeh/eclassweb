@@ -100,6 +100,7 @@ class sc {
             }
         });
 
+
         this.voiceStream.addEventListener('inactive', e => {
             if(e.type == "inactive"){
                 this._stopCapturing();
@@ -146,7 +147,7 @@ function ScreenShare(btn) {
 
   var on = $(btn).hasClass('on');
 
-  // if (connection.userid != classroomInfo.nowClassPermission && !window.tempStream) {
+  // if (!connection.extra.roomOwner && connection.userid != classroomInfo.nowClassPermission) {
   //   alert('화면 공유 권한이 없습니다');
   //   $(btn).removeClass("on selected-shape")
   //   return;
