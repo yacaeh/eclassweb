@@ -470,15 +470,27 @@ classroomCommand.openEpub = function () {
         loadEpubViewer ();
         $('#canvas-controller').show();
     }
+    
     if(!connection.extra.roomOwner) {
-        if(!classroomInfo.allControl) return;
-        
-        if(isSharingEpub) {            
-            var next = document.getElementById('next');
-            next.style.display = 'none';
-            var prev = document.getElementById('prev');
-            prev.style.display = 'none';
+        if(classroomInfo.allControl) 
+        {        
+            if(isSharingEpub) {            
+                var next = document.getElementById('next');
+                next.style.display = 'none';
+                var prev = document.getElementById('prev');
+                prev.style.display = 'none';
+            }
         }
+        else 
+        {
+            if(isSharingEpub) {      
+                var next = document.getElementById('next');
+                next.style.display = 'block';
+                var prev = document.getElementById('prev');
+                prev.style.display = 'block';
+            }
+        }
+
     }
 };
 
