@@ -1812,11 +1812,8 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    console.log(e);
-
     if (e.userid != classroomInfo.nowMicPermission )
       if(!e.extra.roomOwner) {
-      console.log(e.userid,"MUTE")
       e.stream.mute("audio");
     }
   });
@@ -1825,7 +1822,6 @@ function mute() {
 function unmute(id) {
   connection.streamEvents.selectAll().forEach(function (e) {
     if (e.userid == id && e.type != "local") {
-      console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
   });
