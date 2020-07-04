@@ -2023,7 +2023,55 @@ function loadFileInput(){
 
 }
 
+var isFocused = true;
+var isIframeFocused = false;
 
+let widgetIframe = document
+.getElementById('widget-container')
+.getElementsByTagName('iframe')[0].contentWindow;
+
+
+function sendFocus(state){
+  if(!connection.extra.roomOwner){
+    connection.send({
+      onFocus :{
+          userid : connection.userid,
+          focus : state
+      } 
+    });
+    if(!state){
+      alert('수업 째지 마세요...');
+      console.log("You left class!");
+    }  
+  }
+}
+
+$(widgetIframe).on("blur focus", function(e){
+  var prevType = $(this).data("prevType");
+
+  if (prevType != e.type) {   //  reduce double fire issues
+      switch (e.type) {
+        case "blur":
+          isIframeFocused = false;
+          setTimeout(function(){
+            if(!isFocused && !isIframeFocused){
+              sendFocus(false);  
+            }
+            else{
+              sendFocus(true);
+            }  
+          },100);
+          break;
+        case "focus":
+          isIframeFocused = true;
+          sendFocus(true);
+          break;
+      }
+    }
+
+  $(this).data("prevType", e.type);
+
+})
 
 $(window).on("blur focus", function(e) {
   var prevType = $(this).data("prevType");
@@ -2031,23 +2079,18 @@ $(window).on("blur focus", function(e) {
   if (prevType != e.type) {   //  reduce double fire issues
       switch (e.type) {
           case "blur":
-            console.log( "Focus out ee z~"); 
-            
-            connection.send({
-              onFocus :{
-                  userid : connection.userid,
-                  focus : false
-              } 
-            });
+            isFocused = false;
+            console.log("blur");
+            if(document.activeElement !== frame){
+            }
+            else{
+              isFocused = true;
+              sendFocus(true);
+            }
             break;
           case "focus":
-            console.log( "Focus in ee z~");
-            connection.send({
-              onFocus :{
-                  userid : connection.userid,
-                  focus : true
-              } 
-            });
+            isFocused = true;
+            sendFocus(true);
             break;
       }
   }
