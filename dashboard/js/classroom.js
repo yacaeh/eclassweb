@@ -1904,6 +1904,36 @@ function fileUploadModal(message, callback) {
 
 }
 
+function getUploadFileList(){
+  var xhr = new XMLHttpRequest();
+  var url = "url";
+  var data = "email=hey@mail.com&password=101010";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          // do something with response
+          console.log(xhr.responseText);
+      }
+ };
+ xhr.send(data); 
+}
+
+function deleteUploadedFile(){
+  var xhr = new XMLHttpRequest();
+  var url = "url";
+  var data = "email=hey@mail.com&password=101010";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          // do something with response
+          console.log(xhr.responseText);
+      }
+  };
+  xhr.send(data);
+}
+
 function loadFileInput(){
 
   $(document).ready(function () {
@@ -1979,7 +2009,11 @@ function loadFileInput(){
        'mp3': function(ext) {
            return ext.match(/(mp3|wav)$/i);
        }
-   }
+   },
+   uploadExtraData: {
+    userId: params.sessionid
+  },
+
     }).on('fileuploaded', function(event, previewId, index, fileId) {
       console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
       console.log(previewId.response);
