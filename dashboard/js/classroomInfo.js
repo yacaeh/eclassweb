@@ -183,6 +183,38 @@ classroomCommand.receivAlert = function () {
     };
 };
 
+// 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
+classroomCommand.receivedOnFocusResponse = (_response) => {
+    if(connection.extra.roomOwner)
+    {        
+        let userId = _response.userId;
+        let boolOnFocus = _response.onFocus; 
+
+        let children = document.getElementById("student_list").children;
+
+        for(let i = 0; i < children.length; i++){
+            if( children[i].dataset.id == userId ){
+                console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
+            }
+        };
+    }
+};
+
+// 학생이 선생님에게 권한 요청을 한다.
+classroomCommand.receivedCallTeacherResponse = (userId) => {
+    if(connection.extra.roomOwner)
+    {        
+        let children = document.getElementById("student_list").children;
+
+        for(let i = 0; i < children.length; i++){
+            if( children[i].dataset.id == userId ){
+                console.log( "Received Call Teacher Respose : " +  userId );    
+
+            }
+        };
+    }
+};
+
 // 학생이 응답했을 때, 선생님 처리 부분
 classroomCommand.receiveAlertResponse = function (_response) {
     if(connection.extra.roomOwner)

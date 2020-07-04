@@ -42,6 +42,7 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 SetCanvasBtn('epub', LoadEpub);
+SetCanvasBtn('callteacher', CallTeacher);
 
 var isSharingScreen = false;
 var isSharing3D = false;
@@ -281,6 +282,23 @@ connection.onmessage = function (event) {
   if(!connection.extra.roomOwner){
     designer.syncData(event.data);
   }
+
+  // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
+  if(event.data.onFocus){
+    if(connection.extra.roomOwner){      
+      classroomCommand.receivedOnFocusResponse( { userId : event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
+    }
+      
+    return;
+  }
+
+  // 학생이 선생님에게 권한 요청을 한다.
+  if( event.data.callTeacher ){
+    if(connection.extra.roomOwner)
+      classroomCommand.receivedCallTeacherResponse(event.data.callTeacher.userid);
+    return;
+  }
+
 };
 
 // extra code
@@ -905,11 +923,17 @@ function updateClassTime() {
 
 
 function SetTeacher(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+
     $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
     $(".controll").show();
     $(".feature").show();
+  $(frame.document.getElementById("callteacher")).remove();
+
 }
 
 function SetStudent() {
@@ -1423,6 +1447,14 @@ function LoadEpub(btn) {
     isEpubViewer = false;
     classroomCommand.sendCloseEpub();
   }
+}
+
+function CallTeacher() {
+  connection.send({
+    callTeacher :{
+        userid : connection.userid
+    } 
+  });  
 }
 
 function loadEpubViewer() {
@@ -1962,3 +1994,35 @@ function loadFileInput(){
 });
 
 }
+
+
+
+$(window).on("blur focus", function(e) {
+  var prevType = $(this).data("prevType");
+
+  if (prevType != e.type) {   //  reduce double fire issues
+      switch (e.type) {
+          case "blur":
+            console.log( "Focus out ee z~"); 
+            
+            connection.send({
+              onFocus :{
+                  userid : connection.userid,
+                  focus : false
+              } 
+            });
+            break;
+          case "focus":
+            console.log( "Focus in ee z~");
+            connection.send({
+              onFocus :{
+                  userid : connection.userid,
+                  focus : true
+              } 
+            });
+            break;
+      }
+  }
+
+  $(this).data("prevType", e.type);
+})

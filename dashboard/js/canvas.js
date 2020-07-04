@@ -16,6 +16,7 @@ designer.icons.movie = '/dashboard/newimg/videolink.png';
 designer.icons.file = '/dashboard/newimg/openfile.png';
 designer.icons.text = '/dashboard/newimg/text.png';
 designer.icons.epub = '/dashboard/newimg/epub.png';
+designer.icons.callteacher = '/dashboard/newimg/epub.png';
 
 designer.addSyncListener(function (data) {
   connection.send(data);
@@ -47,6 +48,7 @@ designer.setTools({
   view3d: true,
   movie: true,
   file: true,
+  callteacher: true,
 });
 
 function SetCanvasBtn(btnid, callback){
