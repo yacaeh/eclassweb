@@ -1933,7 +1933,7 @@ function updateFileList(list){
 
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
-    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(file.name.split('.').pop())+'</span>'+file.name+'<button type="button" class="btn btn-primary btn-lg" onclick="loadFileViewer(\''+file.url+'\')"/><i class="fa fa-folder"></i></button><button type="button" class="btn btn-danger btn-lg" onclick="deleteUploadedFile(\''+file.name+'\')"/><i class="fa fa-trash"></i></button></p></li>';
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(file.name.split('.').pop())+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
   })
   listElement+= '</ul>';
   var $listElement = $($.parseHTML(listElement));

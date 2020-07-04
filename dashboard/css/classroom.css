@@ -1235,8 +1235,19 @@ input[type="number"]:focus{
   line-height: 1;
 }
 
-.list-group-item p{
+.list-group-item button i{
   font-size: 1em;
-  line-height: 1;
 }
-.btn { white-space: normal; }
+
+.list-group-item p label{
+  font-size: 1.2em;
+  margin-top: 15px;
+  margin-left:10px;
+  overflow: hidden;
+  width:50%;
+}
+.list-group-item .btn{
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  width:50px; height:50px;
+}
