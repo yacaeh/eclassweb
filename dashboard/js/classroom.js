@@ -1929,9 +1929,11 @@ function getUploadFileList(){
 
 function updateFileList(list){
   console.log(list.files);
+  $("#confirm-message .list-group-flush").remove();
+
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
-    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(file.name.split('.').pop())+'</span>'+file.name+'<button type="button" class="btn btn-primary btn-lg" onclick="loadFileViewer(\''+file.url+'\')"/><i class="fa fa-folder"></i></button><button type="button" class="btn btn-danger btn-lg" onclick="deleteUploadedFile(\''+file.url+'\')"/><i class="fa fa-trash"></i></button></p></li>';
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(file.name.split('.').pop())+'</span>'+file.name+'<button type="button" class="btn btn-primary btn-lg" onclick="loadFileViewer(\''+file.url+'\')"/><i class="fa fa-folder"></i></button><button type="button" class="btn btn-danger btn-lg" onclick="deleteUploadedFile(\''+file.name+'\')"/><i class="fa fa-trash"></i></button></p></li>';
   })
   listElement+= '</ul>';
   var $listElement = $($.parseHTML(listElement));
@@ -1986,18 +1988,19 @@ function getFileType(ext){
   return element;
 }
 
-function deleteUploadedFile(){
+function deleteUploadedFile(filename){
   var xhr = new XMLHttpRequest();
   var url = uploadServerUrl+'/delete';
-  var data = "email=hey@mail.com&password=101010";
+  var data = {"userId":params.sessionid, "name":filename};
   xhr.open("POST", url, true);
-  xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
       if (xhr.readyState == 4 && xhr.status == 200) {
           // do something with response
-          console.log(xhr.responseText);
+          getUploadFileList();
       }
   };
+  data = JSON.stringify(data);
   xhr.send(data);
 }
 
