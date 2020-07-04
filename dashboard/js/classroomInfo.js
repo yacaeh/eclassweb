@@ -15,7 +15,7 @@ classroomInfo = {
     },
     epub : {
         state : false,
-        page : 1,
+        page : 0,        
         data : {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
@@ -448,8 +448,7 @@ classroomCommand.pdfOnLoaded = function () {
         .getElementById('widget-container')
         .getElementsByTagName('iframe')[0].contentWindow;
         let fileViewer = frame.document.getElementById('file-viewer');
-        let viewer = fileViewer.contentWindow.document.getElementById("viewer")    
-        console.log(fileViewer);                        
+        let viewer = fileViewer.contentWindow.document.getElementById("viewer")                                  
         if(_lock) {
             viewer.style.pointerEvents = 'none';
         }
@@ -464,7 +463,7 @@ classroomCommand.pdfOnLoaded = function () {
 */
 classroomCommand.receiveEpubMessage = function (_epub) {  
     if(_epub.cmd) {
-        classroomCommand.updateEpubCmd (_epub.cmd);
+        classroomCommand.updateEpubCmd (_epub);
     }else   {
         let currentState = classroomInfo.epub.state;
         if(currentState != _epub.state) {       
@@ -477,7 +476,9 @@ classroomCommand.receiveEpubMessage = function (_epub) {
 classroomCommand.sendOpenEpub = function () {
     classroomInfo.epub.state = true;
     connection.send({
-        epub : classroomInfo.epub
+        epub : classroomInfo.epub,
+        start : classroomInfo.epub.start,
+        end : classroomInfo.epub.end,
     });
 };
 
@@ -491,8 +492,38 @@ classroomCommand.sendCloseEpub = function () {
 };
 
 classroomCommand.openEpub = function () {
-    loadEpubViewer ();
-    $('#canvas-controller').show();
+    if(isSharingEpub) {
+        if(renditionBuffer) { 
+            if(classroomInfo.allControl)                                                        
+                renditionBuffer.display(classroomInfo.epub.page);
+        }
+    }
+    else {
+        loadEpubViewer ();
+        $('#canvas-controller').show();
+    }
+    
+    if(!connection.extra.roomOwner) {
+        if(classroomInfo.allControl) 
+        {        
+            if(isSharingEpub) {            
+                var next = document.getElementById('next');
+                next.style.display = 'none';
+                var prev = document.getElementById('prev');
+                prev.style.display = 'none';
+            }
+        }
+        else 
+        {
+            if(isSharingEpub) {      
+                var next = document.getElementById('next');
+                next.style.display = 'block';
+                var prev = document.getElementById('prev');
+                prev.style.display = 'block';
+            }
+        }
+
+    }
 };
 
 classroomCommand.closeEpub = function () {
@@ -500,18 +531,26 @@ classroomCommand.closeEpub = function () {
     $('#canvas-controller').hide();
 }
 
-classroomCommand.sendEpubCmd = function (_cmd) {
+classroomCommand.sendEpubCmd = function (_cmd, _data) {
+    
     if(!connection.extra.roomOwner) return;    
-    if(!classroomInfo.allControl) return;
+    if(classroomInfo.epub.page == _data.page)   return;
 
+    classroomInfo.epub.page = _data.page;
+
+    if(!classroomInfo.allControl) return;
+    console.log(_data);
     connection.send ({
         epub : {
-            cmd : _cmd
+            cmd : _cmd,
+            data : _data         
         }
     });
 }
 
-classroomCommand.updateEpubCmd = function (_cmd) {
+classroomCommand.updateEpubCmd = function (_data) {
+
+    console.log(_data);
 
     let frame = document
     .getElementById('widget-container')
@@ -519,8 +558,19 @@ classroomCommand.updateEpubCmd = function (_cmd) {
     let epubViewer = frame.document.getElementById('epub-viewer');
     if(!epubViewer)  return;
 
-    switch(_cmd)
+    console.log('page');
+    switch(_data.cmd)
     {
+        case 'page' :            
+            let page = _data.data.page;           
+            if(classroomInfo.epub.page != page) {
+                classroomInfo.epub.page = page;
+                if(renditionBuffer) {                                                
+                    renditionBuffer.display(page);
+                }
+            }
+            break;
+
         case 'next' :
             document.getElementById('next').click();
             break;
