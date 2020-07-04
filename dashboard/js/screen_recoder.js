@@ -146,11 +146,11 @@ function ScreenShare(btn) {
 
   var on = $(btn).hasClass('on');
 
-  if (connection.userid != classroomInfo.nowClassPermission && !window.tempStream) {
-    alert('화면 공유 권한이 없습니다');
-    $(btn).removeClass("on selected-shape")
-    return;
-  }
+  // if (connection.userid != classroomInfo.nowClassPermission && !window.tempStream) {
+  //   alert('화면 공유 권한이 없습니다');
+  //   $(btn).removeClass("on selected-shape")
+  //   return;
+  // }
 
   if (!on) {
     isSharingScreen = false;

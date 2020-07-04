@@ -164,9 +164,13 @@ connection.onmessage = function (event) {
 
 
   if (event.data.showMainVideo) {
-    console.log("Share Video");
+    console.log("Share Video", event.data.showMainVideo);
+
+    var src = document.getElementById(event.data.showMainVideo.streamid).srcObject;
+    console.log(src);
     classroomCommand.setShareScreenLocal (true);
     CanvasResize();
+    document.getElementById("screen-viewer").srcObject = src;
     $('#screen-viewer').show();
     return;
   }
@@ -292,9 +296,20 @@ connection.onstream = function (event) {
   }
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
+
+    if(event.type == "remote"){
+      var newScreenViewer = document.createElement("video");
+      newScreenViewer.id = event.streamid;
+      document.getElementById("article").appendChild(newScreenViewer);
+      newScreenViewer.srcObject = event.stream;
+    }
+
+
     $('#screen-viewer').get(0).srcObject = event.stream;
-    if (!classroomInfo.shareScreen) 
+    if (!classroomInfo.shareScreen) {
       $('#screen-viewer').hide();
+      newScreenViewer.style.display = "none";
+    }
   } 
   else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
@@ -591,16 +606,20 @@ if (!!params.password) {
 
 designer.appendTo(document.getElementById('widget-container'), function () {
   console.log('designer append');
+
+  var tempStreamCanvas = document.createElement('canvas');
+  var tempStream = tempStreamCanvas.captureStream();
+  tempStream.isScreen = true;
+  tempStream.streamid = tempStream.id;
+  tempStream.type = 'local';
+  connection.attachStreams.push(tempStream);
+  window.tempStream = tempStream;
+
+
+
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
     
-    var tempStreamCanvas = document.getElementById('temp-stream-canvas');
-    var tempStream = tempStreamCanvas.captureStream();
-    tempStream.isScreen = true;
-    tempStream.streamid = tempStream.id;
-    tempStream.type = 'local';
-    connection.attachStreams.push(tempStream);
-    window.tempStream = tempStream;
 
     SetTeacher(); 
 
@@ -806,15 +825,15 @@ function replaceScreenTrack(stream, btn) {
 
   // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
 
-  if(params.open === 'true'){
-    StreamingStart(stream, btn);
-  }
-  else{
-    console.log(stream);
-    connection.send({
-      studentStreaming: stream
-    })
-  }
+  StreamingStart(stream, btn);
+  // if(params.open === 'true'){
+  // }
+  // else{
+  //   console.log(stream);
+  //   connection.send({
+  //     studentStreaming: stream
+  //   })
+  // }
   
 
   });
@@ -843,16 +862,16 @@ function StreamingStart(stream, btn){
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
   });
-  console.log(stream);
-
+  
   stream.getTracks().forEach(function (track) {
     if (track.kind === 'video' && track.readyState === 'live') {
       replaceTrack(track);
     }
   });
-
+  
+  
   connection.send({
-    showMainVideo: true,
+    showMainVideo: tempStream,
   });
 
   showScreenViewerUI ();
