@@ -1873,6 +1873,7 @@ function unmute(id) {
     }
   });
 }
+fileUploadModal("오픈!",function(e){console.loge(e)});
 
 function fileUploadModal(message, callback) {
   console.log(message);
