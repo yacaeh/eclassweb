@@ -1329,10 +1329,6 @@ function unloadFileViewer() {
   fileViewer.remove();
 }
 
-fileUploadModal('파일을 올리거나 선택하세요.', function(e){
-  console.log(e);
-});
-
 function loadFileViewer(url) {
   $('#confirm-box').modal('hide');
   $('#confirm-box-topper').hide();
