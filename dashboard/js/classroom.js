@@ -11,6 +11,8 @@
     params[d(match[1])] = d(match[2]);
   window.params = params;
 })();
+let uploadServerUrl = "https://files.primom.co.kr:1443";
+
 var connection = new RTCMultiConnection();
 console.log('Connection!');
 
@@ -1327,12 +1329,14 @@ function unloadFileViewer() {
   fileViewer.remove();
 }
 
+fileUploadModal('파일을 올리거나 선택하세요.', function(e){
+  console.log(e);
+});
 
-function loadFileViewer() {
-  fileUploadModal('파일을 올리거나 선택하세요.', function(e){
-    console.log(e);
-  });
-  
+function loadFileViewer(url) {
+  $('#confirm-box').modal('hide');
+  $('#confirm-box-topper').hide();
+
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
@@ -1341,7 +1345,7 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://'+window.location.host+'/ViewerJS/#https://files.primom.co.kr/test.pdf'
+    'https://'+window.location.host+'/ViewerJS/#'+url
   );
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
@@ -1876,6 +1880,7 @@ function unmute(id) {
 
 function fileUploadModal(message, callback) {
   console.log(message);
+  getUploadFileList();
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
       $('#confirm-box').modal('hide');
@@ -1892,7 +1897,7 @@ function fileUploadModal(message, callback) {
       callback(false);
   });
 
-  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="kv-explorer" type="file" multiple></form>');
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple></form>');
   $('#confirm-title').html('파일 관리자');
   $('#confirm-box-topper').show();
 
@@ -1901,27 +1906,89 @@ function fileUploadModal(message, callback) {
       keyboard: false
   });
   loadFileInput();
-
 }
+
 
 function getUploadFileList(){
   var xhr = new XMLHttpRequest();
-  var url = "url";
-  var data = "email=hey@mail.com&password=101010";
+  console.log(uploadServerUrl);
+  var url = uploadServerUrl+'/list';
+  var data = { "userId" : params.sessionid };
   xhr.open("POST", url, true);
-  xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
-      if (xhr.readyState == 4 && xhr.status == 200) {
-          // do something with response
-          console.log(xhr.responseText);
-      }
- };
- xhr.send(data); 
+  if (xhr.readyState == 4 && xhr.status == 200) {
+      // do something with response
+      updateFileList(JSON.parse(xhr.responseText));
+      console.log(xhr.responseText);
+  }
+  };
+  data = JSON.stringify(data);
+  xhr.send(data); 
+}
+
+function updateFileList(list){
+  console.log(list.files);
+  var listElement = '<ul class="list-group-flush">';
+  list.files.forEach(file => {
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(file.name.split('.').pop())+'</span>'+file.name+'<button type="button" class="btn btn-primary btn-lg" onclick="loadFileViewer(\''+file.url+'\')"/><i class="fa fa-folder"></i></button><button type="button" class="btn btn-danger btn-lg" onclick="deleteUploadedFile(\''+file.url+'\')"/><i class="fa fa-trash"></i></button></p></li>';
+  })
+  listElement+= '</ul>';
+  var $listElement = $($.parseHTML(listElement));
+  console.log($listElement);
+  $("#confirm-message").prepend($listElement);
+  //document.getElementById('confirm-message').append($listElement);
+}
+
+function getFileType(ext){
+  let element='';
+  if(ext.match(/(doc|docx)$/i)){
+    element += '<i class="fas fa-file-word text-primary"></i>';
+  }
+  if(ext.match(/(xls|xlsx)$/i)){
+    element += '<i class="fas fa-file-excel text-success"></i>';
+  }
+  if(ext.match(/(ppt|pptx)$/i)){
+    element += '<i class="fas fa-file-powerpoint text-danger"></i>';
+  }
+  if(ext.match(/(pdf)$/i)){
+    element += '<i class="fas fa-file-pdf text-danger"></i>';
+  }
+  if(ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)){
+    element += '<i class="fas fa-file-archive text-muted"></i>';
+  }
+  if(ext.match(/(htm|html)$/i)){
+    element += '<i class="fas fa-file-code text-info"></i>';
+  }
+  if(ext.match(/(txt|ini|csv|java|php|js|css)$/i)){
+    element += '<i class="fas fa-file-code text-info"></i>';
+  }
+  if(ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)){
+    element += '<i class="fas fa-file-video text-warning"></i>';
+  }
+  if(ext.match(/(mp3|wav)$/i)){
+    element += '<i class="fas fa-file-audio text-warning"></i>';
+  }
+  if(ext.match(/(jpg)$/i)){
+    element += '<i class="fas fa-file-image text-danger"></i>';
+  }
+  if(ext.match(/(gif)$/i)){
+    element += '<i class="fas fa-file-image text-muted"></i>';
+  }
+  if(ext.match(/(png)$/i)){
+    element += '<i class="fas fa-file-image text-primary"></i>' ;
+  }
+  else {
+    element += '<i class="fas fa-file-etc text-primary"></i>' ;
+  }
+  console.log(element);
+
+  return element;
 }
 
 function deleteUploadedFile(){
   var xhr = new XMLHttpRequest();
-  var url = "url";
+  var url = uploadServerUrl+'/delete';
   var data = "email=hey@mail.com&password=101010";
   xhr.open("POST", url, true);
   xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
@@ -1946,7 +2013,7 @@ function loadFileInput(){
         'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
         'elErrorContainer': '#errorBlock'
     });
-    $("#kv-explorer").fileinput({
+    $("#file-explorer").fileinput({
         'theme': 'explorer-fas',
         'language': 'kr',
         'uploadUrl': 'https://files.primom.co.kr:1443/upload',
@@ -2017,6 +2084,7 @@ function loadFileInput(){
     }).on('fileuploaded', function(event, previewId, index, fileId) {
       console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
       console.log(previewId.response);
+      getUploadFileList();
   }).on('fileuploaderror', function(event, data, msg) {
       console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
   }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
