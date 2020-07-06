@@ -122,9 +122,9 @@ classroomCommand = {
             classroomCommand.openEpub ();
         }
 
-        if(classroomInfo.shareScreen.state){
-            classroomCommand.openShare();
-        }
+        // if(classroomInfo.shareScreen.state){
+        //     classroomCommand.openShare();
+        // }
     },
 
 
@@ -143,28 +143,16 @@ classroomCommand = {
 
 
 classroomCommand.openShare = function (callback){
-    // console.log("NEW")
-    // var id= classroomInfo.shareScreen.id;
-    // connection.peers.forEach(function(e){
-    //     var userid = e.userid;
-    //     if(classroomInfo.shareScreen.userid != userid)  return;
-    //     e.streams.forEach(function(stream){
-    //         console.log(stream);
-    //       if(stream.streamid == id){
+    console.log("OPEN SHARE")
+    var s = GetStream(classroomInfoLocal.shareScreen.id)
+    if(s != undefined){
+        document.getElementById("screen-viewer").srcObject = s;
+        document.getElementById("screen-viewer").style.display = 'block';
+    }
 
-    //           console.log("LOAD STREAM", stream)
-    //           var screenTrackId = stream.getTracks()[0].id;
-    //           console.log(stream.getTracks())
-    //           stream.getTracks().forEach(function (track) {
-    //             if (track.kind === 'video' && track.readyState === 'live') {
-    //                 replaceTrackToPeer(userid, track, screenTrackId);
-    //             }
-    //           });
-    //         // document.getElementById("screen-viewer").srcObject = stream;
-    //       }
-    //     })
-    //   })
-    // document.getElementById("screen-viewer").style.display = 'block';
+    // connection.send({
+    //     rtrack:true
+    // })
 }
 
 
