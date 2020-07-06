@@ -246,6 +246,10 @@ connection.onmessage = function (event) {
 
   if (event.data.alertResponse) {
     classroomCommand.receiveAlertResponse(event.data.alertResponse);
+    
+    if(connection.extra.roomOwner)
+      attentionObj.submit({userid:event.data.alertResponse.userid, name :  params.userFullName, response : event.data.alertResponse.response });
+    
     return;
   }
 
@@ -2353,3 +2357,16 @@ $(window).on("blur focus", function(e) {
 
   $(this).data("prevType", e.type);
 })
+
+document.getElementById("top_save_alert").addEventListener('click' ,function(){
+   if(!attentionObj.exportAttention())
+        alert("저장할 데이터가 없습니다")
+})
+
+
+function handleDragDropEvent(oEvent) {
+  if(oEvent.target.classList == "emojionearea-editor" || oEvent.target.id == "urlinput")
+    return false;
+
+  oEvent.preventDefault();
+}
