@@ -126,24 +126,6 @@ connection.onopen = function (event) {
   console.log('onopen!');
 
 
-  if(classroomInfo.shareScreen.state){
-    // var stream = document.getElementById("screen-viewer").srcObject;
-    var stream = tempStream;
-
-    var videoTrack = stream.getTracks()[0]
-    var screenTrackId = videoTrack.id;
-
-    console.log(stream)
-    console.log(event);
-    console.log(videoTrack)
-    console.log(screenTrackId)
-
-    if (videoTrack.kind === 'video' && videoTrack.readyState === 'live') {
-      replaceTrackToPeer(event.userid, videoTrack, screenTrackId)
-    }
-    document.getElementById("screen-viewer").style.display = "block";
-  }
-
   SetStudentList();
 
   connection.onUserStatusChanged(event);
@@ -160,6 +142,12 @@ connection.onopen = function (event) {
 
   //  session 연결 완료
   classroomCommand.onConnectionSession (event);
+
+  if(classroomInfo.shareScreen.state && connection.extra.roomOwner){
+    StreamingStart(document.getElementById("screen-viewer").srcObject, undefined)
+  }
+
+
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -196,6 +184,7 @@ connection.onmessage = function (event) {
         if(stream.streamid == event.data.showMainVideo.streamid){
           console.log("FIND VIDEO", event.data.showMainVideo.streamid);
           document.getElementById("screen-viewer").srcObject = stream;
+          classroomInfoLocal.shareScreen.stream = stream;
         }
       })
     })
@@ -324,12 +313,14 @@ var stemp;
 connection.onstream = function (event) {
   console.log('onstream!');
 
+  console.log(event);
+
   if(params.open === 'true' || params.open === true){
     mute();
   }
 
   console.log(classroomInfo.shareScreen)
-  if(event.type == "local" && !classroomInfo.shareScreen.state){
+  if(event.type == "local" && !classroomInfo.shareScreen.state && event.stream.isScreen){
     console.log("Obj changed", event.stream.streamid)
     $('#screen-viewer').get(0).srcObject = event.stream;
   }
@@ -842,6 +833,7 @@ function replaceScreenTrack(stream, btn) {
 
   classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
 
+  document.getElementById("screen-viewer").srcObject = stream;
   classroomInfo.shareScreen = {}
   classroomInfo.shareScreen.state = true
   classroomInfo.shareScreen.id = tempStream.streamid
@@ -1888,3 +1880,32 @@ function unmute(id) {
     }
   });
 }
+
+function GetStream(id){
+  var s ;
+
+  connection.peers.forEach(function(e){
+    e.streams.forEach(function(stream){
+      if(stream.streamid == id){
+        console.log("FIND VIDEO", id);
+        document.getElementById("screen-viewer").srcObject = stream;
+        s = stream;
+      }
+    })
+  })
+
+  return s;
+
+}
+
+function TestV(stream, userid){
+  // var stream = GetStream(id);
+  var videoTrack = stream.getTracks()[0]
+  var screenTrackId = videoTrack.id;
+  if (videoTrack.kind === 'video' && videoTrack.readyState === 'live') {
+    replaceTrackToPeer(userid, videoTrack, screenTrackId)
+  }
+  document.getElementById("screen-viewer").style.display = "block";
+}
+
+
