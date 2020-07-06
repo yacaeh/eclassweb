@@ -217,8 +217,9 @@ connection.onmessage = function (event) {
     appendChatMessage(event);
     return;
   }
-
+  // 학생 접속시 싱크
   if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
+    console.log("Sync! when connect !");
     designer.sync();
     return;
   }
@@ -316,7 +317,7 @@ connection.onmessage = function (event) {
 
   // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
   if(event.data.onFocus){
-    if(connection.extra.roomOwner){      
+    if(connection.extra.roomOwner){
       classroomCommand.receivedOnFocusResponse( { userId : event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
     }
       
@@ -2374,4 +2375,9 @@ function handleDragDropEvent(oEvent) {
     return false;
 
   oEvent.preventDefault();
+}
+
+function syncWithTeacher(){
+  connection.send('plz-sync-points');
+  console.log("Sync!");
 }
