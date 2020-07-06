@@ -52,6 +52,7 @@ var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
+let extraPath = '';
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -2056,6 +2057,7 @@ function GetStream(id){
 
 function fileUploadModal(message, callback) {
   console.log(message);
+  extraPath = '';
   getUploadFileList();
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
@@ -2073,7 +2075,7 @@ function fileUploadModal(message, callback) {
       callback(false);
   });
 
-  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple></form>');
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
   $('#confirm-title').html('파일 관리자');
   $('#confirm-box-topper').show();
 
@@ -2099,7 +2101,7 @@ function getUploadFileList(){
   var xhr = new XMLHttpRequest();
   console.log(uploadServerUrl);
   var url = uploadServerUrl+'/list';
-  var data = { "userId" : params.sessionid };
+  var data = { "userId" : params.sessionid ,"extraPath":extraPath};
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
@@ -2199,8 +2201,7 @@ function loadFileInput(){
         'theme': 'fas',
         'showPreview': true,
         'language': 'kr',
-        'allowedFileExtensions': ['*'],
-        'fileType': "any",
+        'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg","odt"],
         'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
         'elErrorContainer': '#errorBlock'
     });
