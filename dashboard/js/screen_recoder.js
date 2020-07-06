@@ -161,7 +161,7 @@ function ScreenShare(btn) {
 
   var on = $(btn).hasClass('on');
 
-  if (!connection.extra.roomOwner && connection.userid != classroomInfo.nowClassPermission) {
+  if (!connection.extra.roomOwner && connection.userid != classroomInfo.classPermission) {
     alert('화면 공유 권한이 없습니다');
     $(btn).removeClass("on selected-shape")
     return;

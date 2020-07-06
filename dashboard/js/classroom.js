@@ -179,7 +179,7 @@ connection.onmessage = function (event) {
     classroomInfo = event.data.permissionChanged;
     var id = connection.userid;
 
-    if(id == event.data.permissionChanged.nowMicPermission){
+    if(id == event.data.permissionChanged.micPermission){
       console.log("GET PERMISSION")
       document.getElementById("class_permission").innerHTML = "수업 권한";
       document.getElementById("mic_permission").innerHTML = "마이크 권한";
@@ -1067,21 +1067,21 @@ function SetStudentList() {
       $("#student_list").append(div);
 
       /* 사라진 권한을 다시 준다  */
-      if(pid === classroomInfo.nowClassPermission){
+      if(pid === classroomInfo.classPermission){
         isOutCPms = false;
         $(`[data-id='${pid}']`).attr('data-class-Permission', true);
         $(`[data-id='${pid}']`).find(".bor").show();
       }
-      if(pid === classroomInfo.nowMicPermission){
+      if(pid === classroomInfo.micPermission){
         isOutMPms = false;
         $(`[data-id='${pid}']`).attr('data-mic-Permission', true);
       }
     });
 
     if(isOutCPms)
-      classroomInfo.nowClassPermission = undefined;
+      classroomInfo.classPermission = undefined;
     if(isOutMPms)
-      classroomInfo.nowMicPermission = undefined;
+      classroomInfo.micPermission = undefined;
   }
 }
 
@@ -1806,20 +1806,20 @@ $(".perbtn").click(function(){
 
   if (this.id == "classP") {
     if (this.classList.contains("off")) {
-      if (classroomInfo.nowClassPermission != undefined) {
+      if (classroomInfo.classPermission != undefined) {
         alert('이미 다른 학생에게 권한이 있습니다.');
         return false;
       }
 
-      classroomInfo.nowClassPermission = pid;
+      classroomInfo.classPermission = pid;
       nowSelectStudent.dataset.classPermission = true;
 
-      if(classroomInfo.nowMicPermission !== pid){
-        if(classroomInfo.nowMicPermission === undefined){
-          classroomInfo.nowMicPermission = pid;
+      if(classroomInfo.micPermission !== pid){
+        if(classroomInfo.micPermission === undefined){
+          classroomInfo.micPermission = pid;
         }
         else{
-          $(`[data-id='${classroomInfo.nowMicPermission}']`).attr('data-mic-Permission', false);
+          $(`[data-id='${classroomInfo.micPermission}']`).attr('data-mic-Permission', false);
         }
         $('#micP').animate({
           'background-color': "#18dbbe"
@@ -1831,7 +1831,7 @@ $(".perbtn").click(function(){
         $('#micP').toggleClass("on");
         $('#micP').toggleClass("off");
 
-        classroomInfo.nowMicPermission = pid;
+        classroomInfo.micPermission = pid;
         nowSelectStudent.dataset.micPermission = true;
       }
 
@@ -1851,20 +1851,20 @@ $(".perbtn").click(function(){
       $(nowSelectStudent).find(".bor").show();
     }
     else {
-      if(classroomInfo.nowMicPermission == classroomInfo.nowClassPermission){
+      if(classroomInfo.micPermission == classroomInfo.classPermission){
         $('#micP').animate({
           'background-color': "gray"
         }, 'fast')
         $('#micP').children('.circle').animate({
           left: "2px"
         }, 'fast')
-        classroomInfo.nowMicPermission = undefined;
+        classroomInfo.micPermission = undefined;
         nowSelectStudent.dataset.micPermission = false;
         
         $('#micP').toggleClass("on");
         $('#micP').toggleClass("off");
       }
-      classroomInfo.nowClassPermission = undefined;
+      classroomInfo.classPermission = undefined;
       nowSelectStudent.dataset.classPermission = false;
 
       $(this).animate(
@@ -1885,14 +1885,14 @@ $(".perbtn").click(function(){
 
   else if (this.id == "micP") {
     if (this.classList.contains("off")) {
-      console.log(classroomInfo.nowMicPermission != undefined);
+      console.log(classroomInfo.micPermission != undefined);
 
-      if (classroomInfo.nowMicPermission != undefined) {
+      if (classroomInfo.micPermission != undefined) {
         alert('이미 다른 학생에게 권한이 있습니다.');
         return false;
       }
 
-      classroomInfo.nowMicPermission = pid;
+      classroomInfo.micPermission = pid;
       nowSelectStudent.dataset.micPermission = true;
 
       $(this).animate(
@@ -1909,7 +1909,7 @@ $(".perbtn").click(function(){
       );
     }
     else {
-      classroomInfo.nowMicPermission = undefined;
+      classroomInfo.micPermission = undefined;
       nowSelectStudent.dataset.micPermission = false;
       $(this).animate(
         {
@@ -1930,7 +1930,7 @@ $(".perbtn").click(function(){
   this.classList.toggle('off');
 
   if(this.classList.contains("on")){
-    SendUnmute(classroomInfo.nowMicPermission);
+    SendUnmute(classroomInfo.micPermission);
   }
   else{
     SendMute();
@@ -2036,7 +2036,7 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    if (e.userid != classroomInfo.nowMicPermission )
+    if (e.userid != classroomInfo.micPermission )
       if(!e.extra.roomOwner) {
       e.stream.mute("audio");
     }
