@@ -155,6 +155,13 @@ classroomCommand.openShare = function (callback){
     // })
 }
 
+classroomCommand.exitAlert = function (callback) {    
+    
+    alert_exit_Box("나가시겠습니까?", "경고", () => {
+        callback()
+    });
+    
+};
 
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
