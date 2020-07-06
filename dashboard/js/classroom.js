@@ -1170,18 +1170,26 @@ $('#exam-start').click(function () {
   $('#exam-setting-bar').hide();
   showExamStateForm();
 
-  $('#exam-teacher-timer').html(
-    parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-  );
+  $('#exam-teacher-timer').html(getFormatmmss(m_ExamTime));
   m_ExamTimerInterval = setInterval(function () {
     m_ExamTime--;
     examObj.updateExameTimer(m_ExamTime);
-    $('#exam-teacher-timer').html(
-      parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-    );
-    if (m_ExamTime <= 0) $('#exam-start').click();
+    $('#exam-teacher-timer').html(getFormatmmss(m_ExamTime));
+    if (m_ExamTime <= 0) 
+      finishExam();
   }, 1000);
 });
+
+function getFormatmmss(sceond){
+  var mm = numberPad(parseInt(sceond / 60),2);
+  var ss = numberPad(sceond % 60,2);
+  return mm+":"+ss;
+}
+
+function numberPad(n, width) {
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+}
 
 function finishExam() {
   clearInterval(m_ExamTimerInterval);
@@ -1218,7 +1226,7 @@ function showExamStateForm() {
 // 시험 문제 하나의 정답률 변경 / 형식 -> (문제번호, 문제정답수/학생수)
 function setExamState(num, percent) {
   $(`#exam-state-progress-${num}`).val(percent);
-  $(`#exam-state-percent-${num}`).html(percent + '%');
+  $(`#exam-state-percent-${num}`).html(Math.round(percent) + '%');
 }
 
 // 문제 html에 하나 추가 (apeend)
@@ -1306,20 +1314,15 @@ function setStudentOMR(quesCount, examTime) {
   question +=
     "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
   $('#exam-omr').html(question);
-
-  m_ExamTime = parseInt(examTime * 60);
-  $('#exam-student-timer').html(
-    parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-  );
-
-  m_ExamTime = parseInt(examTime * 60);
-
+  
+  examTime *= 60;
+  $('#exam-student-timer').html(getFormatmmss(examTime));
   m_ExamTimerInterval = setInterval(function () {
-    m_ExamTime--;
-    $('#exam-student-timer').html(
-      parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-    );
-    if (m_ExamTime <= 0) clearInterval(m_ExamTimerInterval);
+    examTime--;
+    examObj.updateExameTimer(examTime);
+    $('#exam-student-timer').html(getFormatmmss(examTime));
+    if (examTime <= 0) 
+      finishExam();
   }, 1000);
 }
 
