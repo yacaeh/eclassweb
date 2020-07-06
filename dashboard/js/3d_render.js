@@ -21,9 +21,6 @@ var createScene = function (_canvas) {
     // Add lights to the scene
     var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
 
-
-
-
     var model = BABYLON.SceneLoader.ImportMesh("","./assets/models/scenes/", "skull.babylon", scene, function (newMeshes, particleSystems, skeletons) {
         camera.target = newMeshes[0];
 

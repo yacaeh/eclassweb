@@ -52,6 +52,7 @@ var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
+let extraPath = '';
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -2011,6 +2012,7 @@ function GetStream(id){
 
 function fileUploadModal(message, callback) {
   console.log(message);
+  extraPath = '';
   getUploadFileList();
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
@@ -2054,7 +2056,7 @@ function getUploadFileList(){
   var xhr = new XMLHttpRequest();
   console.log(uploadServerUrl);
   var url = uploadServerUrl+'/list';
-  var data = { "userId" : params.sessionid };
+  var data = { "userId" : params.sessionid ,"extraPath":extraPath};
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
@@ -2314,3 +2316,8 @@ $(window).on("blur focus", function(e) {
 
   $(this).data("prevType", e.type);
 })
+$(window).bind("beforeunload", function (e){
+
+	return "정말 수업을 종료 합니까?";
+
+});
