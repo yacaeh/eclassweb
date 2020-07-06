@@ -470,6 +470,9 @@ hr {
 #top_record_video {
   content: url(/dashboard/newimg/recordoff.png);
 }
+#top_save_alert {
+  content: url(/dashboard/newimg/download.png);
+}
 #top_pdf {
   content: url(/dashboard/img/pdf.png);
 }
@@ -858,6 +861,7 @@ hr {
   position: absolute;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
 }
 
 .student {
