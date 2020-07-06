@@ -79,7 +79,21 @@ class sc {
         this.stream = new MediaStream(tracks);
         this.blobs = [];
 
-        this.rec = new MediaRecorder(this.stream, { mimeType: 'video/webm; codecs=vp8,opus' });
+        let options = {mimeType: 'video/webm;codecs=vp9,opus'};
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.error(`${options.mimeType} is not supported`);
+          options = {mimeType: 'video/webm;codecs=vp8,opus'};
+          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            console.error(`${options.mimeType} is not supported`);
+            options = {mimeType: 'video/webm'};
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+              console.error(`${options.mimeType} is not supported`);
+              options = {mimeType: ''};
+            }
+          }
+        }
+
+        this.rec = new MediaRecorder(this.stream, options );
 
         this.rec.ondataavailable = (e) => this.blobs.push(e.data);
         this.rec.onstop = async () => {

@@ -11,6 +11,8 @@
     params[d(match[1])] = d(match[2]);
   window.params = params;
 })();
+let uploadServerUrl = "https://files.primom.co.kr:1443";
+
 var connection = new RTCMultiConnection();
 console.log('Connection!');
 
@@ -42,12 +44,14 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 SetCanvasBtn('epub', LoadEpub);
+SetCanvasBtn('callteacher', CallTeacher);
 
 var isSharingScreen = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
+let isFileViewer = false;
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -303,6 +307,28 @@ connection.onmessage = function (event) {
   }
   if(!connection.extra.roomOwner){
     designer.syncData(event.data);
+  }
+
+  // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
+  if(event.data.onFocus){
+    if(connection.extra.roomOwner){      
+      classroomCommand.receivedOnFocusResponse( { userId : event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
+    }
+      
+    return;
+  }
+
+  // 학생이 선생님에게 권한 요청을 한다.
+  if( event.data.callTeacher ){
+    if(connection.extra.roomOwner)
+      classroomCommand.receivedCallTeacherResponse(event.data.callTeacher.userid);
+    return;
+  }
+
+  if(event.data.closeTesting){
+    if(!connection.extra.roomOwner){
+      $('#exam-board').hide(300);
+    }
   }
 };
 
@@ -964,11 +990,17 @@ function updateClassTime() {
 
 
 function SetTeacher(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+
     $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
     $(".controll").show();
     $(".feature").show();
+  $(frame.document.getElementById("callteacher")).remove();
+
 }
 
 function SetStudent() {
@@ -1057,8 +1089,13 @@ function SelectViewType() {
 
 $('#top_test').click(function () {
   if ($('#exam-board').is(':visible')) {
-    $('#exam-board').hide(300);
-  } else {
+    if(examObj.closeTesting()){
+      $('#exam-board').hide(300);
+    }else{
+      alert("시험 종료 후 닫을 수 있습니다");
+    }
+  }
+  else {
     // 선생님
     if (params.open === 'true') {
       $('#exam-omr').hide();
@@ -1080,8 +1117,13 @@ var m_ExamTime; //
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
   m_QuesCount = $('#exam-question-count').val();
+  if(m_QuesCount>200){
+    alert("최대 문항수는 200개입니다");
+    m_QuesCount = 200;
+    $('#exam-question-count').val(m_QuesCount);
+  }
   var answerList = getQuestionAnswerList();
-  $('#exam-qustion-list').html('');
+  $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
     apeendQuestion(i);
   }
@@ -1178,17 +1220,17 @@ function setExamState(num, percent) {
 function apeendQuestion(i) {
   question = `<div id='exam-question-${i}' style='display: flex;'>`;
 
-  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:2; margin-top:2px;'>${i}.</span>`;
+  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='margin-top:5px; text-align:center; width:30px;'>${i}.</span>`;
 
   for (var j = 1; j <= 5; j++) {
     question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
     question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
   }
 
-  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 0px 3px; margin:5px;'>─</button>`;
+  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 3px 3px; margin:8px; height:20px; line-height:12px'>─</button>`;
 
   question += `</div>`;
-  $('#exam-qustion-list').append(question);
+  $('#exam-question-list').append(question);
 
   $(`#exam-question-${i}`).change(function () {
     $(`#exam-question-${i}`).css('background', '#eff1f0');
@@ -1200,7 +1242,7 @@ function deleteQuestion(num) {
   var answerList = getQuestionAnswerList();
   m_QuesCount--;
   answerList.splice(num - 1, 1);
-  $('#exam-qustion-list').html('');
+  $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
     apeendQuestion(i);
   }
@@ -1241,18 +1283,20 @@ function setStudentOMR(quesCount, examTime) {
   question += '<div>시험 중</div>';
   question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
   question += '</div>';
-  question += "<div id='exam-question-list' class='exam-border-bottom'>";
+  question += "<div class='exam-overflow exam-border-bottom'>";
+  question += "<div id='exam-omr-question-list'>";
   m_QuesCount = quesCount;
   for (var i = 1; i <= m_QuesCount; i++) {
     question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`;
-    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1;'>${i}.</span>`;
+    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'>${i}.</span>`;
     for (var j = 1; j <= 5; j++) {
       question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
       question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
     }
-    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1;'></span>`;
+    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'></span>`;
     question += `</div>`;
   }
+  question += '</div>';
   question += `</div>`;
   question +=
     "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
@@ -1294,7 +1338,7 @@ function stopQuestionOMR() {
   examObj.examAnswer = studentOMR;
   //  console.log(studentOMR);
 
-  $('#exam-question-list').css('pointer-events', 'none');
+  $('#exam-omr-question-list').css('pointer-events', 'none');
   $('#exam-answer-submit').hide();
 }
 
@@ -1334,7 +1378,6 @@ $(window).on('beforeunload', function () {
 // 로드시 글자깨짐 현상 해결 해야함
 // 소켓통신으로 제어 필요
 
-let isFileViewer = false;
 
 function LoadFile(btn) {
   if (!isSharingFile && checkSharing()) {
@@ -1343,19 +1386,21 @@ function LoadFile(btn) {
   }
   
   if(!connection.extra.roomOwner) return;
+  
+  fileUploadModal("파일 관리자",function(e){console.log(e)});
 
-  classroomCommand.togglePdfStateServer ((state) => {
-    // if(state) 
-    // {
-    //   isSharingFile = true;
-    //   isFileViewer = true;
-    // }
-    // else
-    // {
-    //   isSharingFile = false;
-    //   isFileViewer = false;
-    // }
-  }) 
+  // classroomCommand.togglePdfStateServer ((state) => {
+  //   // if(state) 
+  //   // {
+  //   //   isSharingFile = true;
+  //   //   isFileViewer = true;
+  //   // }
+  //   // else
+  //   // {
+  //   //   isSharingFile = false;
+  //classroomCommand   //   isFileViewer = false;
+  //   // }
+  // }) 
   
   // if (isFileViewer === false) {
   //   isSharingFile = true;
@@ -1376,6 +1421,9 @@ function unloadFileViewer() {
   isSharingFile = false;
   isFileViewer = false;
 
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (false);
+
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
@@ -1385,8 +1433,20 @@ function unloadFileViewer() {
 
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
+
 }
-function loadFileViewer() {
+
+function loadFileViewer(url) {
+
+if(isSharingFile)
+  unloadFileViewer ();
+
+  $('#confirm-box').modal('hide');
+  $('#confirm-box-topper').hide();
+
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (true, url);
+
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
@@ -1395,8 +1455,9 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://'+window.location.host+'/ViewerJS/#https://files.primom.co.kr/test.pdf'
+    'https://'+window.location.host+'/ViewerJS/#'+url
   );
+
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
@@ -1409,6 +1470,10 @@ function loadFileViewer() {
   frame.document
     .getElementsByClassName('design-surface')[0]
     .appendChild(fileViewer);
+  console.log(frame.document
+    .getElementsByClassName('design-surface')[0]
+    .appendChild(fileViewer));
+
   frame.document.getElementById('main-canvas').style.zIndex = '1';
   frame.document.getElementById('temp-canvas').style.zIndex = '2';
   frame.document.getElementById('tool-box').style.zIndex = '3';
@@ -1421,12 +1486,13 @@ function pdfOnLoaded () {
   classroomCommand.pdfOnLoaded ();
 }
 
-function showPage(n){  ;
+function showPage(n){
+  console.log(n);
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
     classroomCommand.setPdfPage(n);
 }
 
-function showNextPage(){
+function showNextPage(){  
   // if(connection.extra.roomOwner || !classroomInfo.allControl) 
   //   classroomCommand.sendPDFCmd('next');
 }
@@ -1470,6 +1536,8 @@ function LoadEpub(btn) {
     $('#canvas-controller').show();
     isEpubViewer = true;
     classroomCommand.sendOpenEpub();
+
+
   } else {
     isSharingEpub = false;
     unloadEpubViewer();
@@ -1479,7 +1547,19 @@ function LoadEpub(btn) {
   }
 }
 
+function CallTeacher() {
+  connection.send({
+    callTeacher :{
+        userid : connection.userid
+    } 
+  });  
+}
+
+var renditionBuffer;
+
 function loadEpubViewer() {
+  isSharingEpub = true;
+  isEpubViewer = true;
   console.log("Load Epub viewer");
   let epubViewer = document.createElement('div');
   epubViewer.setAttribute('id', 'epub-viewer');
@@ -1507,24 +1587,46 @@ function loadEpubViewer() {
     snap: true
   });
 
-  var displayed = rendition.display();
 
-  displayed.then(function (renderer) {
+  renditionBuffer = rendition;
+ 
+var displayed;
+if(connection.extra.roomOwner)
+  displayed = rendition.display();
+else 
+{
+  if(classroomInfo.epub.page)
+      displayed = rendition.display(classroomInfo.epub.page);
+    else
+      displayed = rendition.display();
+}
+
+
+  displayed.then(function (renderer) {  
+    // console.log(renderer);
   });
 
   // Navigation loaded
   book.loaded.navigation.then(function (toc) {
-    // console.log(toc);
+    // console.log(toc);    
   });
 
+  rendition.on('relocated', function(locations) {    
+    // Tofix : 현재 페이지의 정보가 제대로 안 날라온다.
+    console.log(locations);
+    classroomCommand.sendEpubCmd('page', {
+      page : locations.start.index
+    });    
+  });
   
-  var next = document.getElementById('next');
+
+
+  var next = document.getElementById('next');  
   next.style.display = 'block';
   next.addEventListener(
     'click',
     function () {
-      rendition.next();
-      showNextEpubPage();
+      rendition.next(); 
     },
     false
   );
@@ -1533,9 +1635,8 @@ function loadEpubViewer() {
   prev.style.display = 'block';
   prev.addEventListener(
     'click',
-    function () {
-      rendition.prev();
-      showPreviousEpubPage();
+    function () {   
+      rendition.prev();  
     },
     false
   );
@@ -1544,13 +1645,11 @@ function loadEpubViewer() {
     // Left Key
     if ((e.keyCode || e.which) == 37) {
       rendition.prev();
-      showPreviousEpubPage();
     }
 
     // Right Key
     if ((e.keyCode || e.which) == 39) {
-      rendition.next();
-      showNextEpubPage();
+      rendition.next();  
     }
   };
 
@@ -1559,11 +1658,22 @@ function loadEpubViewer() {
 }
 
 function unloadEpubViewer() {
+
+  isSharingEpub = false;
+  isEpubViewer = false;
+
+  renditionBuffer = null;
+
   var prev = document.getElementById('prev');
   prev.style.display = 'none';
+  var prevClone = prev.cloneNode(true);
+  prev.parentNode.replaceChild(prevClone, prev);
 
   var next = document.getElementById('next');
   next.style.display = 'none';
+
+  var nextClone = next.cloneNode(true);
+  next.parentNode.replaceChild(nextClone, next);
 
   let frame = document
     .getElementById('widget-container')
@@ -1576,15 +1686,6 @@ function unloadEpubViewer() {
   epubViewer.remove();
 }
 
-function showNextEpubPage() {
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendEpubCmd('next');
-}
-
-function showPreviousEpubPage() {
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.sendEpubCmd('prev');
-}
 
 _3DCanvasFunc();
 _AllCantrallFunc();
@@ -1908,3 +2009,308 @@ function GetStream(id){
 
 
 
+function fileUploadModal(message, callback) {
+  console.log(message);
+  getUploadFileList();
+  $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(true);
+  });
+
+  $('#btn-confirm-close').html('취소');
+
+  $('.btn-confirm-close').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(false);
+  });
+
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple></form>');
+  $('#confirm-title').html('파일 관리자');
+  $('#confirm-box-topper').show();
+
+  $('#confirm-box').modal({
+      backdrop: 'static',
+      keyboard: false
+  });
+  if(!isFileViewer) $('#btn-confirm-file-close').hide();
+  else {
+    $('#btn-confirm-file-close').show();
+    $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      unloadFileViewer();
+      unloadEpubViewer();
+    });
+    }
+
+  loadFileInput();
+}
+
+
+function getUploadFileList(){
+  var xhr = new XMLHttpRequest();
+  console.log(uploadServerUrl);
+  var url = uploadServerUrl+'/list';
+  var data = { "userId" : params.sessionid };
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onreadystatechange = function () {
+  if (xhr.readyState == 4 && xhr.status == 200) {
+      // do something with response
+      updateFileList(JSON.parse(xhr.responseText));
+  }
+  };
+  data = JSON.stringify(data);
+  xhr.send(data); 
+}
+
+function updateFileList(list){
+  console.log(list.files);
+  $("#confirm-message .list-group-flush").remove();
+  var re = /(?:\.([^.]+))?$/;
+  var listElement = '<ul class="list-group-flush">';
+  list.files.forEach(file => {
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
+  })
+  listElement+= '</ul>';
+  var $listElement = $($.parseHTML(listElement));
+  $("#confirm-message").prepend($listElement);
+  //document.getElementById('confirm-message').append($listElement);
+}
+
+function getFileType(ext){
+  console.log("ext:",ext);
+  let element='';
+  if (ext === undefined){
+    element += '<i class="fas fa-folder text-primary"></i>';
+  }
+  else if(ext.match(/(doc|docx)$/i)){
+    element += '<i class="fas fa-file-word text-primary"></i>';
+  }
+  else if(ext.match(/(xls|xlsx)$/i)){
+    element += '<i class="fas fa-file-excel text-success"></i>';
+  }
+  else if(ext.match(/(ppt|pptx)$/i)){
+    element += '<i class="fas fa-file-powerpoint text-danger"></i>';
+  }
+  else if(ext.match(/(pdf)$/i)){
+    element += '<i class="fas fa-file-pdf text-danger"></i>';
+  }
+  else if(ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)){
+    element += '<i class="fas fa-file-archive text-muted"></i>';
+  }
+  else if(ext.match(/(htm|html)$/i)){
+    element += '<i class="fas fa-file-code text-info"></i>';
+  }
+  else if(ext.match(/(txt|ini|csv|java|php|js|css)$/i)){
+    element += '<i class="fas fa-file-code text-info"></i>';
+  }
+  else if(ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)){
+    element += '<i class="fas fa-file-video text-warning"></i>';
+  }
+  else if(ext.match(/(mp3|wav)$/i)){
+    element += '<i class="fas fa-file-audio text-warning"></i>';
+  }
+  else if(ext.match(/(jpg)$/i)){
+    element += '<i class="fas fa-file-image text-danger"></i>';
+  }
+  else if(ext.match(/(gif)$/i)){
+    element += '<i class="fas fa-file-image text-muted"></i>';
+  }
+  else if(ext.match(/(png)$/i)){
+    element += '<i class="fas fa-file-image text-primary"></i>' ;
+  }
+  else {
+    element += '<i class="fas fa-file text-muted"></i>' ;
+  }
+  console.log(element);
+
+  return element;
+}
+
+function deleteUploadedFile(filename){
+  var xhr = new XMLHttpRequest();
+  var url = uploadServerUrl+'/delete';
+  var data = {"userId":params.sessionid, "name":filename};
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          // do something with response
+          getUploadFileList();
+      }
+  };
+  data = JSON.stringify(data);
+  xhr.send(data);
+}
+
+function loadFileInput(){
+
+  $(document).ready(function () {
+    $("#test-upload").fileinput({
+        'theme': 'fas',
+        'showPreview': true,
+        'language': 'kr',
+        'allowedFileExtensions': ['*'],
+        'fileType': "any",
+        'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
+        'elErrorContainer': '#errorBlock'
+    });
+    $("#file-explorer").fileinput({
+        'theme': 'explorer-fas',
+        'language': 'kr',
+        'uploadUrl': 'https://files.primom.co.kr:1443/upload',
+        fileActionSettings : {
+          showZoom : false,
+        },
+          
+          
+        overwriteInitial: false,
+        initialPreviewAsData: true,
+        initialPreview: [
+            // "https://files.primom.co.kr/test.pdf",
+            // "https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
+            // "https://files.primom.co.kr/small.mp4"
+        ],
+        initialPreviewConfig: [
+            // {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
+            // {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
+            // {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
+        ],
+        preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
+        previewFileIconSettings: { // configure your icon file extensions
+       'doc': '<i class="fas fa-file-word text-primary"></i>',
+       'xls': '<i class="fas fa-file-excel text-success"></i>',
+       'ppt': '<i class="fas fa-file-powerpoint text-danger"></i>',
+       'pdf': '<i class="fas fa-file-pdf text-danger"></i>',
+       'zip': '<i class="fas fa-file-archive text-muted"></i>',
+       'htm': '<i class="fas fa-file-code text-info"></i>',
+       'txt': '<i class="fas fa-file-text text-info"></i>',
+       'mov': '<i class="fas fa-file-video text-warning"></i>',
+       'mp3': '<i class="fas fa-file-audio text-warning"></i>',
+       // note for these file types below no extension determination logic 
+       // has been configured (the keys itself will be used as extensions)
+       'jpg': '<i class="fas fa-file-image text-danger"></i>', 
+       'gif': '<i class="fas fa-file-image text-muted"></i>', 
+       'png': '<i class="fas fa-file-image text-primary"></i>'    
+   },
+   previewFileExtSettings: { // configure the logic for determining icon file extensions
+       'doc': function(ext) {
+           return ext.match(/(doc|docx)$/i);
+       },
+       'xls': function(ext) {
+           return ext.match(/(xls|xlsx)$/i);
+       },
+       'ppt': function(ext) {
+           return ext.match(/(ppt|pptx)$/i);
+       },
+       'zip': function(ext) {
+           return ext.match(/(zip|rar|tar|gzip|gz|7z)$/i);
+       },
+       'htm': function(ext) {
+           return ext.match(/(htm|html)$/i);
+       },
+       'txt': function(ext) {
+           return ext.match(/(txt|ini|csv|java|php|js|css)$/i);
+       },
+       'mov': function(ext) {
+           return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
+       },
+       'mp3': function(ext) {
+           return ext.match(/(mp3|wav)$/i);
+       }
+   },
+   uploadExtraData: {
+    userId: params.sessionid
+  },
+
+    }).on('fileuploaded', function(event, previewId, index, fileId) {
+      console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
+      console.log(previewId.response);
+      getUploadFileList();
+  }).on('fileuploaderror', function(event, data, msg) {
+      console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
+  }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
+      console.log('File Batch Uploaded', preview, config, tags, extraData);
+  });
+});
+
+}
+
+var isFocused = true;
+var isIframeFocused = false;
+
+let widgetIframe = document
+.getElementById('widget-container')
+.getElementsByTagName('iframe')[0].contentWindow;
+
+
+function sendFocus(state){
+  if(!connection.extra.roomOwner){
+    connection.send({
+      onFocus :{
+          userid : connection.userid,
+          focus : state
+      } 
+    });
+    if(!state){
+      alert('수업 째지 마세요...');
+      console.log("You left class!");
+    }  
+  }
+}
+
+$(widgetIframe).on("blur focus", function(e){
+  var prevType = $(this).data("prevType");
+
+  if (prevType != e.type) {   //  reduce double fire issues
+      switch (e.type) {
+        case "blur":
+          isIframeFocused = false;
+          setTimeout(function(){
+            if(!isFocused && !isIframeFocused){
+              sendFocus(false);  
+            }
+            else{
+              sendFocus(true);
+            }  
+          },100);
+          break;
+        case "focus":
+          isIframeFocused = true;
+          sendFocus(true);
+          break;
+      }
+    }
+
+  $(this).data("prevType", e.type);
+
+})
+
+$(window).on("blur focus", function(e) {
+  var prevType = $(this).data("prevType");
+
+  if (prevType != e.type) {   //  reduce double fire issues
+      switch (e.type) {
+          case "blur":
+            isFocused = false;
+            console.log("blur");
+            if(document.activeElement !== frame){
+            }
+            else{
+              isFocused = true;
+              sendFocus(true);
+            }
+            break;
+          case "focus":
+            isFocused = true;
+            sendFocus(true);
+            break;
+      }
+  }
+
+  $(this).data("prevType", e.type);
+})

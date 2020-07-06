@@ -1485,6 +1485,10 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             var servers = {
                 iceServers: [{
                     urls: 'stun:stun.l.google.com:19302'
+                },{ 
+                    urls : 'turn:turn.primom.co.kr:3478', 
+                    credential : 'webrtc',
+                    username: 'primomceo'
                 }]
             };
 
@@ -3426,9 +3430,14 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     'stun:stun.l.google.com:19302?transport=udp',
                 ]
             },{ 
-                'urls' : ['turn:34.64.252.139:3478'], 
+                'urls' : ['turn:turn.primom.co.kr:3478'], 
                 'credential' : 'webrtc',
-                 'username': 'primomceo'
+                'username': 'primomceo'
+            },
+            { 
+                'urls' : ['turn:turn.primom.co.kr:3478?transport=udp'], 
+                'credential' : 'webrtc',
+                'username': 'primomceo'
             }];
 
             return iceServers;
@@ -4701,12 +4710,20 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
         connection.enableFileSharing = false;
 
-        // all values in kbps
+        // all values in kbps 
+        // 기본값 
+        // connection.bandwidth = {
+        //     screen: false,
+        //     audio: false,
+        //     video: false
+        // };
+        // 최적값
         connection.bandwidth = {
-            screen: false,
-            audio: false,
-            video: false
+            screen: 64,
+            audio: 128,
+            video: 254
         };
+
 
         connection.codecs = {
             audio: 'opus',

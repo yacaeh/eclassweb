@@ -2241,6 +2241,7 @@ function canvasresize(id){
         movie : icons.movie || '',
         file : icons.file,
         epub : icons.epub,
+        callteacher : icons.callteacher,
     };
 
 
@@ -2524,6 +2525,26 @@ function canvasresize(id){
         if (tools.view3d === true) {
             decoratemovie();
             document.getElementById('movie').style.display = 'block';
+        }
+
+        
+        function decoratecallteacher() {
+            var context = getContext('callteacher');
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.callteacher;
+
+            document.getElementById('callteacher').onclick = function() {
+                this.classList.toggle("on");
+                this.classList.toggle("selected-shape");
+            }
+        }
+
+        if (tools.view3d === true) {
+            decoratecallteacher();
+            document.getElementById('callteacher').style.display = 'block';
         }
 
 

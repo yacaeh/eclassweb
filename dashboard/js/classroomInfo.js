@@ -18,7 +18,7 @@ classroomInfo = {
     },
     epub : {
         state : false,
-        page : 1,
+        page : 0,        
         data : {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
@@ -115,7 +115,7 @@ classroomCommand = {
             sync3DModel ();
         }
 
-        if(classroomInfo.pdf.state) {
+        if(classroomInfo.pdf.state) {            
             classroomCommand.syncPdf ();
         }
         if(classroomInfo.epub.state) {
@@ -204,6 +204,38 @@ classroomCommand.receivAlert = function () {
     };
 };
 
+// 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
+classroomCommand.receivedOnFocusResponse = (_response) => {
+    if(connection.extra.roomOwner)
+    {        
+        let userId = _response.userId;
+        let boolOnFocus = _response.onFocus; 
+
+        let children = document.getElementById("student_list").children;
+
+        for(let i = 0; i < children.length; i++){
+            if( children[i].dataset.id == userId ){
+                console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
+            }
+        };
+    }
+};
+
+// 학생이 선생님에게 권한 요청을 한다.
+classroomCommand.receivedCallTeacherResponse = (userId) => {
+    if(connection.extra.roomOwner)
+    {        
+        let children = document.getElementById("student_list").children;
+
+        for(let i = 0; i < children.length; i++){
+            if( children[i].dataset.id == userId ){
+                console.log( "Received Call Teacher Respose : " +  userId );    
+
+            }
+        };
+    }
+};
+
 // 학생이 응답했을 때, 선생님 처리 부분
 classroomCommand.receiveAlertResponse = function (_response) {
     if(connection.extra.roomOwner)
@@ -263,26 +295,31 @@ classroomCommand.syncScreenShare = function (_userid) {
 /*
     PDF
 */
-classroomCommand.togglePdfStateServer = function (_success, _error) {
+classroomCommand.togglePdfStateServer = function (_state, _url='') {
 
-    connection.socket.emit('toggle-share-pdf', (result) => {
-        if(result.result) 
-        {
-            classroomCommand.setPdfStateLocal(result.data);
-            if(result.data)                
-                classroomCommand.sendPDFCmdOnlyTeacher ('open', {page : classroomInfo.pdf.page});
+    //connection.socket.emit('toggle-share-pdf', (result) => {
+      //  if(result.result) 
+      //  {
+            classroomInfo.pdf.src = _url;
+            classroomInfo.pdf.state = _state;
+            if(_state)                
+                classroomCommand.sendPDFCmdOnlyTeacher ('open', 
+                {
+                    page : classroomInfo.pdf.page,
+                    src : classroomInfo.pdf.src
+                });
             else
                 classroomCommand.sendPDFCmdOnlyTeacher ('close');
                 
-            if(_success)
-                _success(result.data)
-        }
-        else 
-        {
-            if(_error)
-                _error(result.error);
-        }
-    });
+            // if(_success)
+            //     _success(result.data)
+        //}
+        // else 
+        // {
+        //     if(_error)
+        //         _error(result.error);
+        // }
+    //});
 }
 
 
@@ -341,9 +378,9 @@ classroomCommand.updatePDFCmd = function (_pdf) {
     const cmd = _pdf.cmd;
 
     if(cmd == 'open') {
-        console.log(_pdf);
         classroomInfo.pdf.page = _pdf.data.page;
-        classroomCommand.setPdfStateLocal (true);
+        classroomInfo.pdf.src = _pdf.data.src;
+        loadFileViewer (classroomInfo.pdf.src);
         return;
     }
     else if(cmd == 'close') {
@@ -396,7 +433,7 @@ classroomCommand.updatePDFCmd = function (_pdf) {
 }
 
 classroomCommand.syncPdf = function () {    
-    if(classroomInfo.pdf.state) {
+    if(classroomInfo.pdf.state) {        
         if(isFileViewer)
         {
             //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
@@ -404,7 +441,7 @@ classroomCommand.syncPdf = function () {
         }
         else {
             // open
-            loadFileViewer ();
+            loadFileViewer (classroomInfo.pdf.src);
             $('#canvas-controller').show();
         }
     }
@@ -438,8 +475,7 @@ classroomCommand.pdfOnLoaded = function () {
         .getElementById('widget-container')
         .getElementsByTagName('iframe')[0].contentWindow;
         let fileViewer = frame.document.getElementById('file-viewer');
-        let viewer = fileViewer.contentWindow.document.getElementById("viewer")    
-        console.log(fileViewer);                        
+        let viewer = fileViewer.contentWindow.document.getElementById("viewer")                                  
         if(_lock) {
             viewer.style.pointerEvents = 'none';
         }
@@ -454,7 +490,7 @@ classroomCommand.pdfOnLoaded = function () {
 */
 classroomCommand.receiveEpubMessage = function (_epub) {  
     if(_epub.cmd) {
-        classroomCommand.updateEpubCmd (_epub.cmd);
+        classroomCommand.updateEpubCmd (_epub);
     }else   {
         let currentState = classroomInfo.epub.state;
         if(currentState != _epub.state) {       
@@ -467,7 +503,9 @@ classroomCommand.receiveEpubMessage = function (_epub) {
 classroomCommand.sendOpenEpub = function () {
     classroomInfo.epub.state = true;
     connection.send({
-        epub : classroomInfo.epub
+        epub : classroomInfo.epub,
+        start : classroomInfo.epub.start,
+        end : classroomInfo.epub.end,
     });
 };
 
@@ -481,8 +519,38 @@ classroomCommand.sendCloseEpub = function () {
 };
 
 classroomCommand.openEpub = function () {
-    loadEpubViewer ();
-    $('#canvas-controller').show();
+    if(isSharingEpub) {
+        if(renditionBuffer) { 
+            if(classroomInfo.allControl)                                                        
+                renditionBuffer.display(classroomInfo.epub.page);
+        }
+    }
+    else {
+        loadEpubViewer ();
+        $('#canvas-controller').show();
+    }
+    
+    if(!connection.extra.roomOwner) {
+        if(classroomInfo.allControl) 
+        {        
+            if(isSharingEpub) {            
+                var next = document.getElementById('next');
+                next.style.display = 'none';
+                var prev = document.getElementById('prev');
+                prev.style.display = 'none';
+            }
+        }
+        else 
+        {
+            if(isSharingEpub) {      
+                var next = document.getElementById('next');
+                next.style.display = 'block';
+                var prev = document.getElementById('prev');
+                prev.style.display = 'block';
+            }
+        }
+
+    }
 };
 
 classroomCommand.closeEpub = function () {
@@ -490,18 +558,26 @@ classroomCommand.closeEpub = function () {
     $('#canvas-controller').hide();
 }
 
-classroomCommand.sendEpubCmd = function (_cmd) {
+classroomCommand.sendEpubCmd = function (_cmd, _data) {
+    
     if(!connection.extra.roomOwner) return;    
-    if(!classroomInfo.allControl) return;
+    if(classroomInfo.epub.page == _data.page)   return;
 
+    classroomInfo.epub.page = _data.page;
+
+    if(!classroomInfo.allControl) return;
+    console.log(_data);
     connection.send ({
         epub : {
-            cmd : _cmd
+            cmd : _cmd,
+            data : _data         
         }
     });
 }
 
-classroomCommand.updateEpubCmd = function (_cmd) {
+classroomCommand.updateEpubCmd = function (_data) {
+
+    console.log(_data);
 
     let frame = document
     .getElementById('widget-container')
@@ -509,8 +585,19 @@ classroomCommand.updateEpubCmd = function (_cmd) {
     let epubViewer = frame.document.getElementById('epub-viewer');
     if(!epubViewer)  return;
 
-    switch(_cmd)
+    console.log('page');
+    switch(_data.cmd)
     {
+        case 'page' :            
+            let page = _data.data.page;           
+            if(classroomInfo.epub.page != page) {
+                classroomInfo.epub.page = page;
+                if(renditionBuffer) {                                                
+                    renditionBuffer.display(page);
+                }
+            }
+            break;
+
         case 'next' :
             document.getElementById('next').click();
             break;
