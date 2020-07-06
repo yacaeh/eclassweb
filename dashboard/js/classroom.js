@@ -1285,19 +1285,21 @@ function LoadFile(btn) {
   }
   
   if(!connection.extra.roomOwner) return;
+  
+  fileUploadModal("파일 관리자",function(e){console.log(e)});
 
-  classroomCommand.togglePdfStateServer ((state) => {
-    // if(state) 
-    // {
-    //   isSharingFile = true;
-    //   isFileViewer = true;
-    // }
-    // else
-    // {
-    //   isSharingFile = false;
-    //   isFileViewer = false;
-    // }
-  }) 
+  // classroomCommand.togglePdfStateServer ((state) => {
+  //   // if(state) 
+  //   // {
+  //   //   isSharingFile = true;
+  //   //   isFileViewer = true;
+  //   // }
+  //   // else
+  //   // {
+  //   //   isSharingFile = false;
+  //   //   isFileViewer = false;
+  //   // }
+  // }) 
   
   // if (isFileViewer === false) {
   //   isSharingFile = true;
@@ -1873,7 +1875,6 @@ function unmute(id) {
     }
   });
 }
-fileUploadModal("파일 관리자",function(e){console.loge(e)});
 
 function fileUploadModal(message, callback) {
   console.log(message);
@@ -1917,7 +1918,6 @@ function getUploadFileList(){
   if (xhr.readyState == 4 && xhr.status == 200) {
       // do something with response
       updateFileList(JSON.parse(xhr.responseText));
-      console.log(xhr.responseText);
   }
   };
   data = JSON.stringify(data);
@@ -1927,58 +1927,61 @@ function getUploadFileList(){
 function updateFileList(list){
   console.log(list.files);
   $("#confirm-message .list-group-flush").remove();
-
+  var re = /(?:\.([^.]+))?$/;
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
-    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(file.name.split('.').pop())+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
   })
   listElement+= '</ul>';
   var $listElement = $($.parseHTML(listElement));
-  console.log($listElement);
   $("#confirm-message").prepend($listElement);
   //document.getElementById('confirm-message').append($listElement);
 }
 
 function getFileType(ext){
+  console.log("ext:",ext);
   let element='';
-  if(ext.match(/(doc|docx)$/i)){
+  if (ext === undefined){
+    element += '<i class="fas fa-folder text-primary"></i>';
+  }
+  else if(ext.match(/(doc|docx)$/i)){
     element += '<i class="fas fa-file-word text-primary"></i>';
   }
-  if(ext.match(/(xls|xlsx)$/i)){
+  else if(ext.match(/(xls|xlsx)$/i)){
     element += '<i class="fas fa-file-excel text-success"></i>';
   }
-  if(ext.match(/(ppt|pptx)$/i)){
+  else if(ext.match(/(ppt|pptx)$/i)){
     element += '<i class="fas fa-file-powerpoint text-danger"></i>';
   }
-  if(ext.match(/(pdf)$/i)){
+  else if(ext.match(/(pdf)$/i)){
     element += '<i class="fas fa-file-pdf text-danger"></i>';
   }
-  if(ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)){
+  else if(ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)){
     element += '<i class="fas fa-file-archive text-muted"></i>';
   }
-  if(ext.match(/(htm|html)$/i)){
+  else if(ext.match(/(htm|html)$/i)){
     element += '<i class="fas fa-file-code text-info"></i>';
   }
-  if(ext.match(/(txt|ini|csv|java|php|js|css)$/i)){
+  else if(ext.match(/(txt|ini|csv|java|php|js|css)$/i)){
     element += '<i class="fas fa-file-code text-info"></i>';
   }
-  if(ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)){
+  else if(ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)){
     element += '<i class="fas fa-file-video text-warning"></i>';
   }
-  if(ext.match(/(mp3|wav)$/i)){
+  else if(ext.match(/(mp3|wav)$/i)){
     element += '<i class="fas fa-file-audio text-warning"></i>';
   }
-  if(ext.match(/(jpg)$/i)){
+  else if(ext.match(/(jpg)$/i)){
     element += '<i class="fas fa-file-image text-danger"></i>';
   }
-  if(ext.match(/(gif)$/i)){
+  else if(ext.match(/(gif)$/i)){
     element += '<i class="fas fa-file-image text-muted"></i>';
   }
-  if(ext.match(/(png)$/i)){
+  else if(ext.match(/(png)$/i)){
     element += '<i class="fas fa-file-image text-primary"></i>' ;
   }
   else {
-    element += '<i class="fas fa-file-etc text-primary"></i>' ;
+    element += '<i class="fas fa-file text-muted"></i>' ;
   }
   console.log(element);
 

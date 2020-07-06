@@ -22,7 +22,9 @@ var createScene = function (_canvas) {
     var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
 
 
-    var model = BABYLON.SceneLoader.ImportMesh("","https://files.primom.co.kr/uploads/11/audi-r8-red-babylon/", "audi-r8-red.babylon", scene, function (newMeshes, particleSystems, skeletons) {
+
+
+    var model = BABYLON.SceneLoader.ImportMesh("","./assets/models/scenes/", "skull.babylon", scene, function (newMeshes, particleSystems, skeletons) {
         camera.target = newMeshes[0];
 
 
