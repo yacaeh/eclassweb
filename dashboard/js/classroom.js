@@ -50,6 +50,7 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
+let isFileViewer = false;
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -1276,7 +1277,6 @@ $(window).on('beforeunload', function () {
 // 로드시 글자깨짐 현상 해결 해야함
 // 소켓통신으로 제어 필요
 
-let isFileViewer = false;
 
 function LoadFile(btn) {
   if (!isSharingFile && checkSharing()) {
@@ -1332,6 +1332,8 @@ function unloadFileViewer() {
 }
 
 function loadFileViewer(url) {
+  if(isFileViewer) unloadFileViewer();
+
   $('#confirm-box').modal('hide');
   $('#confirm-box-topper').hide();
 
@@ -1346,6 +1348,7 @@ function loadFileViewer(url) {
     'src',
     'https://'+window.location.host+'/ViewerJS/#'+url
   );
+
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
@@ -1358,6 +1361,10 @@ function loadFileViewer(url) {
   frame.document
     .getElementsByClassName('design-surface')[0]
     .appendChild(fileViewer);
+  console.log(frame.document
+    .getElementsByClassName('design-surface')[0]
+    .appendChild(fileViewer));
+
   frame.document.getElementById('main-canvas').style.zIndex = '1';
   frame.document.getElementById('temp-canvas').style.zIndex = '2';
   frame.document.getElementById('tool-box').style.zIndex = '3';
@@ -1904,6 +1911,16 @@ function fileUploadModal(message, callback) {
       backdrop: 'static',
       keyboard: false
   });
+  if(!isFileViewer) $('#btn-confirm-file-close').hide();
+  else {
+    $('#btn-confirm-file-close').show();
+    $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      unloadFileViewer();
+      unloadEpubViewer();
+    });
+    }
+
   loadFileInput();
 }
 
