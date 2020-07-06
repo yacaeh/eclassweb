@@ -2,7 +2,10 @@
 classroomInfo = {   
     roomOpenTime : 0,       // 방을 처음 개설한 시간
     allControl : false,
-    shareScreen : false,
+    shareScreen : {
+        state : false,
+        id : undefined
+    },
     share3D : {
         state : false,
         data : { }   // position, rotation 
@@ -25,7 +28,10 @@ classroomInfo = {
 
 classroomInfoLocal = {
     allControl : false,
-    shareScreen : false,
+    shareScreen : {
+        state : false,
+        id : undefined
+    },
     share3D : false,
     pdf : false,
     epub : false,
@@ -41,10 +47,9 @@ classroomCommand = {
     */
     joinRoom : function () {  
         connection.socket.emit ('update-room-info', (_info) => {                    
-            
             classroomInfo.roomOpenTime = _info.roomOpenTime;
             classroomInfo.allControl = _info.allControl;
-            classroomInfo.shareScreen = _info.shareScreen;
+            classroomInfo.shareScreen.state = _info.shareScreen;
             classroomInfo.share3D.state = _info.share3D.state;
             classroomInfo.pdf.state = _info.pdf.state;
             classroomInfo.exam = _info.exam;
@@ -61,9 +66,9 @@ classroomCommand = {
     */
     onConnectionSession : function (_data) {
         if(!connection.extra.roomOwner) return;
-        
+
         //  shareScreen은 선생님이 연결을 해주어야 한다.
-        if(classroomInfo.shareScreen) {
+        if(classroomInfo.shareScreen.state) {
             classroomCommand.syncScreenShare (_data.userid);
         };
         
@@ -116,6 +121,10 @@ classroomCommand = {
         if(classroomInfo.epub.state) {
             classroomCommand.openEpub ();
         }
+
+        // if(classroomInfo.shareScreen.state){
+        //     classroomCommand.openShare();
+        // }
     },
 
 
@@ -133,6 +142,18 @@ classroomCommand = {
 };
 
 
+classroomCommand.openShare = function (callback){
+    console.log("OPEN SHARE")
+    var s = GetStream(classroomInfoLocal.shareScreen.id)
+    if(s != undefined){
+        document.getElementById("screen-viewer").srcObject = s;
+        document.getElementById("screen-viewer").style.display = 'block';
+    }
+
+    // connection.send({
+    //     rtrack:true
+    // })
+}
 
 
 classroomCommand.sendAlert = function (callback) {    
@@ -246,11 +267,8 @@ classroomCommand.receiveAlertResponse = function (_response) {
 /*
     공유 스크린 설정
 */
-classroomCommand.setShareScreenServer = function (_state, success, error) {    
-    
-    classroomCommand.setShareScreenLocal (_state);
-
-    connection.socket.emit('set-share-screen', _state, result => {  
+classroomCommand.setShareScreenServer = function (_data, success, error) {    
+    connection.socket.emit('set-share-screen', _data, result => {  
         if(result.result)
             success ();
         else 
@@ -258,15 +276,19 @@ classroomCommand.setShareScreenServer = function (_state, success, error) {
     });
 };
 
-classroomCommand.setShareScreenLocal = function (_state) {
-    classroomInfo.shareScreen = _state;
+classroomCommand.setShareScreenLocal = function (_data) {
+    classroomInfoLocal.shareScreen.state = _data.state;
+    classroomInfoLocal.shareScreen.id = _data.id;
 };
 /*
     Screen share
  */
 
 classroomCommand.syncScreenShare = function (_userid) {
-    currentScreenViewShare (_userid);
+    // connection.peers.forEach(function(e){
+        // console.log(e);
+    // })
+    // currentScreenViewShare (_userid);
 };
 
 
@@ -607,6 +629,9 @@ classroomCommand.syncClassroomOpenTime =  function () {
 
 // 학생 pdf 페이지가 바뀔 때 호출 된다. 
 classroomStudentsWatchInfo.onPdfPage =  function (student) {
+    var id = student.userid;
+    var page = student.pdfViewPage;
+
     console.log(student);
 }
 

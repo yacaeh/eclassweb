@@ -123,8 +123,12 @@ connection.onUserStatusChanged = function (event) {
 
 };
 
+
+
+
 connection.onopen = function (event) {
   console.log('onopen!');
+
 
   SetStudentList();
 
@@ -142,6 +146,11 @@ connection.onopen = function (event) {
 
   //  session 연결 완료
   classroomCommand.onConnectionSession (event);
+
+    if(classroomInfoLocal.shareScreen.fromme){
+      RTrack(document.getElementById("screen-viewer").srcObject)
+    }
+
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -161,6 +170,10 @@ connection.onmessage = function (event) {
     mute();
   }
 
+  if(event.rtrack){
+    RTrack(GetStream(classroomInfoLocal.shareScreen.id));
+  }
+
   if(event.data.permissionChanged){
     console.log("permission changed");
     classroomInfo = event.data.permissionChanged;
@@ -168,14 +181,19 @@ connection.onmessage = function (event) {
 
 
   if (event.data.showMainVideo) {
-    classroomCommand.setShareScreenLocal (true);
-          // $('#main-video').show();
-    $('#screen-viewer').css({
-      top: $('#widget-container').offset().top,
-      left: $('#widget-container').offset().left,
-      width: $('#widget-container').width(),
-      height: $('#widget-container').height(),
-    });
+    classroomInfoLocal.shareScreen.state = true;
+
+    if(connection.extra.roomOwner){
+      classroomInfo.shareScreen = {}
+      classroomInfo.shareScreen.state = true
+      classroomInfo.shareScreen.id = event.data.showMainVideo
+    }
+
+    console.log("SHOW MAIN VIDEO",event.data.showMainVideo)
+    var stream = GetStream(event.data.showMainVideo)
+    CanvasResize();
+    document.getElementById("screen-viewer").srcObject = stream;
+    // document.getElementById("screen-viewer").srcObject = src;
     $('#screen-viewer').show();
     return;
   }
@@ -183,7 +201,7 @@ connection.onmessage = function (event) {
   if (event.data.hideMainVideo) {
     // $('#main-video').hide();
     $('#screen-viewer').hide();
-    classroomCommand.setShareScreenLocal (false);
+    classroomCommand.setShareScreenLocal ({state : false , id : undefined});
     return;
   }
 
@@ -245,6 +263,11 @@ connection.onmessage = function (event) {
   if (event.data.epub) {
     classroomCommand.receiveEpubMessage(event.data.epub);
     return;
+  }
+
+  if(event.data.studentStreaming){
+    console.log("Student Start Streaming");
+    StreamingStart(event.data.studentStreaming)
   }
 
   //3d 모델링 Enable
@@ -309,26 +332,46 @@ connection.onmessage = function (event) {
   }
 };
 
+var stemp;
+
 // extra code
 connection.onstream = function (event) {
   console.log('onstream!');
+  console.log(event);
 
   if(params.open === 'true' || params.open === true){
     mute();
+    CanvasResize();
+  }
+  else{
+  }
+
+  if(classroomInfo.shareScreen.state){
+    classroomCommand.openShare();
+  }
+
+  // if(event.streamid == classroomInfo.shareScreen.id){
+  // }
+
+  // else if(classroomInfo.shareScreen.state && event.type == "local"){
+  // }
+
+  if(event.type != "local" && classroomInfo.shareScreen.state){
   }
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
-    $('#screen-viewer').get(0).srcObject = event.stream;
-    if (!classroomInfo.shareScreen) 
+    if (!classroomInfoLocal.shareScreen.state) {
       $('#screen-viewer').hide();
-  } else if (event.extra.roomOwner === true) {
+    }
+  } 
+  else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
     video.setAttribute('data-streamid', event.streamid);
-    // video.style.display = 'none';
     if (event.type === 'local') {
       video.muted = true;
       video.volume = 0;
     }
+
     video.srcObject = event.stream;
     // $('#main-video').show();
   } else {
@@ -368,6 +411,7 @@ connection.onstreamended = function (event) {
     }
   }
   if (video) {
+    console.log("!!..?")
     video.srcObject = null;
     video.style.display = 'none';
   }
@@ -616,15 +660,22 @@ if (!!params.password) {
 
 designer.appendTo(document.getElementById('widget-container'), function () {
   console.log('designer append');
+
+  var tempStreamCanvas = document.createElement('canvas');
+  var tempStream = tempStreamCanvas.captureStream();
+  tempStream.isScreen = true;
+  tempStream.isSS = true;
+  tempStream.streamid = tempStream.id;
+  tempStream.type = 'local';
+  connection.attachStreams.push(tempStream);
+  window.tempStream = tempStream;
+
+
+
+
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
-    var tempStreamCanvas = document.getElementById('temp-stream-canvas');
-    var tempStream = tempStreamCanvas.captureStream();
-    tempStream.isScreen = true;
-    tempStream.streamid = tempStream.id;
-    tempStream.type = 'local';
-    connection.attachStreams.push(tempStream);
-    window.tempStream = tempStream;
+    
 
     SetTeacher(); 
 
@@ -649,21 +700,18 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-
-      console.log(connection.DetectRTC);
-      console.log(connection);
-        if (!connection.DetectRTC.hasMicrophone) {
+      if (!connection.DetectRTC.hasMicrophone) {
         connection.mediaConstraints.audio = false;
         connection.session.audio = false;
         console.log('user has no mic!');
-        alert('마이크가 없습니다!');
+        // alert('마이크가 없습니다!');
       }
 
       if (!connection.DetectRTC.hasWebcam) {
         connection.mediaConstraints.video = false;
         connection.session.video = false;
         console.log('user has no cam!');
-        alert('캠이 없습니다!');
+        // alert('캠이 없습니다!');
         connection.session.oneway = true;
         connection.sdpConstraints.mandatory = {
           OfferToReceiveAudio: false,
@@ -684,9 +732,11 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            alert(
-              'This room does not exist. Please either create it or wait for moderator to enter in the room.'
-            );
+            // alert(
+              // 'This room does not exist. Please either create it or wait for moderator to enter in the room.'
+            // );
+            location.reload();
+
             return;
           }
           if (error === connection.errors.ROOM_FULL) {
@@ -719,7 +769,9 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           console.log('disconnect Class!');
           location.reload();
         });
+
         console.log('isRoomJoined', isRoomJoined);
+        console.log(classroomInfo);
       }
     );
   }
@@ -730,7 +782,7 @@ function addStreamStopListener(stream, callback) {
     'ended',
     function () {
       callback();
-      callback = function () {};
+      callback = function () { };
     },
     false
   );
@@ -738,8 +790,11 @@ function addStreamStopListener(stream, callback) {
   stream.addEventListener(
     'inactive',
     function () {
+      classroomInfo.shareScreen.state = false;
+      classroomInfoLocal.shareScreen.fromme = false;
+      console.log("Off Sharing");
       callback();
-      callback = function () {};
+      callback = function () { };
     },
     false
   );
@@ -748,8 +803,9 @@ function addStreamStopListener(stream, callback) {
     track.addEventListener(
       'ended',
       function () {
+        console.log("3");
         callback();
-        callback = function () {};
+        callback = function () { };
       },
       false
     );
@@ -757,8 +813,9 @@ function addStreamStopListener(stream, callback) {
     track.addEventListener(
       'inactive',
       function () {
+        console.log("4");
         callback();
-        callback = function () {};
+        callback = function () { };
       },
       false
     );
@@ -786,6 +843,9 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
     console.error('connection peer error');
     return;
   }
+
+  console.log(pid, "RETECK")
+
   var peer = connection.peers[pid].peer;
   if (!peer.getSenders) return;
   var trackToReplace = videoTrack;
@@ -807,94 +867,93 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
   });
 }
 
-/*
-   특정 유저에게 스크린공유를 걸어준다.
-*/
-function currentScreenViewShare(_pid) {
-  let stream = window.shareStream;
-  if (!stream) {
-    console.error('stream not found');
-    return;
+function replaceScreenTrack(stream, btn) {
+  console.log("Stream Start",tempStream.streamid);
+
+
+  classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
+  classroomInfoLocal.shareScreen.fromme = true;
+
+  // document.getElementById("screen-viewer").srcObject = tempStream;
+  $('#screen-viewer').get(0).srcObject = stream;
+
+  if(connection.extra.roomOwner){
+    classroomInfo.shareScreen = {}
+    classroomInfo.shareScreen.state = true
+    classroomInfo.shareScreen.id = tempStream.streamid
   }
 
-  //  선생님만 할 수 있게..
-  if (!connection.extra.roomOwner) return;
-
-  // var remoteUserId = _pid;
-  // var videoTrack = stream.getVideoTracks()[0];
-  // connection.replaceTrack(videoTrack, remoteUserId);
-  const pid = _pid;
-  stream.getTracks().forEach(function (track) {
-    if (track.kind === 'video' && track.readyState === 'live') {
-      replaceTrackToPeer(pid, track);
-    }
-  });
-
-  connection.send({
-    showMainVideo: true,
-  });
-}
-
-function replaceScreenTrack(stream, btn) {
-  
   classroomCommand.setShareScreenServer (true, result => {
-
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
 
+
   connection.onstream({
     stream: stream,
     type: 'local',
+    ScreenShare: true,
     streamid: stream.id,
   });
 
-  // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
+  
+  connection.send({
+    showMainVideo: tempStream.streamid,
+  });
+
+  StreamingStart(stream, btn);
+  });
+}
+
+function StreamingStart(stream, btn){
   window.shareStream = stream;  
   var screenTrackId = stream.getTracks()[0].id;
 
   addStreamStopListener(stream, function () {    
+    console.log("STOP SHARE")
+
+    classroomCommand.setShareScreenLocal ({state : false , id : undefined, stream : undefined});
+    classroomInfo.shareScreen = {}
+    classroomInfo.shareScreen.state = false
+    classroomInfo.shareScreen.id = undefined
+    classroomInfo.shareScreen.stream = undefined
 
     classroomCommand.setShareScreenServer(false, () => {
       connection.send({
         hideMainVideo: true,
       });
-      $(btn).removeClass("on");
-      $(btn).removeClass("selected-shape");
+      if(btn != undefined){
+        $(btn).removeClass("on");
+        $(btn).removeClass("selected-shape");
+      }
       isSharingScreen = false;
       // $('#main-video').hide();
-      classroomInfo.shareScreen = false;
       window.sharedStream = null;
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
-  
   });
+  
 
+
+  RTrack(stream);
+  showScreenViewerUI ();
+
+}
+
+function RTrack(stream){
+  console.log("RTRACk",stream.streamid);
   stream.getTracks().forEach(function (track) {
     if (track.kind === 'video' && track.readyState === 'live') {
       replaceTrack(track);
+
     }
   });
-
-  connection.send({
-    showMainVideo: true,
-  });
-
-  showScreenViewerUI ();
-
-  });
-
-  // $('#main-video').show();
 }
 
+
 function showScreenViewerUI() {
-  $('#screen-viewer').css({
-    top: $('#widget-container').offset().top,
-    left: $('#widget-container').offset().left,
-    width: $('#widget-container').width(),
-    height: $('#widget-container').height(),
-  });
+  CanvasResize();
   $('#screen-viewer').show();
 }
 
@@ -985,8 +1044,9 @@ function SetStudentList() {
     connection.getAllParticipants().forEach(function(pid) {
       var name = getFullName(pid)
       var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
-        <span class="bor"></span> \
-        <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
+                    <img src="/dashboard/newimg/exit.png"> \
+                    <span class="bor"></span> \
+                    <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
       OnClickStudent(div,pid,name);
       $("#student_list").append(div);
 
@@ -1921,11 +1981,8 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    console.log(e);
-
     if (e.userid != classroomInfo.nowMicPermission )
       if(!e.extra.roomOwner) {
-      console.log(e.userid,"MUTE")
       e.stream.mute("audio");
     }
   });
@@ -1934,11 +1991,23 @@ function mute() {
 function unmute(id) {
   connection.streamEvents.selectAll().forEach(function (e) {
     if (e.userid == id && e.type != "local") {
-      console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
   });
 }
+
+function GetStream(id){
+  try{
+    return connection.streamEvents[id].stream;
+  }
+  catch{
+    console.error("Can't find stream", id);
+    console.log(connection.streamEvents)
+    return undefined;
+  }   
+}
+
+
 
 function fileUploadModal(message, callback) {
   console.log(message);
