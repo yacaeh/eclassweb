@@ -1297,7 +1297,7 @@ function LoadFile(btn) {
   //   // else
   //   // {
   //   //   isSharingFile = false;
-  //   //   isFileViewer = false;
+  //classroomCommand   //   isFileViewer = false;
   //   // }
   // }) 
   
@@ -1320,6 +1320,9 @@ function unloadFileViewer() {
   isSharingFile = false;
   isFileViewer = false;
 
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (false);
+
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
@@ -1329,15 +1332,20 @@ function unloadFileViewer() {
 
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
+
 }
 
 function loadFileViewer(url) {
-  if(isFileViewer) unloadFileViewer();
+
+if(isSharingFile)
+  unloadFileViewer ();
 
   $('#confirm-box').modal('hide');
   $('#confirm-box-topper').hide();
 
-  classroomCommand.togglePdfStateServer ((state) => {});
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (true, url);
+
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
@@ -1377,10 +1385,10 @@ function pdfOnLoaded () {
   classroomCommand.pdfOnLoaded ();
 }
 
-function showPage(n){  ;
+function showPage(n){
+  console.log(n);
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
     classroomCommand.setPdfPage(n);
-
 }
 
 function showNextPage(){  
