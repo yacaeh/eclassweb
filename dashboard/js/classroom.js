@@ -143,17 +143,9 @@ connection.onopen = function (event) {
   //  session 연결 완료
   classroomCommand.onConnectionSession (event);
 
-  if(classroomInfo.shareScreen.state){
-
-
-    if(connection.extra.roomOwner){
+    if(classroomInfoLocal.shareScreen.fromme){
       RTrack(document.getElementById("screen-viewer").srcObject)
     }
-    else{
-
-    } 
-  }
-
 
 };
 
@@ -328,11 +320,12 @@ connection.onstream = function (event) {
   else{
   }
 
-  if(event.streamid == classroomInfo.shareScreen.id){
-    console.log("FIND STREAM" , event.streamid)
-      classroomCommand.openShare();
-
+  if(classroomInfo.shareScreen.state){
+    classroomCommand.openShare();
   }
+
+  // if(event.streamid == classroomInfo.shareScreen.id){
+  // }
 
   // else if(classroomInfo.shareScreen.state && event.type == "local"){
   // }
@@ -340,14 +333,12 @@ connection.onstream = function (event) {
   if(event.type != "local" && classroomInfo.shareScreen.state){
   }
 
-  console.log(event);
-
   if (event.stream.isScreen && !event.stream.canvasStream) {
     if (!classroomInfoLocal.shareScreen.state) {
       $('#screen-viewer').hide();
     }
   } 
-  else if (connection.extra.roomOwner) {
+  else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
     video.setAttribute('data-streamid', event.streamid);
     if (event.type === 'local') {
@@ -774,6 +765,7 @@ function addStreamStopListener(stream, callback) {
     'inactive',
     function () {
       classroomInfo.shareScreen.state = false;
+      classroomInfoLocal.shareScreen.fromme = false;
       console.log("Off Sharing");
       callback();
       callback = function () { };
@@ -826,6 +818,8 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
     return;
   }
 
+  console.log(pid, "RETECK")
+
   var peer = connection.peers[pid].peer;
   if (!peer.getSenders) return;
   var trackToReplace = videoTrack;
@@ -850,39 +844,39 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
 function replaceScreenTrack(stream, btn) {
   console.log("Stream Start",tempStream.streamid);
 
+
+  classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
+  classroomInfoLocal.shareScreen.fromme = true;
+
+  // document.getElementById("screen-viewer").srcObject = tempStream;
+  $('#screen-viewer').get(0).srcObject = stream;
+
   if(connection.extra.roomOwner){
-    classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
-    $('#screen-viewer').get(0).srcObject = stream;
     classroomInfo.shareScreen = {}
     classroomInfo.shareScreen.state = true
     classroomInfo.shareScreen.id = tempStream.streamid
-  
-    classroomCommand.setShareScreenServer (true, result => {
-    stream.isScreen = true;
-    stream.streamid = stream.id;
-    stream.type = 'local';
-  
-
-    
-    connection.send({
-      showMainVideo: tempStream.streamid,
-    });
-  
-    StreamingStart(stream, btn);
-    });
-  }
-  else{
-  
-    connection.onstream({
-      stream: stream,
-      type: 'local',
-      ScreenShare: true,
-      streamid: stream.id,
-    });
-  
   }
 
+  classroomCommand.setShareScreenServer (true, result => {
+  stream.isScreen = true;
+  stream.streamid = stream.id;
+  stream.type = 'local';
 
+
+  connection.onstream({
+    stream: stream,
+    type: 'local',
+    ScreenShare: true,
+    streamid: stream.id,
+  });
+
+  
+  connection.send({
+    showMainVideo: tempStream.streamid,
+  });
+
+  StreamingStart(stream, btn);
+  });
 }
 
 function StreamingStart(stream, btn){
@@ -922,10 +916,11 @@ function StreamingStart(stream, btn){
 }
 
 function RTrack(stream){
-  console.log("RTRACk")
+  console.log("RTRACk",stream.streamid);
   stream.getTracks().forEach(function (track) {
     if (track.kind === 'video' && track.readyState === 'live') {
       replaceTrack(track);
+
     }
   });
 }
