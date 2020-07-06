@@ -892,7 +892,7 @@ function showScreenViewerUI() {
   $('#screen-viewer').css({
     top: $('#widget-container').offset().top,
     left: $('#widget-container').offset().left,
-    width: $('#widget-container').width(),
+    //width: $('#widget-container').width(),
     height: $('#widget-container').height(),
   });
   $('#screen-viewer').show();
