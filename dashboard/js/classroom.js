@@ -1297,7 +1297,7 @@ function LoadFile(btn) {
   //   // else
   //   // {
   //   //   isSharingFile = false;
-  //   //   isFileViewer = false;
+  //classroomCommand   //   isFileViewer = false;
   //   // }
   // }) 
   
@@ -1332,8 +1332,15 @@ function unloadFileViewer() {
 }
 
 function loadFileViewer(url) {
+
+if(isSharingFile)
+  unloadFileViewer ();
+
   $('#confirm-box').modal('hide');
   $('#confirm-box-topper').hide();
+
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (true, url);
 
   console.log('loadFileViewer');
   isSharingFile = true;

@@ -110,7 +110,7 @@ classroomCommand = {
             sync3DModel ();
         }
 
-        if(classroomInfo.pdf.state) {
+        if(classroomInfo.pdf.state) {            
             classroomCommand.syncPdf ();
         }
         if(classroomInfo.epub.state) {
@@ -241,26 +241,31 @@ classroomCommand.syncScreenShare = function (_userid) {
 /*
     PDF
 */
-classroomCommand.togglePdfStateServer = function (_success, _error) {
+classroomCommand.togglePdfStateServer = function (_state, _url) {
 
-    connection.socket.emit('toggle-share-pdf', (result) => {
-        if(result.result) 
-        {
-            classroomCommand.setPdfStateLocal(result.data);
-            if(result.data)                
-                classroomCommand.sendPDFCmdOnlyTeacher ('open', {page : classroomInfo.pdf.page});
+    //connection.socket.emit('toggle-share-pdf', (result) => {
+      //  if(result.result) 
+      //  {
+            classroomInfo.pdf.src = _url;
+            classroomInfo.pdf.state = _state;
+            if(_state)                
+                classroomCommand.sendPDFCmdOnlyTeacher ('open', 
+                {
+                    page : classroomInfo.pdf.page,
+                    src : classroomInfo.pdf.src
+                });
             else
                 classroomCommand.sendPDFCmdOnlyTeacher ('close');
                 
-            if(_success)
-                _success(result.data)
-        }
-        else 
-        {
-            if(_error)
-                _error(result.error);
-        }
-    });
+            // if(_success)
+            //     _success(result.data)
+        //}
+        // else 
+        // {
+        //     if(_error)
+        //         _error(result.error);
+        // }
+    //});
 }
 
 
@@ -319,9 +324,9 @@ classroomCommand.updatePDFCmd = function (_pdf) {
     const cmd = _pdf.cmd;
 
     if(cmd == 'open') {
-        console.log(_pdf);
         classroomInfo.pdf.page = _pdf.data.page;
-        classroomCommand.setPdfStateLocal (true);
+        classroomInfo.pdf.src = _pdf.data.src;
+        loadFileViewer (classroomInfo.pdf.src);
         return;
     }
     else if(cmd == 'close') {
@@ -374,7 +379,7 @@ classroomCommand.updatePDFCmd = function (_pdf) {
 }
 
 classroomCommand.syncPdf = function () {    
-    if(classroomInfo.pdf.state) {
+    if(classroomInfo.pdf.state) {        
         if(isFileViewer)
         {
             //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
@@ -382,7 +387,7 @@ classroomCommand.syncPdf = function () {
         }
         else {
             // open
-            loadFileViewer ();
+            loadFileViewer (classroomInfo.pdf.src);
             $('#canvas-controller').show();
         }
     }
