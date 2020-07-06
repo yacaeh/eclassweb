@@ -2,7 +2,10 @@
 classroomInfo = {   
     roomOpenTime : 0,       // 방을 처음 개설한 시간
     allControl : false,
-    shareScreen : false,
+    shareScreen : {
+        state : false,
+        id : undefined
+    },
     share3D : {
         state : false,
         data : { }   // position, rotation 
@@ -25,7 +28,10 @@ classroomInfo = {
 
 classroomInfoLocal = {
     allControl : false,
-    shareScreen : false,
+    shareScreen : {
+        state : false,
+        id : undefined
+    },
     share3D : false,
     pdf : false,
     epub : false,
@@ -41,10 +47,9 @@ classroomCommand = {
     */
     joinRoom : function () {  
         connection.socket.emit ('update-room-info', (_info) => {                    
-            
             classroomInfo.roomOpenTime = _info.roomOpenTime;
             classroomInfo.allControl = _info.allControl;
-            classroomInfo.shareScreen = _info.shareScreen;
+            classroomInfo.shareScreen.state = _info.shareScreen;
             classroomInfo.share3D.state = _info.share3D.state;
             classroomInfo.pdf.state = _info.pdf.state;
             classroomInfo.exam = _info.exam;
@@ -61,9 +66,9 @@ classroomCommand = {
     */
     onConnectionSession : function (_data) {
         if(!connection.extra.roomOwner) return;
-        
+
         //  shareScreen은 선생님이 연결을 해주어야 한다.
-        if(classroomInfo.shareScreen) {
+        if(classroomInfo.shareScreen.state) {
             classroomCommand.syncScreenShare (_data.userid);
         };
         
@@ -110,12 +115,16 @@ classroomCommand = {
             sync3DModel ();
         }
 
-        if(classroomInfo.pdf.state) {
+        if(classroomInfo.pdf.state) {            
             classroomCommand.syncPdf ();
         }
         if(classroomInfo.epub.state) {
             classroomCommand.openEpub ();
         }
+
+        // if(classroomInfo.shareScreen.state){
+        //     classroomCommand.openShare();
+        // }
     },
 
 
@@ -133,6 +142,18 @@ classroomCommand = {
 };
 
 
+classroomCommand.openShare = function (callback){
+    console.log("OPEN SHARE")
+    var s = GetStream(classroomInfoLocal.shareScreen.id)
+    if(s != undefined){
+        document.getElementById("screen-viewer").srcObject = s;
+        document.getElementById("screen-viewer").style.display = 'block';
+    }
+
+    // connection.send({
+    //     rtrack:true
+    // })
+}
 
 
 classroomCommand.sendAlert = function (callback) {    
@@ -249,11 +270,8 @@ classroomCommand.receiveAlertResponse = function (_response) {
 /*
     공유 스크린 설정
 */
-classroomCommand.setShareScreenServer = function (_state, success, error) {    
-    
-    classroomCommand.setShareScreenLocal (_state);
-
-    connection.socket.emit('set-share-screen', _state, result => {  
+classroomCommand.setShareScreenServer = function (_data, success, error) {    
+    connection.socket.emit('set-share-screen', _data, result => {  
         if(result.result)
             success ();
         else 
@@ -261,41 +279,50 @@ classroomCommand.setShareScreenServer = function (_state, success, error) {
     });
 };
 
-classroomCommand.setShareScreenLocal = function (_state) {
-    classroomInfo.shareScreen = _state;
+classroomCommand.setShareScreenLocal = function (_data) {
+    classroomInfoLocal.shareScreen.state = _data.state;
+    classroomInfoLocal.shareScreen.id = _data.id;
 };
 /*
     Screen share
  */
 
 classroomCommand.syncScreenShare = function (_userid) {
-    currentScreenViewShare (_userid);
+    // connection.peers.forEach(function(e){
+        // console.log(e);
+    // })
+    // currentScreenViewShare (_userid);
 };
 
 
 /*
     PDF
 */
-classroomCommand.togglePdfStateServer = function (_success, _error) {
+classroomCommand.togglePdfStateServer = function (_state, _url='') {
 
-    connection.socket.emit('toggle-share-pdf', (result) => {
-        if(result.result) 
-        {
-            classroomCommand.setPdfStateLocal(result.data);
-            if(result.data)                
-                classroomCommand.sendPDFCmdOnlyTeacher ('open', {page : classroomInfo.pdf.page});
+    //connection.socket.emit('toggle-share-pdf', (result) => {
+      //  if(result.result) 
+      //  {
+            classroomInfo.pdf.src = _url;
+            classroomInfo.pdf.state = _state;
+            if(_state)                
+                classroomCommand.sendPDFCmdOnlyTeacher ('open', 
+                {
+                    page : classroomInfo.pdf.page,
+                    src : classroomInfo.pdf.src
+                });
             else
                 classroomCommand.sendPDFCmdOnlyTeacher ('close');
                 
-            if(_success)
-                _success(result.data)
-        }
-        else 
-        {
-            if(_error)
-                _error(result.error);
-        }
-    });
+            // if(_success)
+            //     _success(result.data)
+        //}
+        // else 
+        // {
+        //     if(_error)
+        //         _error(result.error);
+        // }
+    //});
 }
 
 
@@ -354,9 +381,9 @@ classroomCommand.updatePDFCmd = function (_pdf) {
     const cmd = _pdf.cmd;
 
     if(cmd == 'open') {
-        console.log(_pdf);
         classroomInfo.pdf.page = _pdf.data.page;
-        classroomCommand.setPdfStateLocal (true);
+        classroomInfo.pdf.src = _pdf.data.src;
+        loadFileViewer (classroomInfo.pdf.src);
         return;
     }
     else if(cmd == 'close') {
@@ -409,7 +436,7 @@ classroomCommand.updatePDFCmd = function (_pdf) {
 }
 
 classroomCommand.syncPdf = function () {    
-    if(classroomInfo.pdf.state) {
+    if(classroomInfo.pdf.state) {        
         if(isFileViewer)
         {
             //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
@@ -417,7 +444,7 @@ classroomCommand.syncPdf = function () {
         }
         else {
             // open
-            loadFileViewer ();
+            loadFileViewer (classroomInfo.pdf.src);
             $('#canvas-controller').show();
         }
     }
@@ -605,6 +632,9 @@ classroomCommand.syncClassroomOpenTime =  function () {
 
 // 학생 pdf 페이지가 바뀔 때 호출 된다. 
 classroomStudentsWatchInfo.onPdfPage =  function (student) {
+    var id = student.userid;
+    var page = student.pdfViewPage;
+
     console.log(student);
 }
 

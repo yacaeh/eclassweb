@@ -11,6 +11,8 @@
     params[d(match[1])] = d(match[2]);
   window.params = params;
 })();
+let uploadServerUrl = "https://files.primom.co.kr:1443";
+
 var connection = new RTCMultiConnection();
 console.log('Connection!');
 
@@ -49,6 +51,7 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
+let isFileViewer = false;
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -120,8 +123,12 @@ connection.onUserStatusChanged = function (event) {
 
 };
 
+
+
+
 connection.onopen = function (event) {
   console.log('onopen!');
+
 
   SetStudentList();
 
@@ -139,6 +146,11 @@ connection.onopen = function (event) {
 
   //  session 연결 완료
   classroomCommand.onConnectionSession (event);
+
+    if(classroomInfoLocal.shareScreen.fromme){
+      RTrack(document.getElementById("screen-viewer").srcObject)
+    }
+
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (
@@ -158,6 +170,10 @@ connection.onmessage = function (event) {
     mute();
   }
 
+  if(event.rtrack){
+    RTrack(GetStream(classroomInfoLocal.shareScreen.id));
+  }
+
   if(event.data.permissionChanged){
     console.log("permission changed");
     classroomInfo = event.data.permissionChanged;
@@ -165,14 +181,19 @@ connection.onmessage = function (event) {
 
 
   if (event.data.showMainVideo) {
-    classroomCommand.setShareScreenLocal (true);
-          // $('#main-video').show();
-    $('#screen-viewer').css({
-      top: $('#widget-container').offset().top,
-      left: $('#widget-container').offset().left,
-      width: $('#widget-container').width(),
-      height: $('#widget-container').height(),
-    });
+    classroomInfoLocal.shareScreen.state = true;
+
+    if(connection.extra.roomOwner){
+      classroomInfo.shareScreen = {}
+      classroomInfo.shareScreen.state = true
+      classroomInfo.shareScreen.id = event.data.showMainVideo
+    }
+
+    console.log("SHOW MAIN VIDEO",event.data.showMainVideo)
+    var stream = GetStream(event.data.showMainVideo)
+    CanvasResize();
+    document.getElementById("screen-viewer").srcObject = stream;
+    // document.getElementById("screen-viewer").srcObject = src;
     $('#screen-viewer').show();
     return;
   }
@@ -180,7 +201,7 @@ connection.onmessage = function (event) {
   if (event.data.hideMainVideo) {
     // $('#main-video').hide();
     $('#screen-viewer').hide();
-    classroomCommand.setShareScreenLocal (false);
+    classroomCommand.setShareScreenLocal ({state : false , id : undefined});
     return;
   }
 
@@ -248,6 +269,11 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if(event.data.studentStreaming){
+    console.log("Student Start Streaming");
+    StreamingStart(event.data.studentStreaming)
+  }
+
   //3d 모델링 Enable
   if (event.data.modelEnable) {
     var enable = event.data.modelEnable.enable;
@@ -303,28 +329,53 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if(event.data.closeTesting){
+    if(!connection.extra.roomOwner){
+      $('#exam-board').hide(300);
+    }
+  }
 };
+
+var stemp;
 
 // extra code
 connection.onstream = function (event) {
   console.log('onstream!');
+  console.log(event);
 
   if(params.open === 'true' || params.open === true){
     mute();
+    CanvasResize();
+  }
+  else{
+  }
+
+  if(classroomInfo.shareScreen.state){
+    classroomCommand.openShare();
+  }
+
+  // if(event.streamid == classroomInfo.shareScreen.id){
+  // }
+
+  // else if(classroomInfo.shareScreen.state && event.type == "local"){
+  // }
+
+  if(event.type != "local" && classroomInfo.shareScreen.state){
   }
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
-    $('#screen-viewer').get(0).srcObject = event.stream;
-    if (!classroomInfo.shareScreen) 
+    if (!classroomInfoLocal.shareScreen.state) {
       $('#screen-viewer').hide();
-  } else if (event.extra.roomOwner === true) {
+    }
+  } 
+  else if (event.extra.roomOwner === true) {
     var video = document.getElementById('main-video');
     video.setAttribute('data-streamid', event.streamid);
-    // video.style.display = 'none';
     if (event.type === 'local') {
       video.muted = true;
       video.volume = 0;
     }
+
     video.srcObject = event.stream;
     // $('#main-video').show();
   } else {
@@ -364,6 +415,7 @@ connection.onstreamended = function (event) {
     }
   }
   if (video) {
+    console.log("!!..?")
     video.srcObject = null;
     video.style.display = 'none';
   }
@@ -612,15 +664,22 @@ if (!!params.password) {
 
 designer.appendTo(document.getElementById('widget-container'), function () {
   console.log('designer append');
+
+  var tempStreamCanvas = document.createElement('canvas');
+  var tempStream = tempStreamCanvas.captureStream();
+  tempStream.isScreen = true;
+  tempStream.isSS = true;
+  tempStream.streamid = tempStream.id;
+  tempStream.type = 'local';
+  connection.attachStreams.push(tempStream);
+  window.tempStream = tempStream;
+
+
+
+
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
-    var tempStreamCanvas = document.getElementById('temp-stream-canvas');
-    var tempStream = tempStreamCanvas.captureStream();
-    tempStream.isScreen = true;
-    tempStream.streamid = tempStream.id;
-    tempStream.type = 'local';
-    connection.attachStreams.push(tempStream);
-    window.tempStream = tempStream;
+    
 
     SetTeacher(); 
 
@@ -645,21 +704,18 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-
-      console.log(connection.DetectRTC);
-      console.log(connection);
-        if (!connection.DetectRTC.hasMicrophone) {
+      if (!connection.DetectRTC.hasMicrophone) {
         connection.mediaConstraints.audio = false;
         connection.session.audio = false;
         console.log('user has no mic!');
-        alert('마이크가 없습니다!');
+        // alert('마이크가 없습니다!');
       }
 
       if (!connection.DetectRTC.hasWebcam) {
         connection.mediaConstraints.video = false;
         connection.session.video = false;
         console.log('user has no cam!');
-        alert('캠이 없습니다!');
+        // alert('캠이 없습니다!');
         connection.session.oneway = true;
         connection.sdpConstraints.mandatory = {
           OfferToReceiveAudio: false,
@@ -680,9 +736,11 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            alert(
-              'This room does not exist. Please either create it or wait for moderator to enter in the room.'
-            );
+            // alert(
+              // 'This room does not exist. Please either create it or wait for moderator to enter in the room.'
+            // );
+            location.reload();
+
             return;
           }
           if (error === connection.errors.ROOM_FULL) {
@@ -715,7 +773,9 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           console.log('disconnect Class!');
           location.reload();
         });
+
         console.log('isRoomJoined', isRoomJoined);
+        console.log(classroomInfo);
       }
     );
   }
@@ -726,7 +786,7 @@ function addStreamStopListener(stream, callback) {
     'ended',
     function () {
       callback();
-      callback = function () {};
+      callback = function () { };
     },
     false
   );
@@ -734,8 +794,11 @@ function addStreamStopListener(stream, callback) {
   stream.addEventListener(
     'inactive',
     function () {
+      classroomInfo.shareScreen.state = false;
+      classroomInfoLocal.shareScreen.fromme = false;
+      console.log("Off Sharing");
       callback();
-      callback = function () {};
+      callback = function () { };
     },
     false
   );
@@ -744,8 +807,9 @@ function addStreamStopListener(stream, callback) {
     track.addEventListener(
       'ended',
       function () {
+        console.log("3");
         callback();
-        callback = function () {};
+        callback = function () { };
       },
       false
     );
@@ -753,8 +817,9 @@ function addStreamStopListener(stream, callback) {
     track.addEventListener(
       'inactive',
       function () {
+        console.log("4");
         callback();
-        callback = function () {};
+        callback = function () { };
       },
       false
     );
@@ -782,6 +847,9 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
     console.error('connection peer error');
     return;
   }
+
+  console.log(pid, "RETECK")
+
   var peer = connection.peers[pid].peer;
   if (!peer.getSenders) return;
   var trackToReplace = videoTrack;
@@ -803,94 +871,93 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
   });
 }
 
-/*
-   특정 유저에게 스크린공유를 걸어준다.
-*/
-function currentScreenViewShare(_pid) {
-  let stream = window.shareStream;
-  if (!stream) {
-    console.error('stream not found');
-    return;
+function replaceScreenTrack(stream, btn) {
+  console.log("Stream Start",tempStream.streamid);
+
+
+  classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
+  classroomInfoLocal.shareScreen.fromme = true;
+
+  // document.getElementById("screen-viewer").srcObject = tempStream;
+  $('#screen-viewer').get(0).srcObject = stream;
+
+  if(connection.extra.roomOwner){
+    classroomInfo.shareScreen = {}
+    classroomInfo.shareScreen.state = true
+    classroomInfo.shareScreen.id = tempStream.streamid
   }
 
-  //  선생님만 할 수 있게..
-  if (!connection.extra.roomOwner) return;
-
-  // var remoteUserId = _pid;
-  // var videoTrack = stream.getVideoTracks()[0];
-  // connection.replaceTrack(videoTrack, remoteUserId);
-  const pid = _pid;
-  stream.getTracks().forEach(function (track) {
-    if (track.kind === 'video' && track.readyState === 'live') {
-      replaceTrackToPeer(pid, track);
-    }
-  });
-
-  connection.send({
-    showMainVideo: true,
-  });
-}
-
-function replaceScreenTrack(stream, btn) {
-  
   classroomCommand.setShareScreenServer (true, result => {
-
   stream.isScreen = true;
   stream.streamid = stream.id;
   stream.type = 'local';
 
+
   connection.onstream({
     stream: stream,
     type: 'local',
+    ScreenShare: true,
     streamid: stream.id,
   });
 
-  // 현재 stream을 저장해서, 나중에 들어오는 사람한테도 전송한다.
+  
+  connection.send({
+    showMainVideo: tempStream.streamid,
+  });
+
+  StreamingStart(stream, btn);
+  });
+}
+
+function StreamingStart(stream, btn){
   window.shareStream = stream;  
   var screenTrackId = stream.getTracks()[0].id;
 
   addStreamStopListener(stream, function () {    
+    console.log("STOP SHARE")
+
+    classroomCommand.setShareScreenLocal ({state : false , id : undefined, stream : undefined});
+    classroomInfo.shareScreen = {}
+    classroomInfo.shareScreen.state = false
+    classroomInfo.shareScreen.id = undefined
+    classroomInfo.shareScreen.stream = undefined
 
     classroomCommand.setShareScreenServer(false, () => {
       connection.send({
         hideMainVideo: true,
       });
-      $(btn).removeClass("on");
-      $(btn).removeClass("selected-shape");
+      if(btn != undefined){
+        $(btn).removeClass("on");
+        $(btn).removeClass("selected-shape");
+      }
       isSharingScreen = false;
       // $('#main-video').hide();
-      classroomInfo.shareScreen = false;
       window.sharedStream = null;
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
     });
-  
   });
+  
 
+
+  RTrack(stream);
+  showScreenViewerUI ();
+
+}
+
+function RTrack(stream){
+  console.log("RTRACk",stream.streamid);
   stream.getTracks().forEach(function (track) {
     if (track.kind === 'video' && track.readyState === 'live') {
       replaceTrack(track);
+
     }
   });
-
-  connection.send({
-    showMainVideo: true,
-  });
-
-  showScreenViewerUI ();
-
-  });
-
-  // $('#main-video').show();
 }
 
+
 function showScreenViewerUI() {
-  $('#screen-viewer').css({
-    top: $('#widget-container').offset().top,
-    left: $('#widget-container').offset().left,
-    width: $('#widget-container').width(),
-    height: $('#widget-container').height(),
-  });
+  CanvasResize();
   $('#screen-viewer').show();
 }
 
@@ -981,8 +1048,9 @@ function SetStudentList() {
     connection.getAllParticipants().forEach(function(pid) {
       var name = getFullName(pid)
       var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
-        <span class="bor"></span> \
-        <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
+                    <img src="/dashboard/newimg/exit.png"> \
+                    <span class="bor"></span> \
+                    <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
       OnClickStudent(div,pid,name);
       $("#student_list").append(div);
 
@@ -1025,8 +1093,13 @@ function SelectViewType() {
 
 $('#top_test').click(function () {
   if ($('#exam-board').is(':visible')) {
-    $('#exam-board').hide(300);
-  } else {
+    if(examObj.closeTesting()){
+      $('#exam-board').hide(300);
+    }else{
+      alert("시험 종료 후 닫을 수 있습니다");
+    }
+  }
+  else {
     // 선생님
     if (params.open === 'true') {
       $('#exam-omr').hide();
@@ -1048,8 +1121,13 @@ var m_ExamTime; //
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
   m_QuesCount = $('#exam-question-count').val();
+  if(m_QuesCount>200){
+    alert("최대 문항수는 200개입니다");
+    m_QuesCount = 200;
+    $('#exam-question-count').val(m_QuesCount);
+  }
   var answerList = getQuestionAnswerList();
-  $('#exam-qustion-list').html('');
+  $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
     apeendQuestion(i);
   }
@@ -1146,17 +1224,17 @@ function setExamState(num, percent) {
 function apeendQuestion(i) {
   question = `<div id='exam-question-${i}' style='display: flex;'>`;
 
-  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:2; margin-top:2px;'>${i}.</span>`;
+  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='margin-top:5px; text-align:center; width:30px;'>${i}.</span>`;
 
   for (var j = 1; j <= 5; j++) {
     question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
     question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
   }
 
-  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 0px 3px; margin:5px;'>─</button>`;
+  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 3px 3px; margin:8px; height:20px; line-height:12px'>─</button>`;
 
   question += `</div>`;
-  $('#exam-qustion-list').append(question);
+  $('#exam-question-list').append(question);
 
   $(`#exam-question-${i}`).change(function () {
     $(`#exam-question-${i}`).css('background', '#eff1f0');
@@ -1168,7 +1246,7 @@ function deleteQuestion(num) {
   var answerList = getQuestionAnswerList();
   m_QuesCount--;
   answerList.splice(num - 1, 1);
-  $('#exam-qustion-list').html('');
+  $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
     apeendQuestion(i);
   }
@@ -1209,18 +1287,20 @@ function setStudentOMR(quesCount, examTime) {
   question += '<div>시험 중</div>';
   question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
   question += '</div>';
-  question += "<div id='exam-question-list' class='exam-border-bottom'>";
+  question += "<div class='exam-overflow exam-border-bottom'>";
+  question += "<div id='exam-omr-question-list'>";
   m_QuesCount = quesCount;
   for (var i = 1; i <= m_QuesCount; i++) {
     question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`;
-    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1;'>${i}.</span>`;
+    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'>${i}.</span>`;
     for (var j = 1; j <= 5; j++) {
       question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
       question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
     }
-    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1;'></span>`;
+    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'></span>`;
     question += `</div>`;
   }
+  question += '</div>';
   question += `</div>`;
   question +=
     "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
@@ -1262,7 +1342,7 @@ function stopQuestionOMR() {
   examObj.examAnswer = studentOMR;
   //  console.log(studentOMR);
 
-  $('#exam-question-list').css('pointer-events', 'none');
+  $('#exam-omr-question-list').css('pointer-events', 'none');
   $('#exam-answer-submit').hide();
 }
 
@@ -1302,7 +1382,6 @@ $(window).on('beforeunload', function () {
 // 로드시 글자깨짐 현상 해결 해야함
 // 소켓통신으로 제어 필요
 
-let isFileViewer = false;
 
 function LoadFile(btn) {
   if (!isSharingFile && checkSharing()) {
@@ -1311,19 +1390,21 @@ function LoadFile(btn) {
   }
   
   if(!connection.extra.roomOwner) return;
+  
+  fileUploadModal("파일 관리자",function(e){console.log(e)});
 
-  classroomCommand.togglePdfStateServer ((state) => {
-    // if(state) 
-    // {
-    //   isSharingFile = true;
-    //   isFileViewer = true;
-    // }
-    // else
-    // {
-    //   isSharingFile = false;
-    //   isFileViewer = false;
-    // }
-  }) 
+  // classroomCommand.togglePdfStateServer ((state) => {
+  //   // if(state) 
+  //   // {
+  //   //   isSharingFile = true;
+  //   //   isFileViewer = true;
+  //   // }
+  //   // else
+  //   // {
+  //   //   isSharingFile = false;
+  //classroomCommand   //   isFileViewer = false;
+  //   // }
+  // }) 
   
   // if (isFileViewer === false) {
   //   isSharingFile = true;
@@ -1344,6 +1425,9 @@ function unloadFileViewer() {
   isSharingFile = false;
   isFileViewer = false;
 
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (false);
+
   let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
@@ -1353,14 +1437,20 @@ function unloadFileViewer() {
 
   let fileViewer = frame.document.getElementById('file-viewer');
   fileViewer.remove();
+
 }
 
+function loadFileViewer(url) {
 
-function loadFileViewer() {
-  fileUploadModal('파일을 올리거나 선택하세요.', function(e){
-    console.log(e);
-  });
-  
+if(isSharingFile)
+  unloadFileViewer ();
+
+  $('#confirm-box').modal('hide');
+  $('#confirm-box-topper').hide();
+
+  if(connection.extra.roomOwner)
+    classroomCommand.togglePdfStateServer (true, url);
+
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
@@ -1369,8 +1459,9 @@ function loadFileViewer() {
   fileViewer.setAttribute('id', 'file-viewer');
   fileViewer.setAttribute(
     'src',
-    'https://'+window.location.host+'/ViewerJS/#https://files.primom.co.kr/test.pdf'
+    'https://'+window.location.host+'/ViewerJS/#'+url
   );
+
   fileViewer.style.width = '1024px';
   fileViewer.style.height = '724px';
   fileViewer.style.cssText =
@@ -1383,6 +1474,10 @@ function loadFileViewer() {
   frame.document
     .getElementsByClassName('design-surface')[0]
     .appendChild(fileViewer);
+  console.log(frame.document
+    .getElementsByClassName('design-surface')[0]
+    .appendChild(fileViewer));
+
   frame.document.getElementById('main-canvas').style.zIndex = '1';
   frame.document.getElementById('temp-canvas').style.zIndex = '2';
   frame.document.getElementById('tool-box').style.zIndex = '3';
@@ -1395,10 +1490,10 @@ function pdfOnLoaded () {
   classroomCommand.pdfOnLoaded ();
 }
 
-function showPage(n){  ;
+function showPage(n){
+  console.log(n);
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
     classroomCommand.setPdfPage(n);
-
 }
 
 function showNextPage(){  
@@ -1890,11 +1985,8 @@ function SendUnmute(id){
 
 function mute() {
   connection.streamEvents.selectAll().forEach(function (e) {
-    console.log(e);
-
     if (e.userid != classroomInfo.nowMicPermission )
       if(!e.extra.roomOwner) {
-      console.log(e.userid,"MUTE")
       e.stream.mute("audio");
     }
   });
@@ -1903,14 +1995,27 @@ function mute() {
 function unmute(id) {
   connection.streamEvents.selectAll().forEach(function (e) {
     if (e.userid == id && e.type != "local") {
-      console.log(e.userid,"UNMUTE")
       e.stream.unmute("audio");
     }
   });
 }
 
+function GetStream(id){
+  try{
+    return connection.streamEvents[id].stream;
+  }
+  catch{
+    console.error("Can't find stream", id);
+    console.log(connection.streamEvents)
+    return undefined;
+  }   
+}
+
+
+
 function fileUploadModal(message, callback) {
   console.log(message);
+  getUploadFileList();
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
       $('#confirm-box').modal('hide');
@@ -1927,7 +2032,7 @@ function fileUploadModal(message, callback) {
       callback(false);
   });
 
-  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="kv-explorer" type="file" multiple></form>');
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple></form>');
   $('#confirm-title').html('파일 관리자');
   $('#confirm-box-topper').show();
 
@@ -1935,8 +2040,115 @@ function fileUploadModal(message, callback) {
       backdrop: 'static',
       keyboard: false
   });
-  loadFileInput();
+  if(!isFileViewer) $('#btn-confirm-file-close').hide();
+  else {
+    $('#btn-confirm-file-close').show();
+    $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      unloadFileViewer();
+      unloadEpubViewer();
+    });
+    }
 
+  loadFileInput();
+}
+
+
+function getUploadFileList(){
+  var xhr = new XMLHttpRequest();
+  console.log(uploadServerUrl);
+  var url = uploadServerUrl+'/list';
+  var data = { "userId" : params.sessionid };
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onreadystatechange = function () {
+  if (xhr.readyState == 4 && xhr.status == 200) {
+      // do something with response
+      updateFileList(JSON.parse(xhr.responseText));
+  }
+  };
+  data = JSON.stringify(data);
+  xhr.send(data); 
+}
+
+function updateFileList(list){
+  console.log(list.files);
+  $("#confirm-message .list-group-flush").remove();
+  var re = /(?:\.([^.]+))?$/;
+  var listElement = '<ul class="list-group-flush">';
+  list.files.forEach(file => {
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
+  })
+  listElement+= '</ul>';
+  var $listElement = $($.parseHTML(listElement));
+  $("#confirm-message").prepend($listElement);
+  //document.getElementById('confirm-message').append($listElement);
+}
+
+function getFileType(ext){
+  console.log("ext:",ext);
+  let element='';
+  if (ext === undefined){
+    element += '<i class="fas fa-folder text-primary"></i>';
+  }
+  else if(ext.match(/(doc|docx)$/i)){
+    element += '<i class="fas fa-file-word text-primary"></i>';
+  }
+  else if(ext.match(/(xls|xlsx)$/i)){
+    element += '<i class="fas fa-file-excel text-success"></i>';
+  }
+  else if(ext.match(/(ppt|pptx)$/i)){
+    element += '<i class="fas fa-file-powerpoint text-danger"></i>';
+  }
+  else if(ext.match(/(pdf)$/i)){
+    element += '<i class="fas fa-file-pdf text-danger"></i>';
+  }
+  else if(ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)){
+    element += '<i class="fas fa-file-archive text-muted"></i>';
+  }
+  else if(ext.match(/(htm|html)$/i)){
+    element += '<i class="fas fa-file-code text-info"></i>';
+  }
+  else if(ext.match(/(txt|ini|csv|java|php|js|css)$/i)){
+    element += '<i class="fas fa-file-code text-info"></i>';
+  }
+  else if(ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)){
+    element += '<i class="fas fa-file-video text-warning"></i>';
+  }
+  else if(ext.match(/(mp3|wav)$/i)){
+    element += '<i class="fas fa-file-audio text-warning"></i>';
+  }
+  else if(ext.match(/(jpg)$/i)){
+    element += '<i class="fas fa-file-image text-danger"></i>';
+  }
+  else if(ext.match(/(gif)$/i)){
+    element += '<i class="fas fa-file-image text-muted"></i>';
+  }
+  else if(ext.match(/(png)$/i)){
+    element += '<i class="fas fa-file-image text-primary"></i>' ;
+  }
+  else {
+    element += '<i class="fas fa-file text-muted"></i>' ;
+  }
+  console.log(element);
+
+  return element;
+}
+
+function deleteUploadedFile(filename){
+  var xhr = new XMLHttpRequest();
+  var url = uploadServerUrl+'/delete';
+  var data = {"userId":params.sessionid, "name":filename};
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+          // do something with response
+          getUploadFileList();
+      }
+  };
+  data = JSON.stringify(data);
+  xhr.send(data);
 }
 
 function loadFileInput(){
@@ -1951,7 +2163,7 @@ function loadFileInput(){
         'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
         'elErrorContainer': '#errorBlock'
     });
-    $("#kv-explorer").fileinput({
+    $("#file-explorer").fileinput({
         'theme': 'explorer-fas',
         'language': 'kr',
         'uploadUrl': 'https://files.primom.co.kr:1443/upload',
@@ -2014,10 +2226,15 @@ function loadFileInput(){
        'mp3': function(ext) {
            return ext.match(/(mp3|wav)$/i);
        }
-   }
+   },
+   uploadExtraData: {
+    userId: params.sessionid
+  },
+
     }).on('fileuploaded', function(event, previewId, index, fileId) {
       console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
       console.log(previewId.response);
+      getUploadFileList();
   }).on('fileuploaderror', function(event, data, msg) {
       console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
   }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
