@@ -23,7 +23,9 @@ classroomInfo = {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
     },
-    exam : false    
+    exam : false,
+    classPermission : undefined,
+    micPermission : undefined,
 };
 
 classroomInfoLocal = {
@@ -46,13 +48,16 @@ classroomCommand = {
         방 동기화를 해준다.
     */
     joinRoom : function () {  
-        connection.socket.emit ('update-room-info', (_info) => {                    
+        connection.socket.emit ('update-room-info', (_info) => {
+            console.log(_info);                    
             classroomInfo.roomOpenTime = _info.roomOpenTime;
             classroomInfo.allControl = _info.allControl;
             classroomInfo.shareScreen.state = _info.shareScreen;
             classroomInfo.share3D.state = _info.share3D.state;
             classroomInfo.pdf.state = _info.pdf.state;
             classroomInfo.exam = _info.exam;
+            classroomInfo.classPermission = _info.classPermission;
+            classroomInfo.micPermission = _info.micPermission;
 
             updateClassTime ();
             if(connection.extra.roomOwner)

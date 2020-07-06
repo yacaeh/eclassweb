@@ -601,6 +601,17 @@ hr {
   height: 50px;
 }
 
+#student_permission{
+  color: green;
+  font-size: 14px;
+  font-family: roboto;
+  vertical-align: middle;
+  display: inline-grid;
+  height: 50px;
+  margin-left: 5px;
+  line-height: 25px;
+}
+
 .student-menu {
   position: absolute;
   width: 126px;
