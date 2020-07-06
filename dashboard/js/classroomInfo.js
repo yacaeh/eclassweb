@@ -337,6 +337,8 @@ classroomCommand.setShareScreenServer = function (_data, success, error) {
 };
 
 classroomCommand.setShareScreenLocal = function (_data) {
+    classroomInfo.shareScreen.state = _data.state;
+    classroomInfo.shareScreen.id = _data.id;
     classroomInfoLocal.shareScreen.state = _data.state;
     classroomInfoLocal.shareScreen.id = _data.id;
 };
