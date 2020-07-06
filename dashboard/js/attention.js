@@ -45,7 +45,7 @@ attentionObj.submit = (submitStudent) => {
 attentionObj.exportAttention = () => {
     if( attentionObj.totalCount <= 0 ){
         console.log("집중모드 저장할 데이타가 없습니다.");
-        return;
+        return false;
     } 
 
     if(connection.extra.roomOwner) {
@@ -68,6 +68,7 @@ attentionObj.exportAttention = () => {
         saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelFileName);
 
         console.log("집중모드 저장하였습니다.");
+        return true
     }  
 
      // export excel data

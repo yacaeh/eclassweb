@@ -159,17 +159,22 @@ classroomCommand.openShare = function (callback){
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
-        alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => { //callback yes
+        alertBox("<span>학생들에게 알림을 보내겠습니까? \<label class='label_stu' for='view_stu'><input checked id='view_stu' type='checkbox'>학생 보기</label> \
+        </span>  ", "알림", () => { //callback yes
            // classroomInfo.alert
             // console.log(connection.getAllParticipants());
             // console.log(connection.getAllParticipants().length);
             callback();
+            if(document.getElementById("view_stu").checked){
+                document.getElementById("top_student").click();
+            }
+
             attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
             connection.send ({
                 alert : true
             });
         },()=>{ //callback no 파일 저장한다.
-            attentionObj.exportAttention();
+            // attentionObj.exportAttention();
         });    
     }
 };
@@ -664,6 +669,8 @@ studentCommand = {
         this.sendStudentToTeachCmd ('pdf-page', _page);
     },
 }
+
+
 
 
 /*

@@ -2318,3 +2318,13 @@ $(window).on("blur focus", function(e) {
 
   $(this).data("prevType", e.type);
 })
+
+document.getElementById("top_save_alert").addEventListener('click' ,function(){
+   if(!attentionObj.exportAttention())
+        alert("저장할 데이터가 없습니다")
+})
+
+
+document.addEventListener("ondrop" ,function(){
+  alert("asd");
+})
