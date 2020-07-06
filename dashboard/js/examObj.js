@@ -301,7 +301,8 @@ examObj.sendExamEnd = function() {
     {
         if(!examObj.isStart)
             return;
-        
+
+        examObj.isStart = false;        
         connection.send({
             exam: {
                 examEnd : true

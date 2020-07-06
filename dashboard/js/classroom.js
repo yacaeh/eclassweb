@@ -1028,6 +1028,8 @@ $('#top_test').click(function () {
   if ($('#exam-board').is(':visible')) {
     if(examObj.closeTesting()){
       $('#exam-board').hide(300);
+    }else{
+      alert("시험 종료 후 닫을 수 있습니다");
     }
   }
   else {
