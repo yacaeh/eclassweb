@@ -2326,6 +2326,8 @@ document.getElementById("top_save_alert").addEventListener('click' ,function(){
 
 
 function handleDragDropEvent(oEvent) {
-  if(oEvent.target.classList != "emojionearea-editor")
+  if(oEvent.target.classList == "emojionearea-editor" || oEvent.target.id == "urlinput")
+    return false;
+
   oEvent.preventDefault();
 }
