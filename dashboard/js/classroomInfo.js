@@ -242,7 +242,7 @@ classroomCommand.syncScreenShare = function (_userid) {
     PDF
 */
 classroomCommand.togglePdfStateServer = function (_success, _error) {
-
+    console.log("togglePdfStateServer ");
     connection.socket.emit('toggle-share-pdf', (result) => {
         if(result.result) 
         {

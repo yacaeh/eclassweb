@@ -1335,6 +1335,7 @@ function loadFileViewer(url) {
   $('#confirm-box').modal('hide');
   $('#confirm-box-topper').hide();
 
+  classroomCommand.togglePdfStateServer ((state) => {});
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
