@@ -175,9 +175,21 @@ connection.onmessage = function (event) {
   }
 
   if(event.data.permissionChanged){
-    console.log("permission changed");
+    console.log("permission changed" ,connection);
     classroomInfo = event.data.permissionChanged;
+    var id = connection.userid;
+
+    if(id == event.data.permissionChanged.nowMicPermission){
+      console.log("GET PERMISSION")
+      document.getElementById("class_permission").innerHTML = "수업 권한";
+      document.getElementById("mic_permission").innerHTML = "마이크 권한";
+    }
+    else{
+      document.getElementById("class_permission").innerHTML = "";
+      document.getElementById("mic_permission").innerHTML = "";
+    }
   }
+
 
 
   if (event.data.showMainVideo) {
