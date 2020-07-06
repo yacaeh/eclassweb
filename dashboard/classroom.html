@@ -61,7 +61,7 @@
 <a id="downloadLink" type="video/webm" style="display: none"></a>
 
 <div id="confirm-box" class="modal fade">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirm-title">파일을 선택하세요</h5>
@@ -72,6 +72,7 @@
       <div id="confirm-message" class="modal-body">
       </div>
       <div class="modal-footer">
+        <button class="btn btn-danger" id="btn-confirm-file-close">현재 파일 닫기</button>
         <button class="btn btn-confirm-close" id="btn-confirm-close">취소</button>
         <button class="btn btn-primary" id="btn-confirm-action">확인</button>
       </div>
@@ -161,21 +162,15 @@
         <div id="exam-teacher-menu" style="display: none;">
           <!-- 시험 만들기 -->
           <div id="exam-setting-bar">
-            <div class="exam-border-bottom"
-              style="background-color: white; text-align: center; border-bottom:gray solid 1px;">문제출제</div>
-            <div style="display: flex; background-color: #eff1f0; border-bottom:gray solid 1px;">
-              <label style="flex: 1.5; text-align: center; margin-top: 12px;" for="exam-question-count">문항수</label>
-              <input style="flex: 1.2; padding: 0px; margin: 5px 2px 5px 5px; text-align: center; "
-                id="exam-question-count" class="form-control" type="number">
-              <label style="flex: 2; text-align: right; margin-top: 12px; margin-right: 10px;"
-                for="exam-time">시간</label>
-              <input style="flex: 1.2; padding: 0px; margin: 5px;  text-align: center; " id="exam-time"
-                class="form-control" type="text" placeholder="(분)">
-              <button style="flex: 1.5; padding: 0px; margin: 8px 20px 8px 50px;" id="exam-setting-apply"
-                class="btn btn-exam"><b>설정</b></button>
+            <div id="exam-title" class="exam-border-bottom">문제출제</div>
+            <div style="display: flex; width: 339px; height: 37px; background: #EFF1F0;" class="exam-border-bottom">
+              <label id="exam-question-count-label" for="exam-question-count">문항수</label>
+              <input id="exam-question-count" type="number">
+              <label id="exam-time-label" for="exam-time">시간</label>
+              <input id="exam-time" type="text" placeholder="(분)">
+              <button id="exam-setting-apply" class="btn btn-exam"><b>설정</b></button>
             </div>
-
-            <div id="exam-qustion-list" class="exam-border-bottom exam-overflow">
+            <div id="exam-question-list" class="exam-border-bottom exam-overflow" style="text-align: center;">
             </div>
             <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
             <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
