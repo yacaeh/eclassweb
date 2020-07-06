@@ -1036,7 +1036,7 @@ input[type="number"]:focus{
   position: absolute;
   left: 8px;
   top: 42px;
-  width: 378px;
+  width: 96%;
   border: 2px solid #B8B8B8;
   border-radius: 3px;
   font-size: 14px;
@@ -1046,7 +1046,7 @@ input[type="number"]:focus{
 #urlinput:focus{
   outline: 2px solid #18DBBE;
 
-  width: 100%;
+  width: 96%;
   height: auto;
 }
 
@@ -1211,4 +1211,12 @@ input[type="number"]:focus{
 .filepond--panel-root {
   background-color: transparent;
   border: 2px solid #2c3340;
+}
+
+#edunetContent{
+  left: 52px; 
+  width: 77%; 
+  height: 95%; 
+  position: absolute; 
+  display: none;
 }
