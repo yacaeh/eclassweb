@@ -32,6 +32,17 @@ var examObj = {
       */
 };
 
+examObj.closeTesting = function () {
+    if( this.isStart ){
+        return false;
+    }
+
+    connection.send({
+        closeTesting: true
+    });  
+    return true;
+}
+
 // 정답 확인.
 examObj.checkAnswerCount = function (studentAnswers) {
     var len = examObj.examAnswer.length;
