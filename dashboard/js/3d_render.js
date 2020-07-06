@@ -144,13 +144,12 @@ top_3d_render_jthis = $("#top_3d");
     }
 }
 
-function modelEnable(send)
+function modelEnable()
 {
     frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
     //console.log(classroomInfo);
-    classroomInfo.share3D.state = true;
     // create 3d canvas on model enanbled      
     let _3d_canvas = document.createElement('canvas');
     _3d_canvas.setAttribute('id', 'renderCanvas');
@@ -169,12 +168,13 @@ function modelEnable(send)
     CanvasResize();
     top_3d_button.addClass('top_3d_on');
     top_3d_button.removeClass('top_3d_off')
-    if (send == true) {
-        connection.send({
-            modelEnable: { enable: true }
-        });
-    }
+    // if (send == true) {
+    //     connection.send({
+    //         modelEnable: { enable: true }
+    //     });
+    // }
 }
+
 
 function remove3DCanvas(){
     //console.log("remove 3d!");
@@ -184,8 +184,7 @@ function remove3DCanvas(){
     
     frame.document.getElementById("renderCanvas").remove();
     top_3d_button.addClass('top_3d_off');
-    top_3d_button.removeClass('top_3d_on')    
-    classroomInfo.share3D.state = false;
+    top_3d_button.removeClass('top_3d_on')   
 }
 
 function CanvasResize() {
@@ -219,8 +218,43 @@ function updateShared3DData (_pos, _rot) {
 /*
     선생님의 화면과 동기화 시킨다
 */
-function sync3DModel () {    
-    var data = classroomInfo.share3D.data;    
+function sync3DModel () {                
+    var data = classroomInfo.share3D.data;   
+        
+    if(classroomInfo.share3D.state != isSharing3D) {
+        isSharing3D = classroomInfo.share3D.state
+        setShared3DStateLocal (classroomInfo.share3D.state);;
+    }
+    
     set3DModelStateData (data.newPosition, data.newRotation);
-    modelEnable (false);
+}
+
+function setShared3DStateServer (_state) {
+    // classroomInfo.share3D.state
+    if(!connection.extra.roomOwner)  return;
+
+    connection.socket.emit ('toggle-share-3D', (result) => {
+        console.log(result);
+        if(result.result) {
+            // success            
+            setShared3DStateLocal (result.data);        
+            connection.send({
+                modelEnable: { enable: classroomInfo.share3D.state }
+            });
+        }else {
+            // error
+            
+        }
+    })
+}
+
+function setShared3DStateLocal (_state) {
+    
+    classroomInfo.share3D.state = _state;
+    if(_state) {                
+            modelEnable ();        
+    }
+    else  {
+        remove3DCanvas ();
+    }
 }

@@ -1,17 +1,17 @@
 
+var top_all_controll_jthis;
 
-function allControllEnable(jthis, b, send)
+
+function updateControlView(send)
 {
-    classroomInfo.allControl = b;
-
     if(classroomInfo.allControl)
     {
-        jthis.addClass('top_all_controll_on');
-        jthis.removeClass('top_all_controll_off')
+        top_all_controll_jthis.addClass('top_all_controll_on');
+        top_all_controll_jthis.removeClass('top_all_controll_off')
     }
     else{
-        jthis.addClass('top_all_controll_off');
-        jthis.removeClass('top_all_controll_on')
+        top_all_controll_jthis.addClass('top_all_controll_off');
+        top_all_controll_jthis.removeClass('top_all_controll_on')
     }
 
     if(send == true)
@@ -21,7 +21,20 @@ function allControllEnable(jthis, b, send)
 }
 
 
-var top_all_controll_jthis;
+function onAllControlValue (_allControl) {    
+    classroomInfo.allControl = _allControl.state;  
+    if(classroomInfo.allControl) {        
+        //  전체제어하기가 걸리게 되면, 현재 상태와 동기화 시킨다.
+        classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
+    }
+    else
+    {
+        classroomCommand.updateSyncRoom ();
+        // updateControlView (false);   
+    }
+}
+
+
 
 function _AllCantrallFunc() {
 
@@ -29,20 +42,34 @@ function _AllCantrallFunc() {
     if(params.open == "true")
     {
         top_all_controll_jthis.click(function(){
-            //_3dcanvas.toggle();
-            
-
-            allControllEnable(top_all_controll_jthis, !classroomInfo.allControl, true);
-
+            connection.socket.emit('toggle-all-control', (changeControl) => {
+                classroomInfo.allControl = changeControl;
+                updateControlView (true);        
+                //setAllControlValueWithSend (changeControl);
+            });
         })
     }
-
 }
 
 
 function SendAllControll(b)
 {
-    connection.send({
-        allControl: b
-    });
+    if(b) {
+        // true면 방의 정보를 다시 보낸다.
+        connection.send({
+            allControl: {
+                state : b,
+                roomInfo : classroomInfo
+            }
+        });
+    }
+    else
+    {
+        // false 면 일반 값만 보낸다.
+        connection.send({
+            allControl:  {
+                state : b
+            }
+        });
+    }
 }

@@ -40,6 +40,7 @@ function serverHandler(request, response) {
     // even if external codes are overriding it
     config = getValuesFromConfigJson(jsonPath);
     config = getBashParameters(config, BASH_COLORS_HELPER);
+
     // HTTP_GET handling code goes below
     try {
         var uri, filename;

@@ -134,8 +134,10 @@ function Viewer( viewerPlugin, parameters ) {
             viewerPlugin.onScroll();
         }
         if ( viewerPlugin.getPageInView ) {
-            pageNumber = viewerPlugin.getPageInView();
+            pageNumber = viewerPlugin.getPageInView();            
             if ( pageNumber ) {
+                if(pageNumber != currentPage)
+                    self.showPage (pageNumber);
                 currentPage                                 = pageNumber;
                 document.getElementById('pageNumber').value = pageNumber;
             }
@@ -241,7 +243,7 @@ function Viewer( viewerPlugin, parameters ) {
                 }
             }
 
-            initialized                                   = true;
+            
             pages                                         = getPages();
             document.getElementById('numPages').innerHTML = 'of ' + pages.length;
 
@@ -255,6 +257,9 @@ function Viewer( viewerPlugin, parameters ) {
             // Doesn't work in older browsers: document.getElementById('loading-document').remove();
             var loading = document.getElementById('loading-document');
             loading.parentNode.removeChild(loading);
+            
+            window.top.pdfOnLoaded ();
+            initialized                                   = true;
         };
 
         viewerPlugin.initialize(canvasContainer, url);
@@ -276,6 +281,9 @@ function Viewer( viewerPlugin, parameters ) {
 
         currentPage                                 = n;
         document.getElementById('pageNumber').value = currentPage;
+
+        if(initialized)
+            window.top.showPage(n);
     };
 
     /**
@@ -283,6 +291,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.showNextPage = function () {
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.showNextPage();
         self.showPage(currentPage + 1);
     };
 
@@ -291,6 +301,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.showPreviousPage = function () {
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.showPreviousPage();
         self.showPage(currentPage - 1);
     };
 
@@ -418,6 +430,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.zoomOut = function () {
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.zoomOut();
         // 10 % decrement
         var newScale = (self.getZoomLevel() / kDefaultScaleDelta).toFixed(2);
         newScale     = Math.max(kMinScale, newScale);
@@ -429,6 +443,8 @@ function Viewer( viewerPlugin, parameters ) {
      * @return {undefined}
      */
     this.zoomIn = function () {
+        if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
+            window.top.zoomIn();
         // 10 % increment
         var newScale = (self.getZoomLevel() * kDefaultScaleDelta).toFixed(2);
         newScale     = Math.min(kMaxScale, newScale);
@@ -536,7 +552,7 @@ function Viewer( viewerPlugin, parameters ) {
             setButtonClickHandler('previousPage', self.showPreviousPage);
             setButtonClickHandler('nextPage', self.showNextPage);
 
-            document.getElementById('pageNumber').addEventListener('change', function () {
+            document.getElementById('pageNumber').addEventListener('change', function () {                                               
                 self.showPage(this.value);
             });
 
@@ -598,14 +614,14 @@ function Viewer( viewerPlugin, parameters ) {
                         case 37: // left arrow
                         case 38: // up arrow
                         case 80: // key 'p'
-                            self.showPreviousPage();
+                           self.showPreviousPage();
                             break;
                         case 13: // enter
                         case 34: // pageDown
                         case 39: // right arrow
                         case 40: // down arrow
                         case 78: // key 'n'
-                            self.showNextPage();
+                           self.showNextPage();
                             break;
                         case 32: // space
                             shiftKey ? self.showPreviousPage() : self.showNextPage();
