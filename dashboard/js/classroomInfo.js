@@ -142,6 +142,7 @@ classroomCommand = {
 };
 
 
+
 classroomCommand.openShare = function (callback){
     console.log("OPEN SHARE")
     var s = GetStream(classroomInfoLocal.shareScreen.id)
@@ -262,6 +263,17 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
+
+
+classroomCommand.StopScreenShare = function(){
+    classroomInfo.shareScreen = {};
+    classroomInfo.shareScreen.state = false
+    classroomInfo.shareScreen.id = undefined
+    classroomInfo.shareScreen.stream = undefined
+
+    classroomInfoLocal.shareScreen.state = false;
+    classroomInfoLocal.shareScreen.id = false;
+}
 
 
 /*
