@@ -690,11 +690,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.extra.roomOwner = true;
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
-        if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-          alert('이미 존재하는 방 번호입니다.');
-          return;
-        }
-        alert(error);
+        connection.rejoin(params.sessionid);
       }
 
 
