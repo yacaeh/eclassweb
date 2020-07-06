@@ -70,7 +70,6 @@ function _Movie_Render_key_event() {
     }
 }
 
-
 function _Movie_Render_Func() {
     var urlinput = document.getElementById("urlinput");
     var url = urlinput.value;
@@ -88,16 +87,16 @@ function _Movie_Render_Func() {
     }else{
         iframeEdunetContent(true,url,true);
     }
+    
+    urlinput.value = '';
 }
 
 function embedYoutubeContent(bshow, url, send)
-{
-    var webview_edunet = document.getElementById("webview_edunet");
-    if(webview_edunet && bshow == true)
-        return;
-
+{ 
     if( bshow ){
         var viwerEdunet = document.getElementById("edunetContent");
+        eraseEdunetContent(document.getElementById("webview_edunet"));
+
         console.log("div create");
         var div = document.createElement("div");
         div.setAttribute("id", "webview_edunet");
@@ -145,35 +144,40 @@ function embedYoutubeContent(bshow, url, send)
         
     }
     else{
-        var viwerEdunet = document.getElementById("webview_edunet");
-        if( viwerEdunet !== null ){
-            var viwer = document.getElementById("edunetContent");
-            viwer.removeChild(viwerEdunet);
-
-            viwer.style.display = "none";
-        }
+        let viwerEdunet = document.getElementById("webview_edunet");        
+        eraseEdunetContent(viwerEdunet);
     } 
 
     _Send_Moive_Video("YOUTUBE",url, bshow, send);
 
 }
+
+function eraseEdunetContent(viwerEdunet) {
+    if (viwerEdunet !== null) {
+        let viwer = document.getElementById("edunetContent");
+        viwer.removeChild(viwerEdunet);
+        viwer.style.display = "none";
+    }
+}
+
 function iframeEdunetContent(bshow, url, send) {
-    var webview_edunet = document.getElementById("webview_edunet");
-    if(webview_edunet && bshow == true)
-        return;
+ 
+        
     if( bshow ){
-        var viwerEdunet = document.getElementById("edunetContent");
-            var ifrmEdunetContent = document.createElement("iframe");
-            ifrmEdunetContent.setAttribute("src", url);
-            ifrmEdunetContent.setAttribute("id", "webview_edunet");
-			ifrmEdunetContent.style.width = "100%";
-            ifrmEdunetContent.style.height = "100%";
-            ifrmEdunetContent.frameBorder = "0";
-			
-            viwerEdunet.appendChild(ifrmEdunetContent);
-        viwerEdunet.style.display = "inline-block";
+        let viwerEdunet = document.getElementById("edunetContent");
+        eraseEdunetContent(document.getElementById("webview_edunet"));
+                
+        let ifrmEdunetContent = document.createElement("iframe");
+        ifrmEdunetContent.setAttribute("src", url);
+        ifrmEdunetContent.setAttribute("id", "webview_edunet");
+        ifrmEdunetContent.style.width = "100%";
+        ifrmEdunetContent.style.height = "100%";
+        ifrmEdunetContent.frameBorder = "0";
+        
+        viwerEdunet.appendChild(ifrmEdunetContent);
+        viwerEdunet.style.display = "inline-block";        
     }else{
-        var webview_cam = document.getElementById("webview_edunet");
+        let webview_cam = document.getElementById("webview_edunet");
         if( webview_cam !== null ){
             var viwer = document.getElementById("edunetContent");
             viwer.removeChild(webview_cam);
@@ -185,12 +189,12 @@ function iframeEdunetContent(bshow, url, send) {
 
 
 function VideoEdunetContent(bshow, url, send) {
-    var webview_edunet = document.getElementById("webview_edunet");
-    if(webview_edunet && bshow == true)
-        return;
-    var timer = 0;
+    
+    
     if( bshow ){
-        var viwerEdunet = document.getElementById("edunetContent");
+        var viwerEdunet = document.getElementById("edunetContent");        
+        eraseEdunetContent(document.getElementById("webview_edunet"));
+
         var videoContent = document.createElement("video");
         var ifrmEdunetContent = document.createElement("source");
         ifrmEdunetContent.setAttribute("src", url);
