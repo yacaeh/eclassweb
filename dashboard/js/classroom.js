@@ -1157,7 +1157,7 @@ function apeendQuestion(i) {
     question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
   }
 
-  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 0px 3px; margin:5px;'>─</button>`;
+  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 3px 3px; margin:8px; height:20px; line-height:12px'>─</button>`;
 
   question += `</div>`;
   $('#exam-question-list').append(question);
