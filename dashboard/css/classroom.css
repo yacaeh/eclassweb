@@ -918,28 +918,93 @@ font-size: 12px;
 line-height: 28px; 
 padding-right: 22px;
 background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
-margin-left: 0.5vw;
-margin-right: 1vw;
+margin-left: 15px;
+margin-right: 5px;
+margin-top: 3px;
 }
 
 input[type=radio]:checked + label { background-image: url(/dashboard/newimg/radio_on.png); }
 
 .btn-exam{
   color: #fff;
-    background-color: #3ee1c9;
-    border-color: #3ee1c9;
+  background-color: #3ee1c9;
+  border-color: #3ee1c9;
+}
+
+.btn-exam:hover {
+  background-color: #13b59c;
 }
 
 #exam-board{
   display: none; 
-  z-index: 5;
+  z-index: 10;
   position: fixed; 
-  top:53px; 
+  top:50px; 
   bottom: 0; 
   right: 0; 
-  width: 20%; 
+  width: 339px; 
   border-left: gray solid 1px;
   background-color: white;
+}
+
+#exam-title {
+  background-color: white; 
+  text-align: center;
+  padding-top: 9px;
+  padding-bottom: 7px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  color: #707070;
+}
+
+#exam-question-count-label {
+  width: 54px;
+  height: 16px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #707070;
+  margin-top: 11px;
+  margin-left: 15px;
+}
+
+#exam-time-label {
+  width: 40px;
+  height: 16px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #707070;
+  margin-top: 12px;
+  margin-left: 27px;
+}
+
+#exam-question-count, #exam-time {
+  width: 50px;
+  height: 28px;
+  background: #FFFFFF;
+  border: 2px solid #B8B8B8;
+  border-radius: 3px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+#exam-setting-apply {
+  width: 52px;
+  height: 28px;
+  margin-top: 5px;
+  margin-left: 40px;
+  padding: 0px;
+}
+
+#exam-question-count:focus, #exam-time:focus {
+  outline: solid #3ee1c9 1px;
 }
 
 input[type="number"]::-webkit-outer-spin-button,
@@ -991,7 +1056,7 @@ input[type="number"]:focus{
 }
 
 .exam-overflow{
-  max-height: 50vh;
+  max-height: 70vh;
   overflow-y: auto;
 }
 
