@@ -691,12 +691,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
         connection.rejoin(params.sessionid);
-        // if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-        //   connection.rejoin(params.sessionid);
-        //   // alert('이미 존재하는 방 번호입니다.');
-        //   // return;
-        // }
-        // alert(error);
       }
 
 
