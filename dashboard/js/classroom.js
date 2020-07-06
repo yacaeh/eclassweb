@@ -52,6 +52,7 @@ var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
+let extraPath = '';
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -185,15 +186,15 @@ connection.onmessage = function (event) {
 
     if(connection.extra.roomOwner){
       classroomInfo.shareScreen = {}
-      classroomInfo.shareScreen.state = true
-      classroomInfo.shareScreen.id = event.data.showMainVideo
+      classroomInfo.shareScreen.state = true;
+      classroomInfo.shareScreen.id = event.data.showMainVideo;
+      classroomInfo.shareScreen.userid = event.data.userid;
     }
 
-    console.log("SHOW MAIN VIDEO",event.data.showMainVideo)
+    console.log("SCREEN SHARE START",event.data.showMainVideo)
     var stream = GetStream(event.data.showMainVideo)
     CanvasResize();
     document.getElementById("screen-viewer").srcObject = stream;
-    // document.getElementById("screen-viewer").srcObject = src;
     $('#screen-viewer').show();
     return;
   }
@@ -404,6 +405,9 @@ connection.setUserPreferences = function (userPreferences) {
 
 connection.onstreamended = function (event) {
   console.log('onstreameneded!');
+  console.log(event);
+
+
   var video = document.querySelector(
     'video[data-streamid="' + event.streamid + '"]'
   );
@@ -415,7 +419,6 @@ connection.onstreamended = function (event) {
     }
   }
   if (video) {
-    console.log("!!..?")
     video.srcObject = null;
     video.style.display = 'none';
   }
@@ -916,11 +919,7 @@ function StreamingStart(stream, btn){
   addStreamStopListener(stream, function () {    
     console.log("STOP SHARE")
 
-    classroomCommand.setShareScreenLocal ({state : false , id : undefined, stream : undefined});
-    classroomInfo.shareScreen = {}
-    classroomInfo.shareScreen.state = false
-    classroomInfo.shareScreen.id = undefined
-    classroomInfo.shareScreen.stream = undefined
+    classroomCommand.StopScreenShare();
 
     classroomCommand.setShareScreenServer(false, () => {
       connection.send({
@@ -950,7 +949,6 @@ function RTrack(stream){
   stream.getTracks().forEach(function (track) {
     if (track.kind === 'video' && track.readyState === 'live') {
       replaceTrack(track);
-
     }
   });
 }
@@ -1377,7 +1375,9 @@ $('#icon_exit').click(function () {
  
 
   classroomCommand.exitAlert(function () {
-    history.back();
+    //history.back();
+    var href = location.protocol + "//"+ location.host + "/dashboard/";
+    window.open(href, "_self");
   });
 
 
@@ -2057,6 +2057,7 @@ function GetStream(id){
 
 function fileUploadModal(message, callback) {
   console.log(message);
+  extraPath = '';
   getUploadFileList();
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
@@ -2074,7 +2075,7 @@ function fileUploadModal(message, callback) {
       callback(false);
   });
 
-  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple></form>');
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
   $('#confirm-title').html('파일 관리자');
   $('#confirm-box-topper').show();
 
@@ -2099,7 +2100,7 @@ function getUploadFileList(){
   var xhr = new XMLHttpRequest();
   console.log(uploadServerUrl);
   var url = uploadServerUrl+'/list';
-  var data = { "userId" : params.sessionid };
+  var data = { "userId" : params.sessionid ,"extraPath":extraPath};
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
@@ -2199,8 +2200,7 @@ function loadFileInput(){
         'theme': 'fas',
         'showPreview': true,
         'language': 'kr',
-        'allowedFileExtensions': ['*'],
-        'fileType': "any",
+        'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg","odt"],
         'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
         'elErrorContainer': '#errorBlock'
     });
