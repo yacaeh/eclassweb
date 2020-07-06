@@ -2726,6 +2726,7 @@ function canvasresize(id){
                 drawHelper.redraw();
                 syncPoints(true);
                 pointHistory = [];
+                window.top.syncWithTeacher();
             };
         }
 

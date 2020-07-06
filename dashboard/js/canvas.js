@@ -21,7 +21,8 @@ designer.icons.callteacher = '/dashboard/newimg/handsup.png';
 
 
 designer.addSyncListener(function (data) {
-  connection.send(data);
+  if(connection.extra.roomOwner)
+    connection.send(data);
 });
 
 designer.setTools({
