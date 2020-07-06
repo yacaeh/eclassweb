@@ -238,14 +238,14 @@ classroomCommand.receivedCallTeacherResponse = (userId) => {
             if( children[i].dataset.id == userId ){
                 console.log( "Received Call Teacher Respose : " +  userId );    
 
-                var student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
-
+                var student_overlay;
                 var isMeCount = 5;
-
                 var flickerInterval = setInterval(function(){
+                    student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
                     var initBackColor = student_overlay.css('background');
                     var orangeColor = setOverlayColor('orange');
                     setTimeout(function(){
+                        student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
                         var initBackColor2 = student_overlay.css('background');
                         if(orangeColor !== initBackColor2)
                             initBackColor = initBackColor2
