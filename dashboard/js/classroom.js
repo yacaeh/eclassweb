@@ -2088,7 +2088,6 @@ function fileUploadModal(message, callback) {
     $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
       e.preventDefault();
       unloadFileViewer();
-      unloadEpubViewer();
     });
     }
 
