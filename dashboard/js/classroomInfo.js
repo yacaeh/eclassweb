@@ -207,7 +207,7 @@ classroomCommand.receivAlert = function () {
 // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
 classroomCommand.receivedOnFocusResponse = (_response) => {
     if(connection.extra.roomOwner)
-    {        
+    {     
         let userId = _response.userId;
         let boolOnFocus = _response.onFocus; 
 
@@ -215,6 +215,13 @@ classroomCommand.receivedOnFocusResponse = (_response) => {
 
         for(let i = 0; i < children.length; i++){
             if( children[i].dataset.id == userId ){
+                var student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                if(boolOnFocus == false){
+                    student_overlay.css('background','black');
+                }
+                else{
+                    student_overlay.css('background','none');
+                }
                 console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
             }
         };
@@ -231,6 +238,27 @@ classroomCommand.receivedCallTeacherResponse = (userId) => {
             if( children[i].dataset.id == userId ){
                 console.log( "Received Call Teacher Respose : " +  userId );    
 
+                var student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+
+                var isMeCount = 5;
+
+                var flickerInterval = setInterval(function(){
+                    var initBackColor = student_overlay.css('background');
+                    var orangeColor = setOverlayColor('orange');
+                    setTimeout(function(){
+                        var initBackColor2 = student_overlay.css('background');
+                        if(orangeColor !== initBackColor2)
+                            initBackColor = initBackColor2
+                        setOverlayColor(initBackColor);
+                    } ,500);
+                    if(isMeCount-- <= 0)
+                        clearInterval(flickerInterval);
+                },1000);
+                
+                function setOverlayColor(overlayColor){
+                    student_overlay.css('background',overlayColor);
+                    return student_overlay.css('background');
+                }
             }
         };
     }
