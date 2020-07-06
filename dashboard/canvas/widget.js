@@ -1573,9 +1573,9 @@ function canvasresize(id){
             this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
             // this.textInputContainer.style.position = 'relative';
 
-            this.fontColorBox.style.display = show == 'show' ? 'block' : 'none';
-            this.fontColorBox.style.left = this.x + this.fontColorBox.clientWidth + 30+'px'; 
-            this.fontColorBox.style.top =  this.y - this.textInputBox.clientHeight + 'px';
+            this.fontColorBox.style.display = show == 'show' ? 'grid' : 'none';
+            this.fontColorBox.style.left = this.x +'px';
+            this.fontColorBox.style.top =  this.y - this.textInputBox.clientHeight - this.fontColorBox.clientHeight -10 +'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -1631,65 +1631,29 @@ function canvasresize(id){
             document.getElementsByClassName("textInputUI")[0].focus();
 
         },
-        textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
+        //textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
         eachFontColor: function(callback){
-            function hexToRGBA(h, alpha) {
-                return 'rgba(' + hexToRGB(h).join(',') + ',1)';
-            }
-            //console.log("each font color!");
-            var colors = [
-                ['FFFFFF', '006600', '000099', 'CC0000', '8C4600'],
-                ['CCCCCC', '00CC00', '6633CC', 'FF0000', 'B28500'],
-                ['666666', '66FFB2', '006DD9', 'FF7373', 'FF9933'],
-                ['333333', '26FF26', '6699FF', 'CC33FF', 'FFCC99'],
-                ['000000', 'CCFF99', 'BFDFFF', 'FFBFBF', 'FFFF33']
-            ];
-
-            var textColorContainer = find('text-fill-colors'),
-                textColorsList = find("text-colors-list"),
-                fillStyleText = find('text-fill-style'),
-                textSelectedColor = find('text-selected-color'),
-                textSelectedColor2 = find('text-selected-color-2'),
-                alpha = 0.2;
-
-            // START INIT TEXT
-            this.textStrokeStyle = hexToRGBA(fillStyleText.value, alpha)
-            textSelectedColor.style.backgroundColor =
-            textSelectedColor2.style.backgroundColor = '#' + fillStyleText.value;
-            textColorsList.innerHTML = '';
-
-            colors.forEach(function(colorRow) {
-                var row = '<tr>';
-
-                colorRow.forEach(function(color) {
-                    row += '<td style="background-color:#' + color + '" data-color="' + color + '"></td>';
-                })
-                row += '</tr>';
-
-                textColorsList.innerHTML += row;
-            })
-
-            Array.prototype.slice.call(textColorsList.getElementsByTagName('td')).forEach(function(td) {
-                addEvent(td, 'mouseover', function() {
-                    var elColor = td.getAttribute('data-color');
-                    textSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor;
-                });
-
-                addEvent(td, 'click', function() {
-                    var elColor = td.getAttribute('data-color');
-                    textSelectedColor.style.backgroundColor =
-                    textSelectedColor2.style.backgroundColor = '#' + elColor;
-                    fillStyleText.value = elColor;
-                    textHandler.lastFillStyle = hexToRGBA(fillStyleText.value, alpha);
-                    //console.log("this.LastFillStyle",textHandler.lastFillStyle);
-                    textColorContainer.style.display = 'none';
-                });
-            })
-            addEvent(textSelectedColor, 'click', function() {
-                textColorContainer.style.display = 'block';
+            var container = document.getElementById('textInputContainer');
+            var template = container.getElementsByClassName("color_template_text")[0];
+            var divs = [];
+            template.innerHTML = '';
+            penColors.forEach(function(color){
+                var div = document.createElement("div");
+                div.dataset.color = color;
+                div.className = "color";
+                div.style.backgroundColor = color;
+                divs.push(div);
+                template.appendChild(div);
             });
 
+            for(var i= 0 ; i < divs.length; i++){
+                divs[i].addEventListener("click", function(){
+                    var nowColor = this.dataset.color;
+                    divs.forEach(element => element.classList.remove("on"));
+                    this.classList.add("on");
+                    textHandler.lastFillStyle = nowColor;
+                })
+            }
         },
         eachFontFamily: function(callback) {
             var childs = this.fontFamilyBox.querySelectorAll('li');
@@ -1735,7 +1699,7 @@ function canvasresize(id){
         textInputBox: document.querySelector('.textInputUI'),
         fontFamilyBox: document.querySelector('.fontSelectUl'),
         fontSizeBox: document.querySelector('.fontSizeUl'),
-        fontColorBox: document.querySelector('.fontColorUI'),
+        fontColorBox: document.getElementById('textInputContainer').querySelector('.color_template_text'),
         textInputContainer:document.getElementById('textInputContainer')
     };
 
