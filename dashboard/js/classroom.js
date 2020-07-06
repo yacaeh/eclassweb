@@ -2325,6 +2325,7 @@ document.getElementById("top_save_alert").addEventListener('click' ,function(){
 })
 
 
-document.addEventListener("ondrop" ,function(){
-  alert("asd");
-})
+function handleDragDropEvent(oEvent) {
+  if(oEvent.target.classList != "emojionearea-editor")
+  oEvent.preventDefault();
+}

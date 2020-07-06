@@ -58,7 +58,9 @@
 
 </head>
 
-<body oncontextmenu="return false" ondragstart="return false">
+<body ondragenter="handleDragDropEvent(event)"
+ondragover="handleDragDropEvent(event)"
+ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false">
 <a id="downloadLink" type="video/webm" style="display: none"></a>
 
 <div id="confirm-box" class="modal fade">

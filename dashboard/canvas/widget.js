@@ -3726,3 +3726,7 @@ function SliderSetting(element, targetinput, defaultv, callback){
         sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
     })
 }
+
+function handleDragDropEvent(oEvent) {
+    oEvent.preventDefault();
+  }
