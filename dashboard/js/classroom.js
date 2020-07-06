@@ -44,6 +44,7 @@ SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 SetCanvasBtn('epub', LoadEpub);
+SetCanvasBtn('callteacher', CallTeacher);
 
 var isSharingScreen = false;
 var isSharing3D = false;
@@ -284,6 +285,23 @@ connection.onmessage = function (event) {
   if(!connection.extra.roomOwner){
     designer.syncData(event.data);
   }
+
+  // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
+  if(event.data.onFocus){
+    if(connection.extra.roomOwner){      
+      classroomCommand.receivedOnFocusResponse( { userId : event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
+    }
+      
+    return;
+  }
+
+  // 학생이 선생님에게 권한 요청을 한다.
+  if( event.data.callTeacher ){
+    if(connection.extra.roomOwner)
+      classroomCommand.receivedCallTeacherResponse(event.data.callTeacher.userid);
+    return;
+  }
+
 };
 
 // extra code
@@ -908,11 +926,17 @@ function updateClassTime() {
 
 
 function SetTeacher(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+
     $('#session-id').text(connection.extra.userFullName+" ("+params.sessionid+")");
     $("#my-name").remove();
     $(".for_teacher").show();
     $(".controll").show();
     $(".feature").show();
+  $(frame.document.getElementById("callteacher")).remove();
+
 }
 
 function SetStudent() {
@@ -1446,6 +1470,13 @@ function LoadEpub(btn) {
   }
 }
 
+function CallTeacher() {
+  connection.send({
+    callTeacher :{
+        userid : connection.userid
+    } 
+  });  
+}
 
 var renditionBuffer;
 
@@ -2122,3 +2153,78 @@ function loadFileInput(){
 });
 
 }
+
+var isFocused = true;
+var isIframeFocused = false;
+
+let widgetIframe = document
+.getElementById('widget-container')
+.getElementsByTagName('iframe')[0].contentWindow;
+
+
+function sendFocus(state){
+  if(!connection.extra.roomOwner){
+    connection.send({
+      onFocus :{
+          userid : connection.userid,
+          focus : state
+      } 
+    });
+    if(!state){
+      alert('수업 째지 마세요...');
+      console.log("You left class!");
+    }  
+  }
+}
+
+$(widgetIframe).on("blur focus", function(e){
+  var prevType = $(this).data("prevType");
+
+  if (prevType != e.type) {   //  reduce double fire issues
+      switch (e.type) {
+        case "blur":
+          isIframeFocused = false;
+          setTimeout(function(){
+            if(!isFocused && !isIframeFocused){
+              sendFocus(false);  
+            }
+            else{
+              sendFocus(true);
+            }  
+          },100);
+          break;
+        case "focus":
+          isIframeFocused = true;
+          sendFocus(true);
+          break;
+      }
+    }
+
+  $(this).data("prevType", e.type);
+
+})
+
+$(window).on("blur focus", function(e) {
+  var prevType = $(this).data("prevType");
+
+  if (prevType != e.type) {   //  reduce double fire issues
+      switch (e.type) {
+          case "blur":
+            isFocused = false;
+            console.log("blur");
+            if(document.activeElement !== frame){
+            }
+            else{
+              isFocused = true;
+              sendFocus(true);
+            }
+            break;
+          case "focus":
+            isFocused = true;
+            sendFocus(true);
+            break;
+      }
+  }
+
+  $(this).data("prevType", e.type);
+})

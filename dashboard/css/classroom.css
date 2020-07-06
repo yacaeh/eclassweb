@@ -1086,8 +1086,13 @@ input[type='number']:focus {
   position: absolute;
   left: 8px;
   top: 42px;
+<<<<<<< HEAD
   width: 378px;
   border: 2px solid #b8b8b8;
+=======
+  width: 96%;
+  border: 2px solid #B8B8B8;
+>>>>>>> 74537f932edce12bf3af9d4bfcabe78a60acc5da
   border-radius: 3px;
   font-size: 14px;
   padding-left: 11px;
@@ -1096,7 +1101,7 @@ input[type='number']:focus {
 #urlinput:focus {
   outline: 2px solid #18dbbe;
 
-  width: 100%;
+  width: 96%;
   height: auto;
 }
 
@@ -1328,5 +1333,12 @@ video::-webkit-media-controls-toggle-closed-captions-button {
   display: none;
 }
 video::-webkit-media-controls-volume-slider {
+  display: none;
+}
+#edunetContent{
+  left: 52px; 
+  width: 77%; 
+  height: 95%; 
+  position: absolute; 
   display: none;
 }
