@@ -470,6 +470,9 @@ hr {
 #top_record_video {
   content: url(/dashboard/newimg/recordoff.png);
 }
+#top_save_alert {
+  content: url(/dashboard/newimg/download.png);
+}
 #top_pdf {
   content: url(/dashboard/img/pdf.png);
 }
@@ -859,6 +862,7 @@ hr {
   position: absolute;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
 }
 
 .student {
@@ -1240,6 +1244,42 @@ input[type='number']:focus {
   background: #d84b4b;
 }
 
+
+#alert-exit-content {
+  text-align: center;
+  height: 57px;
+  line-height: 48px;
+  color: #707070;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.btn-alert-exit-yes {
+  width: 82px;
+  height: 28px;
+  background: #ff5959;
+  
+  border-radius: 3px;
+  color: white;
+}
+
+.btn-alert-exit-yes:hover {
+  background: #d84b4b;
+  
+}
+
+.btn-alert-exit-no {
+  width: 280px;
+  height: 28px;
+  background: #18dbbe;
+  border-radius: 3px;
+  color: white;
+}
+
+.btn-alert-exit-no:hover {
+  background: #13b59c;
+}
+
 #alert-btns {
   margin-left: 39px;
 }
@@ -1410,4 +1450,13 @@ video::-webkit-media-controls-volume-slider {
   height: 91%; 
   position: absolute; 
   display: none;
+}
+
+.student-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: .5
 }

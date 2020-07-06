@@ -246,6 +246,10 @@ connection.onmessage = function (event) {
 
   if (event.data.alertResponse) {
     classroomCommand.receiveAlertResponse(event.data.alertResponse);
+    
+    if(connection.extra.roomOwner)
+      attentionObj.submit({userid:event.data.alertResponse.userid, name :  params.userFullName, response : event.data.alertResponse.response });
+    
     return;
   }
 
@@ -1029,6 +1033,8 @@ function SetStudentList() {
   if(!connection.extra.roomOwner)
     return;
 
+  
+
   $('#student_list').empty();
 
   if(connection.getAllParticipants().length == 0){
@@ -1041,6 +1047,7 @@ function SetStudentList() {
     connection.getAllParticipants().forEach(function(pid) {
       var name = getFullName(pid)
       var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
+                    <span class="student-overlay"></span> \
                     <img src="/dashboard/newimg/exit.png"> \
                     <span class="bor"></span> \
                     <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
@@ -1364,7 +1371,14 @@ function omrChange(num) {
   examObj.sendSelectExamAnswerToTeacher(questionNumber, answerNumber);
 }
 $('#icon_exit').click(function () {
-  history.back();
+ 
+
+  classroomCommand.exitAlert(function () {
+    history.back();
+  });
+
+
+  
 });
 
 $(window).on('beforeunload', function () {
@@ -1718,6 +1732,38 @@ function alertBox(message, title, callback_yes, callback_no) {
   $('#alert-content').html(message);
   $('#alert-box').fadeIn(300);
 }
+
+// 알림 박스 생성
+function alert_exit_Box(message, title, callback_yes, callback_no) {
+  callback_yes = callback_yes || function () {};
+  callback_no = callback_no || function () {};
+
+  var clickCount = 0;
+
+  $('.btn-alert-exit-yes')
+    .unbind('click')
+    .bind('click', function (e) {
+      if (clickCount++ == 0) {
+        e.preventDefault();
+        $('#alert-exit').fadeOut(300);
+        callback_yes();
+      }
+    });
+  $('.btn-alert-exit-no')
+    .unbind('click')
+    .bind('click', function (e) {
+      if (clickCount++ == 0) {
+        e.preventDefault();
+        $('#alert-exit').fadeOut(300);
+        callback_no();
+      }
+    });
+
+  $('#alert-exit-title').html(title || '알림');
+  $('#alert-exit-content').html(message);
+  $('#alert-exit').fadeIn(300);
+}
+
 
 $('#top_alert').click(function () {
   classroomCommand.sendAlert(function () {
@@ -2254,7 +2300,7 @@ function sendFocus(state){
       } 
     });
     if(!state){
-      alert('수업 째지 마세요...');
+      // alert('수업 째지 마세요...');
       console.log("You left class!");
     }  
   }
@@ -2311,3 +2357,16 @@ $(window).on("blur focus", function(e) {
 
   $(this).data("prevType", e.type);
 })
+
+document.getElementById("top_save_alert").addEventListener('click' ,function(){
+   if(!attentionObj.exportAttention())
+        alert("저장할 데이터가 없습니다")
+})
+
+
+function handleDragDropEvent(oEvent) {
+  if(oEvent.target.classList == "emojionearea-editor" || oEvent.target.id == "urlinput")
+    return false;
+
+  oEvent.preventDefault();
+}

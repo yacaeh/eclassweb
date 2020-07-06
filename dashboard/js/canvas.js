@@ -16,7 +16,9 @@ designer.icons.movie = '/dashboard/newimg/videolink.png';
 designer.icons.file = '/dashboard/newimg/openfile.png';
 designer.icons.text = '/dashboard/newimg/text.png';
 designer.icons.epub = '/dashboard/newimg/epub.png';
-designer.icons.callteacher = '/dashboard/newimg/epub.png';
+designer.icons.callteacher = '/dashboard/newimg/handsup.png';
+
+
 
 designer.addSyncListener(function (data) {
   connection.send(data);
