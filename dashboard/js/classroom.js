@@ -1036,6 +1036,8 @@ function SetStudentList() {
   if(!connection.extra.roomOwner)
     return;
 
+  
+
   $('#student_list').empty();
 
   if(connection.getAllParticipants().length == 0){
@@ -1048,6 +1050,7 @@ function SetStudentList() {
     connection.getAllParticipants().forEach(function(pid) {
       var name = getFullName(pid)
       var div = $(' <span data-id="' + pid + '" data-name="' + name + '" class="student">\
+                    <span class="student-overlay"></span> \
                     <img src="/dashboard/newimg/exit.png"> \
                     <span class="bor"></span> \
                     <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
@@ -2300,7 +2303,7 @@ function sendFocus(state){
       } 
     });
     if(!state){
-      alert('수업 째지 마세요...');
+      // alert('수업 째지 마세요...');
       console.log("You left class!");
     }  
   }
