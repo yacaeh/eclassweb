@@ -302,6 +302,11 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if(event.data.closeTesting){
+    if(!connection.extra.roomOwner){
+      $('#exam-board').hide(300);
+    }
+  }
 };
 
 // extra code
@@ -1024,8 +1029,13 @@ function SelectViewType() {
 
 $('#top_test').click(function () {
   if ($('#exam-board').is(':visible')) {
-    $('#exam-board').hide(300);
-  } else {
+    if(examObj.closeTesting()){
+      $('#exam-board').hide(300);
+    }else{
+      alert("시험 종료 후 닫을 수 있습니다");
+    }
+  }
+  else {
     // 선생님
     if (params.open === 'true') {
       $('#exam-omr').hide();
@@ -1047,8 +1057,13 @@ var m_ExamTime; //
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
   m_QuesCount = $('#exam-question-count').val();
+  if(m_QuesCount>200){
+    alert("최대 문항수는 200개입니다");
+    m_QuesCount = 200;
+    $('#exam-question-count').val(m_QuesCount);
+  }
   var answerList = getQuestionAnswerList();
-  $('#exam-qustion-list').html('');
+  $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
     apeendQuestion(i);
   }
@@ -1145,17 +1160,17 @@ function setExamState(num, percent) {
 function apeendQuestion(i) {
   question = `<div id='exam-question-${i}' style='display: flex;'>`;
 
-  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:2; margin-top:2px;'>${i}.</span>`;
+  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='margin-top:5px; text-align:center; width:30px;'>${i}.</span>`;
 
   for (var j = 1; j <= 5; j++) {
     question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
     question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
   }
 
-  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 0px 3px; margin:5px;'>─</button>`;
+  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 3px 3px; margin:8px; height:20px; line-height:12px'>─</button>`;
 
   question += `</div>`;
-  $('#exam-qustion-list').append(question);
+  $('#exam-question-list').append(question);
 
   $(`#exam-question-${i}`).change(function () {
     $(`#exam-question-${i}`).css('background', '#eff1f0');
@@ -1167,7 +1182,7 @@ function deleteQuestion(num) {
   var answerList = getQuestionAnswerList();
   m_QuesCount--;
   answerList.splice(num - 1, 1);
-  $('#exam-qustion-list').html('');
+  $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
     apeendQuestion(i);
   }
@@ -1208,18 +1223,20 @@ function setStudentOMR(quesCount, examTime) {
   question += '<div>시험 중</div>';
   question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
   question += '</div>';
-  question += "<div id='exam-question-list' class='exam-border-bottom'>";
+  question += "<div class='exam-overflow exam-border-bottom'>";
+  question += "<div id='exam-omr-question-list'>";
   m_QuesCount = quesCount;
   for (var i = 1; i <= m_QuesCount; i++) {
     question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`;
-    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1;'>${i}.</span>`;
+    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'>${i}.</span>`;
     for (var j = 1; j <= 5; j++) {
       question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
       question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
     }
-    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1;'></span>`;
+    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'></span>`;
     question += `</div>`;
   }
+  question += '</div>';
   question += `</div>`;
   question +=
     "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
@@ -1261,7 +1278,7 @@ function stopQuestionOMR() {
   examObj.examAnswer = studentOMR;
   //  console.log(studentOMR);
 
-  $('#exam-question-list').css('pointer-events', 'none');
+  $('#exam-omr-question-list').css('pointer-events', 'none');
   $('#exam-answer-submit').hide();
 }
 

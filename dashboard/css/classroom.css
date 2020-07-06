@@ -960,15 +960,16 @@ input[type='radio'] {
   display: none;
 }
 
-input[type='radio'] + label {
-  display: inline-block;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 28px;
-  padding-right: 22px;
-  background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat;
-  margin-left: 0.5vw;
-  margin-right: 1vw;
+input[type=radio] + label { 
+display: inline-block; 
+cursor: pointer; 
+font-size: 12px;
+line-height: 28px; 
+padding-right: 22px;
+background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
+margin-left: 15px;
+margin-right: 5px;
+margin-top: 3px;
 }
 
 input[type='radio']:checked + label {
@@ -981,22 +982,86 @@ input[type='radio']:checked + label {
   border-color: #3ee1c9;
 }
 
-#exam-board {
-  display: none;
-  z-index: 5;
-  position: fixed;
-  top: 53px;
-  bottom: 0;
-  right: 0;
-  width: 20%;
+.btn-exam:hover {
+  background-color: #13b59c;
+}
+
+#exam-board{
+  display: none; 
+  z-index: 10;
+  position: fixed; 
+  top:50px; 
+  bottom: 0; 
+  right: 0; 
+  width: 339px; 
   border-left: gray solid 1px;
   background-color: white;
 }
 
-input[type='number']::-webkit-outer-spin-button,
-input[type='number']::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+#exam-title {
+  background-color: white; 
+  text-align: center;
+  padding-top: 9px;
+  padding-bottom: 7px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  color: #707070;
+}
+
+#exam-question-count-label {
+  width: 54px;
+  height: 16px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #707070;
+  margin-top: 11px;
+  margin-left: 15px;
+}
+
+#exam-time-label {
+  width: 40px;
+  height: 16px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #707070;
+  margin-top: 12px;
+  margin-left: 27px;
+}
+
+#exam-question-count, #exam-time {
+  width: 50px;
+  height: 28px;
+  background: #FFFFFF;
+  border: 2px solid #B8B8B8;
+  border-radius: 3px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+#exam-setting-apply {
+  width: 52px;
+  height: 28px;
+  margin-top: 5px;
+  margin-left: 40px;
+  padding: 0px;
+}
+
+#exam-question-count:focus, #exam-time:focus {
+  outline: solid #3ee1c9 1px;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 input[type='number']:focus {
@@ -1041,8 +1106,8 @@ input[type='number']:focus {
   border-bottom: gray solid 1px;
 }
 
-.exam-overflow {
-  max-height: 50vh;
+.exam-overflow{
+  max-height: 70vh;
   overflow-y: auto;
 }
 
@@ -1086,13 +1151,8 @@ input[type='number']:focus {
   position: absolute;
   left: 8px;
   top: 42px;
-<<<<<<< HEAD
-  width: 378px;
-  border: 2px solid #b8b8b8;
-=======
   width: 96%;
   border: 2px solid #B8B8B8;
->>>>>>> 74537f932edce12bf3af9d4bfcabe78a60acc5da
   border-radius: 3px;
   font-size: 14px;
   padding-left: 11px;
