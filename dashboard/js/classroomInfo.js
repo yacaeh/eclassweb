@@ -138,14 +138,17 @@ classroomCommand = {
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
-        alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => {
+        alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => { //callback yes
            // classroomInfo.alert
             // console.log(connection.getAllParticipants());
             // console.log(connection.getAllParticipants().length);
-            callback()
+            callback();
+            attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
             connection.send ({
                 alert : true
             });
+        },()=>{ //callback no 파일 저장한다.
+            attentionObj.exportAttention();
         });    
     }
 };
@@ -165,7 +168,7 @@ classroomCommand.receivAlert = function () {
         $(".alert-progress").val(progressVal)
     },10);
 
-    function response (yesOrno) {
+    function response (yesOrno) {        
         connection.send({                
             alertResponse :  {
                 userid : connection.userid,

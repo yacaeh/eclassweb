@@ -225,6 +225,10 @@ connection.onmessage = function (event) {
 
   if (event.data.alertResponse) {
     classroomCommand.receiveAlertResponse(event.data.alertResponse);
+    
+    if(connection.extra.roomOwner)
+      attentionObj.submit({userid:event.data.alertResponse.userid, name :  params.userFullName, response : event.data.alertResponse.response });
+    
     return;
   }
 
