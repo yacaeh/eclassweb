@@ -1054,6 +1054,11 @@ var m_ExamTime; //
 // 문제수 적용 (문제 n개 만들기)
 $('#exam-setting-apply').click(function () {
   m_QuesCount = $('#exam-question-count').val();
+  if(m_QuesCount>200){
+    alert("최대 문항수는 200개입니다");
+    m_QuesCount = 200;
+    $('#exam-question-count').val(m_QuesCount);
+  }
   var answerList = getQuestionAnswerList();
   $('#exam-question-list').html('');
   for (var i = 1; i <= m_QuesCount; i++) {
