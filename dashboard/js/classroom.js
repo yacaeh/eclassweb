@@ -1370,7 +1370,9 @@ $('#icon_exit').click(function () {
  
 
   classroomCommand.exitAlert(function () {
-    history.back();
+    //history.back();
+    var href = location.protocol + "//"+ location.host + "/dashboard/";
+    window.open(href, "_self");
   });
 
 
