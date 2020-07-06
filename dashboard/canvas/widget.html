@@ -15,7 +15,9 @@
     <link href="widget.css" rel="stylesheet">
 </head>
 
-<body oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+<body  ondragenter="handleDragDropEvent(event)"
+ondragover="handleDragDropEvent(event)"
+ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
 
     <section class="design-surface">
         <canvas id="temp-canvas" class="pen"></canvas>

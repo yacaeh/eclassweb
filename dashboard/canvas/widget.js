@@ -2537,8 +2537,8 @@ function canvasresize(id){
             image.src = data_uris.callteacher;
 
             document.getElementById('callteacher').onclick = function() {
-                this.classList.toggle("on");
-                this.classList.toggle("selected-shape");
+                // this.classList.toggle("on");
+                // this.classList.toggle("selected-shape");
             }
         }
 
@@ -3499,14 +3499,16 @@ function canvasresize(id){
     MakeTitlePop("textIcon", "글자를 적습니다");
     MakeTitlePop("undo", "작업 하나를 취소합니다");
     MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
-
+    
     MakeTitlePop("screen_share", "내 화면을 공유합니다");
     MakeTitlePop("3d_view", "3D 모델을 공유합니다");
     MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
     MakeTitlePop("file", "파일을 불러옵니다");
     MakeTitlePop("epub", "E-Pub을 불러옵니다");
-
+    
     MakeTitlePop("image-icon", "이미지를 불러옵니다");
+    MakeTitlePop("callteacher", "저요");
+    
 
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
 
@@ -3724,3 +3726,7 @@ function SliderSetting(element, targetinput, defaultv, callback){
         sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
     })
 }
+
+function handleDragDropEvent(oEvent) {
+    oEvent.preventDefault();
+  }

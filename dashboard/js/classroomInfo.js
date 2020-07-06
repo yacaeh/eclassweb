@@ -155,18 +155,33 @@ classroomCommand.openShare = function (callback){
     // })
 }
 
+classroomCommand.exitAlert = function (callback) {    
+    
+    alert_exit_Box("나가시겠습니까?", "경고", () => {
+        callback()
+    });
+    
+};
 
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
-        alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => {
+        alertBox("<span>학생들에게 알림을 보내겠습니까? \<label class='label_stu' for='view_stu'><input checked id='view_stu' type='checkbox'>학생 보기</label> \
+        </span>  ", "알림", () => { //callback yes
            // classroomInfo.alert
             // console.log(connection.getAllParticipants());
             // console.log(connection.getAllParticipants().length);
-            callback()
+            callback();
+            if(document.getElementById("view_stu").checked){
+                document.getElementById("top_student").click();
+            }
+
+            attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
             connection.send ({
                 alert : true
             });
+        },()=>{ //callback no 파일 저장한다.
+            // attentionObj.exportAttention();
         });    
     }
 };
@@ -186,7 +201,7 @@ classroomCommand.receivAlert = function () {
         $(".alert-progress").val(progressVal)
     },10);
 
-    function response (yesOrno) {
+    function response (yesOrno) {        
         connection.send({                
             alertResponse :  {
                 userid : connection.userid,
@@ -207,7 +222,7 @@ classroomCommand.receivAlert = function () {
 // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
 classroomCommand.receivedOnFocusResponse = (_response) => {
     if(connection.extra.roomOwner)
-    {        
+    {     
         let userId = _response.userId;
         let boolOnFocus = _response.onFocus; 
 
@@ -215,6 +230,13 @@ classroomCommand.receivedOnFocusResponse = (_response) => {
 
         for(let i = 0; i < children.length; i++){
             if( children[i].dataset.id == userId ){
+                var student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                if(boolOnFocus == false){
+                    student_overlay.css('background','black');
+                }
+                else{
+                    student_overlay.css('background','none');
+                }
                 console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
             }
         };
@@ -231,6 +253,27 @@ classroomCommand.receivedCallTeacherResponse = (userId) => {
             if( children[i].dataset.id == userId ){
                 console.log( "Received Call Teacher Respose : " +  userId );    
 
+                var student_overlay;
+                var isMeCount = 5;
+                var flickerInterval = setInterval(function(){
+                    student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                    var initBackColor = student_overlay.css('background');
+                    var orangeColor = setOverlayColor('orange');
+                    setTimeout(function(){
+                        student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                        var initBackColor2 = student_overlay.css('background');
+                        if(orangeColor !== initBackColor2)
+                            initBackColor = initBackColor2
+                        setOverlayColor(initBackColor);
+                    } ,500);
+                    if(isMeCount-- <= 0)
+                        clearInterval(flickerInterval);
+                },1000);
+                
+                function setOverlayColor(overlayColor){
+                    student_overlay.css('background',overlayColor);
+                    return student_overlay.css('background');
+                }
             }
         };
     }
@@ -661,6 +704,8 @@ studentCommand = {
         this.sendStudentToTeachCmd ('pdf-page', _page);
     },
 }
+
+
 
 
 /*

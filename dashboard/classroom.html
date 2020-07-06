@@ -31,6 +31,7 @@
   <script src="/dashboard/js/emojionearea.min.js"></script>
   <script src="/dashboard/js/classroomStudentsWatchInfo.js"></script>  
   <script src="/dashboard/js/examObj.js"></script>
+  <script src="/dashboard/js/attention.js"></script>
   <script src="/dashboard/js/classroomInfo.js"></script>
   <script src="/dashboard/js/all_controll.js"></script>
   <script src="/dashboard/js/canvas.js"></script>
@@ -57,7 +58,9 @@
 
 </head>
 
-<body oncontextmenu="return false" ondragstart="return false">
+<body ondragenter="handleDragDropEvent(event)"
+ondragover="handleDragDropEvent(event)"
+ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false">
 <a id="downloadLink" type="video/webm" style="display: none"></a>
 
 <div id="confirm-box" class="modal fade">
@@ -103,6 +106,7 @@
             <img class="divide">
             <img class="top_icon view_type-on view_type" id="top_student">
             <img class="top_icon view_type" id="top_camera">
+            <img class="top_icon" id="top_save_alert">
             <img class="top_icon" id="top_record_video">
           </span>
 
@@ -144,10 +148,12 @@
         <div class="lwindow">
           <span class="nos">
             <span class="now_selected_student">
-              <span class="name">지이잉</span>
-              <span class="status_img"></span>
-              <span class="status_text">접속중</span>
-                  </span>
+              <!-- <span class="name">지이잉</span> -->
+              <!-- <span class="status_img"></span> -->
+              <!-- <span class="status_text">접속중</span> -->
+             
+            
+            </span>
                   <span class="nos_student_text" id="nos">0</span>
                   <img class="nos_student_icon" src="/dashboard/newimg/student2.png">
                 </span>
@@ -230,6 +236,23 @@
       <div id="alert-footer"></div>
     </div>
   </div>
+
+  <div id="alert-exit" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
+    <div id="alert-dialog">
+      <div id="alert-header"><span id="alert-exit-title">경고</span></div>
+      <div id="alert-body">
+        <div id="alert-exit-content">
+          
+        </div>
+        <div id="alert-btns">
+          <button class="btn btn-alert-exit-yes" style="padding-top: 0;">예</button>
+          <button class="btn btn-alert-exit-no" style="padding-top: 0;">아니요</button>
+        </div>
+      </div>
+      <div id="alert-footer"></div>
+    </div>
+  </div>
+
 </body>
 
 
