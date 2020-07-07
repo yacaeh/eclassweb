@@ -3632,10 +3632,6 @@ function SliderSetting(element, targetinput, defaultv, callback){
 
     Set(defaultv);
     function Set(v){
-        var parent = sliderval.parentElement;
-        console.log(parent.style.display = 'block');
-        console.log(parent.getBoundingClientRect());
-
         var ratio = v / maxSlider;
         var sliderWidth = slider.getBoundingClientRect().width;
         // back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';

@@ -161,20 +161,29 @@ function ScreenShare(btn) {
 
   var on = $(btn).hasClass('on');
 
-  if (!connection.extra.roomOwner && connection.userid != classroomInfo.classPermission) {
+  if (!connection.extra.roomOwner && 
+    connection.userid != classroomInfo.classPermission) {
     alert('화면 공유 권한이 없습니다');
     $(btn).removeClass("on selected-shape")
     return;
   }
 
+
+
   if (!on) {
     isSharingScreen = false;
-    lastStream.getTracks().forEach((track) => track.stop());
-    connection.send({
-      hideMainVideo: true,
-    });
+    if(typeof(lastStream) !== "undefined")
+      lastStream.getTracks().forEach((track) => track.stop());
     return false;
   }
+
+  if(classroomInfo.shareScreen.state){
+    alert("다른 사람이 화면 공유를 사용 중 입니다.")
+    $(btn).removeClass("on selected-shape")
+    return;
+  }
+
+
 
   screen_constraints = {
     screen: true,

@@ -616,7 +616,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 },
                 onRemoteStream: function(stream) {
                     if (connection.peers[remoteUserId]) {
-                        console.error("PUSH")
                         connection.peers[remoteUserId].streams.push(stream);
                     }
 
@@ -2521,7 +2520,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         var localStreams = [];
         connection.attachStreams.forEach(function(stream) {
             if (!!stream) {
-                console.error("ASDASD")
                 localStreams.push(stream);
             }
         });
@@ -3612,6 +3610,26 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
 
+            if (connection.extra.roomOwner) {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 640,
+                    "maxWidth": 1280,
+                    "minHeight": 480,
+                    "maxHeight": 960,
+                    "minFrameRate": 30
+                };
+            }
+            else {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 82,
+                    "maxWidth": 82,
+                    "minHeight": 64,
+                    "maxHeight": 64,
+                    "minFrameRate": 2,
+                    "maxFrameRate": 2
+                };
+            }
+            
             navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
                 stream.streamid = stream.streamid || stream.id || getRandomString();
                 stream.idInstance = idInstance;
@@ -5345,7 +5363,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     var streams = [];
                     connection.attachStreams.forEach(function(s) {
                         if (s.id != stream.id) {
-                            console.error("ASd")
                             streams.push(s);
                         }
                     });
