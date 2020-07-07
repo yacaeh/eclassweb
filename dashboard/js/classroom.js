@@ -84,6 +84,7 @@ var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
+let extraPath = '';
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -266,8 +267,9 @@ connection.onmessage = function (event) {
     appendChatMessage(event);
     return;
   }
-
+  // 학생 접속시 싱크
   if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
+    console.log("Sync! when connect !");
     designer.sync();
     return;
   }
@@ -367,7 +369,7 @@ connection.onmessage = function (event) {
 
   // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
   if(event.data.onFocus){
-    if(connection.extra.roomOwner){      
+    if(connection.extra.roomOwner){
       classroomCommand.receivedOnFocusResponse( { userId : event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
     }
       
@@ -760,11 +762,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.extra.roomOwner = true;
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
-        if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-          alert('이미 존재하는 방 번호입니다.');
-          return;
-        }
-        alert(error);
+        connection.rejoin(params.sessionid);
       }
 
 
@@ -1277,18 +1275,26 @@ $('#exam-start').click(function () {
   $('#exam-setting-bar').hide();
   showExamStateForm();
 
-  $('#exam-teacher-timer').html(
-    parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-  );
+  $('#exam-teacher-timer').html(getFormatmmss(m_ExamTime));
   m_ExamTimerInterval = setInterval(function () {
     m_ExamTime--;
     examObj.updateExameTimer(m_ExamTime);
-    $('#exam-teacher-timer').html(
-      parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-    );
-    if (m_ExamTime <= 0) $('#exam-start').click();
+    $('#exam-teacher-timer').html(getFormatmmss(m_ExamTime));
+    if (m_ExamTime <= 0) 
+      finishExam();
   }, 1000);
 });
+
+function getFormatmmss(sceond){
+  var mm = numberPad(parseInt(sceond / 60),2);
+  var ss = numberPad(sceond % 60,2);
+  return mm+":"+ss;
+}
+
+function numberPad(n, width) {
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
+}
 
 function finishExam() {
   clearInterval(m_ExamTimerInterval);
@@ -1325,7 +1331,7 @@ function showExamStateForm() {
 // 시험 문제 하나의 정답률 변경 / 형식 -> (문제번호, 문제정답수/학생수)
 function setExamState(num, percent) {
   $(`#exam-state-progress-${num}`).val(percent);
-  $(`#exam-state-percent-${num}`).html(percent + '%');
+  $(`#exam-state-percent-${num}`).html(Math.round(percent) + '%');
 }
 
 // 문제 html에 하나 추가 (apeend)
@@ -1413,20 +1419,15 @@ function setStudentOMR(quesCount, examTime) {
   question +=
     "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
   $('#exam-omr').html(question);
-
-  m_ExamTime = parseInt(examTime * 60);
-  $('#exam-student-timer').html(
-    parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-  );
-
-  m_ExamTime = parseInt(examTime * 60);
-
+  
+  examTime *= 60;
+  $('#exam-student-timer').html(getFormatmmss(examTime));
   m_ExamTimerInterval = setInterval(function () {
-    m_ExamTime--;
-    $('#exam-student-timer').html(
-      parseInt(m_ExamTime / 60) + ':' + (m_ExamTime % 60)
-    );
-    if (m_ExamTime <= 0) clearInterval(m_ExamTimerInterval);
+    examTime--;
+    examObj.updateExameTimer(examTime);
+    $('#exam-student-timer').html(getFormatmmss(examTime));
+    if (examTime <= 0) 
+      finishExam();
   }, 1000);
 }
 
@@ -1482,7 +1483,9 @@ $('#icon_exit').click(function () {
  
 
   classroomCommand.exitAlert(function () {
-    history.back();
+    //history.back();
+    var href = location.protocol + "//"+ location.host + "/dashboard/";
+    window.open(href, "_self");
   });
 
 
@@ -2122,6 +2125,7 @@ function GetStream(id){
 
 function fileUploadModal(message, callback) {
   console.log(message);
+  extraPath = '';
   getUploadFileList();
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
@@ -2139,7 +2143,7 @@ function fileUploadModal(message, callback) {
       callback(false);
   });
 
-  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple></form>');
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
   $('#confirm-title').html('파일 관리자');
   $('#confirm-box-topper').show();
 
@@ -2153,7 +2157,6 @@ function fileUploadModal(message, callback) {
     $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
       e.preventDefault();
       unloadFileViewer();
-      unloadEpubViewer();
     });
     }
 
@@ -2165,7 +2168,7 @@ function getUploadFileList(){
   var xhr = new XMLHttpRequest();
   console.log(uploadServerUrl);
   var url = uploadServerUrl+'/list';
-  var data = { "userId" : params.sessionid };
+  var data = { "userId" : params.sessionid ,"extraPath":extraPath};
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
@@ -2265,8 +2268,7 @@ function loadFileInput(){
         'theme': 'fas',
         'showPreview': true,
         'language': 'kr',
-        'allowedFileExtensions': ['*'],
-        'fileType': "any",
+        'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg","odt"],
         'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
         'elErrorContainer': '#errorBlock'
     });
@@ -2448,7 +2450,7 @@ function LoadScreenShare(){
   }
 }
 
-
-window.addEventListener("beforeunload",function(){
-  alert("tes");
-})
+function syncWithTeacher(){
+  connection.send('plz-sync-points');
+  console.log("Sync!");
+}
