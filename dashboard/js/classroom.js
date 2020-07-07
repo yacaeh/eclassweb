@@ -39,6 +39,38 @@ connection.maxParticipantsAllowed = 1000;
 // set value 2 for one-to-one connection
 // connection.maxParticipantsAllowed = 2;
 
+var topButtonContents = {
+  top_all_controll : "전체 제어",
+  top_test         : "시험",
+  top_alert        : "알림",
+  top_student      : "학생 목록",
+  top_camera       : "선생님 카메라",
+  top_save_alert   : "알림 기록 저장",
+  top_record_video : "화면 녹화"
+}
+
+function CreateTopTooltip(data){
+  Object.keys(data).forEach(function(id){
+    var element = document.getElementById(id);
+      element.addEventListener("mouseover" ,function(e){
+      document.getElementById("toptooltip").style.display = 'block';
+
+      var tooltip = document.getElementById("toptooltip")
+      tooltip.children[0].innerHTML  = data[id];
+      var x = e.target.x;
+      var width = tooltip.getBoundingClientRect().width / 2;
+      tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width /2) - width  + "px";
+        
+      element.addEventListener("mouseleave", function(){
+        document.getElementById("toptooltip").style.display = 'none';
+
+      })
+    
+    })
+  });
+}
+CreateTopTooltip(topButtonContents);
+
 SetCanvasBtn('screen_share', ScreenShare);
 SetCanvasBtn('3d_view', _3DCanvasOnOff);
 SetCanvasBtn('movie', Movie_Render_Button);
@@ -2415,3 +2447,8 @@ function LoadScreenShare(){
     classroomCommand.openShare();
   }
 }
+
+
+window.addEventListener("beforeunload",function(){
+  alert("tes");
+})
