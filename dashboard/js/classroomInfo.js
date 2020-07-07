@@ -23,10 +23,9 @@ classroomInfo = {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
     },
-    file : {
-        state : false,
+    viewer : {
+        state : false,  // on, off
         type : 'none',  // pdf, video, jpg,
-
     },
 
     video : {
@@ -50,6 +49,7 @@ classroomInfoLocal = {
     epub : false,
     exam : false  
 };
+
 
 
 
@@ -416,6 +416,7 @@ classroomCommand.onStudentCommand = function (_cmd) {
 }
 
 classroomCommand.setPdfPage = function (_page) {    
+    mfileViewer.onShowPage (_page);
     classroomInfo.pdf.page = _page;
     if(connection.extra.roomOwner)
         classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
@@ -448,63 +449,34 @@ classroomCommand.sendPDFCmd = function (_cmd, _data) {
     });
 }
 
-classroomCommand.updatePDFCmd = function (_pdf) {  
-    const cmd = _pdf.cmd;
-
-    if(cmd == 'open') {
-        classroomInfo.pdf.page = _pdf.data.page;
-        classroomInfo.pdf.src = _pdf.data.src;
-        loadFileViewer (classroomInfo.pdf.src);
-        return;
-    }
-    else if(cmd == 'close') {
-        classroomCommand.setPdfStateLocal (false);
-    }
-    else
-    {
-        let frame = document
-        .getElementById('widget-container')
-        .getElementsByTagName('iframe')[0].contentWindow;
-        let fileViewer = frame.document.getElementById('file-viewer');
-        if(!fileViewer)  return;
-    
-        switch(cmd)
-        {
-            case "first-page" :            
-                fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-                fileJQuery.scrollTop();
-                break;
-            case 'next' :
-                fileViewer.contentWindow.document.getElementById('next').click();
-                break;
-            case 'prev' :
-                fileViewer.contentWindow.document.getElementById('previous').click();
-                break;
-            case 'last-page' :
-                fileViewer.contentWindow.document.getElementById('previous').click();
-                break;
-            case 'fullscreen' :
-                fileViewer.contentWindow.document.getElementById('fullscreen').click();
-                break;
-            case 'presentation' :
-                fileViewer.contentWindow.document.getElementById('presentation').click();
-                break;
-            case 'zoomIn' :
-                fileViewer.contentWindow.document.getElementById('zoomIn').click();
-                break;
-            case 'zoomOut' :
-                fileViewer.contentWindow.document.getElementById('zoomOut').click();
-                break;
-            case 'page' :                        
-                const page = _pdf.data;
-                classroomInfo.pdf.page = page;  
-                var e = new Event("change");
-                $(fileViewer.contentWindow.document.getElementById("pageNumber")).val(page);
-                fileViewer.contentWindow.document.getElementById("pageNumber").dispatchEvent (e);           
-                break;
-        }
-    }
+classroomCommand.updateViewer = function (_cmd) {
+    mfileViewer.updateViewer(_cmd);
 }
+
+classroomCommand.openFile = function (_url) {
+    if(connection.extra.roomOwner) {
+        classroomCommand.togglePdfStateServer (true, _url);
+    }
+    mfileViewer.openFile (_url);
+}
+
+classroomCommand.closeFile = function () {
+    if(connection.extra.roomOwner)
+        classroomCommand.togglePdfStateServer (false);
+    mfileViewer.closeFile ();
+}
+
+classroomCommand.onShowPage = function (_page) {
+    console.log('onshowpage : ' + _page);
+    mfileViewer.onShowPage (_page);
+}
+
+classroomCommand.onViewerLoaded = function () {
+    mfileViewer.onLoadedViewer ();
+}
+
+
+
 
 classroomCommand.syncPdf = function () {    
     if(classroomInfo.pdf.state) {        
@@ -533,9 +505,9 @@ classroomCommand.pdfOnLoaded = function () {
     if(!classroomInfo.pdf.page)
         classroomInfo.pdf.page = 1;
 
-    classroomCommand.updatePDFCmd ({
+    classroomCommand.updateViewer ({
         cmd : 'page',
-        data : classroomInfo.pdf.page
+        page : classroomInfo.pdf.page
     });
 
     // 학생인 경우만 처리
@@ -558,6 +530,7 @@ classroomCommand.pdfOnLoaded = function () {
         }
     }
 }
+
 
 /*
     Epub

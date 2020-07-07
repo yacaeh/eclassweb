@@ -1443,16 +1443,11 @@ function LoadFile(btn) {
   // }
 }
 
-var mfileViewer = new fileViewerInfo ();
 
 function unloadFileViewer() {
   isSharingFile = false;
   isFileViewer = false;
-
-  if(connection.extra.roomOwner)
-    classroomCommand.togglePdfStateServer (false);
-
-  mfileViewer.closeFile ();
+  classroomCommand.closeFile ();
 }
 
 
@@ -1460,23 +1455,21 @@ function loadFileViewer(url) {
 
   console.log('loadFileViewer');
   isSharingFile = true;
-  isFileViewer = true;
-  if(connection.extra.roomOwner)
-      classroomCommand.togglePdfStateServer (true, url);
-  mfileViewer.openFile (url);
+  isFileViewer = true;  
+  classroomCommand.openFile (url);
 }
 
 
 // Pdf가 처음 로딩이 다 되었는지 확인.
 // 로딩이 다 된 후에 페이지 동기화
 function pdfOnLoaded () {
-  classroomCommand.pdfOnLoaded ();
+  classroomCommand.onViewerLoaded ();
 }
 
 function showPage(n){
-  console.log(n);
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
-    classroomCommand.setPdfPage(n);
+    classroomCommand.onShowPage (n);
+    // classroomCommand.setPdfPage(n);
 }
 
 function showNextPage(){  
