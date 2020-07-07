@@ -1443,6 +1443,8 @@ function LoadFile(btn) {
   // }
 }
 
+var mfileViewer = new fileViewerInfo ();
+
 function unloadFileViewer() {
   isSharingFile = false;
   isFileViewer = false;
@@ -1450,59 +1452,18 @@ function unloadFileViewer() {
   if(connection.extra.roomOwner)
     classroomCommand.togglePdfStateServer (false);
 
-  let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-  frame.document.getElementById('main-canvas').style.zIndex = '1';
-  frame.document.getElementById('temp-canvas').style.zIndex = '2';
-  frame.document.getElementById('tool-box').style.zIndex = '3';
-
-  let fileViewer = frame.document.getElementById('file-viewer');
-  fileViewer.remove();
-
+  mfileViewer.closeFile ();
 }
 
+
 function loadFileViewer(url) {
-
-if(isSharingFile)
-  unloadFileViewer ();
-
-  $('#confirm-box').modal('hide');
-  $('#confirm-box-topper').hide();
-
-  if(connection.extra.roomOwner)
-    classroomCommand.togglePdfStateServer (true, url);
 
   console.log('loadFileViewer');
   isSharingFile = true;
   isFileViewer = true;
-
-  let fileViewer = document.createElement('iframe');
-  fileViewer.setAttribute('id', 'file-viewer');
-  fileViewer.setAttribute(
-    'src',
-    'https://'+window.location.host+'/ViewerJS/#'+url
-  );
-
-  fileViewer.style.width = '1024px';
-  fileViewer.style.height = '724px';
-  fileViewer.style.cssText =
-    'border: 1px solid black;height:1024px;direction: ltr;margin-left:2%;width:78%;';
-  fileViewer.setAttribute('allowFullScreen', '');
-  let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-
-  frame.document
-    .getElementsByClassName('design-surface')[0]
-    .appendChild(fileViewer);
-  console.log(frame.document
-    .getElementsByClassName('design-surface')[0]
-    .appendChild(fileViewer));
-
-  frame.document.getElementById('main-canvas').style.zIndex = '1';
-  frame.document.getElementById('temp-canvas').style.zIndex = '2';
-  frame.document.getElementById('tool-box').style.zIndex = '3';
+  if(connection.extra.roomOwner)
+      classroomCommand.togglePdfStateServer (true, url);
+  mfileViewer.openFile (url);
 }
 
 

@@ -23,6 +23,17 @@ classroomInfo = {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
     },
+    file : {
+        state : false,
+        type : 'none',  // pdf, video, jpg,
+
+    },
+
+    video : {
+        state : 'close',
+        time : 0,
+        src : ''        
+    },
     exam : false,
     classPermission : undefined,
     micPermission : undefined,
@@ -39,6 +50,7 @@ classroomInfoLocal = {
     epub : false,
     exam : false  
 };
+
 
 
 classroomCommand = {    
@@ -678,6 +690,22 @@ classroomCommand.syncEpub = function () {
         // close        
         classroomCommand.closeEpub ();     
     }
+};
+
+
+classroomCommand.openVideo = function () {
+
+}
+
+classroomCommand.syncVideo = function () {
+
+    // state
+    // playing,
+    // pause,
+    // time
+
+    //$('.vjs-play-control').click();
+    //$('.vjs-play-progress').getAttribute('data-current-time')
 };
 
 

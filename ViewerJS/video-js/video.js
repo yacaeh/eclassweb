@@ -5177,6 +5177,7 @@ var MouseTimeDisplay = (function (_Component) {
   };
 
   MouseTimeDisplay.prototype.update = function update(newTime, position) {
+
     var time = _utilsFormatTimeJs2['default'](newTime, this.player_.duration());
 
     this.el().style.left = position + 'px';
@@ -5257,7 +5258,7 @@ var PlayProgressBar = (function (_Component) {
     });
   };
 
-  PlayProgressBar.prototype.updateDataAttr = function updateDataAttr() {
+  PlayProgressBar.prototype.updateDataAttr = function updateDataAttr() {    
     var time = this.player_.scrubbing() ? this.player_.getCache().currentTime : this.player_.currentTime();
     this.el_.setAttribute('data-current-time', _utilsFormatTimeJs2['default'](time, this.player_.duration()));
   };
@@ -5423,7 +5424,7 @@ var SeekBar = (function (_Slider) {
    * @method updateARIAAttributes
    */
 
-  SeekBar.prototype.updateARIAAttributes = function updateARIAAttributes() {
+  SeekBar.prototype.updateARIAAttributes = function updateARIAAttributes() {    
     // Allows for smooth scrubbing, when player can't keep up.
     var time = this.player_.scrubbing() ? this.player_.getCache().currentTime : this.player_.currentTime();
     this.el_.setAttribute('aria-valuenow', (this.getPercent() * 100).toFixed(2)); // machine readable value of progress bar (percentage complete)
@@ -5470,7 +5471,7 @@ var SeekBar = (function (_Slider) {
     if (newTime === this.player_.duration()) {
       newTime = newTime - 0.1;
     }
-
+    
     // Set new time (tell player to seek to new time)
     this.player_.currentTime(newTime);
   };
