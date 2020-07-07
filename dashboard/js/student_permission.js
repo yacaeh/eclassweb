@@ -111,7 +111,6 @@ permissionManager = {
   mute: function () {
     connection.streamEvents.selectAll().forEach(function (e) {
       if(e.stream.isVideo && !e.extra.roomOwner && e.userid != classroomInfo.micPermission){
-        console.log(e);
         e.mediaElement.volume = 0;
         // e.stream.mute("audio");
       }

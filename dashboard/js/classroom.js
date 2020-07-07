@@ -85,6 +85,7 @@ var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
 let extraPath = '';
+let currentPdfPage = 0;
 
 function checkSharing() {
   return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
@@ -1560,6 +1561,7 @@ function pdfOnLoaded () {
 
 function showPage(n){
   console.log(n);
+  currentPdfPage = n;
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
     classroomCommand.setPdfPage(n);
 }
@@ -2358,3 +2360,39 @@ $(".perbtn").click(function () {
     permissionManager.mute();
   }
 });
+// Save classinfo on user exit
+function saveClassInfo(){
+console.log();
+localStorage.setItem('sessionid', params.sessionid);
+localStorage.setItem('points', params.sessionid);
+localStorage.setItem('currentPage', currentPdfPage);
+localStorage.setItem('isSharingScreen', isSharingScreen);
+localStorage.setItem('isSharing3D', isSharing3D);
+localStorage.setItem('isSharingMovie', isSharingMovie);
+localStorage.setItem('isSharingFile', isSharingFile);
+localStorage.setItem('isSharingEpub', isSharingEpub);
+localStorage.setItem('isFileViewer', isFileViewer);
+
+}
+
+function loadClassInfo(){
+  localStorage.getItem('sessionid', params.sessionid);
+  localStorage.getItem('isSharingScreen', isSharingScreen);
+  localStorage.getItem('isSharing3D', isSharing3D);
+  localStorage.getItem('isSharingMovie', isSharingMovie);
+  localStorage.getItem('isSharingFile', isSharingFile);
+  localStorage.getItem('isSharingEpub', isSharingEpub);
+  localStorage.getItem('isFileViewer', isFileViewer);
+  
+}
+
+function removeClassInfo(){
+  localStorage.removeItem('sessionid', params.sessionid);
+  localStorage.removeItem('isSharingScreen', isSharingScreen);
+  localStorage.removeItem('isSharing3D', isSharing3D);
+  localStorage.removeItem('isSharingMovie', isSharingMovie);
+  localStorage.removeItem('isSharingFile', isSharingFile);
+  localStorage.removeItem('isSharingEpub', isSharingEpub);
+  localStorage.removeItem('isFileViewer', isFileViewer);
+
+}
