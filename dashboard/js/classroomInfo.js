@@ -149,16 +149,13 @@ classroomCommand = {
 
 
 classroomCommand.openShare = function (callback){
-    console.log("OPEN SHARE")
     var s = GetStream(classroomInfoLocal.shareScreen.id)
     if(s != undefined){
         document.getElementById("screen-viewer").srcObject = s;
         document.getElementById("screen-viewer").style.display = 'block';
     }
-
-    // connection.send({
-    //     rtrack:true
-    // })
+    
+    console.log("OPEN SHARE",s)
 }
 
 classroomCommand.exitAlert = function (callback) {    
@@ -331,8 +328,11 @@ classroomCommand.setShareScreenServer = function (_data, success, error) {
     connection.socket.emit('set-share-screen', _data, result => {  
         if(result.result)
             success ();
-        else 
+        else {
+            console.log(result.error);
+            alert(result.error)
             error (result.error);
+        }
     });
 };
 
