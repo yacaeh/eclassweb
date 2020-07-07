@@ -616,7 +616,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 },
                 onRemoteStream: function(stream) {
                     if (connection.peers[remoteUserId]) {
-                        console.error("PUSH")
                         connection.peers[remoteUserId].streams.push(stream);
                     }
 
@@ -2521,7 +2520,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         var localStreams = [];
         connection.attachStreams.forEach(function(stream) {
             if (!!stream) {
-                console.error("ASDASD")
                 localStreams.push(stream);
             }
         });
@@ -5345,7 +5343,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     var streams = [];
                     connection.attachStreams.forEach(function(s) {
                         if (s.id != stream.id) {
-                            console.error("ASd")
                             streams.push(s);
                         }
                     });

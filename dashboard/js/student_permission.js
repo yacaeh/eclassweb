@@ -6,8 +6,6 @@ function OnClickStudent(div) {
       var name = e.target.dataset.name;
       var pid = e.target.dataset.id;
   
-      console.log(e.target.id);
-  
       $('#perbtn').clearQueue();
       $('#perbtn > .circle').clearQueue();
   
