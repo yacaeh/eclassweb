@@ -3610,6 +3610,26 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
 
+            if (connection.extra.roomOwner) {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 640,
+                    "maxWidth": 1280,
+                    "minHeight": 480,
+                    "maxHeight": 960,
+                    "minFrameRate": 30
+                };
+            }
+            else {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 82,
+                    "maxWidth": 82,
+                    "minHeight": 64,
+                    "maxHeight": 64,
+                    "minFrameRate": 2,
+                    "maxFrameRate": 2
+                };
+            }
+            
             navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
                 stream.streamid = stream.streamid || stream.id || getRandomString();
                 stream.idInstance = idInstance;

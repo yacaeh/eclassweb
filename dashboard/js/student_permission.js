@@ -121,24 +121,29 @@ permissionManager = {
   },
 
   unmute: function (id) {
+    var array = [];
+
     connection.streamEvents.selectAll().forEach(function (e) {
       if(e.stream.isVideo && 
         e.userid == id && 
         !e.extra.roomOwner && 
         e.type != "remote"){
-
         console.log("UNMUTED ", e);
         e.stream.unmute("audio");
       }
-
-      // if(e.extra.roomOwner && e.stream.isVideo){
-      //   e.stream.mute("audio");
-      // }
-
     })
+
+    if(id == connection.userid){
+        connection.streamEvents.selectAll().forEach(function(e){
+          if(e.extra.roomOwner && e.stream.isVideo && e.userid == id){
+            e.stream.mute("audio");
+          }
+        })
+    }
 
     if(connection.extra.roomOwner){
       connection.send({unmute : id});
+      // e.forEach(element => element.stream.mute("audio"));
     }
   }
 }
