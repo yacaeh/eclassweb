@@ -305,7 +305,7 @@ class mediaViewer {
 
 
 
-class fileViewerInfo {
+class fileViewer {
     mViewerLoader = new fileViewerLoader();
     mLoaded = false;
     
@@ -460,7 +460,7 @@ class fileViewerInfo {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-var mfileViewer = new fileViewerInfo ();
+var mfileViewer = new fileViewer ();
 
 mfileViewer.onopen = function (_type, _url) {
 
