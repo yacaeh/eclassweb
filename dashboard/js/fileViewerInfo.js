@@ -10,6 +10,7 @@ class fileViewerLoader {
     type = 'none';
     ext = 'none';   // 확장자
     url = '';
+    bLock = false;
 
     constructor () {
 
@@ -47,6 +48,10 @@ class fileViewerLoader {
     
     IsOpen () {
         return this.bOpen;
+    }
+
+    IsLock () {
+        return this.bLock;
     }
 
     getUrl () {
@@ -130,7 +135,9 @@ class fileViewerLoader {
         fileViewer.remove();
     }
 
-    pdfViewerLock(_lock) {
+    LockViewer (_lock) {
+        this.bLock = _lock;
+
         let frame = document
         .getElementById('widget-container')
         .getElementsByTagName('iframe')[0].contentWindow;
@@ -148,7 +155,7 @@ class fileViewerLoader {
 
 class pdfViewer {
     
-    page = Number; 
+    page; 
     onpage = function (_page) {}   
 
     
@@ -159,49 +166,6 @@ class pdfViewer {
     /*
         interface method 다른 viewer도 같이 구현을 해야 함.
     */
-
-   syncViewerState () {
-        const page = classroomInfo.viewer.pdf.page;      
-        this.showPage(page); 
-    }    
-
-    onUpdate (_data) {                       
-        const cmd = _data.cmd; 
-        switch(cmd)
-        {
-            // case "first-page" :            
-            //     fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-            //     fileJQuery.scrollTop();
-            //     break;
-            // case 'next' :
-            //     fileViewer.contentWindow.document.getElementById('next').click();
-            //     break;
-            // case 'prev' :
-            //     fileViewer.contentWindow.document.getElementById('previous').click();
-            //     break;
-            // case 'last-page' :
-            //     fileViewer.contentWindow.document.getElementById('previous').click();
-            //     break;
-            // case 'fullscreen' :
-            //     fileViewer.contentWindow.document.getElementById('fullscreen').click();
-            //     break;
-            // case 'presentation' :
-            //     fileViewer.contentWindow.document.getElementById('presentation').click();
-            //     break;
-            // case 'zoomIn' :
-            //     fileViewer.contentWindow.document.getElementById('zoomIn').click();
-            //     break;
-            // case 'zoomOut' :
-            //     fileViewer.contentWindow.document.getElementById('zoomOut').click();
-            //     break;
-            case 'page' :                                        
-                const page = _data.page;
-                this.showPage (page);
-                break;
-        }
-    }
-
-
     getElementFileViewer () {
         let frame = document
         .getElementById('widget-container')
@@ -210,10 +174,6 @@ class pdfViewer {
         return fileViewer;
     }
 
-
-    /*
-
-    */
     showPage  (_page) {         
 
         //  현재 같은 페이지이면 바꾸지 않는다.
@@ -243,33 +203,39 @@ class videoViewer {
     state;
     time;
 
-    update (_data) {
-
-    }
 }
 
 
 
 class fileViewerInfo {
-
-
     mViewerLoader = new fileViewerLoader();
     mLoaded = false;
     
     mCurrentViewer;
 
-    onclose = function () {}
+    // all 
     onopen = function (_type = String, _url = String) {}
+    onclose = function () {}        
     onloaded = function (_type = String) {}    
+    onsync = function () {}
 
-    
+    // private
+    onopeneachtype = function () {}         // 
+    oncloseeachtype = function () {}        // 
+    onloadedeachtype = function () {}
+    onupdateeachtype = function (_data) {}   // 방 동기화 처리
+    onsynceachtype = function () {}          // 난입시, 동기화 처리
 
     getCurrentViewer () {
         return this.mCurrentViewer;
     }
+
+    getCurrentViewerType () {
+        return this.mViewerLoader.getType();
+    }
    
     initViewer () {        
-        switch(this.mViewerLoader.getType()){
+        switch(this.getCurrentViewerType()){
             case 'pdf' :                
                 this.mCurrentViewer = new pdfViewer();
                 break;
@@ -277,6 +243,7 @@ class fileViewerInfo {
                 this.mCurrentViewer = new videoViewer ();
                 break;
             case 'img' :
+                this.mCurrentViewer = new pdfViewer();
                 break;
         }
     }
@@ -292,14 +259,21 @@ class fileViewerInfo {
         this.mViewerLoader.openViewer (_url);
         this.initViewer ();
 
-        this.onopen (this.mViewerLoader.getType(), _url);
+        const type = this.mViewerLoader.getType();
+        this.onopen (type, _url);
+        if(this.onopeneachtype[type])
+            this.onopeneachtype[type]();
     }
 
     closeFile () {
-        this.mViewerLoader.closeViewer ();
-        this.mCurrentViewer = null;
 
         this.onclose ();
+        const viewerType = this.getCurrentViewerType();
+        if(this.oncloseeachtype[viewerType])
+            this.oncloseeachtype[viewerType]();
+
+        this.mViewerLoader.closeViewer ();
+        this.mCurrentViewer = null;
     }
 
     hasLoadViewer () {
@@ -311,9 +285,14 @@ class fileViewerInfo {
         const state = classroomInfo.viewer.state;
         if(state) {
             if(this.mViewerLoader.IsOpen()) {
-                if(state) {
-                    // 값만 동기화
-                    this.mCurrentViewer.syncViewerState();
+                if(state) {                                      
+``
+                    if(this.onsync)
+                        this.onsync ();
+
+                    //  현재 타입에 따라 동기화
+                    if(this.onsynceachtype[this.getCurrentViewerType()])
+                        this.onsynceachtype[this.getCurrentViewerType()]();
                 }
                 else {
                     this.closeFile ();
@@ -345,8 +324,11 @@ class fileViewerInfo {
             default :
                 if(!this.mLoaded)
                     return;
-
-                this.mCurrentViewer.onUpdate (_data);
+                
+                const viewerType = this.getCurrentViewerType();
+                if(this.onupdateeachtype[viewerType])
+                    this.onupdateeachtype[viewerType] (_data);
+                
                 break;
         }
     }
@@ -355,8 +337,7 @@ class fileViewerInfo {
         
         //  showPage      
         if(!this.hasLoadViewer())    return;
-        //if(connection.extra.roomOwner)              
-        
+        //if(connection.extra.roomOwner)                            
         this.mCurrentViewer.setPage(_page);      
     }
 
@@ -364,7 +345,11 @@ class fileViewerInfo {
         if(!this.hasLoadViewer())    return;
 
         this.mLoaded = true;
-        this.onloaded (this.mViewerLoader.getType());
+        this.onloaded ();        
+        const viewerType = this.getCurrentViewerType();
+        if(this.onloadedeachtype[viewerType])
+            this.onloadedeachtype[viewerType]();
+
     } 
 }
 
@@ -379,25 +364,13 @@ var mfileViewer = new fileViewerInfo ();
 
 mfileViewer.onopen = function (_type, _url) {
 
+    isSharingFile = true;
+    isFileViewer = true;
+
     console.log('onopen');
     classroomInfo.viewer.type = _type;
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
-
-    switch(_type) {
-        case 'pdf' :
-            if(!classroomInfo.viewer.pdf) {
-                classroomInfo.viewer.pdf = {};
-                classroomInfo.viewer.pdf.page = 1;
-            }        
-            break;
-
-        case 'video' :
-            break;
-
-        case 'jpg' :
-            break;
-    }
 
     if(connection.extra.roomOwner) {
         connection.send({
@@ -407,9 +380,17 @@ mfileViewer.onopen = function (_type, _url) {
             }            
         });        
     }
+    else {
+        if(classroomInfo.allControl) 
+            mfileViewer.mViewerLoader.LockViewer (true);
+    }
 }
 
 mfileViewer.onclose = function () {
+
+    isSharingFile = false;
+    isFileViewer = false;
+
     console.log('close');
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;
@@ -425,33 +406,136 @@ mfileViewer.onclose = function () {
 }
 
 mfileViewer.onloaded = function (_type) {
-    console.log('onloaded ' + _type);
     classroomInfo.viewer.loaded = true;
-    
-    switch(_type) {
-        case 'pdf' :            
-        {
-            mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);                
-            mfileViewer.getCurrentViewer().onpage = (page) => {
-                
-                classroomInfo.viewer.pdf.page = page;
+}
 
-                if(connection.extra.roomOwner) {
-                    if(!classroomInfo.allControl)   return;
-                    connection.send ({
-                        viewer : {
-                            cmd : 'page',
-                            page : page                        
-                        }
-                    });            
+
+mfileViewer.onsync = function () {    
+    if(!connection.extra.roomOwner)
+    {
+        if(classroomInfo.allControl) 
+            mfileViewer.mViewerLoader.LockViewer (true);
+        else
+            mfileViewer.mViewerLoader.LockViewer (false);
+    }
+}
+
+/*
+    PDF fileViewer
+*/
+mfileViewer.onopeneachtype['pdf'] = function () {
+
+    console.log('onopen pdf');
+
+    if(!classroomInfo.viewer.pdf) {
+        classroomInfo.viewer.pdf = {};
+        classroomInfo.viewer.pdf.page = 1;
+    }                
+}
+
+mfileViewer.onupdateeachtype['pdf'] = function (_data) {
+    console.log('onupdate pdf');            
+    const cmd = _data.cmd; 
+    switch(cmd)
+    {
+        // case "first-page" :            
+        //     fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
+        //     fileJQuery.scrollTop();
+        //     break;
+        // case 'next' :
+        //     fileViewer.contentWindow.document.getElementById('next').click();
+        //     break;
+        // case 'prev' :
+        //     fileViewer.contentWindow.document.getElementById('previous').click();
+        //     break;
+        // case 'last-page' :
+        //     fileViewer.contentWindow.document.getElementById('previous').click();
+        //     break;
+        // case 'fullscreen' :
+        //     fileViewer.contentWindow.document.getElementById('fullscreen').click();
+        //     break;
+        // case 'presentation' :
+        //     fileViewer.contentWindow.document.getElementById('presentation').click();
+        //     break;
+        // case 'zoomIn' :
+        //     fileViewer.contentWindow.document.getElementById('zoomIn').click();
+        //     break;
+        // case 'zoomOut' :
+        //     fileViewer.contentWindow.document.getElementById('zoomOut').click();
+        //     break;
+        case 'page' :                                        
+            const page = _data.page;
+            mfileViewer.getCurrentViewer().showPage(page);
+            break;
+    }
+}
+
+mfileViewer.onsynceachtype['pdf'] = function () {
+    console.log('onsync pdf');
+    const page = classroomInfo.viewer.pdf.page;     
+    mfileViewer.getCurrentViewer().showPage(page);
+}
+
+mfileViewer.onloadedeachtype['pdf'] = function () {
+    console.log('onloaded pdf');
+    mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);                
+    mfileViewer.getCurrentViewer().onpage = (page) => {
+        
+        classroomInfo.viewer.pdf.page = page;
+        if(connection.extra.roomOwner) {
+            
+            // 선생님
+            if(!classroomInfo.allControl)   return;
+            connection.send ({
+                viewer : {
+                    cmd : 'page',
+                    page : page                        
                 }
-                else {
-                    //  학생
-                }
-            }            
+            });            
         }
-            break;
-        case 'video' :
-            break;
-    }   
+        else {
+            //  학생
+            console.log('send page');
+            connection.send({
+                studentCmd : {
+                    from : connection.userid,
+                    cmd : 'pdf-page',
+                    data : page
+                }        
+            });
+        }
+    }            
+}
+
+
+
+/*
+    Video Viewer
+*/
+mfileViewer.onopeneachtype['video'] = function () {
+
+    console.log('onopen video');
+
+    // if(!classroomInfo.viewer.pdf) {
+    //     classroomInfo.viewer.pdf = {};
+    //     classroomInfo.viewer.pdf.page = 1;
+    // }                
+}
+
+mfileViewer.onupdateeachtype['video'] = function (_data) {
+    console.log('onupdate video');            
+    const cmd = _data.cmd; 
+    switch(cmd)
+    {
+        
+    }
+}
+
+mfileViewer.onsynceachtype['video'] = function () {
+    console.log('onsync video');
+ 
+}
+
+mfileViewer.onloadedeachtype['video'] = function () {
+    console.log('onloaded video');   
 }

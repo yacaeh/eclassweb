@@ -390,67 +390,11 @@ classroomCommand.onViewerLoaded = function () {
     mfileViewer.onLoadedViewer ();
 }
 
-
 classroomCommand.syncViewer = function () {
     mfileViewer.syncViewer ();
 }
 
 
-
-classroomCommand.syncPdf = function () {    
-
-    mfileViewer.syncViewer ();
-    // if(classroomInfo.pdf.state) {        
-    //     if(isFileViewer)
-    //     {
-    //         //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
-    //         classroomCommand.pdfOnLoaded ();      
-    //     }
-    //     else {
-    //         // open
-    //         loadFileViewer (classroomInfo.pdf.src);
-    //         $('#canvas-controller').show();
-    //     }
-    // }
-    // else {
-    //     // close        
-    //     if(isFileViewer) {
-    //         unloadFileViewer();
-    //         $('#canvas-controller').hide();
-    //     }
-    // }
-};
-
-
-// classroomCommand.pdfOnLoaded = function () {
-//     if(!classroomInfo.pdf.page)
-//         classroomInfo.pdf.page = 1;
-
-//     classroomCommand.updateViewer ({
-//         cmd : 'page',
-//         page : classroomInfo.pdf.page
-//     });
-
-//     // 학생인 경우만 처리
-//     if(!connection.extra.roomOwner) {                
-//         studentCommand.sendPdfPage (classroomInfo.pdf.page);
-//         pdfViewerLock (classroomInfo.allControl);
-//     }
-    
-//     function pdfViewerLock(_lock) {
-//         let frame = document
-//         .getElementById('widget-container')
-//         .getElementsByTagName('iframe')[0].contentWindow;
-//         let fileViewer = frame.document.getElementById('file-viewer');
-//         let viewer = fileViewer.contentWindow.document.getElementById("viewer")                                  
-//         if(_lock) {
-//             viewer.style.pointerEvents = 'none';
-//         }
-//         else{
-//             viewer.style.pointerEvents = '';
-//         }
-//     }
-// }
 
 
 /*
@@ -611,13 +555,15 @@ classroomCommand.syncClassroomOpenTime =  function () {
 };
 
 
-// 학생 pdf 페이지가 바뀔 때 호출 된다. 
-classroomStudentsWatchInfo.onPdfPage =  function (student) {
-    var id = student.userid;
-    var page = student.pdfViewPage;
+// // 학생 pdf 페이지가 바뀔 때 호출 된다. 
+// classroomStudentsWatchInfo.onPdfPage =  function (student) {
+//     var id = student.userid;
+//     var page = student.pdfViewPage;
 
-    console.log(student);
-}
+//     console.log(student);
+
+//     //classroomStudentsWatchInfo.setPdfPage (id, page);
+// }
 
 
 //--------------------------------------------------------------------------------//
