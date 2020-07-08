@@ -10,18 +10,17 @@ classroomInfo = {
         state : false,
         data : { }   // position, rotation 
     },
-    pdf : {
-        state : false,
-        src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf',
-        page : 1
-       // 어떤 pdf, 몇 페이지 등
-    },
     epub : {
         state : false,
         page : 0,        
         data : {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
+    },
+    viewer : {
+        state : false,  // on, off
+        type : 'none',  // pdf, video, jpg,
+        loaded : false,
     },
     exam : false,
     classPermission : undefined,
@@ -41,6 +40,8 @@ classroomInfoLocal = {
 };
 
 
+
+
 classroomCommand = {    
     
     /*    
@@ -53,8 +54,7 @@ classroomCommand = {
             classroomInfo.roomOpenTime = _info.roomOpenTime;
             classroomInfo.allControl = _info.allControl;
             classroomInfo.shareScreen.state = _info.shareScreen;
-            classroomInfo.share3D.state = _info.share3D.state;
-            classroomInfo.pdf.state = _info.pdf.state;
+            classroomInfo.share3D.state = _info.share3D.state;                 
             classroomInfo.exam = _info.exam;
             classroomInfo.classPermission = _info.classPermission;
             classroomInfo.micPermission = _info.micPermission;
@@ -102,10 +102,10 @@ classroomCommand = {
     copyGlobalToLocal : function() {
         classroomInfoLocal.allControl = classroomInfo.allControl;
         classroomInfoLocal.shareScreen = classroomInfo.shareScreen;
-        classroomInfoLocal.share3D = classroomInfo.share3D;
-        classroomInfoLocal.pdf = classroomInfo.pdf;
+        classroomInfoLocal.share3D = classroomInfo.share3D;   
         classroomInfoLocal.epub = classroomInfo.epub;
         classroomInfoLocal.exam = classroomInfo.exam;
+        classroomInfoLocal.viewer = classroomInfo.viewer;
     },
 
     /*
@@ -120,11 +120,12 @@ classroomCommand = {
             sync3DModel ();
         }
 
-        if(classroomInfo.pdf.state) {            
-            classroomCommand.syncPdf ();
-        }
         if(classroomInfo.epub.state) {
             classroomCommand.openEpub ();
+        }
+
+        if(classroomInfo.viewer.state) {
+            classroomCommand.syncViewer ();
         }
 
         // if(classroomInfo.shareScreen.state){
@@ -357,41 +358,6 @@ classroomCommand.syncScreenShare = function (_userid) {
 /*
     PDF
 */
-classroomCommand.togglePdfStateServer = function (_state, _url='') {
-
-    //connection.socket.emit('toggle-share-pdf', (result) => {
-      //  if(result.result) 
-      //  {
-            classroomInfo.pdf.src = _url;
-            classroomInfo.pdf.state = _state;
-            if(_state)                
-                classroomCommand.sendPDFCmdOnlyTeacher ('open', 
-                {
-                    page : classroomInfo.pdf.page,
-                    src : classroomInfo.pdf.src
-                });
-            else
-                classroomCommand.sendPDFCmdOnlyTeacher ('close');
-                
-            // if(_success)
-            //     _success(result.data)
-        //}
-        // else 
-        // {
-        //     if(_error)
-        //         _error(result.error);
-        // }
-    //});
-}
-
-
-classroomCommand.setPdfStateLocal = function (_state) {
-    if(classroomInfo.pdf.state != _state) {
-        classroomInfo.pdf.state = _state;        
-        classroomCommand.syncPdf ();
-    }
-}
-
 /*
     학생들한테 오는 메시지 처리.
 */
@@ -403,149 +369,33 @@ classroomCommand.onStudentCommand = function (_cmd) {
     }
 }
 
-classroomCommand.setPdfPage = function (_page) {    
-    classroomInfo.pdf.page = _page;
-    if(connection.extra.roomOwner)
-        classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
-    else {
-        studentCommand.sendPdfPage (_page);
-    }
+classroomCommand.openFile = function (_url) {   
+    mfileViewer.openFile (_url);
 }
 
 
-classroomCommand.sendPDFCmdOnlyTeacher = function (_cmd, _data) {
-    if(!connection.extra.roomOwner) return;  
-
-    classroomCommand.sendPDFCmd(_cmd, _data);
+classroomCommand.updateViewer = function (_cmd) {
+    mfileViewer.updateViewer(_cmd);
 }
 
-classroomCommand.sendPDFCmdAllControlOnlyTeacher = function(_cmd, _data) {
-    if(!connection.extra.roomOwner) return;    
-    if(!classroomInfo.allControl) return;
-
-    classroomCommand.sendPDFCmd(_cmd, _data);
+classroomCommand.closeFile = function () {  
+    mfileViewer.closeFile ();
 }
 
-classroomCommand.sendPDFCmd = function (_cmd, _data) {
-    
-    connection.send ({
-        pdf : {
-            cmd : _cmd,
-            data : _data
-        }
-    });
+classroomCommand.onShowPage = function (_page) {        
+    mfileViewer.onShowPage (_page);
 }
 
-classroomCommand.updatePDFCmd = function (_pdf) {  
-    const cmd = _pdf.cmd;
-
-    if(cmd == 'open') {
-        classroomInfo.pdf.page = _pdf.data.page;
-        classroomInfo.pdf.src = _pdf.data.src;
-        loadFileViewer (classroomInfo.pdf.src);
-        return;
-    }
-    else if(cmd == 'close') {
-        classroomCommand.setPdfStateLocal (false);
-    }
-    else
-    {
-        let frame = document
-        .getElementById('widget-container')
-        .getElementsByTagName('iframe')[0].contentWindow;
-        let fileViewer = frame.document.getElementById('file-viewer');
-        if(!fileViewer)  return;
-    
-        switch(cmd)
-        {
-            case "first-page" :            
-                fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-                fileJQuery.scrollTop();
-                break;
-            case 'next' :
-                fileViewer.contentWindow.document.getElementById('next').click();
-                break;
-            case 'prev' :
-                fileViewer.contentWindow.document.getElementById('previous').click();
-                break;
-            case 'last-page' :
-                fileViewer.contentWindow.document.getElementById('previous').click();
-                break;
-            case 'fullscreen' :
-                fileViewer.contentWindow.document.getElementById('fullscreen').click();
-                break;
-            case 'presentation' :
-                fileViewer.contentWindow.document.getElementById('presentation').click();
-                break;
-            case 'zoomIn' :
-                fileViewer.contentWindow.document.getElementById('zoomIn').click();
-                break;
-            case 'zoomOut' :
-                fileViewer.contentWindow.document.getElementById('zoomOut').click();
-                break;
-            case 'page' :                        
-                const page = _pdf.data;
-                classroomInfo.pdf.page = page;  
-                var e = new Event("change");
-                $(fileViewer.contentWindow.document.getElementById("pageNumber")).val(page);
-                fileViewer.contentWindow.document.getElementById("pageNumber").dispatchEvent (e);           
-                break;
-        }
-    }
+classroomCommand.onViewerLoaded = function () {
+    mfileViewer.onLoadedViewer ();
 }
 
-classroomCommand.syncPdf = function () {    
-    if(classroomInfo.pdf.state) {        
-        if(isFileViewer)
-        {
-            //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
-            classroomCommand.pdfOnLoaded ();      
-        }
-        else {
-            // open
-            loadFileViewer (classroomInfo.pdf.src);
-            $('#canvas-controller').show();
-        }
-    }
-    else {
-        // close        
-        if(isFileViewer) {
-            unloadFileViewer();
-            $('#canvas-controller').hide();
-        }
-    }
-};
-
-
-classroomCommand.pdfOnLoaded = function () {
-    if(!classroomInfo.pdf.page)
-        classroomInfo.pdf.page = 1;
-
-    classroomCommand.updatePDFCmd ({
-        cmd : 'page',
-        data : classroomInfo.pdf.page
-    });
-
-    // 학생인 경우만 처리
-    if(!connection.extra.roomOwner) {                
-        studentCommand.sendPdfPage (classroomInfo.pdf.page);
-        pdfViewerLock (classroomInfo.allControl);
-    }
-    
-    function pdfViewerLock(_lock) {
-        let frame = document
-        .getElementById('widget-container')
-        .getElementsByTagName('iframe')[0].contentWindow;
-        let fileViewer = frame.document.getElementById('file-viewer');
-        let viewer = fileViewer.contentWindow.document.getElementById("viewer")                                  
-        if(_lock) {
-            viewer.style.pointerEvents = 'none';
-        }
-        else{
-            viewer.style.pointerEvents = '';
-        }
-    }
+classroomCommand.syncViewer = function () {
+    mfileViewer.syncViewer ();
 }
+
+
+
 
 /*
     Epub
@@ -687,15 +537,6 @@ classroomCommand.syncEpub = function () {
 classroomCommand.syncClassroomOpenTime =  function () {    
     updateClassTime ();
 };
-
-
-// 학생 pdf 페이지가 바뀔 때 호출 된다. 
-classroomStudentsWatchInfo.onPdfPage =  function (student) {
-    var id = student.userid;
-    var page = student.pdfViewPage;
-
-    console.log(student);
-}
 
 
 //--------------------------------------------------------------------------------//

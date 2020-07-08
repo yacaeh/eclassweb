@@ -296,10 +296,15 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if(event.data.pdf) {    
-    classroomCommand.updatePDFCmd (event.data.pdf);
-    return;
+  if(event.data.viewer) {
+    classroomCommand.updateViewer (event.data.viewer);
+    return;    
   }
+
+  // if(event.data.pdf) {    
+  //   classroomCommand.updateViewer (event.data.pdf);
+  //   return;
+  // }
 
   if (event.data.epub) {
     classroomCommand.receiveEpubMessage(event.data.epub);
@@ -1490,80 +1495,35 @@ function LoadFile(btn) {
   // }
 }
 
+
 function unloadFileViewer() {
   isSharingFile = false;
   isFileViewer = false;
-
-  if(connection.extra.roomOwner)
-    classroomCommand.togglePdfStateServer (false);
-
-  let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-  frame.document.getElementById('main-canvas').style.zIndex = '1';
-  frame.document.getElementById('temp-canvas').style.zIndex = '2';
-  frame.document.getElementById('tool-box').style.zIndex = '3';
-
-  let fileViewer = frame.document.getElementById('file-viewer');
-  fileViewer.remove();
-
+  classroomCommand.closeFile ();
 }
+
 
 function loadFileViewer(url) {
 
-if(isSharingFile)
-  unloadFileViewer ();
-
-  $('#confirm-box').modal('hide');
-  $('#confirm-box-topper').hide();
-
-  if(connection.extra.roomOwner)
-    classroomCommand.togglePdfStateServer (true, url);
-
   console.log('loadFileViewer');
   isSharingFile = true;
-  isFileViewer = true;
-
-  let fileViewer = document.createElement('iframe');
-  fileViewer.setAttribute('id', 'file-viewer');
-  fileViewer.setAttribute(
-    'src',
-    'https://'+window.location.host+'/ViewerJS/#'+url
-  );
-
-  fileViewer.style.width = '1024px';
-  fileViewer.style.height = '724px';
-  fileViewer.style.cssText =
-    'border: 1px solid black;height:1024px;direction: ltr;margin-left:2%;width:78%;';
-  fileViewer.setAttribute('allowFullScreen', '');
-  let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
-
-  frame.document
-    .getElementsByClassName('design-surface')[0]
-    .appendChild(fileViewer);
-  console.log(frame.document
-    .getElementsByClassName('design-surface')[0]
-    .appendChild(fileViewer));
-
-  frame.document.getElementById('main-canvas').style.zIndex = '1';
-  frame.document.getElementById('temp-canvas').style.zIndex = '2';
-  frame.document.getElementById('tool-box').style.zIndex = '3';
+  isFileViewer = true;  
+  classroomCommand.openFile (url);
 }
 
 
 // Pdf가 처음 로딩이 다 되었는지 확인.
 // 로딩이 다 된 후에 페이지 동기화
 function pdfOnLoaded () {
-  classroomCommand.pdfOnLoaded ();
+  classroomCommand.onViewerLoaded ();
 }
 
 function showPage(n){
   console.log(n);
   currentPdfPage = n;
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
-    classroomCommand.setPdfPage(n);
+    classroomCommand.onShowPage (n);
+    // classroomCommand.setPdfPage(n);
 }
 
 function showNextPage(){  
@@ -1587,11 +1547,11 @@ function showPreviousPage(){
 // }
 
 function zoomIn() {
-    classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomIn');
+    //classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomIn');
 }
 
 function zoomOut() {
-    classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomOut');
+   // classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomOut');
 }
 
 isEpubViewer = false;

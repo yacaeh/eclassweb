@@ -931,6 +931,7 @@ function Viewer( viewerPlugin, parameters ) {
             Plugin;
 
         if ( documentUrl ) {
+
             // try to guess the title as filename from the location, if not set by parameter
             if ( !parameters.title ) {
                 parameters.title = documentUrl.replace(/^.*[\\\/]/, '');

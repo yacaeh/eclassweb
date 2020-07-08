@@ -35,7 +35,12 @@ function MultimediaViewerPlugin() {
             controls:  'enabled',
             techOrder: ['flash', 'html5']
         }, function () {
+
             // This is functionally the same as the previous example.
+
+            var player = this;
+           window.top.mfileViewer.getCurrentViewer().setMediaPlayer (player); 
+           
         });
 
         self.onLoad();
