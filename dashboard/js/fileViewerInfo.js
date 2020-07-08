@@ -40,7 +40,7 @@ class fileViewerLoader {
                 type = 'img';
                 break;
         }
-
+        this.ext = _extention;
         this.type = type;
     }
 
@@ -61,14 +61,14 @@ class fileViewerLoader {
         return this.ext;
     }
 
-    getFileNameToExtention (_fileName) {
+    getFileNameToExtention (_fileName) {        
         return _fileName.substr(_fileName.lastIndexOf('.') + 1);
     }   
 
-    openFile (_url) {
+    openViewer (_url) {
 
         if(this.IsOpen()) {
-            this.closeFile ();
+            this.closeViewer ();
         }            
 
         this.setOpenState(true);
@@ -78,7 +78,7 @@ class fileViewerLoader {
     }
 
 
-    closeFile () {
+    closeViewer () {
         this.setOpenState(false);
         this.removeElementViewer ();
     }
@@ -143,18 +143,29 @@ class fileViewerLoader {
             viewer.style.pointerEvents = '';
         }
     }
-
-
 }
 
 
 class pdfViewer {
-
-    page;
     
-    onpage = function (_page) {}
+    page = Number; 
+    onpage = function (_page) {}   
 
-    update (_data) {                       
+    
+    constructor () {
+        this.page = 1;
+    }
+
+    /*
+        interface method 다른 viewer도 같이 구현을 해야 함.
+    */
+
+   syncViewerState () {
+        const page = classroomInfo.viewer.pdf.page;      
+        this.showPage(page); 
+    }    
+
+    onUpdate (_data) {                       
         const cmd = _data.cmd; 
         switch(cmd)
         {
@@ -199,21 +210,33 @@ class pdfViewer {
         return fileViewer;
     }
 
-    showPage  (_page) {
+
+    /*
+
+    */
+    showPage  (_page) {         
+
+        //  현재 같은 페이지이면 바꾸지 않는다.
+        if(this.checkSamePage(_page))  return;
+
         let fileViewer = this.getElementFileViewer ();
         if(!fileViewer)  return;       
 
         var e = new Event("change");
         $(fileViewer.contentWindow.document.getElementById("pageNumber")).val(_page);
         fileViewer.contentWindow.document.getElementById("pageNumber").dispatchEvent (e);           
-        this.setPage (_page);
+        
+        this.setPage (_page);        
     }    
 
     setPage (_page) {
         this.page = _page;
         this.onpage (this.page);
     }
-    
+
+    checkSamePage (_page) {
+        return this.page == _page;
+    }
 }
 
 class videoViewer {
@@ -231,26 +254,27 @@ class fileViewerInfo {
 
 
     mViewerLoader = new fileViewerLoader();
+    mLoaded = false;
     
-    currentViewer;
+    mCurrentViewer;
 
     onclose = function () {}
-    onopen = function (_type = String) {}
+    onopen = function (_type = String, _url = String) {}
     onloaded = function (_type = String) {}    
 
     
 
     getCurrentViewer () {
-        return this.currentViewer;
+        return this.mCurrentViewer;
     }
    
     initViewer () {        
         switch(this.mViewerLoader.getType()){
             case 'pdf' :                
-                this.currentViewer = new pdfViewer();
+                this.mCurrentViewer = new pdfViewer();
                 break;
             case 'video' :
-                this.currentViewer = new videoViewer ();
+                this.mCurrentViewer = new videoViewer ();
                 break;
             case 'img' :
                 break;
@@ -258,55 +282,88 @@ class fileViewerInfo {
     }
 
 
-    openFile (_url) {
+    openFile (_url) {                
+        if(_url == undefined || _url == null)  {
+            console.error('open file url error ' + _url);
+            return;
+        } 
 
-        this.mViewerLoader.openFile (_url);
+        this.mLoaded = false;
+        this.mViewerLoader.openViewer (_url);
         this.initViewer ();
 
-        this.onopen (this.mViewerLoader.getType());
+        this.onopen (this.mViewerLoader.getType(), _url);
     }
 
     closeFile () {
-        this.mViewerLoader.closeFile ();
-        this.currentViewer = null;
+        this.mViewerLoader.closeViewer ();
+        this.mCurrentViewer = null;
 
         this.onclose ();
     }
 
-    syncViewer () {
+    hasLoadViewer () {
+        return (null != this.mCurrentViewer);
+    }
 
+
+    syncViewer () {        
+        const state = classroomInfo.viewer.state;
+        if(state) {
+            if(this.mViewerLoader.IsOpen()) {
+                if(state) {
+                    // 값만 동기화
+                    this.mCurrentViewer.syncViewerState();
+                }
+                else {
+                    this.closeFile ();
+                }
+            }
+            else {
+                if(state) {
+                    // open                    
+                    this.openFile (classroomInfo.viewer.url);
+                }                
+            }
+        }
     }
 
 
     updateViewer (_data) {
-
-        if(null == this.currentViewer)  return;
-
         const cmd = _data.cmd;
+        console.log(_data);
         switch(cmd)
         {
-            case 'open' :
-                const url = _data.url;
-                classroomInfo.viewer.url = url;
-                classroomInfo.viewer.state = true;               
+            case 'open' :                
+                const url = _data.url;                
                 this.openFile (url);
                 break;
 
-            case 'close' :                
-                classroomInfo.viewer.state = false;
+            case 'close' :   
                 this.closeFile ();
                 break;
             default :
-                this.currentViewer.update (_data);
+                if(!this.mLoaded)
+                    return;
+
+                this.mCurrentViewer.onUpdate (_data);
                 break;
         }
     }
 
-    onShowPage (_page) {
-        this.currentViewer.setPage(_page);
+    onShowPage (_page) {        
+        
+        //  showPage      
+        if(!this.hasLoadViewer())    return;
+        //if(connection.extra.roomOwner)              
+        
+        this.mCurrentViewer.setPage(_page);      
     }
 
     onLoadedViewer () {
+        if(!this.hasLoadViewer())    return;
+
+        this.mLoaded = true;
         this.onloaded (this.mViewerLoader.getType());
     } 
 }
@@ -320,45 +377,79 @@ class fileViewerInfo {
 
 var mfileViewer = new fileViewerInfo ();
 
-mfileViewer.onopen = function (_type) {
-    console.log('open ' + _type);
-    switch(_type)
-    {
+mfileViewer.onopen = function (_type, _url) {
+
+    console.log('onopen');
+    classroomInfo.viewer.type = _type;
+    classroomInfo.viewer.url = _url;
+    classroomInfo.viewer.state = true;
+
+    switch(_type) {
         case 'pdf' :
-            initPdf ();
+            if(!classroomInfo.viewer.pdf) {
+                classroomInfo.viewer.pdf = {};
+                classroomInfo.viewer.pdf.page = 1;
+            }        
             break;
+
         case 'video' :
+            break;
+
+        case 'jpg' :
             break;
     }
 
-    function initPdf () {
-
-        mfileViewer.getCurrentViewer().onpage = (page) => {
-            if(connection.extra.roomOwner) {
-
-                // page change                
-                // send to student
-                connection.send ({
-                    viewer : {
-                        cmd : 'page',
-                        page : page                        
-                    }
-                });
-            }
-            console.log('chnage page ' + page);
-        }
+    if(connection.extra.roomOwner) {
+        connection.send({
+            viewer : {
+                cmd : 'open',
+                url : _url                
+            }            
+        });        
     }
 }
 
 mfileViewer.onclose = function () {
     console.log('close');
+    classroomInfo.viewer.state = false;
+    classroomInfo.viewer.loaded = false;
+
+    if(connection.extra.roomOwner) 
+    {
+        connection.send({
+            viewer : {
+                cmd : 'close'
+            }   
+        });
+    }
 }
 
 mfileViewer.onloaded = function (_type) {
-
+    console.log('onloaded ' + _type);
+    classroomInfo.viewer.loaded = true;
+    
     switch(_type) {
         case 'pdf' :            
-                mfileViewer.getCurrentViewer().showPage(classroomInfo.pdf.page);
+        {
+            mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);                
+            mfileViewer.getCurrentViewer().onpage = (page) => {
+                
+                classroomInfo.viewer.pdf.page = page;
+
+                if(connection.extra.roomOwner) {
+                    if(!classroomInfo.allControl)   return;
+                    connection.send ({
+                        viewer : {
+                            cmd : 'page',
+                            page : page                        
+                        }
+                    });            
+                }
+                else {
+                    //  학생
+                }
+            }            
+        }
             break;
         case 'video' :
             break;

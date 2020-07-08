@@ -296,10 +296,15 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if(event.data.pdf) {    
-    classroomCommand.updatePDFCmd (event.data.pdf);
-    return;
+  if(event.data.viewer) {
+    classroomCommand.updateViewer (event.data.viewer);
+    return;    
   }
+
+  // if(event.data.pdf) {    
+  //   classroomCommand.updateViewer (event.data.pdf);
+  //   return;
+  // }
 
   if (event.data.epub) {
     classroomCommand.receiveEpubMessage(event.data.epub);
@@ -1542,11 +1547,11 @@ function showPreviousPage(){
 // }
 
 function zoomIn() {
-    classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomIn');
+    //classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomIn');
 }
 
 function zoomOut() {
-    classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomOut');
+   // classroomCommand.sendPDFCmdAllControlOnlyTeacher('zoomOut');
 }
 
 isEpubViewer = false;
