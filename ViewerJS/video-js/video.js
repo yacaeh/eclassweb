@@ -4677,7 +4677,7 @@ var PlayToggle = (function (_Button) {
    * @method handlePlay
    */
 
-  PlayToggle.prototype.handlePlay = function handlePlay() {
+  PlayToggle.prototype.handlePlay = function handlePlay() {    
     this.removeClass('vjs-paused');
     this.addClass('vjs-playing');
     this.controlText('Pause'); // change the button text to "Pause"
@@ -17334,7 +17334,7 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @mixes videojs
  * @method videojs
  */
-var videojs = function videojs(id, options, ready) {
+var videojs = function videojs(id, options, ready) {  
   var tag; // Element of ID
 
   // Allow for element or ID to be passed in

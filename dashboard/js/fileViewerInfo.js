@@ -33,7 +33,10 @@ class fileViewerLoader {
                 break;
 
             case 'mp4':
-                type = 'video';
+            case 'mp3':
+            case 'avi':
+            case 'mkv':
+                type = 'media';
                 break;
 
             case 'jpg' :
@@ -97,9 +100,11 @@ class fileViewerLoader {
       
         let fileViewer = document.createElement('iframe');
         fileViewer.setAttribute('id', 'file-viewer');
+
+        let src = 'https://'+window.location.host+'/ViewerJS/#'+url;
         fileViewer.setAttribute(
           'src',
-          'https://'+window.location.host+'/ViewerJS/#'+url
+          src
         );
       
         fileViewer.style.width = '1024px';
@@ -114,9 +119,9 @@ class fileViewerLoader {
         frame.document
           .getElementsByClassName('design-surface')[0]
           .appendChild(fileViewer);
-        console.log(frame.document
-          .getElementsByClassName('design-surface')[0]
-          .appendChild(fileViewer));
+        // console.log(frame.document
+        //   .getElementsByClassName('design-surface')[0]
+        //   .appendChild(fileViewer));
       
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
@@ -199,10 +204,103 @@ class pdfViewer {
     }
 }
 
-class videoViewer {
-    state;
-    time;
+class mediaViewer {    
 
+    cacheMediaPlayer;       // mediaplayer를 저장.
+
+    // event method    
+    onplay = null;
+    onpause = null;
+    onended = null;
+    onready = null;
+    onseeked = null;
+    ontimeupdate = null;
+
+
+    setMediaPlayer (_player)  {
+        this.cacheMediaPlayer = _player;
+        
+        _player.on('play', () => this.setPlay());
+        _player.on('pause', () => this.setPause());
+        _player.on('ready', () => this.setReady());
+        _player.on('ended', () => this.setEnded());
+        // _player.on('seeked', () => {
+        //     console.log('time');
+        // });
+        // _player.on('playing', () => {
+        //     console.log('playing');
+        // })
+        
+        _player.on('timeupdate', () => {
+            if(null != ontimeupdate)
+                this.ontimeupdate (this.getCurrentTime());
+        })
+    }    
+  
+
+    hasMediaPlayer () {
+        return null != this.cacheMediaPlayer;
+    }
+
+
+    getCurrentTime () {
+        if(!this.hasMediaPlayer())  return 0;
+
+        return this.cacheMediaPlayer.currentTime();
+    }
+
+    setCurrentTime (_time) {
+        if(!this.hasMediaPlayer())  return;        
+        this.cacheMediaPlayer.currentTime (_time);
+    }
+
+    play (_time) {        
+        if(!this.hasMediaPlayer())  return;
+        
+        this.setCurrentTime (_time);
+        this.cacheMediaPlayer.play ();
+    }
+
+    pause (_time) {        
+        if(!this.hasMediaPlayer())  return;        
+        
+        this.setCurrentTime(_time);
+        this.cacheMediaPlayer.pause ();
+    }
+
+    ended () {
+        // if(!this.hasMediaPlayer())  return;        
+        
+        // this.setCurrentTime(_time);
+        // this.cacheMediaPlayer.ended ();        
+    }
+
+    seeked () {
+    }
+
+    setPlay () {                      
+       if(null != this.onplay)
+        {
+            this.onplay(this.getCurrentTime());
+        }
+    }
+
+    setPause () {             
+       if(null != this.onpause) 
+        {
+            this.onpause (this.getCurrentTime());
+        }
+    }
+
+    setReady () {       
+        if(null != this.onready)
+            this.onready ();
+    }
+
+    setEnded () {
+        if(null != this.onended)
+            this.onended ();
+    }
 }
 
 
@@ -218,13 +316,14 @@ class fileViewerInfo {
     onclose = function () {}        
     onloaded = function (_type = String) {}    
     onsync = function () {}
-
+    
     // private
     onopeneachtype = function () {}         // 
     oncloseeachtype = function () {}        // 
     onloadedeachtype = function () {}
     onupdateeachtype = function (_data) {}   // 방 동기화 처리
     onsynceachtype = function () {}          // 난입시, 동기화 처리
+    onshowpageeachtype = function (_page) {}
 
     getCurrentViewer () {
         return this.mCurrentViewer;
@@ -236,14 +335,12 @@ class fileViewerInfo {
    
     initViewer () {        
         switch(this.getCurrentViewerType()){
-            case 'pdf' :                
+            case 'pdf' :     
+            case 'img' :                       
                 this.mCurrentViewer = new pdfViewer();
                 break;
-            case 'video' :
-                this.mCurrentViewer = new videoViewer ();
-                break;
-            case 'img' :
-                this.mCurrentViewer = new pdfViewer();
+            case 'media' :
+                this.mCurrentViewer = new mediaViewer ();
                 break;
         }
     }
@@ -337,8 +434,11 @@ class fileViewerInfo {
         
         //  showPage      
         if(!this.hasLoadViewer())    return;
-        //if(connection.extra.roomOwner)                            
-        this.mCurrentViewer.setPage(_page);      
+        //if(connection.extra.roomOwner)         
+        
+        const viewerType = this.getCurrentViewerType();
+        if(this.onshowpageeachtype[viewerType])
+            this.onshowpageeachtype[viewerType](_page);
     }
 
     onLoadedViewer () {
@@ -346,7 +446,7 @@ class fileViewerInfo {
 
         this.mLoaded = true;
         this.onloaded ();        
-        const viewerType = this.getCurrentViewerType();
+        const viewerType = this.getCurrentViewerType();        
         if(this.onloadedeachtype[viewerType])
             this.onloadedeachtype[viewerType]();
 
@@ -367,7 +467,6 @@ mfileViewer.onopen = function (_type, _url) {
     isSharingFile = true;
     isFileViewer = true;
 
-    console.log('onopen');
     classroomInfo.viewer.type = _type;
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
@@ -423,17 +522,22 @@ mfileViewer.onsync = function () {
 /*
     PDF fileViewer
 */
-mfileViewer.onopeneachtype['pdf'] = function () {
 
+let pdfString = 'pdf';
+
+mfileViewer.onopeneachtype[pdfString] = function () {
     console.log('onopen pdf');
-
     if(!classroomInfo.viewer.pdf) {
         classroomInfo.viewer.pdf = {};
         classroomInfo.viewer.pdf.page = 1;
     }                
 }
 
-mfileViewer.onupdateeachtype['pdf'] = function (_data) {
+mfileViewer.onshowpageeachtype[pdfString] = function (_page) {
+    mfileViewer.getCurrentViewer().setPage(_page);    
+}
+
+mfileViewer.onupdateeachtype[pdfString] = function (_data) {
     console.log('onupdate pdf');            
     const cmd = _data.cmd; 
     switch(cmd)
@@ -470,13 +574,13 @@ mfileViewer.onupdateeachtype['pdf'] = function (_data) {
     }
 }
 
-mfileViewer.onsynceachtype['pdf'] = function () {
+mfileViewer.onsynceachtype[pdfString] = function () {
     console.log('onsync pdf');
     const page = classroomInfo.viewer.pdf.page;     
     mfileViewer.getCurrentViewer().showPage(page);
 }
 
-mfileViewer.onloadedeachtype['pdf'] = function () {
+mfileViewer.onloadedeachtype[pdfString] = function () {
     console.log('onloaded pdf');
     mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);                
     mfileViewer.getCurrentViewer().onpage = (page) => {
@@ -494,8 +598,7 @@ mfileViewer.onloadedeachtype['pdf'] = function () {
             });            
         }
         else {
-            //  학생
-            console.log('send page');
+            //  학생            
             connection.send({
                 studentCmd : {
                     from : connection.userid,
@@ -512,30 +615,82 @@ mfileViewer.onloadedeachtype['pdf'] = function () {
 /*
     Video Viewer
 */
-mfileViewer.onopeneachtype['video'] = function () {
+let mediaString = 'media';
 
-    console.log('onopen video');
-
-    // if(!classroomInfo.viewer.pdf) {
-    //     classroomInfo.viewer.pdf = {};
-    //     classroomInfo.viewer.pdf.page = 1;
-    // }                
+mfileViewer.onopeneachtype[mediaString] = function () {
+  
+    if(!classroomInfo.viewer.media) {
+        classroomInfo.viewer.media = {};
+        classroomInfo.viewer.media.time = 0;
+        classroomInfo.viewer.media.state = 'none';
+    }    
 }
 
-mfileViewer.onupdateeachtype['video'] = function (_data) {
-    console.log('onupdate video');            
+mfileViewer.onupdateeachtype[mediaString] = function (_data) {
+        
     const cmd = _data.cmd; 
     switch(cmd)
     {
-        
+        case 'play' :            
+            mfileViewer.getCurrentViewer().play ( _data.time);
+            break;
+        case 'pause' :
+            mfileViewer.getCurrentViewer().pause (_data.time);
+            break;
     }
 }
 
-mfileViewer.onsynceachtype['video'] = function () {
+mfileViewer.onsynceachtype[mediaString] = function () {
     console.log('onsync video');
- 
+    switch(classroomInfo.viewer.media.state){
+        case 'play':
+            mfileViewer.getCurrentViewer().play (classroomInfo.viewer.media.time);
+            break;
+        case 'pause':
+            mfileViewer.getCurrentViewer().pause (classroomInfo.viewer.media.time);
+            break;
+    } 
 }
 
-mfileViewer.onloadedeachtype['video'] = function () {
-    console.log('onloaded video');   
+mfileViewer.onloadedeachtype[mediaString] = function () {
+
+   let viewer = mfileViewer.getCurrentViewer();   
+   viewer.onplay = (_currentTime) => {
+        
+        classroomInfo.viewer.media.state = 'play';        
+        classroomInfo.viewer.media.time = _currentTime;
+
+        console.log('onplay');
+
+        if(connection.extra.roomOwner) {
+            // send
+            connection.send ({
+                viewer : {
+                    cmd : 'play',
+                    time : _currentTime
+                }
+            });
+        }
+    }    
+
+    viewer.onpause = (_currentTime) => {
+
+        classroomInfo.viewer.media.state = 'pause';
+        classroomInfo.viewer.media.time = _currentTime;
+
+        console.log('onpause');
+        if(connection.extra.roomOwner) {
+            // send
+            connection.send ({
+                viewer : {
+                    cmd : 'pause',
+                    time : _currentTime
+                }
+            })
+        }
+    }
+
+    viewer.ontimeupdate = (_currentTime) => {
+        classroomInfo.viewer.media.time = _currentTime;
+    }
 }

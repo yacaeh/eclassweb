@@ -531,39 +531,12 @@ classroomCommand.syncEpub = function () {
 };
 
 
-classroomCommand.openVideo = function () {
-
-}
-
-classroomCommand.syncVideo = function () {
-
-    // state
-    // playing,
-    // pause,
-    // time
-
-    //$('.vjs-play-control').click();
-    //$('.vjs-play-progress').getAttribute('data-current-time')
-};
-
-
 /*
     방 오픈 경과 시간 동기화
 */
 classroomCommand.syncClassroomOpenTime =  function () {    
     updateClassTime ();
 };
-
-
-// // 학생 pdf 페이지가 바뀔 때 호출 된다. 
-// classroomStudentsWatchInfo.onPdfPage =  function (student) {
-//     var id = student.userid;
-//     var page = student.pdfViewPage;
-
-//     console.log(student);
-
-//     //classroomStudentsWatchInfo.setPdfPage (id, page);
-// }
 
 
 //--------------------------------------------------------------------------------//
