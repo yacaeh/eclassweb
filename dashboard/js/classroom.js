@@ -1266,10 +1266,10 @@ function showExamStateForm() {
   stateHtmlStr += '</div>';
   stateHtmlStr += "<div class='exam-background exam-overflow'>";
   for (var i = 1; i <= m_QuesCount; i++) {
-    stateHtmlStr += `<div style='display:flex; height:3vh;'>`;
-    stateHtmlStr += `<span class='text-center-bold' style='flex:1;'>${i}.</span>`;
-    stateHtmlStr += `<progress style='flex:4; margin-top:10px' id="exam-state-progress-${i}" class='exam-state-progress'  value="0" max="100"></progress>`;
-    stateHtmlStr += `<span style='flex:1; text-align:center;'  id='exam-state-percent-${i}'>0%</span><br>`;
+    stateHtmlStr += `<div style='display:flex; height:37px;'>`;
+    stateHtmlStr += `<span class='exam-state-progress-number'>${i}.</span>`;
+    stateHtmlStr += `<progress style='margin-top:16px; margin-left:13px; width:240px;' id="exam-state-progress-${i}" class='exam-state-progress'  value="0" max="100"></progress>`;
+    stateHtmlStr += `<span class='exam-state-percent'  id='exam-state-percent-${i}'>0%</span><br>`;
     stateHtmlStr += `</div>`;
   }
   stateHtmlStr += '</div>';
@@ -1289,14 +1289,14 @@ function setExamState(num, percent) {
 function apeendQuestion(i) {
   question = `<div id='exam-question-${i}' style='display: flex;'>`;
 
-  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='margin-top:5px; text-align:center; width:30px;'>${i}.</span>`;
+  question += `<span id='exam-question-text-${i}' class='text-center-bold' style='line-height: 43px; width:30px; text-align:right;'>${i}.</span>`;
 
   for (var j = 1; j <= 5; j++) {
     question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
     question += `<label for='exam-question-${i}_${j}' style='flex:1;'>${j}</label>`;
   }
 
-  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam  text-center-bold' style='flex:1; padding: 0px 3px 3px 3px; margin:8px; height:20px; line-height:12px'>─</button>`;
+  question += `<button id='exam-question-delete-${i}' onclick='deleteQuestion(${i})' class='btn btn-exam text-center-bold' style='flex:1; padding: 0px 3px 3px 3px; margin:12px; height:20px; line-height:12px'>─</button>`;
 
   question += `</div>`;
   $('#exam-question-list').append(question);
@@ -1349,7 +1349,7 @@ function setStudentOMR(quesCount, examTime) {
   var question = '';
 
   question += "<div class='exam-header'>";
-  question += '<div>시험 중</div>';
+  question += "<div id='is-testing'>시험 중</div>";
   question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
   question += '</div>';
   question += "<div class='exam-overflow exam-border-bottom'>";
@@ -1357,12 +1357,12 @@ function setStudentOMR(quesCount, examTime) {
   m_QuesCount = quesCount;
   for (var i = 1; i <= m_QuesCount; i++) {
     question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`;
-    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'>${i}.</span>`;
+    question += `<span id='exam-question-text-${i}' class='text-center-bold' style='line-height: 43px; width:30px; text-align:right;'>${i}.</span>`;
     for (var j = 1; j <= 5; j++) {
       question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
       question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
     }
-    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1; margin-top:5px;'></span>`;
+    question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1; line-height: 43px;'></span>`;
     question += `</div>`;
   }
   question += '</div>';
@@ -1401,7 +1401,7 @@ function stopQuestionOMR() {
   var studentOMR = getQuestionAnswerList();
   examObj.examAnswer = studentOMR;
   //  console.log(studentOMR);
-
+  $('#is-testing').html("시험 종료");
   $('#exam-omr-question-list').css('pointer-events', 'none');
   $('#exam-answer-submit').hide();
 }
@@ -1410,11 +1410,11 @@ function stopQuestionOMR() {
 function markStudent(num, check, answer) {
   console.log(check);
   if (check === answer) {
-    $(`#exam-question-${num}`).css('background-color', 'lightgreen');
+    $(`#exam-question-${num}`).css('background-color', '#92ecc8');
   } else {
-    $(`#exam-question-${num}`).css('background-color', 'pink');
+    $(`#exam-question-${num}`).css('background-color', '#fbccc4');
   }
-  $(`#exam-student-answer-${num}`).html(answer);
+  $(`#exam-student-answer-${num}`).html("("+answer+")");
 }
 
 // 학생 OMR이 변경됨

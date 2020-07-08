@@ -985,15 +985,15 @@ input[type='radio'] {
 }
 
 input[type=radio] + label { 
-display: inline-block; 
-cursor: pointer; 
-font-size: 12px;
-line-height: 28px; 
-padding-right: 22px;
-background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
-margin-left: 15px;
-margin-right: 5px;
-margin-top: 3px;
+  display: inline-block; 
+  cursor: pointer; 
+  font-size: 12px;
+  line-height: 28px; 
+  padding-right: 22px;
+  background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
+  margin-left: 15px;
+  margin-right: 5px;
+  margin-top: 0.5rem;
 }
 
 input[type='radio']:checked + label {
@@ -1106,6 +1106,30 @@ input[type='number']:focus {
 }
 .exam-state-progress[value]::-webkit-progress-bar {
   background: #a8a8a8;
+}
+
+.exam-state-progress-number {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 15px;
+  color: #000000;
+  text-align: right;
+  margin-top: 7px;
+  width: 27px;
+}
+
+.exam-state-percent{
+  width: 25px;
+  height: 12px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 11px;
+  color: #828282;
+  margin-top: 11px;
+  margin-left: 10px;
+  text-align: right;
 }
 
 .exam-header {
