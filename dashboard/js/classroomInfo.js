@@ -95,6 +95,7 @@ classroomCommand = {
             this.copyGlobalToLocal ();        
             this.updateSyncRoom ();
         }
+        LoadScreenShare();
     },
     
     

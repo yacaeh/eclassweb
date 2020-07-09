@@ -21,6 +21,9 @@ console.log('Connection!');
 // module.exports.HarryPotter = printHarryPotter;
 // module.exports.DawnOfDead = printDawnOfDead;​
 
+window._points = {};
+
+
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
 
@@ -251,11 +254,13 @@ connection.onmessage = function (event) {
     return;
   }
   // 학생 접속시 싱크
-  if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
+  if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect !");
     designer.sync();
     return;
   }
+
+
 
   if (event.data.studentCmd)  {
     if(connection.extra.roomOwner)
@@ -267,7 +272,6 @@ connection.onmessage = function (event) {
   if(event.data.roomInfo) {
     classroomCommand.onReceiveRoomInfo (event.data);
     console.log("SYNC", classroomInfo);
-    LoadScreenShare();
     return;
   }
 
@@ -351,9 +355,6 @@ connection.onmessage = function (event) {
     else iframeEdunetContent(moveURL.enable, moveURL.url, false);
     return;
   }
-  if(!connection.extra.roomOwner){
-    designer.syncData(event.data);
-  }
 
   // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
   if(event.data.onFocus){
@@ -376,6 +377,12 @@ connection.onmessage = function (event) {
       $('#exam-board').hide(300);
     }
   }
+
+  // if(!connection.extra.roomOwner){
+    // console.log(event.data);
+  // }
+  designer.syncData(event.data);
+
 };
 
 var stemp;
@@ -2227,6 +2234,7 @@ function LoadScreenShare(){
     !classroomInfoLocal.shareScreen.fromme){
     console.log("LOAD SCREEN")
     classroomCommand.openShare();
+    CanvasResize();
   }
 }
 
