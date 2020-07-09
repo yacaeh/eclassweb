@@ -32,6 +32,17 @@ var examObj = {
       */
 };
 
+examObj.closeTesting = function () {
+    if( this.isStart ){
+        return false;
+    }
+
+    connection.send({
+        closeTesting: true
+    });  
+    return true;
+}
+
 // 정답 확인.
 examObj.checkAnswerCount = function (studentAnswers) {
     var len = examObj.examAnswer.length;
@@ -198,7 +209,7 @@ examObj.receiveExamData = function(_data) {
         if(examObj.isStart)    
         {
             classroomInfo.exam = false;
-            examObj.isStart = false;     
+
             // 학생들 시험 제출.   
             stopQuestionOMR ();
             examObj.sendSubmit();
@@ -290,7 +301,8 @@ examObj.sendExamEnd = function() {
     {
         if(!examObj.isStart)
             return;
-        
+
+        examObj.isStart = false;        
         connection.send({
             exam: {
                 examEnd : true
@@ -302,6 +314,8 @@ examObj.sendExamEnd = function() {
 
 
 examObj.sendSubmit = function() {
+
+    examObj.isStart = false;
     //  학생이 선생한테 정답 제출
     connection.send({
         exam : {
@@ -384,16 +398,16 @@ examObj.receiveSubmit = function (submit) {
 
         if(examObj.totalCount == examObj.submitCount)   // 마지막 제출이 끝났을 때, 결과를 export 한다.
           { 
-            examObj.examClose ();    
               // 시험 종료.
             finishExam();
+            examObj.examClose ();    
           }
     }
 };
 
 examObj.receiveSubmitResult = function (_examResult) {
     // 시험 정답 제출 후, callback
-    console.log(_examResult);
+  //  console.log(_examResult);
 
     if(connection.userid == _examResult.userid) {        
         const len = _examResult.examAnswers.length;  

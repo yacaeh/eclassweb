@@ -1484,6 +1484,10 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             var servers = {
                 iceServers: [{
                     urls: 'stun:stun.l.google.com:19302'
+                },{ 
+                    urls : 'turn:turn.primom.co.kr:3478', 
+                    credential : 'webrtc',
+                    username: 'primomceo'
                 }]
             };
 
@@ -3424,9 +3428,14 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     'stun:stun.l.google.com:19302?transport=udp',
                 ]
             },{ 
-                'urls' : ['turn:34.64.252.139:3478'], 
+                'urls' : ['turn:turn.primom.co.kr:3478'], 
                 'credential' : 'webrtc',
-                 'username': 'primomceo'
+                'username': 'primomceo'
+            },
+            { 
+                'urls' : ['turn:turn.primom.co.kr:3478?transport=udp'], 
+                'credential' : 'webrtc',
+                'username': 'primomceo'
             }];
 
             return iceServers;
@@ -3601,6 +3610,26 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
 
+            if (connection.extra.roomOwner) {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 640,
+                    "maxWidth": 1280,
+                    "minHeight": 480,
+                    "maxHeight": 960,
+                    "minFrameRate": 30
+                };
+            }
+            else {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 82,
+                    "maxWidth": 82,
+                    "minHeight": 64,
+                    "maxHeight": 64,
+                    "minFrameRate": 2,
+                    "maxFrameRate": 2
+                };
+            }
+            
             navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
                 stream.streamid = stream.streamid || stream.id || getRandomString();
                 stream.idInstance = idInstance;
@@ -4699,12 +4728,20 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
         connection.enableFileSharing = false;
 
-        // all values in kbps
+        // all values in kbps 
+        // 기본값 
+        // connection.bandwidth = {
+        //     screen: false,
+        //     audio: false,
+        //     video: false
+        // };
+        // 최적값
         connection.bandwidth = {
-            screen: false,
-            audio: false,
-            video: false
+            screen: 64,
+            audio: 128,
+            video: 254
         };
+
 
         connection.codecs = {
             audio: 'opus',
@@ -5355,6 +5392,8 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                             streams.push(s);
                         }
                     });
+
+                    console.log("ASDzz")
                     connection.peers[streamEvent.userid].streams = streams;
                 }
 

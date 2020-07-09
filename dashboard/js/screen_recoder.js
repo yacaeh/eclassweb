@@ -79,7 +79,21 @@ class sc {
         this.stream = new MediaStream(tracks);
         this.blobs = [];
 
-        this.rec = new MediaRecorder(this.stream, { mimeType: 'video/webm; codecs=vp8,opus' });
+        let options = {mimeType: 'video/webm;codecs=vp9,opus'};
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.error(`${options.mimeType} is not supported`);
+          options = {mimeType: 'video/webm;codecs=vp8,opus'};
+          if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            console.error(`${options.mimeType} is not supported`);
+            options = {mimeType: 'video/webm'};
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+              console.error(`${options.mimeType} is not supported`);
+              options = {mimeType: ''};
+            }
+          }
+        }
+
+        this.rec = new MediaRecorder(this.stream, options );
 
         this.rec.ondataavailable = (e) => this.blobs.push(e.data);
         this.rec.onstop = async () => {
@@ -99,6 +113,7 @@ class sc {
                 this._stopCapturing();
             }
         });
+
 
         this.voiceStream.addEventListener('inactive', e => {
             if(e.type == "inactive"){
@@ -146,20 +161,29 @@ function ScreenShare(btn) {
 
   var on = $(btn).hasClass('on');
 
-  console.log(classroomInfo)
-  if (connection.userid != classroomInfo.nowClassPermission && !window.tempStream) {
-    alert('Screen sharing is not enabled.');
+  if (!connection.extra.roomOwner && 
+    connection.userid != classroomInfo.classPermission) {
+    alert('화면 공유 권한이 없습니다');
+    $(btn).removeClass("on selected-shape")
     return;
   }
 
+
+
   if (!on) {
     isSharingScreen = false;
-    lastStream.getTracks().forEach((track) => track.stop());
-    connection.send({
-      hideMainVideo: true,
-    });
+    if(typeof(lastStream) !== "undefined")
+      lastStream.getTracks().forEach((track) => track.stop());
     return false;
   }
+
+  if(classroomInfo.shareScreen.state){
+    alert("다른 사람이 화면 공유를 사용 중 입니다.")
+    $(btn).removeClass("on selected-shape")
+    return;
+  }
+
+
 
   screen_constraints = {
     screen: true,
@@ -169,7 +193,6 @@ function ScreenShare(btn) {
   if (navigator.mediaDevices.getDisplayMedia) {
     navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
       (stream) => {
-        console.log(stream);
         isSharingScreen = true;
         lastStream = stream;
         replaceScreenTrack(stream, btn);

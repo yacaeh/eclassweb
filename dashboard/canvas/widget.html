@@ -15,7 +15,9 @@
     <link href="widget.css" rel="stylesheet">
 </head>
 
-<body oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+<body  ondragenter="handleDragDropEvent(event)"
+ondragover="handleDragDropEvent(event)"
+ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
 
     <section class="design-surface">
         <canvas id="temp-canvas" class="pen"></canvas>
@@ -40,6 +42,7 @@
         <canvas class="i"  id="movie" width="28" height="28"></canvas>
         <canvas class="i"  id="file" width="28" height="28"></canvas>
         <canvas class="i"  id="epub" width="28" height="28"></canvas>
+        <canvas class="i"  id="callteacher" width="28" height="28"></canvas>
 
         <canvas class="i" id="image-icon" width="28" height="28"></canvas>
 
@@ -173,8 +176,8 @@
         <li>90</li>
         <li>150</li>
     </ul>
-    
-    <span class="fontColorUI colors-container input-div" style="display: none; position: absolute; top: 0; left: 0; text-align: center;">
+    <div class="color_template_text"></div> 
+    <!-- <span class="fontColorUI colors-container input-div" style="display: none; position: absolute; top: 0; left: 0; text-align: center;">
         <div id="text-selected-color"></div>
         <div id="text-fill-colors" class='context-popup'>
             <div class="top">
@@ -184,7 +187,7 @@
             <table id="text-colors-list">
             </table>
         </div>
-    </span>
+    </span> -->
     </div>
     <!-- url-parameters -->
     <script>

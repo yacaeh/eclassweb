@@ -2,16 +2,13 @@
 classroomInfo = {   
     roomOpenTime : 0,       // 방을 처음 개설한 시간
     allControl : false,
-    shareScreen : false,
+    shareScreen : {
+        state : false,
+        id : undefined
+    },
     share3D : {
         state : false,
         data : { }   // position, rotation 
-    },
-    pdf : {
-        state : false,
-        src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf',
-        page : 1
-       // 어떤 pdf, 몇 페이지 등
     },
     epub : {
         state : false,
@@ -20,17 +17,29 @@ classroomInfo = {
             src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
         }   // 어떤 pdf, 몇 페이지 등
     },
-    exam : false    
+    viewer : {
+        state : false,  // on, off
+        type : 'none',  // pdf, video, jpg,
+        loaded : false,
+    },
+    exam : false,
+    classPermission : undefined,
+    micPermission : undefined,
 };
 
 classroomInfoLocal = {
     allControl : false,
-    shareScreen : false,
+    shareScreen : {
+        state : false,
+        id : undefined
+    },
     share3D : false,
     pdf : false,
     epub : false,
     exam : false  
 };
+
+
 
 
 classroomCommand = {    
@@ -40,14 +49,15 @@ classroomCommand = {
         방 동기화를 해준다.
     */
     joinRoom : function () {  
-        connection.socket.emit ('update-room-info', (_info) => {                    
-            
+        connection.socket.emit ('update-room-info', (_info) => {
+            console.log(_info);                    
             classroomInfo.roomOpenTime = _info.roomOpenTime;
             classroomInfo.allControl = _info.allControl;
-            classroomInfo.shareScreen = _info.shareScreen;
-            classroomInfo.share3D.state = _info.share3D.state;
-            classroomInfo.pdf.state = _info.pdf.state;
+            classroomInfo.shareScreen.state = _info.shareScreen;
+            classroomInfo.share3D.state = _info.share3D.state;                 
             classroomInfo.exam = _info.exam;
+            classroomInfo.classPermission = _info.classPermission;
+            classroomInfo.micPermission = _info.micPermission;
 
             updateClassTime ();
             if(connection.extra.roomOwner)
@@ -61,9 +71,9 @@ classroomCommand = {
     */
     onConnectionSession : function (_data) {
         if(!connection.extra.roomOwner) return;
-        
+
         //  shareScreen은 선생님이 연결을 해주어야 한다.
-        if(classroomInfo.shareScreen) {
+        if(classroomInfo.shareScreen.state) {
             classroomCommand.syncScreenShare (_data.userid);
         };
         
@@ -92,10 +102,10 @@ classroomCommand = {
     copyGlobalToLocal : function() {
         classroomInfoLocal.allControl = classroomInfo.allControl;
         classroomInfoLocal.shareScreen = classroomInfo.shareScreen;
-        classroomInfoLocal.share3D = classroomInfo.share3D;
-        classroomInfoLocal.pdf = classroomInfo.pdf;
+        classroomInfoLocal.share3D = classroomInfo.share3D;   
         classroomInfoLocal.epub = classroomInfo.epub;
         classroomInfoLocal.exam = classroomInfo.exam;
+        classroomInfoLocal.viewer = classroomInfo.viewer;
     },
 
     /*
@@ -110,12 +120,17 @@ classroomCommand = {
             sync3DModel ();
         }
 
-        if(classroomInfo.pdf.state) {
-            classroomCommand.syncPdf ();
-        }
         if(classroomInfo.epub.state) {
             classroomCommand.openEpub ();
         }
+
+        if(classroomInfo.viewer.state) {
+            classroomCommand.syncViewer ();
+        }
+
+        // if(classroomInfo.shareScreen.state){
+        //     classroomCommand.openShare();
+        // }
     },
 
 
@@ -134,18 +149,43 @@ classroomCommand = {
 
 
 
+classroomCommand.openShare = function (callback){
+    var s = GetStream(classroomInfoLocal.shareScreen.id)
+    if(s != undefined){
+        document.getElementById("screen-viewer").srcObject = s;
+        document.getElementById("screen-viewer").style.display = 'block';
+    }
+    
+    console.log("OPEN SHARE",s)
+}
+
+classroomCommand.exitAlert = function (callback) {    
+    
+    alert_exit_Box("나가시겠습니까?", "경고", () => {
+        callback()
+    });
+    
+};
 
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
-        alertBox("학생들에게 알림을 보내겠습니까?", "알림", () => {
+        alertBox("<span>학생들에게 알림을 보내겠습니까? \<label class='label_stu' for='view_stu'><input checked id='view_stu' type='checkbox'>학생 보기</label> \
+        </span>  ", "알림", () => { //callback yes
            // classroomInfo.alert
             // console.log(connection.getAllParticipants());
             // console.log(connection.getAllParticipants().length);
-            callback()
+            callback();
+            if(document.getElementById("view_stu").checked){
+                document.getElementById("top_student").click();
+            }
+
+            attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
             connection.send ({
                 alert : true
             });
+        },()=>{ //callback no 파일 저장한다.
+            // attentionObj.exportAttention();
         });    
     }
 };
@@ -165,7 +205,7 @@ classroomCommand.receivAlert = function () {
         $(".alert-progress").val(progressVal)
     },10);
 
-    function response (yesOrno) {
+    function response (yesOrno) {        
         connection.send({                
             alertResponse :  {
                 userid : connection.userid,
@@ -181,6 +221,66 @@ classroomCommand.receivAlert = function () {
         clearTimeout(alertTimeHandler);         
         $('#alert-box').fadeOut(300);       
     };
+};
+
+// 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
+classroomCommand.receivedOnFocusResponse = (_response) => {
+    if(connection.extra.roomOwner)
+    {     
+        let userId = _response.userId;
+        let boolOnFocus = _response.onFocus; 
+
+        let children = document.getElementById("student_list").children;
+
+        for(let i = 0; i < children.length; i++){
+            if( children[i].dataset.id == userId ){
+                var student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                if(boolOnFocus == false){
+                    student_overlay.css('background','black');
+                }
+                else{
+                    student_overlay.css('background','none');
+                }
+                console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
+            }
+        };
+    }
+};
+
+// 학생이 선생님에게 권한 요청을 한다.
+classroomCommand.receivedCallTeacherResponse = (userId) => {
+    if(connection.extra.roomOwner)
+    {        
+        let children = document.getElementById("student_list").children;
+
+        for(let i = 0; i < children.length; i++){
+            if( children[i].dataset.id == userId ){
+                console.log( "Received Call Teacher Respose : " +  userId );    
+
+                var student_overlay;
+                var isMeCount = 5;
+                var flickerInterval = setInterval(function(){
+                    student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                    var initBackColor = student_overlay.css('background');
+                    var orangeColor = setOverlayColor('orange');
+                    setTimeout(function(){
+                        student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                        var initBackColor2 = student_overlay.css('background');
+                        if(orangeColor !== initBackColor2)
+                            initBackColor = initBackColor2
+                        setOverlayColor(initBackColor);
+                    } ,500);
+                    if(isMeCount-- <= 0)
+                        clearInterval(flickerInterval);
+                },1000);
+                
+                function setOverlayColor(overlayColor){
+                    student_overlay.css('background',overlayColor);
+                    return student_overlay.css('background');
+                }
+            }
+        };
+    }
 };
 
 // 학생이 응답했을 때, 선생님 처리 부분
@@ -211,66 +311,53 @@ classroomCommand.receiveAlertResponse = function (_response) {
 
 
 
+classroomCommand.StopScreenShare = function(){
+    classroomInfo.shareScreen = {};
+    classroomInfo.shareScreen.state = false
+    classroomInfo.shareScreen.id = undefined
+    classroomInfo.shareScreen.stream = undefined
+
+    classroomInfoLocal.shareScreen.state = false;
+    classroomInfoLocal.shareScreen.id = false;
+}
+
+
 /*
     공유 스크린 설정
 */
-classroomCommand.setShareScreenServer = function (_state, success, error) {    
-    
-    classroomCommand.setShareScreenLocal (_state);
-
-    connection.socket.emit('set-share-screen', _state, result => {  
+classroomCommand.setShareScreenServer = function (_data, success, error) {    
+    connection.socket.emit('set-share-screen', _data, result => {  
         if(result.result)
             success ();
-        else 
+        else {
+            console.log(result.error);
+            alert(result.error)
             error (result.error);
+        }
     });
 };
 
-classroomCommand.setShareScreenLocal = function (_state) {
-    classroomInfo.shareScreen = _state;
+classroomCommand.setShareScreenLocal = function (_data) {
+    classroomInfo.shareScreen.state = _data.state;
+    classroomInfo.shareScreen.id = _data.id;
+    classroomInfoLocal.shareScreen.state = _data.state;
+    classroomInfoLocal.shareScreen.id = _data.id;
 };
 /*
     Screen share
  */
 
 classroomCommand.syncScreenShare = function (_userid) {
-    currentScreenViewShare (_userid);
+    // connection.peers.forEach(function(e){
+        // console.log(e);
+    // })
+    // currentScreenViewShare (_userid);
 };
 
 
 /*
     PDF
 */
-classroomCommand.togglePdfStateServer = function (_success, _error) {
-
-    connection.socket.emit('toggle-share-pdf', (result) => {
-        if(result.result) 
-        {
-            classroomCommand.setPdfStateLocal(result.data);
-            if(result.data)                
-                classroomCommand.sendPDFCmdOnlyTeacher ('open', {page : classroomInfo.pdf.page});
-            else
-                classroomCommand.sendPDFCmdOnlyTeacher ('close');
-                
-            if(_success)
-                _success(result.data)
-        }
-        else 
-        {
-            if(_error)
-                _error(result.error);
-        }
-    });
-}
-
-
-classroomCommand.setPdfStateLocal = function (_state) {
-    if(classroomInfo.pdf.state != _state) {
-        classroomInfo.pdf.state = _state;        
-        classroomCommand.syncPdf ();
-    }
-}
-
 /*
     학생들한테 오는 메시지 처리.
 */
@@ -282,149 +369,33 @@ classroomCommand.onStudentCommand = function (_cmd) {
     }
 }
 
-classroomCommand.setPdfPage = function (_page) {    
-    classroomInfo.pdf.page = _page;
-    if(connection.extra.roomOwner)
-        classroomCommand.sendPDFCmdAllControlOnlyTeacher ('page', _page);
-    else {
-        studentCommand.sendPdfPage (_page);
-    }
+classroomCommand.openFile = function (_url) {   
+    mfileViewer.openFile (_url);
 }
 
 
-classroomCommand.sendPDFCmdOnlyTeacher = function (_cmd, _data) {
-    if(!connection.extra.roomOwner) return;  
-
-    classroomCommand.sendPDFCmd(_cmd, _data);
+classroomCommand.updateViewer = function (_cmd) {
+    mfileViewer.updateViewer(_cmd);
 }
 
-classroomCommand.sendPDFCmdAllControlOnlyTeacher = function(_cmd, _data) {
-    if(!connection.extra.roomOwner) return;    
-    if(!classroomInfo.allControl) return;
-
-    classroomCommand.sendPDFCmd(_cmd, _data);
+classroomCommand.closeFile = function () {  
+    mfileViewer.closeFile ();
 }
 
-classroomCommand.sendPDFCmd = function (_cmd, _data) {
-    
-    connection.send ({
-        pdf : {
-            cmd : _cmd,
-            data : _data
-        }
-    });
+classroomCommand.onShowPage = function (_page) {        
+    mfileViewer.onShowPage (_page);
 }
 
-classroomCommand.updatePDFCmd = function (_pdf) {  
-    const cmd = _pdf.cmd;
-
-    if(cmd == 'open') {
-        console.log(_pdf);
-        classroomInfo.pdf.page = _pdf.data.page;
-        classroomCommand.setPdfStateLocal (true);
-        return;
-    }
-    else if(cmd == 'close') {
-        classroomCommand.setPdfStateLocal (false);
-    }
-    else
-    {
-        let frame = document
-        .getElementById('widget-container')
-        .getElementsByTagName('iframe')[0].contentWindow;
-        let fileViewer = frame.document.getElementById('file-viewer');
-        if(!fileViewer)  return;
-    
-        switch(cmd)
-        {
-            case "first-page" :            
-                fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-                fileJQuery.scrollTop();
-                break;
-            case 'next' :
-                fileViewer.contentWindow.document.getElementById('next').click();
-                break;
-            case 'prev' :
-                fileViewer.contentWindow.document.getElementById('previous').click();
-                break;
-            case 'last-page' :
-                fileViewer.contentWindow.document.getElementById('previous').click();
-                break;
-            case 'fullscreen' :
-                fileViewer.contentWindow.document.getElementById('fullscreen').click();
-                break;
-            case 'presentation' :
-                fileViewer.contentWindow.document.getElementById('presentation').click();
-                break;
-            case 'zoomIn' :
-                fileViewer.contentWindow.document.getElementById('zoomIn').click();
-                break;
-            case 'zoomOut' :
-                fileViewer.contentWindow.document.getElementById('zoomOut').click();
-                break;
-            case 'page' :                        
-                const page = _pdf.data;
-                classroomInfo.pdf.page = page;  
-                var e = new Event("change");
-                $(fileViewer.contentWindow.document.getElementById("pageNumber")).val(page);
-                fileViewer.contentWindow.document.getElementById("pageNumber").dispatchEvent (e);           
-                break;
-        }
-    }
+classroomCommand.onViewerLoaded = function () {
+    mfileViewer.onLoadedViewer ();
 }
 
-classroomCommand.syncPdf = function () {    
-    if(classroomInfo.pdf.state) {
-        if(isFileViewer)
-        {
-            //  현재 파일Viewer가 열려 있다면, 페이지만 동기화   
-            classroomCommand.pdfOnLoaded ();      
-        }
-        else {
-            // open
-            loadFileViewer ();
-            $('#canvas-controller').show();
-        }
-    }
-    else {
-        // close        
-        if(isFileViewer) {
-            unloadFileViewer();
-            $('#canvas-controller').hide();
-        }
-    }
-};
-
-
-classroomCommand.pdfOnLoaded = function () {
-    if(!classroomInfo.pdf.page)
-        classroomInfo.pdf.page = 1;
-
-    classroomCommand.updatePDFCmd ({
-        cmd : 'page',
-        data : classroomInfo.pdf.page
-    });
-
-    // 학생인 경우만 처리
-    if(!connection.extra.roomOwner) {                
-        studentCommand.sendPdfPage (classroomInfo.pdf.page);
-        pdfViewerLock (classroomInfo.allControl);
-    }
-    
-    function pdfViewerLock(_lock) {
-        let frame = document
-        .getElementById('widget-container')
-        .getElementsByTagName('iframe')[0].contentWindow;
-        let fileViewer = frame.document.getElementById('file-viewer');
-        let viewer = fileViewer.contentWindow.document.getElementById("viewer")                                  
-        if(_lock) {
-            viewer.style.pointerEvents = 'none';
-        }
-        else{
-            viewer.style.pointerEvents = '';
-        }
-    }
+classroomCommand.syncViewer = function () {
+    mfileViewer.syncViewer ();
 }
+
+
+
 
 /*
     Epub
@@ -568,12 +539,6 @@ classroomCommand.syncClassroomOpenTime =  function () {
 };
 
 
-// 학생 pdf 페이지가 바뀔 때 호출 된다. 
-classroomStudentsWatchInfo.onPdfPage =  function (student) {
-    console.log(student);
-}
-
-
 //--------------------------------------------------------------------------------//
 
 teacherCommand =  {
@@ -599,6 +564,8 @@ studentCommand = {
         this.sendStudentToTeachCmd ('pdf-page', _page);
     },
 }
+
+
 
 
 /*

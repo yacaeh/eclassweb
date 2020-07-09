@@ -21,9 +21,6 @@ var createScene = function (_canvas) {
     // Add lights to the scene
     var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
 
-
-
-
     var model = BABYLON.SceneLoader.ImportMesh("","./assets/models/scenes/", "skull.babylon", scene, function (newMeshes, particleSystems, skeletons) {
         camera.target = newMeshes[0];
 
@@ -41,10 +38,10 @@ var createScene = function (_canvas) {
         {
             if(classroomInfo.allControl == true)
             {
-            if(newPosition !== undefined)
+            if(newPosition !== undefined && BABYLON.Vector3.Distance(camera.position,newPosition) > 0)
                 camera.position = new BABYLON.Vector3.Lerp(camera.position,newPosition,0.2);
-            if(newRotation !== undefined)
-                camera.absoluteRotation = new BABYLON.Vector3.Lerp(camera.position,newRotation,0.2);
+            if(newRotation !== undefined && BABYLON.Vector3.Distance(camera.absoluteRotation,newRotation) > 0)
+                camera.absoluteRotation = new BABYLON.Vector3.Lerp(camera.absoluteRotation,newRotation,0.2);
             }
         }
     }, 10);

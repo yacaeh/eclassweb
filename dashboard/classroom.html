@@ -30,8 +30,10 @@
   <script src="/dashboard/canvas/canvas-designer-widget.js"></script>
   <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
   <script src="/dashboard/js/emojionearea.min.js"></script>
-  <script src="/dashboard/js/classroomStudentsWatchInfo.js"></script>  
+  <script src="/dashboard/js/classroomStudentsWatchInfo.js"></script>    
+  <script src="/dashboard/js/fileViewer.js"></script>
   <script src="/dashboard/js/examObj.js"></script>
+  <script src="/dashboard/js/attention.js"></script>
   <script src="/dashboard/js/classroomInfo.js"></script>
   <script src="/dashboard/js/all_controll.js"></script>
   <script src="/dashboard/js/canvas.js"></script>
@@ -56,13 +58,22 @@
   <script src="/dashboard/fileInput/themes/fas/theme.js" type="text/javascript"></script>
   <script src="/dashboard/fileInput/themes/explorer-fas/theme.js" type="text/javascript"></script>
 
+
 </head>
 
-<body oncontextmenu="return false" ondragstart="return false">
+<body ondragenter="handleDragDropEvent(event)"
+ondragover="handleDragDropEvent(event)"
+ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false">
 <a id="downloadLink" type="video/webm" style="display: none"></a>
 
+  <div id="toptooltip">
+    <span class="text"></span>
+    <span class="sq"> </span>
+
+  </div>
+
 <div id="confirm-box" class="modal fade">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirm-title">파일을 선택하세요</h5>
@@ -73,6 +84,7 @@
       <div id="confirm-message" class="modal-body">
       </div>
       <div class="modal-footer">
+        <button class="btn btn-danger" id="btn-confirm-file-close">현재 파일 닫기</button>
         <button class="btn btn-confirm-close" id="btn-confirm-close">취소</button>
         <button class="btn btn-primary" id="btn-confirm-action">확인</button>
       </div>
@@ -103,6 +115,7 @@
             <img class="divide">
             <img class="top_icon view_type-on view_type" id="top_student">
             <img class="top_icon view_type" id="top_camera">
+            <img class="top_icon" id="top_save_alert">
             <img class="top_icon" id="top_record_video">
           </span>
 
@@ -125,7 +138,7 @@
         <div class="epub_button" id="prev" style="display: none;" ></div>
         <div class="epub_button" id="next" style="display: none;" ></div>
         <!--End Epub-->
-        <div id="edunetContent" style="left: 3%; width: 77%; height: 95%; position: absolute; display: none;"></div>
+        <div id="edunetContent"></div>
         <video id="screen-viewer" controls playsinline autoplay></video>
         <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
             <div class="stuname">이름</div>
@@ -133,21 +146,28 @@
             <div class="line1" ></div>
             <div class="permission">수업권한 <span id="classP" class="perbtn off"><span class="circle"></span> </span> </div>
             <div class="mic">마이크 <span id="micP" class="perbtn off"><span class="circle"></span> </span> </div>
-            <div class="line2" ></div>
-            <div class="out">
-              <img src="/dashboard/newimg/getout.png">
-              <span class="outtext">내보내기</span>
-              
-            </div>
+            <!-- <div class="line2" ></div> -->
+            <!-- <div class="out"> -->
+              <!-- <img src="/dashboard/newimg/getout.png"> -->
+              <!-- <span class="outtext">내보내기</span> -->
+            <!-- </div> -->
         </div>
         
         <div class="lwindow">
           <span class="nos">
             <span class="now_selected_student">
-              <span class="name">지이잉</span>
-              <span class="status_img"></span>
-              <span class="status_text">접속중</span>
-                  </span>
+              <!-- <span class="name">지이잉</span> -->
+              <!-- <span class="status_img"></span> -->
+              <!-- <span class="status_text">접속중</span> -->
+             
+            
+            </span>
+              <span id="student_permission">
+                <div id='class_permission'>
+                </div>
+                <div id="mic_permission">
+                </div>
+              </span>
                   <span class="nos_student_text" id="nos">0</span>
                   <img class="nos_student_icon" src="/dashboard/newimg/student2.png">
                 </span>
@@ -162,21 +182,15 @@
         <div id="exam-teacher-menu" style="display: none;">
           <!-- 시험 만들기 -->
           <div id="exam-setting-bar">
-            <div class="exam-border-bottom"
-              style="background-color: white; text-align: center; border-bottom:gray solid 1px;">문제출제</div>
-            <div style="display: flex; background-color: #eff1f0; border-bottom:gray solid 1px;">
-              <label style="flex: 1.5; text-align: center; margin-top: 12px;" for="exam-question-count">문항수</label>
-              <input style="flex: 1.2; padding: 0px; margin: 5px 2px 5px 5px; text-align: center; "
-                id="exam-question-count" class="form-control" type="number">
-              <label style="flex: 2; text-align: right; margin-top: 12px; margin-right: 10px;"
-                for="exam-time">시간</label>
-              <input style="flex: 1.2; padding: 0px; margin: 5px;  text-align: center; " id="exam-time"
-                class="form-control" type="text" placeholder="(분)">
-              <button style="flex: 1.5; padding: 0px; margin: 8px 20px 8px 50px;" id="exam-setting-apply"
-                class="btn btn-exam"><b>설정</b></button>
+            <div id="exam-title" class="exam-border-bottom">문제출제</div>
+            <div style="display: flex; width: 339px; height: 37px; background: #EFF1F0;" class="exam-border-bottom">
+              <label id="exam-question-count-label" for="exam-question-count">문항수</label>
+              <input id="exam-question-count" type="number">
+              <label id="exam-time-label" for="exam-time">시간</label>
+              <input id="exam-time" type="text" placeholder="(분)">
+              <button id="exam-setting-apply" class="btn btn-exam"><b>설정</b></button>
             </div>
-
-            <div id="exam-qustion-list" class="exam-border-bottom exam-overflow">
+            <div id="exam-question-list" class="exam-border-bottom exam-overflow" style="text-align: center;">
             </div>
             <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
             <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
@@ -207,9 +221,12 @@
 
       </div>
 
-      <canvas id="temp-stream-canvas"></canvas>
       </div>
     </article>
+
+    <div id="other-videos">
+
+    </div>
 
   <script src="/dashboard/js/babylon.js"></script>
   <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
@@ -233,6 +250,65 @@
       <div id="alert-footer"></div>
     </div>
   </div>
+
+  <div id="alert-exit" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
+    <div id="alert-dialog">
+      <div id="alert-header"><span id="alert-exit-title">경고</span></div>
+      <div id="alert-body">
+        <div id="alert-exit-content">
+          
+        </div>
+        <div id="alert-btns">
+          <button class="btn btn-alert-exit-yes" style="padding-top: 0;">예</button>
+          <button class="btn btn-alert-exit-no" style="padding-top: 0;">아니요</button>
+        </div>
+      </div>
+      <div id="alert-footer"></div>
+    </div>
+  </div>
+<!-- Channel Plugin Scripts -->
+<script>
+  (function() {
+    var w = window;
+    if (w.ChannelIO) {
+      return (window.console.error || window.console.log || function(){})('ChannelIO script included twice.');
+    }
+    var d = window.document;
+    var ch = function() {
+      ch.c(arguments);
+    };
+    ch.q = [];
+    ch.c = function(args) {
+      ch.q.push(args);
+    };
+    w.ChannelIO = ch;
+    function l() {
+      if (w.ChannelIOInitialized) {
+        return;
+      }
+      w.ChannelIOInitialized = true;
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://cdn.channel.io/plugin/ch-plugin-web.js';
+      s.charset = 'UTF-8';
+      var x = document.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    }
+    if (document.readyState === 'complete') {
+      l();
+    } else if (window.attachEvent) {
+      window.attachEvent('onload', l);
+    } else {
+      window.addEventListener('DOMContentLoaded', l, false);
+      window.addEventListener('load', l, false);
+    }
+  })();
+  ChannelIO('boot', {
+    "pluginKey": "4be5f71d-2246-4f5c-971d-2d2080f36fa2"
+  });
+</script>
+<!-- End Channel Plugin -->
 </body>
 
 
