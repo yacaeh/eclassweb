@@ -170,7 +170,7 @@ function ScreenShare(btn) {
 
 
 
-  if (!on) {
+  if (on) {
     isSharingScreen = false;
     if(typeof(lastStream) !== "undefined")
       lastStream.getTracks().forEach((track) => track.stop());

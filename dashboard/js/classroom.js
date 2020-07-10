@@ -382,7 +382,7 @@ var stemp;
 
 // extra code
 connection.onstream = function (event) {
-  console.log('onstream!');
+  console.log('onstream!',event);
 
   if(params.open === 'true' || params.open === true){
     CanvasResize();
@@ -392,15 +392,6 @@ connection.onstream = function (event) {
   }
 
   LoadScreenShare();
-
-  // if(event.streamid == classroomInfo.shareScreen.id){
-  // }
-
-  // else if(classroomInfo.shareScreen.state && event.type == "local"){
-  // }
-
-  if(event.type != "local" && classroomInfo.shareScreen.state){
-  }
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
     if (!classroomInfoLocal.shareScreen.state) {
@@ -419,21 +410,24 @@ connection.onstream = function (event) {
     // $('#main-video').show();
   } else {
     if(event.stream.isVideo){
-      console.error(event);
-      
-      event.mediaElement.controls = false;
-      event.mediaElement.style.width = "100%";
-      event.mediaElement.style.height = "100%";
-      event.mediaElement.style.pointerEvents = "none";
-      
-      var otherVideos = document.getElementById("student_list");
-      var childern = otherVideos.children;
-      for(var i =0 ; i< childern.length; i++){
-        var child = childern[i];
-        if(child.dataset.id == event.userid){
-          child.appendChild(event.mediaElement);
-          break;
+      try{
+        event.mediaElement.controls = false;
+        event.mediaElement.style.width = "100%";
+        event.mediaElement.style.height = "100%";
+        event.mediaElement.style.pointerEvents = "none";
+        var otherVideos = document.getElementById("student_list");
+        var childern = otherVideos.children;
+        for(var i =0 ; i< childern.length; i++){
+          var child = childern[i];
+          if(child.dataset.id == event.userid){
+            child.appendChild(event.mediaElement);
+            break;
+          }
         }
+      }
+      catch{
+        console.log("No Cam")
+
       }
     }
       
@@ -739,24 +733,17 @@ designer.appendTo(document.getElementById('widget-container'), function () {
   connection.attachStreams.push(tempStream);
   window.tempStream = tempStream;
 
-
-
-
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
-    
-
     SetTeacher(); 
-
+    
     connection.extra.roomOwner = true;
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
         connection.rejoin(params.sessionid);
       }
 
-
       classroomCommand.joinRoom ();
-
       connection.socket.on('disconnect', function () {
         location.reload();
       });
@@ -765,24 +752,25 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-      if (!connection.DetectRTC.hasMicrophone) {
-        connection.mediaConstraints.audio = false;
-        connection.session.audio = false;
-        console.log('user has no mic!');
-        // alert('마이크가 없습니다!');
-      }
 
-      if (!connection.DetectRTC.hasWebcam) {
-        connection.mediaConstraints.video = false;
-        connection.session.video = false;
-        console.log('user has no cam!');
-        // alert('캠이 없습니다!');
-        connection.session.oneway = true;
-        connection.sdpConstraints.mandatory = {
-          OfferToReceiveAudio: false,
-          OfferToReceiveVideo: false,
-        };
-      }
+      // if (!connection.DetectRTC.hasMicrophone) {
+      //   connection.mediaConstraints.audio = false;
+      //   connection.session.audio = false;
+      //   console.log('user has no mic!');
+      //   // alert('마이크가 없습니다!');
+      // }
+
+      // if (!connection.DetectRTC.hasWebcam) {
+      //   connection.mediaConstraints.video = false;
+      //   connection.session.video = false;
+      //   console.log('user has no cam!');
+      //   // alert('캠이 없습니다!');
+      //   connection.session.oneway = true;
+      //   connection.sdpConstraints.mandatory = {
+      //     OfferToReceiveAudio: false,
+      //     OfferToReceiveVideo: false,
+      //   };
+      // }
 
     });
 
@@ -794,6 +782,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       },
       function (isRoomJoined, roomid, error) {
         console.log('Joing Class!');
+      
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {

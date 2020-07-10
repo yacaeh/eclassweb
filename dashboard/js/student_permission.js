@@ -112,7 +112,6 @@ permissionManager = {
     connection.streamEvents.selectAll().forEach(function (e) {
       if(e.stream.isVideo && !e.extra.roomOwner && e.userid != classroomInfo.micPermission){
         e.mediaElement.volume = 0;
-        // e.stream.mute("audio");
       }
     })
 
@@ -122,35 +121,14 @@ permissionManager = {
   },
 
   unmute: function (id) {
-    array = [];
-
     connection.streamEvents.selectAll().forEach(function (e) {
       if(e.stream.isVideo && 
         e.userid == id && 
         !e.extra.roomOwner){
         e.mediaElement.volume = 1;
-
-        array.push(e);
-
         console.log("UNMUTED ", e);
-        // e.stream.unmute();
       }
     })
-
-   // 선생쪽에서 학생꺼 뮤트하면 되지 않을까..?
-
-    if(id == connection.userid){
-        connection.streamEvents.selectAll().forEach(function(e){
-          
-          // if(e.stream.isVideo && e.userid == id){
-          //   e.stream.mute("audio");
-          // }
-          // if(e.extra.roomOwner && e.stream.isVideo){
-          //   e.stream.unmute("audio");
-          // }
-
-        })
-    }
 
     if(connection.extra.roomOwner){
       connection.send({unmute : id});
