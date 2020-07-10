@@ -23,6 +23,9 @@ designer.icons.callteacher = '/dashboard/newimg/handsup.png';
 designer.addSyncListener(function (data) {
     connection.send(data);
 });
+designer.pointSyncListener(function (data) {
+    connection.send(data);
+});
 
 designer.setTools({
   pencil: true,

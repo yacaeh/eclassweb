@@ -196,10 +196,13 @@ connection.onmessage = function (event) {
 
   if(event.data.unmute){
     permissionManager.unmute(event.data.unmute);
+    return;
   }
 
   if(event.data.mute){
     permissionManager.mute();
+    return;
+
   }
 
   if(event.ReTrack){
@@ -772,24 +775,25 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-      if (!connection.DetectRTC.hasMicrophone) {
-        connection.mediaConstraints.audio = false;
-        connection.session.audio = false;
-        console.log('user has no mic!');
-        // alert('마이크가 없습니다!');
-      }
+      
+      // if (!connection.DetectRTC.hasMicrophone) {
+      //   connection.mediaConstraints.audio = false;
+      //   connection.session.audio = false;
+      //   console.log('user has no mic!');
+      //   // alert('마이크가 없습니다!');
+      // }
 
-      if (!connection.DetectRTC.hasWebcam) {
-        connection.mediaConstraints.video = false;
-        connection.session.video = false;
-        console.log('user has no cam!');
-        // alert('캠이 없습니다!');
-        connection.session.oneway = true;
-        connection.sdpConstraints.mandatory = {
-          OfferToReceiveAudio: false,
-          OfferToReceiveVideo: false,
-        };
-      }
+      // if (!connection.DetectRTC.hasWebcam) {
+      //   connection.mediaConstraints.video = false;
+      //   connection.session.video = false;
+      //   console.log('user has no cam!');
+      //   // alert('캠이 없습니다!');
+      //   connection.session.oneway = true;
+      //   connection.sdpConstraints.mandatory = {
+      //     OfferToReceiveAudio: false,
+      //     OfferToReceiveVideo: false,
+      //   };
+      // }
 
     });
 

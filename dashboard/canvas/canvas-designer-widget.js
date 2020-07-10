@@ -67,17 +67,23 @@ function CanvasDesigner() {
 
     function syncData(data) {
         if (!designer.iframe) return;
-
         designer.postMessage({
             canvasDesignerSyncData: data
         });
     }
 
     var syncDataListener = function(data) {};
+    var syncAllPoint = function(data) {};
     var dataURLListener = function(dataURL) {};
     var captureStreamCallback = function() {};
 
     function onMessage(event) {
+        if(event.data.SyncAllPoint){
+            syncAllPoint(event.data.SyncAllPoint);
+            return;
+        }
+            
+
         if (!event.data || event.data.uid !== designer.uid) return;
 
         if(!!event.data.sdp) {
@@ -93,7 +99,8 @@ function CanvasDesigner() {
         }
 
         if (!!event.data.canvasDesignerSyncData) {
-            designer.pointsLength = event.data.canvasDesignerSyncData.points.length;
+            if(event.data.canvasDesignerSyncData.points)
+                designer.pointsLength = event.data.canvasDesignerSyncData.points.length;
             syncDataListener(event.data.canvasDesignerSyncData);
             return;
         }
@@ -151,6 +158,10 @@ function CanvasDesigner() {
 
     designer.addSyncListener = function(callback) {
         syncDataListener = callback;
+    };
+
+    designer.pointSyncListener = function(callback) {
+        syncAllPoint = callback;
     };
 
     designer.syncData = syncData;
