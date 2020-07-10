@@ -1611,7 +1611,7 @@ function loadEpubViewer() {
   frame.document.getElementById('tool-box').style.zIndex = '3';
 
   var book = ePub(
-    'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
+    'https://files.primom.co.kr:1443/uploads/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
   );
   var rendition = book.renderTo(epubViewer, {
     manager: 'continuous',
