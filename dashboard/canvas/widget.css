@@ -204,6 +204,7 @@ h2 {
 }
 html,
 body {
+    background: rgb(255, 255,255) !important;
     background-color: transparent;
     font-size: 13px;
     height: 100%;
@@ -261,6 +262,7 @@ a:hover {
 /* toolbox */
 
 .tool-box {
+    z-index: 10001;
     padding-top: 10px;
     border-right: 1px solid rgba(0, 0, 0, 0.2);
     position: absolute;
@@ -783,3 +785,43 @@ input:focus {
 .color_template > .on {
     box-shadow: 0 0 0pt 1.5pt #FFFFFF, 0px 5px 10px rgba(0, 0, 0, 0.3);
 }
+
+
+#screen-viewer {
+    position: fixed;
+    top: 0px !important;
+    left: 52px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 9999999999999;
+    display: none;
+  }
+
+
+@media(max-width:700px){
+    .tool-box {
+        width: 0px;
+    }
+
+    #screen-viewer {
+        position: fixed;
+        top: 0px !important;
+        left: 0px !important;
+        width: 100%;
+        height: 100%;
+        z-index: 9999999999999;
+        display: none;
+      }
+  }
+
+
+  body:fullscreen {
+    background-color: rgb(255, 255, 255);
+  }
+  #body:-webkit-full-screen {
+    background-color: rgb(255, 255, 255);
+  }
+  #body:-moz-full-screen {
+    background-color: rgb(255, 255, 255);
+  }
+

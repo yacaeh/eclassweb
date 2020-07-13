@@ -120,6 +120,7 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
+        canvasresize('file-viewer');
         drawHelper.redraw();
     }               
 }
@@ -2190,11 +2191,20 @@ function canvasresize(id){
     var canvas = tempContext.canvas,
         isTouch = 'createTouch' in document;
 
-    addEvent(canvas, isTouch ? 'touchstart mousedown' : 'mousedown', function(e) {
-        if (isTouch) e = e.pageX ? e : e.touches.length ? e.touches[0] : {
-            pageX: 0,
-            pageY: 0
-        };
+    function TouchConverter(e){
+        var r = {
+            pageX : e.touches[0].pageX,
+            pageY : e.touches[0].pageY,
+        }   
+        return r;
+
+    }
+
+    addEvent(canvas, 'touchstart mousedown', function(e) {
+        if(e.touches){
+            console.log(e);
+            e = TouchConverter(e);
+        }
 
         var cache = is;
         
@@ -2224,20 +2234,7 @@ function canvasresize(id){
         }
     }
 
-    addEvent(canvas, isTouch ? 'touchend touchcancel mouseup' : 'mouseup', function(e) {
-        if (isTouch && (!e || !('pageX' in e))) {
-            if (e && e.touches && e.touches.length) {
-                e = e.touches[0];
-            } else if (e && e.changedTouches && e.changedTouches.length) {
-                e = e.changedTouches[0];
-            } else {
-                e = {
-                    pageX: 0,
-                    pageY: 0
-                }
-            }
-        }
-
+    addEvent(canvas, 'touchend touchcancel mouseup', function(e) {
         var cache = is;
 
         var command = "default";
@@ -2269,11 +2266,11 @@ function canvasresize(id){
         preventStopEvent(e);
     });
 
-    addEvent(canvas, isTouch ? 'touchmove mousemove' : 'mousemove', function(e) {
-        if (isTouch) e = e.pageX ? e : e.touches.length ? e.touches[0] : {
-            pageX: 0,
-            pageY: 0
-        };
+    addEvent(canvas, 'touchmove mousemove', function(e) {
+        if(e.touches){
+            console.log(e);
+            e = TouchConverter(e);
+        }
 
         var cache = is;
 

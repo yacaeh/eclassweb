@@ -128,6 +128,10 @@ function _3DCanvasOnOff(btn) {
   }
 }
 
+document.getElementById("session-id").addEventListener('click' ,function(){
+  document.getElementById("widget-container").requestFullscreen();
+})
+
 // here goes RTCMultiConnection
 
 connection.chunkSize = 16000;
@@ -164,6 +168,7 @@ connection.onUserStatusChanged = function (event) {
 connection.onopen = function (event) {
   console.log('onopen!');
 
+
   SetStudentList(event,true);
 
   connection.onUserStatusChanged(event);
@@ -182,7 +187,7 @@ connection.onopen = function (event) {
   classroomCommand.onConnectionSession (event);
 
   if(classroomInfoLocal.shareScreen.fromme){
-    ReTrack(document.getElementById("screen-viewer").srcObject)
+    ReTrack(GetScreenViewer().srcObject)
   }
 };
 
@@ -235,13 +240,13 @@ connection.onmessage = function (event) {
     console.log("SCREEN SHARE START",event.data.showMainVideo)
     var stream = GetStream(event.data.showMainVideo)
     showScreenViewerUI();
-    document.getElementById("screen-viewer").srcObject = stream;
+    GetScreenViewer().srcObject = stream;
     return;
   }
 
   if (event.data.hideMainVideo) {
     console.log("SCREEN SHARE STOPED", event.userid)
-    $('#screen-viewer').hide();
+    $(GetScreenViewer()).hide();
     classroomCommand.setShareScreenLocal ({state : false , id : undefined});
     return;
   }
@@ -414,7 +419,7 @@ connection.onstream = function (event) {
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
     if (!classroomInfoLocal.shareScreen.state) {
-      $('#screen-viewer').hide();
+      $(GetScreenViewer()).hide();
     }
   } 
   else if (event.extra.roomOwner === true) {
@@ -429,7 +434,9 @@ connection.onstream = function (event) {
     // $('#main-video').show();
   } else {
     if(event.stream.isVideo){
-      console.error(event);
+      if(event.streamid.includes("-")){
+        return false;
+      }
       
       event.mediaElement.controls = false;
       event.mediaElement.style.width = "100%";
@@ -446,10 +453,6 @@ connection.onstream = function (event) {
         }
       }
     }
-      
-    // event.mediaElement.dataset.id = event.userid;
-    // otherVideos.appendChild(event.mediaElement);
-
   }
 
   connection.onUserStatusChanged(event);
@@ -948,8 +951,8 @@ function replaceScreenTrack(stream, btn) {
   classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
   classroomInfoLocal.shareScreen.fromme = true;
 
-  // document.getElementById("screen-viewer").srcObject = tempStream;
-  $('#screen-viewer').get(0).srcObject = stream;
+
+  GetScreenViewer().srcObject = stream;
 
   if(connection.extra.roomOwner){
     classroomInfo.shareScreen = {}
@@ -1021,11 +1024,11 @@ function ReTrack(stream){
 
 function showScreenViewerUI() {
   CanvasResize();
-  $('#screen-viewer').show();
+  GetScreenViewer().style.display = 'block';
 }
 
 function hideScreenViewerUI() {
-  $('#screen-viewer').hide();
+  GetScreenViewer().style.display = 'none';
 }
 
 let classTimeIntervalHandle;
@@ -1072,6 +1075,8 @@ function SetStudent() {
   $('#session-id').text(
     connection.extra.userFullName + '(' + params.sessionid + ')'
   );
+  $(".for_teacher").remove();
+
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
   $('#main-video').show();
@@ -1847,11 +1852,11 @@ function CanvasResize() {
   var r = document.getElementsByClassName('lwindow')[0];
   var rwidth = $(r).width();
 
-  var x = canvas.width - rwidth - 55;
-  var y = canvas.height - 60;
+  var x = canvas.width - rwidth;
+  var y = canvas.height;
 
-  $('#screen-viewer').width(x);
-  $('#screen-viewer').height(y);
+  $(GetScreenViewer()).width(x);
+  $(GetScreenViewer()).height(y);
 
   var renderCanvas = frame.document.getElementById('renderCanvas');
   if (renderCanvas) {
@@ -2366,5 +2371,14 @@ function removeClassInfo(){
   localStorage.removeItem('isSharingFile', isSharingFile);
   localStorage.removeItem('isSharingEpub', isSharingEpub);
   localStorage.removeItem('isFileViewer', isFileViewer);
+
+}
+
+function GetScreenViewer(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+
+  return frame.document.getElementById("screen-viewer");
 
 }
