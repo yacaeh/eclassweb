@@ -2202,7 +2202,6 @@ function canvasresize(id){
 
     addEvent(canvas, 'touchstart mousedown', function(e) {
         if(e.touches){
-            console.log(e);
             e = TouchConverter(e);
         }
 
@@ -2268,7 +2267,6 @@ function canvasresize(id){
 
     addEvent(canvas, 'touchmove mousemove', function(e) {
         if(e.touches){
-            console.log(e);
             e = TouchConverter(e);
         }
 
