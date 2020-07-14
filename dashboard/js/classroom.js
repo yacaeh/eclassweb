@@ -11,7 +11,9 @@
     params[d(match[1])] = d(match[2]);
   window.params = params;
 })();
+
 let uploadServerUrl = "https://files.primom.co.kr:1443";
+var conversationPanel = document.getElementById('conversation-panel');
 
 var connection = new RTCMultiConnection();
 console.log('Connection!');
@@ -20,6 +22,9 @@ console.log('Connection!');
 // function printDawnOfDead(){ console.log("Dawn Of Dead!"); }
 // module.exports.HarryPotter = printHarryPotter;
 // module.exports.DawnOfDead = printDawnOfDead;​
+
+window._points = {};
+
 
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -125,6 +130,8 @@ function _3DCanvasOnOff(btn) {
   }
 }
 
+
+
 // here goes RTCMultiConnection
 
 connection.chunkSize = 16000;
@@ -161,6 +168,7 @@ connection.onUserStatusChanged = function (event) {
 connection.onopen = function (event) {
   console.log('onopen!');
 
+
   SetStudentList(event,true);
 
   connection.onUserStatusChanged(event);
@@ -179,7 +187,7 @@ connection.onopen = function (event) {
   classroomCommand.onConnectionSession (event);
 
   if(classroomInfoLocal.shareScreen.fromme){
-    ReTrack(document.getElementById("screen-viewer").srcObject)
+    ReTrack(GetScreenViewer().srcObject)
   }
 };
 
@@ -193,10 +201,13 @@ connection.onmessage = function (event) {
 
   if(event.data.unmute){
     permissionManager.unmute(event.data.unmute);
+    return;
   }
 
   if(event.data.mute){
     permissionManager.mute();
+    return;
+
   }
 
   if(event.ReTrack){
@@ -229,13 +240,13 @@ connection.onmessage = function (event) {
     console.log("SCREEN SHARE START",event.data.showMainVideo)
     var stream = GetStream(event.data.showMainVideo)
     showScreenViewerUI();
-    document.getElementById("screen-viewer").srcObject = stream;
+    GetScreenViewer().srcObject = stream;
     return;
   }
 
   if (event.data.hideMainVideo) {
     console.log("SCREEN SHARE STOPED", event.userid)
-    $('#screen-viewer').hide();
+    $(GetScreenViewer()).hide();
     classroomCommand.setShareScreenLocal ({state : false , id : undefined});
     return;
   }
@@ -251,11 +262,13 @@ connection.onmessage = function (event) {
     return;
   }
   // 학생 접속시 싱크
-  if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
+  if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect !");
     designer.sync();
     return;
   }
+
+
 
   if (event.data.studentCmd)  {
     if(connection.extra.roomOwner)
@@ -267,7 +280,6 @@ connection.onmessage = function (event) {
   if(event.data.roomInfo) {
     classroomCommand.onReceiveRoomInfo (event.data);
     console.log("SYNC", classroomInfo);
-    LoadScreenShare();
     return;
   }
 
@@ -351,9 +363,6 @@ connection.onmessage = function (event) {
     else iframeEdunetContent(moveURL.enable, moveURL.url, false);
     return;
   }
-  if(!connection.extra.roomOwner){
-    designer.syncData(event.data);
-  }
 
   // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
   if(event.data.onFocus){
@@ -376,6 +385,12 @@ connection.onmessage = function (event) {
       $('#exam-board').hide(300);
     }
   }
+
+  // if(!connection.extra.roomOwner){
+    // console.log(event.data);
+  // }
+  designer.syncData(event.data);
+
 };
 
 var stemp;
@@ -404,11 +419,11 @@ connection.onstream = function (event) {
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
     if (!classroomInfoLocal.shareScreen.state) {
-      $('#screen-viewer').hide();
+      $(GetScreenViewer()).hide();
     }
   } 
   else if (event.extra.roomOwner === true) {
-    var video = document.getElementById('main-video');
+    var video = GetMainVideo();
     video.setAttribute('data-streamid', event.streamid);
     if (event.type === 'local') {
       video.muted = true;
@@ -416,10 +431,15 @@ connection.onstream = function (event) {
     }
 
     video.srcObject = event.stream;
-    // $('#main-video').show();
   } else {
+    if(connection.extra.roomOwner){
+      
+    }
+
     if(event.stream.isVideo){
-      console.error(event);
+      if(event.streamid.includes("-")){
+        return false;
+      }
       
       event.mediaElement.controls = false;
       event.mediaElement.style.width = "100%";
@@ -435,11 +455,9 @@ connection.onstream = function (event) {
           break;
         }
       }
-    }
-      
-    // event.mediaElement.dataset.id = event.userid;
-    // otherVideos.appendChild(event.mediaElement);
 
+
+    }
   }
 
   connection.onUserStatusChanged(event);
@@ -491,7 +509,6 @@ connection.onstreamended = function (event) {
 
 };
 
-var conversationPanel = document.getElementById('conversation-panel');
 
 function appendChatMessage(event, checkmark_id) {
   var div = document.createElement('div');
@@ -511,14 +528,16 @@ function appendChatMessage(event, checkmark_id) {
     }
   } catch {}
 
+  // Another
   if (event.data) {
     var id = event.extra.userFullName || event.userid;
     if (event.extra.roomOwner == true) {
       id += '(선생님)';
+      id = '<font color="#C63EE8">' + id + '</font>';
     }
 
     div.innerHTML =
-      '<b>' + id + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
+      '<b>' + id + '</b> : ' + ConvertChatMsg(event.data.chatMessage);
     if (event.data.checkmark_id) {
       connection.send({
         checkmark: 'received',
@@ -544,7 +563,7 @@ function appendChatMessage(event, checkmark_id) {
 
   conversationPanel.scrollTop = conversationPanel.clientHeight;
   conversationPanel.scrollTop =
-    conversationPanel.scrollHeight - conversationPanel.scrollTop;
+  conversationPanel.scrollHeight - conversationPanel.scrollTop;
 }
 
 function ConvertChatMsg(_msg) {
@@ -739,9 +758,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
   connection.attachStreams.push(tempStream);
   window.tempStream = tempStream;
 
-
-
-
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
     
@@ -765,24 +781,25 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-      if (!connection.DetectRTC.hasMicrophone) {
-        connection.mediaConstraints.audio = false;
-        connection.session.audio = false;
-        console.log('user has no mic!');
-        // alert('마이크가 없습니다!');
-      }
+      
+      // if (!connection.DetectRTC.hasMicrophone) {
+      //   connection.mediaConstraints.audio = false;
+      //   connection.session.audio = false;
+      //   console.log('user has no mic!');
+      //   // alert('마이크가 없습니다!');
+      // }
 
-      if (!connection.DetectRTC.hasWebcam) {
-        connection.mediaConstraints.video = false;
-        connection.session.video = false;
-        console.log('user has no cam!');
-        // alert('캠이 없습니다!');
-        connection.session.oneway = true;
-        connection.sdpConstraints.mandatory = {
-          OfferToReceiveAudio: false,
-          OfferToReceiveVideo: false,
-        };
-      }
+      // if (!connection.DetectRTC.hasWebcam) {
+      //   connection.mediaConstraints.video = false;
+      //   connection.session.video = false;
+      //   console.log('user has no cam!');
+      //   // alert('캠이 없습니다!');
+      //   connection.session.oneway = true;
+      //   connection.sdpConstraints.mandatory = {
+      //     OfferToReceiveAudio: false,
+      //     OfferToReceiveVideo: false,
+      //   };
+      // }
 
     });
 
@@ -840,6 +857,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       }
     );
   }
+
+  setTimeout(mobileHelper.Init(),1000);
 });
 
 function addStreamStopListener(stream, callback) {
@@ -937,8 +956,8 @@ function replaceScreenTrack(stream, btn) {
   classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
   classroomInfoLocal.shareScreen.fromme = true;
 
-  // document.getElementById("screen-viewer").srcObject = tempStream;
-  $('#screen-viewer').get(0).srcObject = stream;
+
+  GetScreenViewer().srcObject = stream;
 
   if(connection.extra.roomOwner){
     classroomInfo.shareScreen = {}
@@ -984,7 +1003,6 @@ function StreamingStart(stream, btn){
         $(btn).removeClass("selected-shape");
       }
       isSharingScreen = false;
-      // $('#main-video').hide();
       window.sharedStream = null;
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
@@ -1010,11 +1028,11 @@ function ReTrack(stream){
 
 function showScreenViewerUI() {
   CanvasResize();
-  $('#screen-viewer').show();
+  GetScreenViewer().style.display = 'block';
 }
 
 function hideScreenViewerUI() {
-  $('#screen-viewer').hide();
+  GetScreenViewer().style.display = 'none';
 }
 
 let classTimeIntervalHandle;
@@ -1058,12 +1076,13 @@ function SetTeacher(){
 }
 
 function SetStudent() {
-  $('#session-id').text(
-    connection.extra.userFullName + '(' + params.sessionid + ')'
-  );
+
+  $('#session-id').text(connection.extra.userFullName + '(' + params.sessionid + ')');
+  $(".for_teacher").remove();
+
+  GetMainVideo().style.display = 'block';
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
-  $('#main-video').show();
   $(".for_teacher").show();
   $(".controll").remove();
   $(".feature").remove();
@@ -1142,11 +1161,11 @@ function SelectViewType() {
 
     switch (this.id) {
       case 'top_student':
-        $('#main-video').hide();
+        GetMainVideo().style.display = "none";
         $('#student_list').show();
         break;
-      case 'top_camera':
-        $('#main-video').show();
+        case 'top_camera':
+          GetMainVideo().style.display = "block";
         $('#student_list').hide();
         break;
     }
@@ -1836,11 +1855,11 @@ function CanvasResize() {
   var r = document.getElementsByClassName('lwindow')[0];
   var rwidth = $(r).width();
 
-  var x = canvas.width - rwidth - 55;
-  var y = canvas.height - 60;
+  var x = canvas.width - rwidth;
+  var y = canvas.height;
 
-  $('#screen-viewer').width(x);
-  $('#screen-viewer').height(y);
+  $(GetScreenViewer()).width(x);
+  $(GetScreenViewer()).height(y);
 
   var renderCanvas = frame.document.getElementById('renderCanvas');
   if (renderCanvas) {
@@ -2227,6 +2246,7 @@ function LoadScreenShare(){
     !classroomInfoLocal.shareScreen.fromme){
     console.log("LOAD SCREEN")
     classroomCommand.openShare();
+    CanvasResize();
   }
 }
 
@@ -2356,3 +2376,28 @@ function removeClassInfo(){
   localStorage.removeItem('isFileViewer', isFileViewer);
 
 }
+
+function GetScreenViewer(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+
+  return frame.document.getElementById("screen-viewer");
+
+}
+
+function GetMainVideo(){
+  var video = document.getElementById("main-video");
+  console.log(video);
+  if(video){
+    return video;
+  }
+  else{
+     return document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow.document.getElementById("main-video");
+  }
+}
+
+$(document).ready(function(){
+})

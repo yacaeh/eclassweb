@@ -39,6 +39,7 @@
   <script src="/dashboard/js/canvas.js"></script>
   <script src="/dashboard/js/movie_render.js"></script>
   <script src="/dashboard/js/screen_recoder.js"></script>
+  <script src="/dashboard/js/mobileHelper.js"></script>
   <script defer src="/dashboard/js/classroom.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
   <script src="/dashboard/js/epub.min.js"></script>
@@ -61,9 +62,7 @@
 
 </head>
 
-<body ondragenter="handleDragDropEvent(event)"
-ondragover="handleDragDropEvent(event)"
-ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false">
+<body ondragstart="return false" style="height: 1080px;">
 <a id="downloadLink" type="video/webm" style="display: none"></a>
 
   <div id="toptooltip">
@@ -139,7 +138,7 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         <div class="epub_button" id="next" style="display: none;" ></div>
         <!--End Epub-->
         <div id="edunetContent"></div>
-        <video id="screen-viewer" controls playsinline autoplay></video>
+        <!-- <video id="screen-viewer" style="display: none;" controls playsinline autoplay></video> -->
         <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
             <div class="stuname">이름</div>
             <div class="status" >접속중</div>
@@ -176,7 +175,7 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
                 <div id="student_list">
             </div>
             </div>
-            <video style="display: none;"  id="main-video" controls playsinline autoplay></video>
+            <video style="display: none;"  id="main-video" playsinline autoplay></video>
 
       <div id="exam-board">
         <div id="exam-teacher-menu" style="display: none;">
@@ -202,6 +201,7 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         <div id="exam-omr" style="display: none;">
         </div>
       </div>
+
       <div class="chatting">
 
         <div id="notice" class="on">
@@ -212,15 +212,12 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
           </div>
         </div>
 
-        <div class="chatbackground"></div>
-        <!-- Conversation Panel -->
         <div class="conversation-panel">
+          <div class="chatbackground"></div>
             <div id="conversation-panel"></div>
             <textarea id="txt-chat-message"></textarea>
         </div>
-
       </div>
-
       </div>
     </article>
 
@@ -267,6 +264,7 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
     </div>
   </div>
 <!-- Channel Plugin Scripts -->
+
 <script>
   (function() {
     var w = window;

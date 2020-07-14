@@ -20,8 +20,10 @@ ondragover="handleDragDropEvent(event)"
 ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
 
     <section class="design-surface">
-        <canvas id="temp-canvas" class="pen"></canvas>
+        <canvas id="temp-canvas" style="z-index: 1;" class="pen"></canvas>
         <canvas id="main-canvas"></canvas>
+        <video id="screen-viewer" controls playsinline autoplay></video>
+
     </section>
 
     <section id="tool-box" class="tool-box">
@@ -44,19 +46,7 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         <canvas class="i"  id="epub" width="28" height="28"></canvas>
         <canvas class="i"  id="callteacher" width="28" height="28"></canvas>
 
-        <canvas class="i" id="image-icon" width="28" height="28"></canvas>
-
-        <canvas id="drag-last-path" width="28" height="28" title="Drag/move last path"></canvas>
-        <canvas id="drag-all-paths" width="28" height="28" title="Drag/move all paths"></canvas>
-        <canvas id="arrow" width="28" height="28" title="Draw Arrows"></canvas>
-        <canvas id="zoom-up" width="28" height="28" title="Zoon-In"></canvas>
-        <canvas id="zoom-down" width="28" height="28" title="Zoom-Out"></canvas>
-        <canvas id="arc" width="28" height="28" title="Arc"></canvas>
-        <canvas id="rectangle" width="28" height="28" title="Rectangle"></canvas>
-        <canvas id="quadratic-curve" width="28" height="28" title="Quadratic curve"></canvas>
-        <canvas id="bezier-curve" width="28" height="28" title="Bezier curve"></canvas>
-        <canvas id="line-width" width="28" height="28" title="Set line-width"></canvas>
-        <canvas id="colors" width="28" height="28" title="Set foreground and background colors"></canvas>
+        <canvas class="i no-hover"  id="full" width="28" height="28"></canvas>
     </section>
 
     <section id="titlebox">
@@ -64,34 +54,6 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         <span class="sq"></span>
     </section>
 
-    <!-- pdf -->
-
-    <section id="pdf-page-container">
-        <img id="pdf-prev" />
-        <select id="pdf-pages-list"></select>
-        <img id="pdf-next" />
-        <img id="pdf-close" />
-    </section>
-
-    <!-- arc -->
-
-    <section id="arc-range-container" class="arc-range-container">
-        <input id="arc-range" class="arc-range" type="text" value="2">
-        <input type="checkbox" id="is-clockwise" checked="" class="allow-select">
-        <label for="is-clockwise">Clockwise?</label>
-        <div class="arc-range-container-guide">Use arrow keys ↑↓</div>
-    </section>
-
-    <!-- generated code -->
-
-    <section class="code-container">
-        <textarea id="code-text" class="code-text allow-select"></textarea>
-    </section>
-
-    <section class="preview-panel" style="display: none;">
-        <div id="design-preview" class="preview-selected">Preview</div>
-        <div id="code-preview">Code</div>
-    </section>
 
     <!-- options -->
 
@@ -176,20 +138,11 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         <li>90</li>
         <li>150</li>
     </ul>
-    <div class="color_template_text"></div> 
-    <!-- <span class="fontColorUI colors-container input-div" style="display: none; position: absolute; top: 0; left: 0; text-align: center;">
-        <div id="text-selected-color"></div>
-        <div id="text-fill-colors" class='context-popup'>
-            <div class="top">
-                <div id="text-selected-color-2"></div>
-                <input id="text-fill-style" type="text" value="000000">
-            </div>
-            <table id="text-colors-list">
-            </table>
-        </div>
-    </span> -->
-    </div>
-    <!-- url-parameters -->
+    <div class="color_template_text"></div>
+</div>
+
+
+
     <script>
         (function() {
             var params = {},
@@ -222,7 +175,6 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         script.src = params.widgetJsURL || 'https://cdn.webrtc-experiment.com/Canvas-Designer/widget.min.js';
         (document.body || document.documentElement).appendChild(script);
     </script>
-
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>
 </body>
 

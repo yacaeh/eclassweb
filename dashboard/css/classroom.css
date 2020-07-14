@@ -210,11 +210,11 @@ button[disabled] {
 }
 
 #noticewindow {
-  overflow: auto;
+  overflow:rmse auto;
   right: 0px;
   top: 40px;
   position: absolute;
-  left: 20px;
+  left: 10px;
   bottom: 25px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -242,7 +242,7 @@ button[disabled] {
   position: absolute;
   background-color: #eff1f0;
   width: 100%;
-  height: 48px;
+  height: 43px;
   bottom: 0px;
   z-index: -1;
   border-top: 1px solid #b8b8b8;
@@ -274,7 +274,7 @@ button[disabled] {
   width: 100%;
   bottom: 50px;
   position: absolute;
-  top: 0px;
+  top: 5px;
 }
 
 #conversation-panel .message {
@@ -299,8 +299,9 @@ button[disabled] {
   width: 100%;
   border-bottom: 1px solid #121010;
   padding-bottom: 1px;
-  top: 50px;
   left: 1px;
+  top: max(30px, 5%);
+  height: 25%;
 }
 
 hr {
@@ -327,15 +328,7 @@ hr {
   vertical-align: middle;
 }
 
-#screen-viewer {
-  position: fixed;
-  top: 50px !important;
-  left: 52px !important;
-  width: 100%;
-  height: 100%;
-  z-index: 9999999999999;
-  display: none;
-}
+
 
 #screen-container {
   margin: 20px;
@@ -356,10 +349,12 @@ hr {
   bottom: 0;
   right: 0;
   left: 0%;
-  height: 100%;
+  height: calc(100% - 50px);
   border: 0px solid black;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 0px;
+  overscroll-behavior: none;
+
 }
 
 #temp-stream-canvas {
@@ -386,10 +381,11 @@ hr {
   top: 20px;
 }
 
+
 .lwindow {
   position: fixed;
-  width: 339px;
-  height: 95.3%;
+  width: 17.7%;
+  bottom: 0px;
   right: 0px;
   top: 50px;
   background-color: white;
@@ -397,15 +393,18 @@ hr {
   outline: solid 1px rgba(0, 0, 0, 0.1);
 }
 
+
+
 .emojionearea.emojionearea-inline {
-  bottom: 6px;
+  bottom: 3px;
   position: absolute !important;
-  right: 5px;
+  left: 5px;
+  width: 96%;
 }
 
 .for_teacher {
   width: 100%;
-  height: 305px;
+  height: 30%;
 }
 
 .onUserStatusChanged {
@@ -414,16 +413,15 @@ hr {
 
 .chatting {
   position: absolute;
-  top: 305px;
+  top: 30%;
   width: 100%;
   bottom: 0px;
 }
 
 .conversation-panel {
-  left: 12px;
+  left: 0px;
   position: absolute;
   bottom: 0px;
-  padding-bottom: 8px;
   right: 0px;
   height: 48%;
   overflow: inherit !important;
@@ -503,7 +501,7 @@ hr {
 #session-id {
   position: absolute;
   color: #828282;
-  width: 300px;
+  width: auto;
   left: calc(50% - 300px / 2);
   font-size: 19px;
   font-family: Roboto;
@@ -785,7 +783,8 @@ hr {
 .nos {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   width: 100%;
-  height: 50px;
+  height: 5%;
+  min-height: 30px;
   position: absolute;
 }
 
@@ -809,13 +808,13 @@ hr {
 
 .nos_student_icon {
   position: absolute;
-  top: 12px;
+  top: calc(50% - 14px);
   right: 11px;
 }
 
 .nos_student_text {
   position: absolute;
-  top: 21px;
+  top: calc(50% - 6px);
   right: 43px;
   font-family: Roboto;
   font-style: normal;
@@ -865,11 +864,11 @@ hr {
 
 #student_list {
   float: left;
-  width: 339px;
-  height: 256px;
+  width: 100%;
+  height: 25%;
   overflow-x: hidden;
   background: #b8b8b8;
-  top: 50px;
+  top: max(30px, 5%);
   position: absolute;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -877,8 +876,6 @@ hr {
 }
 
 .student {
-  width: 82px;
-  height: 62px;
   background-color: rgb(55, 55, 55);
   display: inline-block;
   margin: 1px;
@@ -1524,4 +1521,37 @@ video::-webkit-media-controls-volume-slider {
 
 #toptooltip > .text{
 margin: 10px;
+}
+
+
+
+@media(max-width:700px){
+  .lwindow,
+  .nos_student_text,
+  .nos_student_icon {
+    display: none;
+    width: 0px;
+  }
+
+  #screen-viewer {
+    position: fixed;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999999999999;
+    display: none;
+  }
+  
+}
+
+
+body:fullscreen {
+  background-color: rgb(255, 255, 255);
+}
+#body:-webkit-full-screen {
+  background-color: rgb(255, 255, 255);
+}
+#body:-moz-full-screen {
+  background-color: rgb(255, 255, 255);
 }
