@@ -128,9 +128,7 @@ function _3DCanvasOnOff(btn) {
   }
 }
 
-document.getElementById("session-id").addEventListener('click' ,function(){
-  document.getElementById("widget-container").requestFullscreen();
-})
+
 
 // here goes RTCMultiConnection
 
@@ -423,7 +421,7 @@ connection.onstream = function (event) {
     }
   } 
   else if (event.extra.roomOwner === true) {
-    var video = document.getElementById('main-video');
+    var video = GetMainVideo();
     video.setAttribute('data-streamid', event.streamid);
     if (event.type === 'local') {
       video.muted = true;
@@ -431,7 +429,6 @@ connection.onstream = function (event) {
     }
 
     video.srcObject = event.stream;
-    // $('#main-video').show();
   } else {
     if(event.stream.isVideo){
       if(event.streamid.includes("-")){
@@ -752,9 +749,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
   connection.attachStreams.push(tempStream);
   window.tempStream = tempStream;
 
-
-
-
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
     
@@ -854,6 +848,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       }
     );
   }
+
+  mobileHelper.Init();
 });
 
 function addStreamStopListener(stream, callback) {
@@ -998,7 +994,6 @@ function StreamingStart(stream, btn){
         $(btn).removeClass("selected-shape");
       }
       isSharingScreen = false;
-      // $('#main-video').hide();
       window.sharedStream = null;
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
@@ -1079,7 +1074,7 @@ function SetStudent() {
 
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
-  $('#main-video').show();
+  GetMainVideo().style.display = "block";
   $(".for_teacher").show();
   $(".controll").remove();
   $(".feature").remove();
@@ -1158,11 +1153,11 @@ function SelectViewType() {
 
     switch (this.id) {
       case 'top_student':
-        $('#main-video').hide();
+        GetMainVideo().style.display = "none";
         $('#student_list').show();
         break;
-      case 'top_camera':
-        $('#main-video').show();
+        case 'top_camera':
+          GetMainVideo().style.display = "block";
         $('#student_list').hide();
         break;
     }
@@ -2381,4 +2376,16 @@ function GetScreenViewer(){
 
   return frame.document.getElementById("screen-viewer");
 
+}
+
+function GetMainVideo(){
+  var video = document.getElementById("main-video");
+  if(video){
+    return video;
+  }
+  else{
+     return document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow.document.getElementById("main-video");
+  }
 }

@@ -120,7 +120,7 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-        canvasresize('file-viewer');
+        // canvasresize('file-viewer');
         drawHelper.redraw();
     }               
 }
@@ -2094,71 +2094,7 @@ function canvasresize(id){
             decorateonoff();
             document.getElementById('onoff-icon').style.display = 'block';
         }
-
-
-
-        var designPreview = find('design-preview'),
-            codePreview = find('code-preview');
-
-        // todo: use this function in share-drawings.js
-        // to sync buttons' states
-        window.selectBtn = function(btn, isSkipWebRTCMessage) {
-            codePreview.className = designPreview.className = '';
-
-            if (btn == designPreview) designPreview.className = 'preview-selected';
-            else codePreview.className = 'preview-selected';
-
-            if (!isSkipWebRTCMessage && window.connection && connection.numberOfConnectedUsers >= 1) {
-                connection.send({
-                    btnSelected: btn.id
-                });
-            } else {
-                // to sync buttons' UI-states
-                if (btn == designPreview) btnDesignerPreviewClicked();
-                else btnCodePreviewClicked();
-            }
-        };
-
-        addEvent(designPreview, 'click', function() {
-            selectBtn(designPreview);
-            btnDesignerPreviewClicked();
-        });
-
-        function btnDesignerPreviewClicked() {
-            codeText.parentNode.style.display = 'none';
-            optionsContainer.style.display = 'none';
-            hideContainers();
-            endLastPath();
-        }
-
-        addEvent(codePreview, 'click', function() {
-            selectBtn(codePreview);
-            btnCodePreviewClicked();
-        });
-
-        function btnCodePreviewClicked() {
-            codeText.parentNode.style.display = 'block';
-            optionsContainer.style.display = 'block';
-
-            codeText.focus();
-            common.updateTextArea();
-
-            setHeightForCodeAndOptionsContainer();
-            hideContainers();
-            endLastPath();
-        }
-
-        var codeText = find('code-text'),
-            optionsContainer = find('options-container');
-
-        function setHeightForCodeAndOptionsContainer() {
-            codeText.style.width = (innerWidth - optionsContainer.clientWidth - 30) + 'px';
-            codeText.style.height = (innerHeight - 40) + 'px';
-
-            codeText.style.marginLeft = (optionsContainer.clientWidth) + 'px';
-            optionsContainer.style.height = (innerHeight) + 'px';
-        }
-
+        
         var isAbsolute = find('is-absolute-points'),
             isShorten = find('is-shorten-code');
 

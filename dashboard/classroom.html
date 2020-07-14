@@ -38,6 +38,7 @@
   <script src="/dashboard/js/canvas.js"></script>
   <script src="/dashboard/js/movie_render.js"></script>
   <script src="/dashboard/js/screen_recoder.js"></script>
+  <script defer src="/dashboard/js/mobileHelper.js"></script>
   <script defer src="/dashboard/js/classroom.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
   <script src="/dashboard/js/epub.min.js"></script>
@@ -199,6 +200,7 @@
         <div id="exam-omr" style="display: none;">
         </div>
       </div>
+
       <div class="chatting">
 
         <div id="notice" class="on">
@@ -209,15 +211,12 @@
           </div>
         </div>
 
-        <div class="chatbackground"></div>
-        <!-- Conversation Panel -->
         <div class="conversation-panel">
+          <div class="chatbackground"></div>
             <div id="conversation-panel"></div>
             <textarea id="txt-chat-message"></textarea>
         </div>
-
       </div>
-
       </div>
     </article>
 
@@ -264,6 +263,7 @@
     </div>
   </div>
 <!-- Channel Plugin Scripts -->
+
 <script>
   (function() {
     var w = window;
