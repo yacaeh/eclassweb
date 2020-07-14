@@ -498,7 +498,7 @@ hr {
 #session-id {
   position: absolute;
   color: #828282;
-  width: 300px;
+  width: auto;
   left: calc(50% - 300px / 2);
   font-size: 19px;
   font-family: Roboto;

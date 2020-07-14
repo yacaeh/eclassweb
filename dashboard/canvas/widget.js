@@ -1669,8 +1669,7 @@ function canvasresize(id){
         }
 
         var toolBox = find('tool-box');
-        toolBox.style.height = 1920 + 'px'; // -toolBox.offsetTop - 77
-
+        toolBox.style.height = "calc(100% - 60px)";
 
         function decorateUndo() {
             var context = getContext('undo');
@@ -1704,6 +1703,22 @@ function canvasresize(id){
             decorateUndo();
             document.getElementById('undo').style.display = 'block';
         }
+
+
+        function decorateFull() {
+            var context = getContext('full');
+
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.undo;
+        }
+
+
+        decorateFull();
+        document.getElementById('full').style.display = 'block';
+
 
         function decorate3dview() {
             var context = getContext('3d_view');
@@ -2647,8 +2662,6 @@ function canvasresize(id){
     MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
     MakeTitlePop("file", "파일을 불러옵니다");
     MakeTitlePop("epub", "E-Pub을 불러옵니다");
-    
-    MakeTitlePop("image-icon", "이미지를 불러옵니다");
     MakeTitlePop("callteacher", "저요");
     
 

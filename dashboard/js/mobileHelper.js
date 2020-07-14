@@ -6,6 +6,7 @@ mobileHelper = {
         if(document.body.getBoundingClientRect().width < limitWidth){
             MainCamSetting();
             FullScreenBtnInit();
+            ToolSetting();
         }
     },
 
@@ -15,6 +16,17 @@ mobileHelper = {
 
 
 }
+
+function ToolSetting(){
+    var doc = document.getElementById('widget-container').getElementsByTagName('iframe')[0].
+    contentWindow.document;
+    doc.getElementById("tool-box").removeChild(doc.getElementsByClassName("tooldivide")[0])
+    doc.getElementById("tool-box").removeChild(doc.getElementById("screen_share"))
+    doc.getElementById("tool-box").removeChild(doc.getElementById("textIcon"))
+    doc.getElementById("tool-box").removeChild(doc.getElementById("clearCanvas"))
+    doc.getElementById("tool-box").removeChild(doc.getElementById("undo"))
+}
+
 
 function MainCamSetting(){
     var video = document.getElementById("main-video");
@@ -57,31 +69,35 @@ function TouchConverter(e){
 function FullScreenBtnInit() {
     this.needHelp = true;
 
-    var btn = document.createElement("button");
+    var doc = document.getElementById('widget-container').getElementsByTagName('iframe')[0].
+    contentWindow.document;
+    
+
+    var btn = doc.getElementById("full");
     btn.className = "fullscreen";
-    btn.innerHTML = "전체화면";
     btn.classList.add("off");            
 
     btn.addEventListener('click' ,function(){
         if(btn.classList.contains("off")){
             document.getElementById("widget-container").requestFullscreen();
             btn.innerHTML = "돌아가기";
-            btn.style.bottom = "5px";
+            doc.getElementById("tool-box").style.height = "calc(100% - 10px)";
         }
         else{
             document.exitFullscreen();
             btn.innerHTML = "전체화면";
-            btn.style.bottom = "55px";
+            doc.getElementById("tool-box").style.height = "calc(100% - 60px)";
         }
         btn.classList.toggle("off");
         btn.classList.toggle("on");
     })
 
-    AppendInFrame(btn);
+    // AppendInFrame(btn);
 }
 
 function AppendInFrame(element){
-    document.getElementById('widget-container').getElementsByTagName('iframe')[0].contentWindow.document.body.appendChild(element);
+    document.getElementById('widget-container').getElementsByTagName('iframe')[0].
+    contentWindow.document.body.appendChild(element);
 }
 
 function addEvent(element, eventType, callback) {
