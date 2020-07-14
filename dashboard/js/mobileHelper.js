@@ -1,20 +1,16 @@
 var limitWidth = 700;
 
 mobileHelper = {
-
     Init : function(){
         if(document.body.getBoundingClientRect().width < limitWidth){
+            document.getElementById("ch-plugin").style.display = "none";
+            
+            ChatSetting();
             MainCamSetting();
             FullScreenBtnInit();
             ToolSetting();
         }
     },
-
-    FullScreenOn : function(){
-
-    }
-
-
 }
 
 function ToolSetting(){
@@ -112,7 +108,6 @@ function MainCamSetting(){
 
         preventStopEvent(e);
     })
-
     addEvent(video, 'touchend mouseup', function(e) {
         preventStopEvent(e);
     })
@@ -163,12 +158,10 @@ function FullScreenBtnInit() {
     btn.addEventListener('click' ,function(){
         if(btn.classList.contains("off")){
             document.getElementById("widget-container").requestFullscreen();
-            doc.getElementById("tool-box").style.height = "calc(100% - 10px)";
             image.src = "/dashboard/img/cam_min.png";
         }
         else{
             document.exitFullscreen();
-            doc.getElementById("tool-box").style.height = "100%";
             image.src = "/dashboard/img/cam_max.png";
         }
         btn.classList.toggle("off");
@@ -206,4 +199,8 @@ function addEvent(element, eventType, callback) {
 function GetDoc(){
     return document.getElementById('widget-container').getElementsByTagName('iframe')[0].
     contentWindow.document;
+}
+
+function ChatSetting(){
+    AppendInFrame(conversationPanel);
 }

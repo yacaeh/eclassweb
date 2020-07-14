@@ -11,7 +11,9 @@
     params[d(match[1])] = d(match[2]);
   window.params = params;
 })();
+
 let uploadServerUrl = "https://files.primom.co.kr:1443";
+var conversationPanel = document.getElementById('conversation-panel');
 
 var connection = new RTCMultiConnection();
 console.log('Connection!');
@@ -501,7 +503,6 @@ connection.onstreamended = function (event) {
 
 };
 
-var conversationPanel = document.getElementById('conversation-panel');
 
 function appendChatMessage(event, checkmark_id) {
   var div = document.createElement('div');
@@ -521,14 +522,16 @@ function appendChatMessage(event, checkmark_id) {
     }
   } catch {}
 
+  // Another
   if (event.data) {
     var id = event.extra.userFullName || event.userid;
     if (event.extra.roomOwner == true) {
       id += '(선생님)';
+      id = '<font color="#C63EE8">' + id + '</font>';
     }
 
     div.innerHTML =
-      '<b>' + id + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
+      '<b>' + id + '</b> : ' + ConvertChatMsg(event.data.chatMessage);
     if (event.data.checkmark_id) {
       connection.send({
         checkmark: 'received',
@@ -554,7 +557,7 @@ function appendChatMessage(event, checkmark_id) {
 
   conversationPanel.scrollTop = conversationPanel.clientHeight;
   conversationPanel.scrollTop =
-    conversationPanel.scrollHeight - conversationPanel.scrollTop;
+  conversationPanel.scrollHeight - conversationPanel.scrollTop;
 }
 
 function ConvertChatMsg(_msg) {

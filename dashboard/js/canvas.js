@@ -24,9 +24,11 @@ designer.icons.fullon = '/dashboard/img/cam_max.png';
 
 
 designer.addSyncListener(function (data) {
+    if(connection.extra.roomOwner)
     connection.send(data);
 });
 designer.pointSyncListener(function (data) {
+    if(connection.extra.roomOwner)
     connection.send(data);
 });
 
