@@ -1509,6 +1509,8 @@ function canvasresize(id){
         file : icons.file,
         epub : icons.epub,
         callteacher : icons.callteacher,
+        fulloff : icons.fulloff,
+        fullon : icons.fullon,
     };
 
 
@@ -1707,17 +1709,14 @@ function canvasresize(id){
 
         function decorateFull() {
             var context = getContext('full');
-
             var image = new Image();
             image.onload = function() {
                 context.drawImage(image, 0, 0, 28, 28);
             };
-            image.src = data_uris.undo;
+            image.src = data_uris.fullon;
         }
 
-
         decorateFull();
-        document.getElementById('full').style.display = 'block';
 
 
         function decorate3dview() {
@@ -2139,8 +2138,7 @@ function canvasresize(id){
         setTimeout(setDefaultSelectedIcon, 2000);
     }
 
-    var canvas = tempContext.canvas,
-        isTouch = 'createTouch' in document;
+    var canvas = tempContext.canvas;
 
     function TouchConverter(e){
         var r = {

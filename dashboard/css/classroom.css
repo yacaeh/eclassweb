@@ -299,8 +299,9 @@ button[disabled] {
   width: 100%;
   border-bottom: 1px solid #121010;
   padding-bottom: 1px;
-  top: 50px;
   left: 1px;
+  top: max(30px, 5%);
+  height: 25%;
 }
 
 hr {
@@ -781,6 +782,7 @@ hr {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   width: 100%;
   height: 5%;
+  min-height: 30px;
   position: absolute;
 }
 
@@ -864,7 +866,7 @@ hr {
   height: 25%;
   overflow-x: hidden;
   background: #b8b8b8;
-  top: 5%;
+  top: max(30px, 5%);
   position: absolute;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1522,7 +1524,10 @@ margin: 10px;
 
 
 @media(max-width:700px){
-  .lwindow {
+  .lwindow,
+  .nos_student_text,
+  .nos_student_icon {
+    display: none;
     width: 0px;
   }
 

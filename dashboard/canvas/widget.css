@@ -793,23 +793,19 @@ input:focus {
     left: 52px !important;
     width: 100%;
     height: 100%;
-    z-index: 9999999999999;
+    z-index: 100000006;
     display: none;
   }
 
 
 @media(max-width:700px){
-    /* .tool-box {
-        width: 0px;
-    } */
-
     #screen-viewer {
         position: fixed;
         top: 0px !important;
-        left: 0px !important;
+        left: 50px !important;
         width: 100%;
         height: 100%;
-        z-index: 9999999999999;
+        z-index: 100000006;
         display: none;
       }
   }

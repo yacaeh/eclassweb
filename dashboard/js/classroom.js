@@ -1067,9 +1067,8 @@ function SetTeacher(){
 }
 
 function SetStudent() {
-  $('#session-id').text(
-    connection.extra.userFullName + '(' + params.sessionid + ')'
-  );
+
+  $('#session-id').text(connection.extra.userFullName + '(' + params.sessionid + ')');
   $(".for_teacher").remove();
 
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
