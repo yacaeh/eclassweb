@@ -54,9 +54,7 @@ function MainCamSetting(){
                 return false;
             }
             else{
-
                 video.style.height = "";
-
                 video.style.width = "20%";
                 video.style.left = lastleft;
                 video.style.top = lastTop;
@@ -89,10 +87,28 @@ function MainCamSetting(){
         }
         x -= e.pageX;
         y -= e.pageY;
-        video.style.left = video.getBoundingClientRect().left - x + "px";  
-        video.style.top = video.getBoundingClientRect().top - y  + "px";  
+
+        var rect = video.getBoundingClientRect();
+        var left = rect.left - x;
+        var top = rect.top - y;
+
         x = e.pageX;
         y = e.pageY;
+
+        if(left < 0 || top < 0)
+            return false;
+
+        var canvaswidth = GetDoc().body.getBoundingClientRect().width;
+        var canvasheight = GetDoc().body.getBoundingClientRect().height;
+
+        if(left + rect.width > canvaswidth ||
+            top + rect.height > canvasheight
+            )
+            return false;
+
+        video.style.left = left + "px";  
+        video.style.top =  top + "px";  
+
 
         preventStopEvent(e);
     })
