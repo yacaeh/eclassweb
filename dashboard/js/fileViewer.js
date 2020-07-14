@@ -33,6 +33,7 @@ class fileViewerLoader {
                 break;
 
             case 'mp4':
+            case 'webm':
             case 'mp3':
             case 'avi':
             case 'mkv':
