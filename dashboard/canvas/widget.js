@@ -1671,7 +1671,6 @@ function canvasresize(id){
         }
 
         var toolBox = find('tool-box');
-        toolBox.style.height = "calc(100% - 60px)";
 
         function decorateUndo() {
             var context = getContext('undo');

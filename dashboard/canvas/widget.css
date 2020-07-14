@@ -836,3 +836,9 @@ input:focus {
     left: 55px;
     bottom: 55px;
   }
+
+  .no-hover:hover{
+    box-shadow: none !important;
+    border-radius: 0px !important;
+    background: rgb(204,204,204,0) !important;
+  }

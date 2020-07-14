@@ -18,8 +18,7 @@ mobileHelper = {
 }
 
 function ToolSetting(){
-    var doc = document.getElementById('widget-container').getElementsByTagName('iframe')[0].
-    contentWindow.document;
+    var doc = GetDoc();
     doc.getElementById("tool-box").removeChild(doc.getElementsByClassName("tooldivide")[0])
     doc.getElementById("tool-box").removeChild(doc.getElementById("screen_share"))
     doc.getElementById("tool-box").removeChild(doc.getElementById("textIcon"))
@@ -32,9 +31,7 @@ function MainCamSetting(){
     var x = 0;
     var y = 0;
     var lastleft = 0;
-    var lastright =0 ;
-
-
+    var lastTop =0 ;
     video.controls = false;
     var timeout = null;
 
@@ -43,21 +40,26 @@ function MainCamSetting(){
             clearTimeout(timeout);
             timeout = null;
             if(!video.classList.contains("full")){
-                lastleft = video.style.left;
-                lastright = video.style.right;
+                var rect = GetDoc().body.getBoundingClientRect();
+                console.log(rect);
 
-                video.style.width = "calc(100% - 50px)";
-                video.style.height = "calc(100% - 25px)";
+                lastleft = video.style.left;
+                lastTop = video.style.top;
+
+                video.style.width = "100%";
+                video.style.height = "100%";
                 video.style.left = "50px";
                 video.style.top = "0px";
                 video.classList.add("full");
                 return false;
             }
             else{
+
+                video.style.height = "";
+
                 video.style.width = "20%";
-                video.style.height = "calc(100% - 25px)";
                 video.style.left = lastleft;
-                video.style.top = lastright;
+                video.style.top = lastTop;
                 video.classList.remove("full");
                 return false;
             }
@@ -81,7 +83,7 @@ function MainCamSetting(){
 
         if(video.classList.contains("full"))
             return false;
-            
+
         if(e.touches){
             e = TouchConverter(e);
         }
@@ -128,12 +130,10 @@ function preventStopEvent(e) {
 function FullScreenBtnInit() {
     this.needHelp = true;
 
-    var doc = document.getElementById('widget-container').getElementsByTagName('iframe')[0].
-    contentWindow.document;
-    
+    var doc = GetDoc();
 
     var btn = doc.getElementById("full");
-    btn.className = "fullscreen";
+    btn.classList.add("fullscreen");
     btn.classList.add("off");            
     btn.style.display = 'block';
     var context = btn.getContext('2d');
@@ -152,7 +152,7 @@ function FullScreenBtnInit() {
         }
         else{
             document.exitFullscreen();
-            doc.getElementById("tool-box").style.height = "calc(100% - 60px)";
+            doc.getElementById("tool-box").style.height = "100%";
             image.src = "/dashboard/img/cam_max.png";
         }
         btn.classList.toggle("off");
@@ -185,4 +185,9 @@ function addEvent(element, eventType, callback) {
         element['on' + eventType] = callback;
     }
     return this;
+}
+
+function GetDoc(){
+    return document.getElementById('widget-container').getElementsByTagName('iframe')[0].
+    contentWindow.document;
 }
