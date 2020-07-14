@@ -5,12 +5,11 @@ var limitWidth = 700;
 mobileHelper = {
     Init : function(){
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-            document.getElementById("ch-plugin").style.display = "none";
+            // document.getElementById("ch-plugin").style.display = "none";
             ChatSetting();
             MainCamSetting();
             FullScreenBtnInit();
             ToolSetting();
-
             $(".lwindow").css({display:"none", width : "0px"})
         }
     },
@@ -145,8 +144,9 @@ function FullScreenBtnInit() {
     this.needHelp = true;
 
     var doc = GetDoc();
-
+    console.log(doc)
     var btn = doc.getElementById("full");
+    console.log(btn);
     btn.classList.add("fullscreen");
     btn.classList.add("off");            
     btn.style.display = 'block';

@@ -432,6 +432,10 @@ connection.onstream = function (event) {
 
     video.srcObject = event.stream;
   } else {
+    if(connection.extra.roomOwner){
+      
+    }
+
     if(event.stream.isVideo){
       if(event.streamid.includes("-")){
         return false;
@@ -451,6 +455,8 @@ connection.onstream = function (event) {
           break;
         }
       }
+
+
     }
   }
 
@@ -852,7 +858,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     );
   }
 
-  mobileHelper.Init();
+  setTimeout(mobileHelper.Init(),1000);
 });
 
 function addStreamStopListener(stream, callback) {
@@ -1074,9 +1080,9 @@ function SetStudent() {
   $('#session-id').text(connection.extra.userFullName + '(' + params.sessionid + ')');
   $(".for_teacher").remove();
 
+  GetMainVideo().style.display = 'block';
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
-  GetMainVideo().style.display = "block";
   $(".for_teacher").show();
   $(".controll").remove();
   $(".feature").remove();
@@ -2382,6 +2388,7 @@ function GetScreenViewer(){
 
 function GetMainVideo(){
   var video = document.getElementById("main-video");
+  console.log(video);
   if(video){
     return video;
   }
@@ -2392,3 +2399,5 @@ function GetMainVideo(){
   }
 }
 
+$(document).ready(function(){
+})

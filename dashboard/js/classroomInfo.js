@@ -153,8 +153,8 @@ classroomCommand = {
 classroomCommand.openShare = function (callback){
     var s = GetStream(classroomInfoLocal.shareScreen.id)
     if(s != undefined){
-        document.getElementById("screen-viewer").srcObject = s;
-        document.getElementById("screen-viewer").style.display = 'block';
+        GetScreenViewer().srcObject = s;
+        GetScreenViewer().style.display = 'block';
     }
     
     console.log("OPEN SHARE",s)
