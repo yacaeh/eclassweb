@@ -1,14 +1,17 @@
 var limitWidth = 700;
 
+
+
 mobileHelper = {
     Init : function(){
-        if(document.body.getBoundingClientRect().width < limitWidth){
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
             document.getElementById("ch-plugin").style.display = "none";
-            
             ChatSetting();
             MainCamSetting();
             FullScreenBtnInit();
             ToolSetting();
+
+            $(".lwindow").css({display:"none", width : "0px"})
         }
     },
 }

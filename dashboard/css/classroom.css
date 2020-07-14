@@ -353,6 +353,8 @@ hr {
   border: 0px solid black;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 0px;
+  overscroll-behavior: none;
+
 }
 
 #temp-stream-canvas {
