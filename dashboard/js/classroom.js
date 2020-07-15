@@ -1830,7 +1830,6 @@ $(window).click(function (e) {
 });
 
 
-
 window.addEventListener('resize', function () {
   rtime = new Date();
   if (timeout === false) {

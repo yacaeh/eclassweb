@@ -1477,10 +1477,11 @@ video::-webkit-media-controls-toggle-closed-captions-button {
 video::-webkit-media-controls-volume-slider {
   display: none;
 }
+
 #edunetContent{
   left: 52px; 
-  width: 77%; 
-  height: 91%; 
+  width: calc(100% - 52px - 17.7%); 
+  height: 100%; 
   position: absolute; 
   display: none;
 }

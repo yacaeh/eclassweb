@@ -120,6 +120,11 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
+        find("design-surface").style.width = innerWidth;
+        find("design-surface").style.height = innerHeight;
+        console.log(find("design-surface"))
+        console.log(find("design-surface").style.height)
+
         // canvasresize('file-viewer');
         drawHelper.redraw();
     }               
