@@ -760,7 +760,7 @@ html[dir='rtl'] .dropdownToolbarButton {
     right:            0;
     bottom:           0px;
     left:             0;
-
+    z-index: 5;
     text-align:       center;
 
     background-color: #EFF1F0;

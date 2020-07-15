@@ -1851,6 +1851,7 @@ function CanvasResize() {
   var frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
+    
   var canvas = frame.document.getElementById('main-canvas');
   var r = document.getElementsByClassName('lwindow')[0];
   var rwidth = $(r).width();
