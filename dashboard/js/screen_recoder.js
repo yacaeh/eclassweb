@@ -162,6 +162,7 @@ function ScreenShare(btn) {
   }
 
   var on = $(btn).hasClass('on');
+  console.log(on);
 
   if (!connection.extra.roomOwner && 
     connection.userid != classroomInfo.classPermission) {
@@ -172,7 +173,7 @@ function ScreenShare(btn) {
 
 
 
-  if (!on) {
+  if (on) {
     isSharingScreen = false;
     if(typeof(lastStream) !== "undefined")
       lastStream.getTracks().forEach((track) => track.stop());

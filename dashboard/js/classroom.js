@@ -1858,21 +1858,11 @@ function CanvasResize() {
   var x = canvas.width - rwidth;
   var y = canvas.height;
 
-  $(GetScreenViewer()).width(x);
-  $(GetScreenViewer()).height(y);
-
   var renderCanvas = frame.document.getElementById('renderCanvas');
   if (renderCanvas) {
     renderCanvas.width = x;
     renderCanvas.height = y;
   }
-
-  var eduent = document.getElementById("edunetContent");
-  if (eduent) {
-    eduent.width = x;
-    eduent.height = y;
-  }
-
 }
 
 document.getElementById('collapse').addEventListener('click', function () {
