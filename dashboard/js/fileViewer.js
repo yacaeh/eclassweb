@@ -6,14 +6,13 @@
 
 class fileViewerLoader {
 
-    bOpen = false;
-    type = 'none';
-    ext = 'none';   // 확장자
-    url = '';
-    bLock = false;
-
     constructor () {
-
+        this.bOpen = false;
+        this.type = 'none';
+        this.ext = 'none';   // 확장자
+        this.url = '';
+        this.bLock = false;
+    
     }
 
     setOpenState (_open = Boolean) {
@@ -160,12 +159,9 @@ class fileViewerLoader {
 
 
 class pdfViewer {
-    
-    page; 
-    onpage = function (_page) {}   
 
-    
     constructor () {
+        this.onpage = function(_page){}
         this.page = 1;
     }
 
@@ -207,15 +203,16 @@ class pdfViewer {
 
 class mediaViewer {    
 
-    cacheMediaPlayer;       // mediaplayer를 저장.
+    constructor () {
+        this.cacheMediaPlayer;    
+        this.onplay = null;
+        this.onpause = null;
+        this.onended = null;
+        this.onready = null;
+        this.onseeked = null;
+        this.ontimeupdate = null;
+    }
 
-    // event method    
-    onplay = null;
-    onpause = null;
-    onended = null;
-    onready = null;
-    onseeked = null;
-    ontimeupdate = null;
 
 
     setMediaPlayer (_player)  {
@@ -307,24 +304,29 @@ class mediaViewer {
 
 
 class fileViewer {
-    mViewerLoader = new fileViewerLoader();
-    mLoaded = false;
-    
-    mCurrentViewer;
-
-    // all 
-    onopen = function (_type = String, _url = String) {}
-    onclose = function () {}        
-    onloaded = function (_type = String) {}    
-    onsync = function () {}
+    constructor(){
+        this.mViewerLoader = new fileViewerLoader();
+        this.mLoaded = false;
+        this.mCurrentViewer;
+            // all 
+    this.onopen = function (_type = String, _url = String) {}
+    this.onclose = function () {}        
+    this.onloaded = function (_type = String) {}    
+    this.onsync = function () {}
     
     // private
-    onopeneachtype = function () {}         // 
-    oncloseeachtype = function () {}        // 
-    onloadedeachtype = function () {}
-    onupdateeachtype = function (_data) {}   // 방 동기화 처리
-    onsynceachtype = function () {}          // 난입시, 동기화 처리
-    onshowpageeachtype = function (_page) {}
+    this.onopeneachtype = function () {}         // 
+    this.oncloseeachtype = function () {}        // 
+    this.onloadedeachtype = function () {}
+    this.onupdateeachtype = function (_data) {}   // 방 동기화 처리
+    this.onsynceachtype = function () {}          // 난입시, 동기화 처리
+    this.onshowpageeachtype = function (_page) {}
+
+
+    }
+
+
+
 
     getCurrentViewer () {
         return this.mCurrentViewer;

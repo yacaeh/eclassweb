@@ -35,9 +35,8 @@ class sc {
         recordingTime.style.display = 'none';
         text.innerHTML = '0:00:00';
     }
-
-
-    mergeAudioStreams = () => {
+    constructor(){
+      this.mergeAudioStreams = () => {
         const context = new AudioContext();
         const destination = context.createMediaStreamDestination();
         let hasDesktop = false;
@@ -64,6 +63,9 @@ class sc {
 
         return (hasDesktop || hasVoice) ? destination.stream.getAudioTracks() : [];
     };
+    }
+
+   
 
     async _startCapturing() {
         this.start = true;
