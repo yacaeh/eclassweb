@@ -861,3 +861,23 @@ background: rgb(204,204,204,0) !important;
     height: 100%;
     direction: ltr;
 }
+
+#epub-viewer{
+    width: calc(100% - 52px - 17.7%);
+    border: 1px solid black;
+    left: 50px;
+    position: absolute;
+    height: 100%;
+    direction: ltr;
+}
+
+.message{
+    font-weight: bold;
+    background-color: rgba(187, 187, 187, 0.64);
+    border-radius: 4px;
+    margin-bottom: 3px;
+    padding: 2px;
+    color: white;
+    -webkit-text-stroke-width: 0.6px;
+    -webkit-text-stroke-color: black;
+    font-size: 13px;

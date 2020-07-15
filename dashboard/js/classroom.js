@@ -1618,8 +1618,11 @@ function loadEpubViewer() {
   let epubViewer = document.createElement('div');
   epubViewer.setAttribute('id', 'epub-viewer');
   epubViewer.setAttribute('class', 'spread');
-  epubViewer.style.cssText = "width: 78%;height: 1024px;box-shadow: 0 0 4px #ccc;border-radius: 5px;padding: 0;position: relative;margin: 10px 3%;background: white url('/dashboard/img/loading.gif') center center no-repeat;";
-  let frame = document
+  // epubViewer.style.cssText = "width: 78%;height: 1024px;box-shadow: 0 0 4px #ccc;border-radius: 5px;padding: 0;position: relative;margin: 10px 3%;background: white url('/dashboard/img/loading.gif') center center no-repeat;";
+  if(isMobile)
+    epubViewer.style.width = "calc(100% - 52px)";
+
+      let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
 
