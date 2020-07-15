@@ -852,3 +852,12 @@ background: rgb(204,204,204,0) !important;
     pointer-events: none;
     
 }
+
+#file-viewer{
+    border: 1px solid black;
+    width: calc(100% - 52px - 17.7%);
+    left: 50px;
+    position: absolute;
+    height: 100%;
+    direction: ltr;
+}

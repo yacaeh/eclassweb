@@ -102,15 +102,11 @@ class fileViewerLoader {
         fileViewer.setAttribute('id', 'file-viewer');
 
         let src = 'https://'+window.location.host+'/ViewerJS/#'+url;
-        fileViewer.setAttribute(
-          'src',
-          src
-        );
+        fileViewer.setAttribute( 'src',src);
       
-        fileViewer.style.width = '1024px';
-        fileViewer.style.height = '724px';
-        fileViewer.style.cssText =
-          'border: 1px solid black;height:1024px;direction: ltr;margin-left:2%;width:78%;';
+        if(isMobile)
+            fileViewer.style.width = "calc(100% - 52px)";
+
         fileViewer.setAttribute('allowFullScreen', '');
         let frame = document
           .getElementById('widget-container')

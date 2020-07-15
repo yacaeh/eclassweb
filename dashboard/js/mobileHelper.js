@@ -1,10 +1,13 @@
 var limitWidth = 700;
+var isMobile = false;
 
 
 
 mobileHelper = {
     Init : function(){
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+            isMobile = true;
+            
             document.getElementById("edunetContent").style.width = "calc(100% - 52px)";
             GetDoc().getElementById("screen-viewer").style.width = "calc(100% - 52px)";
             ChatSetting();
