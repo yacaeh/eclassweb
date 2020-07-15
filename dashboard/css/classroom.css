@@ -924,6 +924,7 @@ hr {
   align-content: center;
   font-size: 12px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .student .name .alert {

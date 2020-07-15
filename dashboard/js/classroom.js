@@ -445,6 +445,7 @@ connection.onstream = function (event) {
       event.mediaElement.style.width = "100%";
       event.mediaElement.style.height = "100%";
       event.mediaElement.style.pointerEvents = "none";
+      event.mediaElement.style.position = "absolute";
       
       var otherVideos = document.getElementById("student_list");
       var childern = otherVideos.children;
