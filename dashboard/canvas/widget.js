@@ -2182,7 +2182,7 @@ function canvasresize(id){
         }
     }
 
-    addEvent(canvas, 'touchend touchcancel mouseup', function(e) {
+    addEvent(canvas, 'touchend mouseup', function(e) {
         var cache = is;
 
         var command = "default";
