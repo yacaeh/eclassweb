@@ -37,6 +37,15 @@
     0 32px 16px rgba(0, 0, 0, 0.09);
 }
 
+.scroll::-webkit-scrollbar-track  {  background: rgba(161, 162, 166, 0.0001);}
+.scroll::-webkit-scrollbar-corner  {  background: rgba(161, 162, 166, 0.0001);}
+.scroll::-webkit-scrollbar {width: 15px;}
+.scroll::-webkit-scrollbar-thumb  {
+  background: rgba(161, 162, 166, 0.4);
+  border-radius: 15px;
+  border:4px solid rgba(255,255,255,1);
+}
+
 /* cyrillic-ext */
 @font-face {
   font-family: 'Roboto';
@@ -205,10 +214,6 @@ button[disabled] {
   overflow-x: hidden;
 }
 
-.teachermsg {
-  color: #18dbbe;
-}
-
 #noticewindow {
   overflow:rmse auto;
   right: 0px;
@@ -275,6 +280,7 @@ button[disabled] {
   bottom: 50px;
   position: absolute;
   top: 5px;
+  overflow-x: hidden;
 }
 
 #conversation-panel .message {
@@ -283,9 +289,9 @@ button[disabled] {
   font-size: 15px;
   line-height: 18px;
   margin-bottom: 0px;
-  font-family: Roboto;
   font-style: normal;
   font-weight: normal;
+  overflow-wrap: anywhere;
 }
 
 #conversation-panel .message img,
@@ -347,14 +353,14 @@ hr {
   position: fixed;
   top: 50px;
   bottom: 0;
-  right: 0;
   left: 0%;
+  right: 17.7%;
   height: calc(100% - 50px);
   border: 0px solid black;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-bottom: 0px;
   overscroll-behavior: none;
-
+  z-index: 2;
 }
 
 #temp-stream-canvas {
@@ -383,7 +389,7 @@ hr {
 
 
 .lwindow {
-  position: fixed;
+  position: absolute;
   width: 17.7%;
   bottom: 0px;
   right: 0px;
@@ -391,6 +397,7 @@ hr {
   background-color: white;
   border-left: solid 1px rgba(0, 0, 0, 0.2);
   outline: solid 1px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 
@@ -614,7 +621,7 @@ hr {
   position: absolute;
   width: 126px;
   /* height: 187px; */
-  height: 135px;
+  height: 120px;
   background: #ffffff;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
@@ -628,7 +635,7 @@ hr {
   left: calc(50% - 104px / 2);
   border-bottom: solid 2px #e5e5e5;
   margin-bottom: 10px;
-  top: 58px;
+  top: 40px;
 }
 
 .student-menu > .line2 {
@@ -675,7 +682,7 @@ hr {
   width: 60px;
   height: 15px;
   left: 14px;
-  top: 72px;
+  top: 60px;
 
   font-family: Roboto;
   font-style: normal;
@@ -691,7 +698,7 @@ hr {
   width: 60px;
   height: 15px;
   left: 14px;
-  top: 106px;
+  top: 95px;
 
   font-family: Roboto;
   font-style: normal;
@@ -924,6 +931,7 @@ hr {
   align-content: center;
   font-size: 12px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .student .name .alert {
@@ -1014,9 +1022,11 @@ input[type='radio']:checked + label {
   top:50px; 
   bottom: 0; 
   right: 0; 
-  width: 339px; 
+  width: 17.7%;
+  min-width: 290px; 
   border-left: gray solid 1px;
   background-color: white;
+  overflow-y: auto;
 }
 
 #exam-title {
@@ -1041,7 +1051,8 @@ input[type='radio']:checked + label {
   line-height: 16px;
   color: #707070;
   margin-top: 11px;
-  margin-left: 15px;
+  margin-left: 3px;
+  margin-right: 3px;
 }
 
 #exam-time-label {
@@ -1476,11 +1487,12 @@ video::-webkit-media-controls-toggle-closed-captions-button {
 video::-webkit-media-controls-volume-slider {
   display: none;
 }
+
 #edunetContent{
-  left: 52px; 
-  width: 77%; 
-  height: 91%; 
-  position: absolute; 
+  left: 52px;
+  width: calc(100% - 52px);
+  height: 100%;
+  position: absolute;
   display: none;
 }
 
@@ -1523,7 +1535,7 @@ video::-webkit-media-controls-volume-slider {
 margin: 10px;
 }
 
-
+/* 
 
 @media(max-width:700px){
   .lwindow,
@@ -1544,7 +1556,7 @@ margin: 10px;
   }
   
 }
-
+ */
 
 body:fullscreen {
   background-color: rgb(255, 255, 255);
@@ -1554,4 +1566,8 @@ body:fullscreen {
 }
 #body:-moz-full-screen {
   background-color: rgb(255, 255, 255);
+}
+
+.teachermsg{
+  overflow-wrap: break-word;
 }

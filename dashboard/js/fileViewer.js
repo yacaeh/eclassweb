@@ -6,14 +6,13 @@
 
 class fileViewerLoader {
 
-    bOpen = false;
-    type = 'none';
-    ext = 'none';   // 확장자
-    url = '';
-    bLock = false;
-
     constructor () {
-
+        this.bOpen = false;
+        this.type = 'none';
+        this.ext = 'none';   // 확장자
+        this.url = '';
+        this.bLock = false;
+    
     }
 
     setOpenState (_open = Boolean) {
@@ -103,15 +102,11 @@ class fileViewerLoader {
         fileViewer.setAttribute('id', 'file-viewer');
 
         let src = 'https://'+window.location.host+'/ViewerJS/#'+url;
-        fileViewer.setAttribute(
-          'src',
-          src
-        );
+        fileViewer.setAttribute( 'src',src);
       
-        fileViewer.style.width = '1024px';
-        fileViewer.style.height = '724px';
-        fileViewer.style.cssText =
-          'border: 1px solid black;height:1024px;direction: ltr;margin-left:2%;width:78%;';
+        if(isMobile)
+            fileViewer.style.width = "calc(100% - 52px)";
+
         fileViewer.setAttribute('allowFullScreen', '');
         let frame = document
           .getElementById('widget-container')
@@ -160,12 +155,9 @@ class fileViewerLoader {
 
 
 class pdfViewer {
-    
-    page; 
-    onpage = function (_page) {}   
 
-    
     constructor () {
+        this.onpage = function(_page){}
         this.page = 1;
     }
 
@@ -207,15 +199,16 @@ class pdfViewer {
 
 class mediaViewer {    
 
-    cacheMediaPlayer;       // mediaplayer를 저장.
+    constructor () {
+        this.cacheMediaPlayer;    
+        this.onplay = null;
+        this.onpause = null;
+        this.onended = null;
+        this.onready = null;
+        this.onseeked = null;
+        this.ontimeupdate = null;
+    }
 
-    // event method    
-    onplay = null;
-    onpause = null;
-    onended = null;
-    onready = null;
-    onseeked = null;
-    ontimeupdate = null;
 
 
     setMediaPlayer (_player)  {
@@ -307,24 +300,29 @@ class mediaViewer {
 
 
 class fileViewer {
-    mViewerLoader = new fileViewerLoader();
-    mLoaded = false;
-    
-    mCurrentViewer;
-
-    // all 
-    onopen = function (_type = String, _url = String) {}
-    onclose = function () {}        
-    onloaded = function (_type = String) {}    
-    onsync = function () {}
+    constructor(){
+        this.mViewerLoader = new fileViewerLoader();
+        this.mLoaded = false;
+        this.mCurrentViewer;
+            // all 
+    this.onopen = function (_type = String, _url = String) {}
+    this.onclose = function () {}        
+    this.onloaded = function (_type = String) {}    
+    this.onsync = function () {}
     
     // private
-    onopeneachtype = function () {}         // 
-    oncloseeachtype = function () {}        // 
-    onloadedeachtype = function () {}
-    onupdateeachtype = function (_data) {}   // 방 동기화 처리
-    onsynceachtype = function () {}          // 난입시, 동기화 처리
-    onshowpageeachtype = function (_page) {}
+    this.onopeneachtype = function () {}         // 
+    this.oncloseeachtype = function () {}        // 
+    this.onloadedeachtype = function () {}
+    this.onupdateeachtype = function (_data) {}   // 방 동기화 처리
+    this.onsynceachtype = function () {}          // 난입시, 동기화 처리
+    this.onshowpageeachtype = function (_page) {}
+
+
+    }
+
+
+
 
     getCurrentViewer () {
         return this.mCurrentViewer;

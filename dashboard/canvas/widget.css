@@ -796,7 +796,7 @@ input:focus {
     position: fixed;
     top: 0px !important;
     left: 52px !important;
-    width: 100%;
+    width: calc(100% - 52px);
     height: 100%;
     z-index: 99998;
     display: none;
@@ -851,4 +851,40 @@ background: rgb(204,204,204,0) !important;
     bottom: 10px;
     pointer-events: none;
     
+}
+
+#file-viewer{
+    border: 1px solid black;
+    width: calc(100% - 52px);
+    left: 50px;
+    position: absolute;
+    height: 100%;
+    direction: ltr;
+}
+
+#epub-viewer{
+    width: calc(100% - 52px);
+    border: 1px solid black;
+    left: 50px;
+    position: absolute;
+    height: 100%;
+    direction: ltr;
+}
+
+.message{
+    font-weight: bold;
+    background-color: rgba(187, 187, 187, 0.64);
+    border-radius: 4px;
+    margin-bottom: 3px;
+    padding: 2px;
+    color: white;
+    -webkit-text-stroke-width: 0.6px;
+    -webkit-text-stroke-color: black;
+    font-size: 13px;
+}
+
+#temp-canvas,
+#main-canvas{
+    position: absolute;
+    left: 50px;
 }
