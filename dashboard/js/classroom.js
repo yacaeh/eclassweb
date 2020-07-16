@@ -379,7 +379,10 @@ connection.onmessage = function (event) {
     if(!connection.extra.roomOwner){
       $('#exam-board').hide(300);
     }
-    document.getElementById("widget-container").removeAttribute("style")
+    if(isMobile)
+      document.getElementById("widget-container").style.right = "0px";
+    else
+      document.getElementById("widget-container").removeAttribute("style")
   }
 
   // if(!connection.extra.roomOwner){
@@ -1181,6 +1184,7 @@ $('#top_test').click(function () {
     // 선생님
     if (params.open === 'true') {
       document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
+      CanvasResize();
       $('#exam-omr').hide();
       $('#exam-teacher-menu').show();
     }
@@ -1370,6 +1374,7 @@ function setStudentOMR(quesCount, examTime) {
   else{
     document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
   }
+  CanvasResize();
 
 
   $('#exam-omr').show();
@@ -1862,7 +1867,6 @@ function CanvasResize() {
     
   var canvas = frame.document.getElementById('main-canvas');
   var r = document.getElementsByClassName('lwindow')[0];
-  var rwidth = $(r).width();
 
   var x = canvas.width;
   var y = canvas.height;
