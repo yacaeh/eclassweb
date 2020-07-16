@@ -353,8 +353,8 @@ hr {
   position: fixed;
   top: 50px;
   bottom: 0;
-  right: 17.7%;
   left: 0%;
+  right: 17.7%;
   height: calc(100% - 50px);
   border: 0px solid black;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -1022,9 +1022,11 @@ input[type='radio']:checked + label {
   top:50px; 
   bottom: 0; 
   right: 0; 
-  width: 339px; 
+  width: 17.7%;
+  min-width: 290px; 
   border-left: gray solid 1px;
   background-color: white;
+  overflow-y: auto;
 }
 
 #exam-title {
@@ -1049,7 +1051,8 @@ input[type='radio']:checked + label {
   line-height: 16px;
   color: #707070;
   margin-top: 11px;
-  margin-left: 15px;
+  margin-left: 3px;
+  margin-right: 3px;
 }
 
 #exam-time-label {
@@ -1532,7 +1535,7 @@ video::-webkit-media-controls-volume-slider {
 margin: 10px;
 }
 
-
+/* 
 
 @media(max-width:700px){
   .lwindow,
@@ -1553,7 +1556,7 @@ margin: 10px;
   }
   
 }
-
+ */
 
 body:fullscreen {
   background-color: rgb(255, 255, 255);

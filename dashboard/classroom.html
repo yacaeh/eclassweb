@@ -133,6 +133,31 @@
     <article id="article">
         <div id="widget-container">
 
+          <div id="exam-board" class="scroll">
+            <div id="exam-teacher-menu" style="display: none;">
+              <!-- 시험 만들기 -->
+              <div id="exam-setting-bar">
+                <div id="exam-title" class="exam-border-bottom">문제출제</div>
+                <div style="display: flex; width: 100%; height: 37px; background: #EFF1F0;" class="exam-border-bottom">
+                  <label id="exam-question-count-label" for="exam-question-count">문항수</label>
+                  <input id="exam-question-count" type="number">
+                  <label id="exam-time-label" for="exam-time">시간</label>
+                  <input id="exam-time" type="text" placeholder="(분)">
+                  <button id="exam-setting-apply" class="btn btn-exam"><b>설정</b></button>
+                </div>
+                <div id="exam-question-list" class="exam-border-bottom exam-overflow" style="text-align: center;">
+                </div>
+                <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
+                <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
+              </div>
+              <!-- 정답률 표시 -->
+              <div id="exam-state" style="display: none;">
+              </div>
+            </div>
+            <div id="exam-omr" style="display: none;">
+            </div>
+          </div>
+          
           <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
             <div id="alert-dialog">
               <div id="alert-header"><span id="alert-title">알림</span></div>
@@ -196,30 +221,7 @@
             </div>
             <video style="display: none;"  id="main-video" playsinline autoplay></video>
 
-      <div id="exam-board">
-        <div id="exam-teacher-menu" style="display: none;">
-          <!-- 시험 만들기 -->
-          <div id="exam-setting-bar">
-            <div id="exam-title" class="exam-border-bottom">문제출제</div>
-            <div style="display: flex; width: 339px; height: 37px; background: #EFF1F0;" class="exam-border-bottom">
-              <label id="exam-question-count-label" for="exam-question-count">문항수</label>
-              <input id="exam-question-count" type="number">
-              <label id="exam-time-label" for="exam-time">시간</label>
-              <input id="exam-time" type="text" placeholder="(분)">
-              <button id="exam-setting-apply" class="btn btn-exam"><b>설정</b></button>
-            </div>
-            <div id="exam-question-list" class="exam-border-bottom exam-overflow" style="text-align: center;">
-            </div>
-            <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
-            <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
-          </div>
-          <!-- 정답률 표시 -->
-          <div id="exam-state" style="display: none;">
-          </div>
-        </div>
-        <div id="exam-omr" style="display: none;">
-        </div>
-      </div>
+
 
       <div class="chatting">
 
@@ -239,6 +241,7 @@
       </div>
       </div>
     </article>
+
 
     <div id="other-videos">
 

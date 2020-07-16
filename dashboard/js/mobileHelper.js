@@ -5,16 +5,21 @@ var isMobile = false;
 
 mobileHelper = {
     Init : function(){
-        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-            isMobile = true;
-            document.getElementById("widget-container").style.right = "0px";
-            ChatSetting();
-            MainCamSetting();
-            FullScreenBtnInit();
-            ToolSetting();
-            $(".lwindow").css({display:"none", width : "0px"})
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+        ) {
+            SetMobile();
         }
     },
+}
+
+function SetMobile(){
+    isMobile = true;
+    document.getElementById("widget-container").style.right = "0px";
+    ChatSetting();
+    MainCamSetting();
+    FullScreenBtnInit();
+    ToolSetting();
+    $(".lwindow").css({display:"none", width : "0px"})
 }
 
 function ToolSetting(){
@@ -34,6 +39,7 @@ function MainCamSetting(){
     var lastTop =0 ;
     video.controls = false;
     var timeout = null;
+    var isTouch = false;
 
     addEvent(video, "touchstart mousedown", function(e){
         if(timeout != null){
@@ -67,6 +73,7 @@ function MainCamSetting(){
             if(e.touches){
                 e = TouchConverter(e);
             }
+            isTouch = true;
             x = e.pageX;
             y = e.pageY;
         }
@@ -79,7 +86,7 @@ function MainCamSetting(){
     })
     addEvent(video, "touchmove mousemove", function(e){
 
-        if(video.classList.contains("full"))
+        if(video.classList.contains("full") || !isTouch)
             return false;
 
         if(e.touches){
@@ -113,7 +120,9 @@ function MainCamSetting(){
         preventStopEvent(e);
     })
     addEvent(video, 'touchend mouseup', function(e) {
+        isTouch = false;
         preventStopEvent(e);
+
     })
 
     AppendInFrame(video);

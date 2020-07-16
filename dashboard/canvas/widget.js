@@ -74,7 +74,7 @@
         var canv = find(id),
             ctx = canv.getContext('2d');
 
-        canv.setAttribute('width', innerWidth - 50);
+        canv.setAttribute('width', innerWidth);
         canv.setAttribute('height', innerHeight);
 
         ctx.lineWidth = lineWidth;
@@ -128,7 +128,7 @@ function canvasresize(id){
     var canv = find(id);
     if(!canv)
         return;
-    canv.setAttribute('width', innerWidth - 50);
+    canv.setAttribute('width', innerWidth);
     canv.setAttribute('height', innerHeight);
 }
 
