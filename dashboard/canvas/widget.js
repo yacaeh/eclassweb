@@ -74,7 +74,7 @@
         var canv = find(id),
             ctx = canv.getContext('2d');
 
-        canv.setAttribute('width', innerWidth);
+        canv.setAttribute('width', innerWidth - 50);
         canv.setAttribute('height', innerHeight);
 
         ctx.lineWidth = lineWidth;
@@ -120,14 +120,15 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-        find("design-surface").style.width = innerWidth;
-        find("design-surface").style.height = innerHeight;
+        canvasresize('renderCanvas');
         drawHelper.redraw();
     }               
 }
 function canvasresize(id){
     var canv = find(id);
-    canv.setAttribute('width', innerWidth);
+    if(!canv)
+        return;
+    canv.setAttribute('width', innerWidth - 50);
     canv.setAttribute('height', innerHeight);
 }
 
@@ -482,7 +483,6 @@ function canvasresize(id){
 
     var drawHelper = {
         redraw: function() {
-            //console.log(textHandler.lastFillStyle);
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
 
@@ -1116,8 +1116,6 @@ function canvasresize(id){
                     console.error(points);
                 }
 
-
-
                 if(near){
                     for(var i = 0 ; i < pointHistory.length; i++){
                         if(idx < pointHistory[i]){
@@ -1135,7 +1133,7 @@ function canvasresize(id){
                             for(var z = i ; z < pointHistory.length; z++){
                                 pointHistory[z] -= numofpoint;
                             }
-                            
+                            syncPoints(true, "eraser");
                             drawHelper.redraw();
                             break;
                         }
@@ -1416,66 +1414,8 @@ function canvasresize(id){
         textInputContainer:document.getElementById('textInputContainer')
     };
 
-
-    var FileSelector = function() {
-        var selector = this;
-
-        selector.selectSingleFile = selectFile;
-        selector.selectMultipleFiles = function(callback) {
-            selectFile(callback, true);
-        };
-
-        function selectFile(callback, multiple, accept) {
-            var file = document.createElement('input');
-            file.type = 'file';
-
-            if (multiple) {
-                file.multiple = true;
-            }
-
-            file.accept = accept || 'image/*';
-
-            file.onchange = function() {
-                if (multiple) {
-                    if (!file.files.length) {
-                        console.error('No file selected.');
-                        return;
-                    }
-                    callback(file.files);
-                    return;
-                }
-
-                if (!file.files[0]) {
-                    console.error('No file selected.');
-                    return;
-                }
-
-                callback(file.files[0]);
-
-                file.parentNode.removeChild(file);
-            };
-            file.style.display = 'none';
-            (document.body || document.documentElement).appendChild(file);
-            fireClickEvent(file);
-        }
-
-        function fireClickEvent(element) {
-            var evt = new window.MouseEvent('click', {
-                view: window,
-                bubbles: true,
-                cancelable: true,
-                button: 0,
-                buttons: 0,
-                mozInputSource: 1
-            });
-
-            var fired = element.dispatchEvent(evt);
-        }
-    };
-
   
     var icons = {};
-    //console.log(params)
     if (params.icons) {
         try {
             icons = JSON.parse(params.icons);
@@ -2155,7 +2095,7 @@ function canvasresize(id){
         }
 
         var cache = is;
-        
+        window.parent.document.getElementById("student-menu").style.display = 'none';
         if (cache.isLine) lineHandler.mousedown(e);
         else if (cache.isDragLastPath || cache.isDragAllPaths) dragHelper.mousedown(e);
         else if (cache.isPencil) pencilHandler.mousedown(e);

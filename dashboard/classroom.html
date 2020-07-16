@@ -132,7 +132,25 @@
 
     <article id="article">
         <div id="widget-container">
+
+          <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
+            <div id="alert-dialog">
+              <div id="alert-header"><span id="alert-title">알림</span></div>
+              <div id="alert-body">
+                <div id="alert-content">
+                  
+                </div>
+                <div id="alert-btns">
+                  <button class="btn btn-alert-yes" style="padding-top: 0;">예</button>
+                  <button class="btn btn-alert-no" style="padding-top: 0;">아니요</button>
+                </div>
+              </div>
+              <div id="alert-footer"></div>
+            </div>
+          </div>
+        
           <div id="edunetContent"></div>
+
         </div>
         <!--Epub-->
         <!-- <div id="viewer" class="spreads"></div> -->
@@ -142,7 +160,7 @@
         <!-- <video id="screen-viewer" style="display: none;" controls playsinline autoplay></video> -->
         <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
             <div class="stuname">이름</div>
-            <div class="status" >접속중</div>
+            <!-- <div class="status" >접속중</div> -->
             <div class="line1" ></div>
             <div class="permission">수업권한 <span id="classP" class="perbtn off"><span class="circle"></span> </span> </div>
             <div class="mic">마이크 <span id="micP" class="perbtn off"><span class="circle"></span> </span> </div>
@@ -233,21 +251,6 @@
   <script src=/dashboard/js/3d_render.js></script>
 
   <!--alert-->
-  <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
-    <div id="alert-dialog">
-      <div id="alert-header"><span id="alert-title">알림</span></div>
-      <div id="alert-body">
-        <div id="alert-content">
-          
-        </div>
-        <div id="alert-btns">
-          <button class="btn btn-alert-yes" style="padding-top: 0;">예</button>
-          <button class="btn btn-alert-no" style="padding-top: 0;">아니요</button>
-        </div>
-      </div>
-      <div id="alert-footer"></div>
-    </div>
-  </div>
 
   <div id="alert-exit" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
     <div id="alert-dialog">

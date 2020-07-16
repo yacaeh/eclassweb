@@ -520,7 +520,7 @@ function appendChatMessage(event, checkmark_id) {
     if (event.extra.roomOwner) {
       var notice = document.getElementById('noticewindow');
       $(notice).append(
-        "<div> <font color='#C63EE8'> 선생님 </font> : " +
+        "<div class='teachermsg'> <font color='#C63EE8'> 선생님 </font> : " +
           ConvertChatMsg(event.data.chatMessage) +
           '</div>'
       );
@@ -551,7 +551,7 @@ function appendChatMessage(event, checkmark_id) {
     if (params.open === 'true' || params.open === true) {
       var notice = document.getElementById('noticewindow');
       $(notice).append(
-        "<div> <font color='#C63EE8'> 선생님 </font> : " +
+        "<div class='teachermsg'> <font color='#C63EE8'> 선생님 </font> : " +
           ConvertChatMsg(event) +
           '</div>'
       );
@@ -1859,7 +1859,7 @@ function CanvasResize() {
   var r = document.getElementsByClassName('lwindow')[0];
   var rwidth = $(r).width();
 
-  var x = canvas.width - rwidth;
+  var x = canvas.width;
   var y = canvas.height;
 
   var renderCanvas = frame.document.getElementById('renderCanvas');

@@ -796,7 +796,7 @@ input:focus {
     position: fixed;
     top: 0px !important;
     left: 52px !important;
-    width: calc(100% - 52px - 17.7%);
+    width: calc(100% - 52px);
     height: 100%;
     z-index: 99998;
     display: none;
@@ -855,7 +855,7 @@ background: rgb(204,204,204,0) !important;
 
 #file-viewer{
     border: 1px solid black;
-    width: calc(100% - 52px - 17.7%);
+    width: calc(100% - 52px);
     left: 50px;
     position: absolute;
     height: 100%;
@@ -863,7 +863,7 @@ background: rgb(204,204,204,0) !important;
 }
 
 #epub-viewer{
-    width: calc(100% - 52px - 17.7%);
+    width: calc(100% - 52px);
     border: 1px solid black;
     left: 50px;
     position: absolute;
@@ -881,3 +881,10 @@ background: rgb(204,204,204,0) !important;
     -webkit-text-stroke-width: 0.6px;
     -webkit-text-stroke-color: black;
     font-size: 13px;
+}
+
+#temp-canvas,
+#main-canvas{
+    position: absolute;
+    left: 50px;
+}
