@@ -1698,3 +1698,24 @@ body:fullscreen {
   right: 1px;
 }
 
+.modal-title{
+  margin-bottom: 0;
+  line-height: 1.5;
+  width: auto;
+  padding-right: 30px;
+  padding-left: 30px;
+  /* border: solid 1px; */
+  border-bottom: 0px;
+  margin-right: 9px;
+  background-color: #f0f0f0;
+  border-color: #f0f0f0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: black;
+}
+
+.modal-title.selected{
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}

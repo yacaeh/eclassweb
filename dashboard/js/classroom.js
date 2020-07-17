@@ -82,6 +82,8 @@ SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 SetCanvasBtn('epub', LoadEpub);
 SetCanvasBtn('callteacher', CallTeacher);
+SetCanvasBtn('homework', HomeworkSubmit);
+
 SetEpubNavigator();
 
 var isSharingScreen = false;
@@ -1071,6 +1073,7 @@ function SetTeacher(){
     $(".controll").show();
     $(".feature").show();
   $(frame.document.getElementById("callteacher")).remove();
+  $(frame.document.getElementById("homework")).remove();
 
 }
 
@@ -1493,39 +1496,14 @@ function LoadFile(btn) {
     removeOnSelect(btn);
     return;
   }
-  
   if(!connection.extra.roomOwner) return;
-  
   fileUploadModal("파일 관리자",function(e){console.log(e)});
-
-  // classroomCommand.togglePdfStateServer ((state) => {
-  //   // if(state) 
-  //   // {
-  //   //   isSharingFile = true;
-  //   //   isFileViewer = true;
-  //   // }
-  //   // else
-  //   // {
-  //   //   isSharingFile = false;
-  //classroomCommand   //   isFileViewer = false;
-  //   // }
-  // }) 
-  
-  // if (isFileViewer === false) {
-  //   isSharingFile = true;
-  //   loadFileViewer();
-  //   $('#canvas-controller').show();
-  //   isFileViewer = true;
-  //   classroomCommand.sendOpenPdf ();
-  // } else {
-  //   isSharingFile = false;
-  //   unloadFileViewer();
-  //   $('#canvas-controller').hide();
-  //   isFileViewer = false;
-  //   classroomCommand.sendClosePdf ();
-  // }
 }
 
+
+function HomeworkSubmit(btn) {
+  HomeworkUploadModal("숙제 제출",function(e){console.log(e)});
+}
 
 function unloadFileViewer() {
   isSharingFile = false;
@@ -2006,11 +1984,40 @@ function GetStream(id){
 }
 
 
+function HomeworkUploadModal(message, callback){
+  console.log(message);
+  extraPath = '';
+  $('#btn-confirm-close').hide();
+  $('#btn-confirm-file-close').hide();
+  $("#confirm-title2").hide();
+  $('#confirm-title').html(message).removeClass("selected");
+
+  $('#btn-confirm-action').html('닫기').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(true);
+  });
+
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
+  $('#confirm-box-topper').show();
+
+  $('#confirm-box').modal({
+      backdrop: 'static',
+      keyboard: false
+  });
+
+  loadFileInput();
+}
+
 
 function fileUploadModal(message, callback) {
   console.log(message);
   extraPath = '';
+
   getUploadFileList();
+  $("#confirm-title2").show();
+
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
       $('#confirm-box').modal('hide');
@@ -2028,7 +2035,8 @@ function fileUploadModal(message, callback) {
   });
 
   $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
-  $('#confirm-title').html('파일 관리자');
+  $('#confirm-title').html(message).addClass("selected");
+  $('#confirm-title2').html("과제").removeClass("selected");
   $('#confirm-box-topper').show();
 
   $('#confirm-box').modal({
@@ -2045,12 +2053,36 @@ function fileUploadModal(message, callback) {
     }
 
   loadFileInput();
+
+  document.getElementById("confirm-title").addEventListener("click",function(){
+    ViewUploadList(this);
+  })
+
+  document.getElementById("confirm-title2").addEventListener("click",function(){
+    ViewHomeworkList(this);
+  })
+}
+
+function ViewHomeworkList(btn){
+  btn.classList.add("selected");
+  document.getElementById("confirm-title").classList.remove("selected");
+  $("form[name=upload]").hide();
+  getUploadFileList("/homework");
+}
+
+function ViewUploadList(btn){
+  btn.classList.add("selected");
+  document.getElementById("confirm-title2").classList.remove("selected");
+  $("form[name=upload]").show();
+  getUploadFileList();
 }
 
 
-function getUploadFileList(){
+function getUploadFileList(extraPath){
+  if(typeof extraPath === "undefined")
+    extraPath = ""; 
+
   var xhr = new XMLHttpRequest();
-  console.log(uploadServerUrl);
   var url = uploadServerUrl+'/list';
   var data = { "userId" : params.sessionid ,"extraPath":extraPath};
   xhr.open("POST", url, true);
@@ -2058,20 +2090,42 @@ function getUploadFileList(){
   xhr.onreadystatechange = function () {
   if (xhr.readyState == 4 && xhr.status == 200) {
       // do something with response
-      updateFileList(JSON.parse(xhr.responseText));
+      updateFileList(JSON.parse(xhr.responseText), extraPath);
   }
   };
   data = JSON.stringify(data);
   xhr.send(data); 
 }
 
-function updateFileList(list){
-  console.log(list.files);
+function updateFileList(list, extraPath){
   $("#confirm-message .list-group-flush").remove();
   var re = /(?:\.([^.]+))?$/;
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
-    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
+
+    if(file.name == "homework")
+      return ;
+
+    var buttons = "";
+
+
+    if(extraPath == "/homework"){
+      buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
+      onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
+
+    } 
+
+    buttons +=  '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
+    onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button> \
+    <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
+    onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
+
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+
+    getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+ 
+    '</label>'  + buttons;
+
+
+
   })
   listElement+= '</ul>';
   var $listElement = $($.parseHTML(listElement));
@@ -2129,16 +2183,41 @@ function getFileType(ext){
   return element;
 }
 
-function deleteUploadedFile(filename){
+function downloadUploadedFile(url,name){
+  fetch(url)
+  .then(resp => resp.blob())
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+  })
+  .catch(() => alert('oh no!'));
+}
+
+function deleteUploadedFile(filename, extraPath){
+
+  console.log(extraPath);
+
   var xhr = new XMLHttpRequest();
+
   var url = uploadServerUrl+'/delete';
-  var data = {"userId":params.sessionid, "name":filename};
+  var data = {
+    "userId":params.sessionid, 
+    "name":filename,
+    "extraPath" : extraPath
+  };
+
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
       if (xhr.readyState == 4 && xhr.status == 200) {
           // do something with response
-          getUploadFileList();
+          getUploadFileList(extraPath);
       }
   };
   data = JSON.stringify(data);
@@ -2148,6 +2227,11 @@ function deleteUploadedFile(filename){
 function loadFileInput(){
 
   $(document).ready(function () {
+    var extraPath = "";
+
+    if(!connection.extra.roomOwner)
+      extraPath = "/homework";
+
     $("#test-upload").fileinput({
         'theme': 'fas',
         'showPreview': true,
@@ -2221,13 +2305,16 @@ function loadFileInput(){
        }
    },
    uploadExtraData: {
-    userId: params.sessionid
+    // userId: path
+    userId: params.sessionid,
+    extraPath : extraPath,
   },
 
     }).on('fileuploaded', function(event, previewId, index, fileId) {
       console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
       console.log(previewId.response);
-      getUploadFileList();
+      if(connection.extra.roomOwner)
+        getUploadFileList();
   }).on('fileuploaderror', function(event, data, msg) {
       console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
   }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {

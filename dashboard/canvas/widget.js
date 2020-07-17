@@ -1427,6 +1427,7 @@ function canvasresize(id){
         callteacher : icons.callteacher,
         fulloff : icons.fulloff,
         fullon : icons.fullon,
+        homework : icons.homework,
     };
 
 
@@ -1652,6 +1653,19 @@ function canvasresize(id){
             decorate3dview();
             document.getElementById('3d_view').style.display = 'block';
         }
+
+        
+        function decorateHomework() {
+            var context = getContext('homework');
+            var image = new Image();
+            image.onload = function() {
+                context.drawImage(image, 0, 0, 28, 28);
+            };
+            image.src = data_uris.homework;
+        }
+
+            decorateHomework();
+            document.getElementById('homework').style.display = 'block';
 
         function decoratemovie() {
             var context = getContext('movie');
@@ -2576,6 +2590,7 @@ function canvasresize(id){
     MakeTitlePop("file", "파일을 불러옵니다");
     MakeTitlePop("epub", "E-Pub을 불러옵니다");
     MakeTitlePop("callteacher", "저요");
+    MakeTitlePop("homework", "숙제를 제출합니다");
     
 
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
