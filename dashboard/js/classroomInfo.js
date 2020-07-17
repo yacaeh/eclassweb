@@ -446,20 +446,23 @@ classroomCommand.openEpub = function () {
     if(!connection.extra.roomOwner) {
         if(classroomInfo.allControl) 
         {        
-            if(isSharingEpub) {            
-                var next = document.getElementById('next');
-                next.style.display = 'none';
-                var prev = document.getElementById('prev');
-                prev.style.display = 'none';
+            if(isSharingEpub) {       
+                document.getElementById('next').style.display = "none";     
+                document.getElementById('prev').style.display = "none";     
+                document.getElementById('lnext').style.display = "none";     
+                document.getElementById('lprev').style.display = "none";  
+                document.getElementsByClassName("thumbnail")
+                $(".thumbnail").css("pointer-events", "none")
             }
         }
         else 
         {
             if(isSharingEpub) {      
-                var next = document.getElementById('next');
-                next.style.display = 'block';
-                var prev = document.getElementById('prev');
-                prev.style.display = 'block';
+                document.getElementById('next').style.display = "block";     
+                document.getElementById('prev').style.display = "block";     
+                document.getElementById('lnext').style.display = "block";     
+                document.getElementById('lprev').style.display = "block";   
+                $(".thumbnail").css("pointer-events", "");
             }
         }
 

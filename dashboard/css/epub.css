@@ -39,29 +39,6 @@
 
 }
 
-
-#prev {
-  position: absolute;
-  top :50%;
-  left:50px;
-  display: inline-block;
-  background-image: url("/dashboard/img/prev.png");
-  background-size: cover;
-  width:70px;
-  height:70px;
-  }
-
-#next {
-  position: absolute;
-  top :50%;
-  right:350px;
-  display: inline-block;
-  background-image: url("/dashboard/img/next.png");
-  background-size: cover;
-  width:70px;
-  height:70px;
-}
-
 #toc {
   display: block;
   margin: 10px auto;
@@ -84,16 +61,6 @@
 
   #epub-viewer.spreads.single:after {
     display: none;
-  }
-
-  #prev {
-    display: inline-block;
-    content: url(../img/prev.png);
-    }
-
-  #next {
-    display: inline-block;
-    content: url(../img/next.png);
   }
 }
 

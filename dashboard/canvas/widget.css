@@ -863,12 +863,15 @@ background: rgb(204,204,204,0) !important;
 }
 
 #epub-viewer{
-    width: calc(100% - 52px);
-    border: 1px solid black;
+    width: calc(100% - 50px);
     left: 50px;
+    border: 1px solid black;
     position: absolute;
     height: 100%;
     direction: ltr;
+    align-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .message{
