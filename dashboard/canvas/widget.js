@@ -74,7 +74,7 @@
         var canv = find(id),
             ctx = canv.getContext('2d');
 
-        canv.setAttribute('width', innerWidth);
+        canv.setAttribute('width', innerWidth - 50);
         canv.setAttribute('height', innerHeight);
 
         ctx.lineWidth = lineWidth;
@@ -120,7 +120,6 @@ function resizeend() {
         timeout = false;
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-        canvasresize('renderCanvas');
         drawHelper.redraw();
     }               
 }
@@ -128,7 +127,7 @@ function canvasresize(id){
     var canv = find(id);
     if(!canv)
         return;
-    canv.setAttribute('width', innerWidth);
+    canv.setAttribute('width', innerWidth - 50);
     canv.setAttribute('height', innerHeight);
 }
 
@@ -201,19 +200,6 @@ function canvasresize(id){
                 if (p[0] === 'text') {
                     tempArray[i] = [this.strokeOrFill(p[2]) + '\ncontext.fillText(' + point[0] + ', ' + point[1] + ', ' + point[2] + ');'];
                 }
-
-                if (p[0] === 'arc') {
-                    tempArray[i] = ['context.beginPath(); \n' + 'context.arc(' + toFixed(point[0]) + ',' + toFixed(point[1]) + ',' + toFixed(point[2]) + ',' + toFixed(point[3]) + ', 0,' + point[4] + '); \n' + this.strokeOrFill(p[2])];
-                }
-
-                if (p[0] === 'rect') {
-                    tempArray[i] = [this.strokeOrFill(p[2]) + '\n' + 'context.strokeRect(' + point[0] + ', ' + point[1] + ',' + point[2] + ',' + point[3] + ');\n' + 'context.fillRect(' + point[0] + ', ' + point[1] + ',' + point[2] + ',' + point[3] + ');'];
-                }
-
-      
-
-          
-
             }
             textarea.value = tempArray.join('\n\n') + this.strokeFillText + '\n\n';
 
@@ -266,7 +252,6 @@ function canvasresize(id){
                         getPoint(point[3], y, 'y')
                     ], p[2]);
                 }
-
            
                 if (p[0] === 'text') {
                     output += this.shortenHelper(p[0], [
@@ -275,9 +260,6 @@ function canvasresize(id){
                         getPoint(point[2], y, 'y')
                     ], p[2]);
                 }
-
-           
-
             }
 
             output = output.substr(0, output.length - 2);
@@ -307,11 +289,8 @@ function canvasresize(id){
                     output = 'var x = ' + x + ', y = ' + y + ';\n\n';
                 }
 
-               
-
                 if (p[0] === 'pencil') {
                     output += 'context.beginPath();\n' + 'context.moveTo(' + getPoint(point[0], x, 'x') + ', ' + getPoint(point[1], y, 'y') + ');\n' + 'context.lineTo(' + getPoint(point[2], x, 'x') + ', ' + getPoint(point[3], y, 'y') + ');\n'
-
                         +
                         this.strokeOrFill(p[2]);
                 }
@@ -1013,11 +992,7 @@ function canvasresize(id){
             markerpoint = [];
             markerpoint.push([t.prevX, t.prevY, x, y]);
 
-            // markerDrawHelper.marker(tempContext, markerpoint);
-
             points[points.length] = ['marker', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
-
-            
             document.getElementById("marker-container").style.display = 'none';
         },
         mouseup: function(e) {
