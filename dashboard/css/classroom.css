@@ -1719,3 +1719,9 @@ body:fullscreen {
   border-color: #007bff;
   color: white;
 }
+
+.btn-safe{
+  color: #fff;
+  background-color: #18DBBE;
+  border-color: #18DBBE;
+}
