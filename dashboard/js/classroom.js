@@ -1496,8 +1496,12 @@ function LoadFile(btn) {
     removeOnSelect(btn);
     return;
   }
-  if(!connection.extra.roomOwner) return;
-  fileUploadModal("파일 관리자",function(e){console.log(e)});
+
+  if(!connection.extra.roomOwner) 
+    return;
+
+
+  fileUploadModal("파일 관리자", btn ,function(e){console.log(e)});
 }
 
 
@@ -1506,6 +1510,10 @@ function HomeworkSubmit(btn) {
 }
 
 function unloadFileViewer() {
+  var btn = GetFrame().document.getElementById("file");
+  btn.classList.remove("selected-shape");
+  btn.classList.remove("on");
+
   isSharingFile = false;
   isFileViewer = false;
   classroomCommand.closeFile ();
@@ -1513,8 +1521,10 @@ function unloadFileViewer() {
 
 
 function loadFileViewer(url) {
-
   console.log('loadFileViewer');
+  var btn = GetFrame().document.getElementById("file");
+  btn.classList.add("selected-shape");
+  btn.classList.add("on");
   isSharingFile = true;
   isFileViewer = true;  
   classroomCommand.openFile (url);
@@ -2011,7 +2021,7 @@ function HomeworkUploadModal(message, callback){
 }
 
 
-function fileUploadModal(message, callback) {
+function fileUploadModal(message, btn, callback) {
   console.log(message);
   extraPath = '';
 
@@ -2029,6 +2039,8 @@ function fileUploadModal(message, callback) {
 
   $('.btn-confirm-close').unbind('click').bind('click', function (e) {
       e.preventDefault();
+
+
       $('#confirm-box').modal('hide');
       $('#confirm-box-topper').hide();
       callback(false);
@@ -2081,6 +2093,7 @@ function ViewUploadList(btn){
 function getUploadFileList(extraPath){
   if(typeof extraPath === "undefined")
     extraPath = ""; 
+  $("#confirm-message .list-group-flush").remove();
 
   var xhr = new XMLHttpRequest();
   var url = uploadServerUrl+'/list';
@@ -2089,7 +2102,6 @@ function getUploadFileList(extraPath){
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
   if (xhr.readyState == 4 && xhr.status == 200) {
-      // do something with response
       updateFileList(JSON.parse(xhr.responseText), extraPath);
   }
   };
@@ -2098,7 +2110,6 @@ function getUploadFileList(extraPath){
 }
 
 function updateFileList(list, extraPath){
-  $("#confirm-message .list-group-flush").remove();
   var re = /(?:\.([^.]+))?$/;
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
@@ -2107,8 +2118,6 @@ function updateFileList(list, extraPath){
       return ;
 
     var buttons = "";
-
-
     if(extraPath == "/homework"){
       buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
       onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
@@ -2123,9 +2132,6 @@ function updateFileList(list, extraPath){
     listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+
     getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+ 
     '</label>'  + buttons;
-
-
-
   })
   listElement+= '</ul>';
   var $listElement = $($.parseHTML(listElement));
@@ -2573,3 +2579,10 @@ function GetMainVideo(){
 
 $(document).ready(function(){
 })
+
+function GetFrame(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+  return frame;
+}
