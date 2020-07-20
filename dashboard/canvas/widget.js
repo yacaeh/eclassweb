@@ -462,7 +462,6 @@ function canvasresize(id){
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
 
-            var i, point, length = points.length;
             var _this = this;
 
             teacherPoints.forEach(function(data){
@@ -470,14 +469,13 @@ function canvasresize(id){
             })
             drawpoint(points);
 
-
-
             function drawpoint(points) {
                 var isBegin = false;
                 var marking = false;
                 var lastmarkpos = undefined;
 
                 points.forEach(function (point) {
+                    console.log(point);
 
                     if (point == null) {
                         return false;
@@ -1034,8 +1032,7 @@ function canvasresize(id){
         var py = point[1]
 
         var dist = Math.pow(x - px,2) + Math.pow(y - py,2);
-        //if(dist < 250)
-        if(dist < 0.0002)
+        if(dist < 0.0005)
             return true;
         else return false;
     }
@@ -1081,13 +1078,21 @@ function canvasresize(id){
 
             points.forEach(function(point,idx){
                 try{
-                    var near = isNear(x,y,point[1]);
+                    if(point[0] == "text"){
+                        const normalize = normalizePoint(point[1][1], point[1][2])
+                        var tempPoint = [normalize[0], normalize[1]];
+                        var near = isNear(x,y,tempPoint);
+                    }
+                    else{
+                        var near = isNear(x,y,point[1]);
+                    }
                 }   
                 catch{
                     console.error(points);
                 }
 
                 if(near){
+                    console.log(point);
                     for(var i = 0 ; i < pointHistory.length; i++){
                         if(idx < pointHistory[i]){
     
@@ -1208,7 +1213,10 @@ function canvasresize(id){
         },
         appendPoints: function() {
             var options = textHandler.getOptions();
+            const normal = normalizePoint(textHandler.x, textHandler.y)
+
             points[points.length] = ['text', ['"' + textHandler.text + '"', textHandler.x, textHandler.y], drawHelper.getOptions(options)];
+            // points[points.length] = ['text', ['"' + textHandler.text + '"', normal[0], normal[1]], drawHelper.getOptions(options)];
             pointHistory.push(points.length);
             console.log(points);
             syncPoints(false, "text");
@@ -2083,8 +2091,7 @@ function canvasresize(id){
         else if (cache.isText) textHandler.mousedown(e);
         else if (cache.isMarker) markerHandler.mousedown(e);
 
-        !cache.isPdf && drawHelper.redraw();
-
+        drawHelper.redraw();
         preventStopEvent(e);
     });
 
