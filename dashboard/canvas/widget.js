@@ -1714,11 +1714,6 @@ function canvasresize(id){
                 context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.file;
-
-            document.getElementById('file').onclick = function() {
-                this.classList.toggle("on");
-                this.classList.toggle("selected-shape");
-            }
         }
 
         if (tools.view3d === true) {
