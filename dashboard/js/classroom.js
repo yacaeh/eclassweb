@@ -1510,6 +1510,8 @@ function HomeworkSubmit(btn) {
 }
 
 function unloadFileViewer() {
+  ClearCanvas();
+
   var btn = GetFrame().document.getElementById("file");
   btn.classList.remove("selected-shape");
   btn.classList.remove("on");
@@ -1521,6 +1523,8 @@ function unloadFileViewer() {
 
 
 function loadFileViewer(url) {
+  ClearCanvas();
+
   console.log('loadFileViewer');
   var btn = GetFrame().document.getElementById("file");
   btn.classList.add("selected-shape");
@@ -1658,6 +1662,8 @@ function SetEpubNavigator(){
 }
 
 function loadEpubViewer() {
+  ClearCanvas();
+
   document.getElementById("epub-navi").style.display = "block";
   document.getElementById("epubidx").value = 1;
   
@@ -1796,6 +1802,8 @@ else
 }
 
 function unloadEpubViewer() {
+  ClearCanvas();
+
   $("#thumbnail-list").empty();
   document.getElementById("epub-navi").style.display = "none";
 
@@ -2585,4 +2593,8 @@ function GetFrame(){
   .getElementById('widget-container')
   .getElementsByTagName('iframe')[0].contentWindow;
   return frame;
+}
+
+function ClearCanvas(){
+  GetFrame().document.getElementById("clearCanvas").click();
 }
