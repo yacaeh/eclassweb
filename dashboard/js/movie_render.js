@@ -93,9 +93,12 @@ function _Movie_Render_Func() {
 
 function embedYoutubeContent(bshow, url, send)
 { 
+    
     if( bshow ){
         var viwerEdunet = document.getElementById("edunetContent");
         eraseEdunetContent(document.getElementById("webview_edunet"));
+
+        ClearCanvas();
 
         console.log("div create");
         var div = document.createElement("div");
@@ -149,7 +152,6 @@ function embedYoutubeContent(bshow, url, send)
     } 
 
     _Send_Moive_Video("YOUTUBE",url, bshow, send);
-
 }
 
 function eraseEdunetContent(viwerEdunet) {

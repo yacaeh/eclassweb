@@ -17,7 +17,7 @@ designer.icons.file = '/dashboard/newimg/openfile.png';
 designer.icons.text = '/dashboard/newimg/text.png';
 designer.icons.epub = '/dashboard/newimg/epub.png';
 designer.icons.callteacher = '/dashboard/newimg/handsup.png';
-designer.icons.homework = '/dashboard/newimg/ex.png';
+designer.icons.homework = '/dashboard/newimg/homework.png';
 
 designer.icons.fulloff = '/dashboard/img/cam_min.png';
 designer.icons.fullon = '/dashboard/img/cam_max.png';
@@ -25,13 +25,13 @@ designer.icons.fullon = '/dashboard/img/cam_max.png';
 
 
 designer.addSyncListener(function (data) {
-    if(connection.extra.roomOwner)
-    connection.send(data);
+    var isStudent = data.userid == classroomInfo.canvasPermission;
+    if(connection.extra.roomOwner || isStudent){
+        data.isStudent = isStudent;
+        connection.send(data);
+    }
 });
-designer.pointSyncListener(function (data) {
-    if(connection.extra.roomOwner)
-    connection.send(data);
-});
+
 
 designer.setTools({
   pencil: true,

@@ -25,7 +25,6 @@ console.log('Connection!');
 
 window._points = {};
 
-
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
 
@@ -113,7 +112,8 @@ function _3DCanvasOnOff(btn) {
 
   var visible = $(btn).hasClass('on');
   console.log(visible);
-
+  
+  ClearCanvas();
   if (params.open == 'true') {
     const isViewer = classroomInfo.share3D.state;
     if (false == isViewer) {
@@ -201,7 +201,6 @@ connection.onclose = connection.onerror = connection.onleave = function (event){
 };
 
 connection.onmessage = function (event) {
-
   if(event.data.unmute){
     permissionManager.unmute(event.data.unmute);
     return;
@@ -217,8 +216,16 @@ connection.onmessage = function (event) {
     ReTrack(GetStream(classroomInfoLocal.shareScreen.id));
   }
 
+  if(event.data.sendStudentPoint){
+    event.data.command = "default";
+    designer.syncData(event.data);
+    console.log(event.data)
+  }
+
   if(event.data.permissionChanged){
     classroomInfo = event.data.permissionChanged;
+
+    console.log(event.data.permissionChanged);
 
     if(event.data.permissionChanged.classPermission)
       permissionManager.setClassPermission(event.data.permissionChanged.classPermission);
@@ -229,11 +236,18 @@ connection.onmessage = function (event) {
       permissionManager.setMicPermission(event.data.permissionChanged.micPermission);
     else
       permissionManager.disableMicPermission();
+  
+    if(event.data.permissionChanged.canvasPermission)
+      permissionManager.setCanvasPermission(event.data.permissionChanged.canvasPermission);
+    else{
+      permissionManager.disableCanvasPermission();
+    }
   }
 
 
 
   if (event.data.showMainVideo) {
+    ClearCanvas();
     classroomInfoLocal.shareScreen.state = true;
     classroomInfo.shareScreen = {}
     classroomInfo.shareScreen.state = true;
@@ -288,7 +302,7 @@ connection.onmessage = function (event) {
 
   if (event.data.allControl) { 
       onAllControlValue (event.data.allControl);
-    return;
+      return;
   }
 
   if (event.data.alert) {
@@ -302,6 +316,32 @@ connection.onmessage = function (event) {
     if(connection.extra.roomOwner)
       attentionObj.submit({userid:event.data.alertResponse.userid, name :  params.userFullName, response : event.data.alertResponse.response });
     
+    return;
+  }
+
+  if(event.data.getpointer){
+    PointerSaver.send(event.data.idx);
+    return;
+  }
+
+  if(event.data.setpointer){
+    if(event.data.idx == "empty")
+      return;
+      event.data.data.command = "load";
+    
+    if(event.extra.roomOwner && !connection.extra.roomOwner){
+      if(PointerSaver.nowIdx == event.data.idx){
+        designer.syncData(event.data.data);
+      }
+    }
+    else{
+      event.data.data.isStudent = true;
+      if(PointerSaver.nowIdx == event.data.idx){
+        designer.syncData(event.data.data);
+      }
+    }
+
+
     return;
   }
 
@@ -328,6 +368,7 @@ connection.onmessage = function (event) {
 
   //3d 모델링 Enable
   if (event.data.modelEnable) {
+    ClearCanvas();
     var enable = event.data.modelEnable.enable;
     setShared3DStateLocal (enable);
     //modelEnable(false);
@@ -352,6 +393,7 @@ connection.onmessage = function (event) {
   //동영상 공유
   if (event.data.MoiveURL) {
     console.log(event.data.MoiveURL);
+    ClearCanvas();
 
     var moveURL = event.data.MoiveURL;
     if (moveURL.type == 'YOUTUBE')
@@ -391,8 +433,10 @@ connection.onmessage = function (event) {
   // if(!connection.extra.roomOwner){
     // console.log(event.data);
   // }
-  designer.syncData(event.data);
 
+  if(event.data.pageidx == PointerSaver.nowIdx){
+    designer.syncData(event.data);
+  }
 };
 
 var stemp;
@@ -409,15 +453,6 @@ connection.onstream = function (event) {
   }
 
   LoadScreenShare();
-
-  // if(event.streamid == classroomInfo.shareScreen.id){
-  // }
-
-  // else if(classroomInfo.shareScreen.state && event.type == "local"){
-  // }
-
-  if(event.type != "local" && classroomInfo.shareScreen.state){
-  }
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
     if (!classroomInfoLocal.shareScreen.state) {
@@ -436,28 +471,30 @@ connection.onstream = function (event) {
   } else {
 
     if(event.stream.isVideo){
+      try{
+        if(event.streamid.includes("-") || !connection.extra.roomOwner){
+          return false;
+        }
 
-      if(event.streamid.includes("-") || !connection.extra.roomOwner){
-        return false;
-      }
-      
-      event.mediaElement.controls = false;
-      event.mediaElement.style.width = "100%";
-      event.mediaElement.style.height = "100%";
-      event.mediaElement.style.pointerEvents = "none";
-      event.mediaElement.style.position = "absolute";
-      
-      var otherVideos = document.getElementById("student_list");
-      var childern = otherVideos.children;
-      for(var i =0 ; i< childern.length; i++){
-        var child = childern[i];
-        if(child.dataset.id == event.userid){
-          child.appendChild(event.mediaElement);
-          break;
+        event.mediaElement.controls = false;
+        event.mediaElement.style.width = "100%";
+        event.mediaElement.style.height = "100%";
+        event.mediaElement.style.pointerEvents = "none";
+        event.mediaElement.style.position = "absolute";
+
+        var otherVideos = document.getElementById("student_list");
+        var childern = otherVideos.children;
+        for(var i =0 ; i< childern.length; i++){
+          var child = childern[i];
+          if(child.dataset.id == event.userid){
+            child.appendChild(event.mediaElement);
+            break;
+          }
         }
       }
-
-
+      catch{
+        console.log("No Cam")
+      }
     }
   }
 
@@ -761,19 +798,15 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
   if (params.open === true || params.open === 'true') {
     console.log('Opening Class!');
-    
-
     SetTeacher(); 
-
+    
     connection.extra.roomOwner = true;
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (error) {
         connection.rejoin(params.sessionid);
       }
 
-
       classroomCommand.joinRoom ();
-
       connection.socket.on('disconnect', function () {
         location.reload();
       });
@@ -782,26 +815,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-      
-      // if (!connection.DetectRTC.hasMicrophone) {
-      //   connection.mediaConstraints.audio = false;
-      //   connection.session.audio = false;
-      //   console.log('user has no mic!');
-      //   // alert('마이크가 없습니다!');
-      // }
-
-      // if (!connection.DetectRTC.hasWebcam) {
-      //   connection.mediaConstraints.video = false;
-      //   connection.session.video = false;
-      //   console.log('user has no cam!');
-      //   // alert('캠이 없습니다!');
-      //   connection.session.oneway = true;
-      //   connection.sdpConstraints.mandatory = {
-      //     OfferToReceiveAudio: false,
-      //     OfferToReceiveVideo: false,
-      //   };
-      // }
-
     });
 
     connection.join(
@@ -812,6 +825,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       },
       function (isRoomJoined, roomid, error) {
         console.log('Joing Class!');
+      
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
@@ -951,9 +965,8 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
 }
 
 function replaceScreenTrack(stream, btn) {
+  ClearCanvas();
   console.log("Stream Start",tempStream.streamid);
-
-
   classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
   classroomInfoLocal.shareScreen.fromme = true;
 
@@ -1098,7 +1111,6 @@ function SetStudent() {
   $(frame.document.getElementById("file")).remove();
   $(frame.document.getElementById("epub")).remove();
   
-  //$("#top_all_controll").hide();
 }
 
 SelectViewType();
@@ -1510,6 +1522,8 @@ function HomeworkSubmit(btn) {
 }
 
 function unloadFileViewer() {
+  ClearCanvas();
+
   var btn = GetFrame().document.getElementById("file");
   btn.classList.remove("selected-shape");
   btn.classList.remove("on");
@@ -1521,6 +1535,8 @@ function unloadFileViewer() {
 
 
 function loadFileViewer(url) {
+  ClearCanvas();
+
   console.log('loadFileViewer');
   var btn = GetFrame().document.getElementById("file");
   btn.classList.add("selected-shape");
@@ -1658,6 +1674,10 @@ function SetEpubNavigator(){
 }
 
 function loadEpubViewer() {
+  ClearCanvas();
+
+  PointerSaver.load(0);
+
   document.getElementById("epub-navi").style.display = "block";
   document.getElementById("epubidx").value = 1;
   
@@ -1755,9 +1775,21 @@ else
         idx ++;
       }
     })
+
+
   });
 
+  var latestIdx = 0;
+
   rendition.on('relocated', function(locations) {    
+    console.log(latestIdx + " => " +locations.start.index);
+
+    PointerSaver.save(latestIdx)
+    latestIdx = locations.start.index
+    PointerSaver.load(latestIdx);
+
+    PointerSaver.get(latestIdx);
+
     var pre = document.getElementById("thumbnail-list").getElementsByClassName("selected")[0];
     if(pre)
       pre.classList.remove("selected");
@@ -1767,6 +1799,7 @@ else
       classroomCommand.sendEpubCmd('page', {
         page : locations.start.index
       });    
+
   });
 
   
@@ -1796,6 +1829,12 @@ else
 }
 
 function unloadEpubViewer() {
+  ClearCanvas();
+  ClearTeacherCanvas();
+  ClearStudentCanvas();
+
+  PointerSaver.close();
+
   $("#thumbnail-list").empty();
   document.getElementById("epub-navi").style.display = "none";
 
@@ -2067,6 +2106,7 @@ function fileUploadModal(message, btn, callback) {
   loadFileInput();
 
   document.getElementById("confirm-title").addEventListener("click",function(){
+    console.log("CLICKED")
     ViewUploadList(this);
   })
 
@@ -2433,91 +2473,9 @@ function syncWithTeacher(){
   console.log("Sync!");
 }
 
-
-$(".perbtn").click(function () {
-  var circle = this.getElementsByClassName("circle")[0];
-  var pid = nowSelectStudent.dataset.id;
-
-  if (this.id == "classP") {
-    if (this.classList.contains("off")) {
-      if (classroomInfo.classPermission != undefined) {
-        alert('이미 다른 학생에게 권한이 있습니다.');
-        return false;
-      }
-
-      classroomInfo.classPermission = pid;
-      nowSelectStudent.dataset.classPermission = true;
-
-      if (classroomInfo.micPermission !== pid) {
-        if (classroomInfo.micPermission === undefined) {
-          classroomInfo.micPermission = pid;
-        }
-        else {
-          $(`[data-id='${classroomInfo.micPermission}']`).attr('data-mic-Permission', false);
-        }
-        $('#micP').animate({ 'background-color': "#18dbbe" }, 'fast')
-        $('#micP').children('.circle').animate({ left: "22px" }, 'fast')
-        $('#micP').toggleClass("on off");
-        classroomInfo.micPermission = pid;
-        nowSelectStudent.dataset.micPermission = true;
-      }
-      $(this).animate({ 'background-color': '#18dbbe' }, 'fast');
-      $(circle).animate({left: '22px'},'fast');
-      $(nowSelectStudent).find(".bor").show();
-    }
-    else {
-      if (classroomInfo.micPermission == classroomInfo.classPermission) {
-        $('#micP').animate({
-          'background-color': "gray"
-        }, 'fast')
-        $('#micP').children('.circle').animate({
-          left: "2px"
-        }, 'fast')
-        classroomInfo.micPermission = undefined;
-        nowSelectStudent.dataset.micPermission = false;
-        $('#micP').toggleClass("on off");
-      }
-      classroomInfo.classPermission = undefined;
-      nowSelectStudent.dataset.classPermission = false;
-
-      $(this).animate({'background-color':'gray'},'fast');
-      $(circle).animate({ left: '2px' }, 'fast');
-      $(nowSelectStudent).find('.bor').hide();
-    }
-  }
-
-  else if (this.id == "micP") {
-    if (this.classList.contains("off")) {
-      if (classroomInfo.micPermission != undefined) {
-        alert('이미 다른 학생에게 권한이 있습니다.');
-        return false;
-      }
-      classroomInfo.micPermission = pid;
-      nowSelectStudent.dataset.micPermission = true;
-      $(this).animate({'background-color':'#18dbbe'},'fast');
-      $(circle).animate({left: '22px'},'fast');
-    }
-    else {
-      classroomInfo.micPermission = undefined;
-      nowSelectStudent.dataset.micPermission = false;
-      $(this).animate({ 'background-color': 'gray' }, 'fast');
-      $(circle).animate({ left: '2px' }, 'fast');
-    }
-  }
-
-  this.classList.toggle('on');
-  this.classList.toggle('off');
+PermissionButtonSetting();
 
 
-  connection.send({ permissionChanged: classroomInfo });
-  
-  if (this.classList.contains("on")) {
-    permissionManager.unmute(classroomInfo.micPermission);
-  }
-  else {
-    permissionManager.mute();
-  }
-});
 // Save classinfo on user exit
 function saveClassInfo(){
 console.log();
@@ -2566,7 +2524,6 @@ function GetScreenViewer(){
 
 function GetMainVideo(){
   var video = document.getElementById("main-video");
-  console.log(video);
   if(video){
     return video;
   }
@@ -2586,3 +2543,4 @@ function GetFrame(){
   .getElementsByTagName('iframe')[0].contentWindow;
   return frame;
 }
+

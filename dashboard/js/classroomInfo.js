@@ -1,7 +1,7 @@
 
 classroomInfo = {   
     roomOpenTime : 0,       // 방을 처음 개설한 시간
-    allControl : false,
+    allControl : true,
     shareScreen : {
         state : false,
         id : undefined
@@ -28,7 +28,7 @@ classroomInfo = {
 };
 
 classroomInfoLocal = {
-    allControl : false,
+    allControl : true,
     shareScreen : {
         state : false,
         id : undefined
