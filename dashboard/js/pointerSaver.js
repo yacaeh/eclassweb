@@ -2,7 +2,7 @@ PointerSaver = {
     container : {},
     nowIdx : 0,
 
-    save : function(idx){
+    save : function(){
         var point, history;
 
         if(typeof window.currentPoints == "undefined")
@@ -15,7 +15,7 @@ PointerSaver = {
         else 
             history = JSON.parse(JSON.stringify( window.currentHistory ))
 
-        this.container[idx] = {
+        this.container[this.nowIdx] = {
             points :  point,
             history : history,
         }
@@ -32,6 +32,8 @@ PointerSaver = {
         ClearCanvas();
         ClearTeacherCanvas();
         ClearStudentCanvas();
+
+        this.get();
 
         if(this.container[idx]){
             this.container[idx].command = "my";
@@ -50,15 +52,15 @@ PointerSaver = {
         else{
             console.log("There is no data");
         }
+
     },
     empty : function(){
         this.container = {};
-        nowIdx = 0;
     },
-    get : function(idx){
+    get : function(){
         connection.send({
             getpointer: true ,
-            idx : idx
+            idx : this.nowIdx
         });
     },
     send : function(idx){
@@ -86,7 +88,6 @@ PointerSaver = {
         this.save(this.nowIdx);
     }
 }
-
 
 function ClearTeacherCanvas(){
   designer.syncData({

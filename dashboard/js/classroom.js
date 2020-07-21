@@ -1550,11 +1550,15 @@ function loadFileViewer(url) {
 // Pdf가 처음 로딩이 다 되었는지 확인.
 // 로딩이 다 된 후에 페이지 동기화
 function pdfOnLoaded () {
+  console.log("PDF ON");
   classroomCommand.onViewerLoaded ();
 }
 
 function showPage(n){
+  PointerSaver.save()
+  PointerSaver.load(n-1);
   console.log(n);
+
   currentPdfPage = n;
   if(connection.extra.roomOwner || !classroomInfo.allControl) 
     classroomCommand.onShowPage (n);
@@ -1779,16 +1783,9 @@ else
 
   });
 
-  var latestIdx = 0;
-
   rendition.on('relocated', function(locations) {    
-    console.log(latestIdx + " => " +locations.start.index);
-
-    PointerSaver.save(latestIdx)
-    latestIdx = locations.start.index
-    PointerSaver.load(latestIdx);
-
-    PointerSaver.get(latestIdx);
+    PointerSaver.save()
+    PointerSaver.load(locations.start.index);
 
     var pre = document.getElementById("thumbnail-list").getElementsByClassName("selected")[0];
     if(pre)

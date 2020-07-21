@@ -185,12 +185,6 @@ function Viewer( viewerPlugin, parameters ) {
             case 'page-fit':
                 viewerPlugin.fitToPage(maxWidth, maxHeight);
                 break;
-                // if ( viewerPlugin.isSlideshow() ) {
-                //     viewerPlugin.fitToPage(maxWidth + kScrollbarPadding, maxHeight + kScrollbarPadding);
-                // } else {
-                //     viewerPlugin.fitSmart(maxWidth);
-                // }
-                // break;
         }
 
         selectScaleOption(value);
