@@ -475,8 +475,6 @@ function canvasresize(id){
                 var lastmarkpos = undefined;
 
                 points.forEach(function (point) {
-                    console.log(point);
-
                     if (point == null) {
                         return false;
                     }
@@ -1111,6 +1109,9 @@ function canvasresize(id){
                             }
                             lastPointIndex = points.length;
 
+                            window.parent.currentPoints = points;
+                            window.parent.currentHistory = pointHistory;
+                            
                             if(_idx != undefined){
                                 var data = {
                                     points : [],
@@ -1122,6 +1123,7 @@ function canvasresize(id){
                                 
                                 if(window.parent.connection.extra.roomOwner){
                                     console.log("SEND ERASER",_uid, data);
+                                    data.pageidx = window.parent.PointerSaver.nowIdx;
                                     window.parent.postMessage({
                                         canvasDesignerSyncData: data,
                                         uid: uid
@@ -1901,6 +1903,9 @@ function canvasresize(id){
                     return false;
                 }
 
+                window.parent.currentPoints = []
+                window.parent.currentHistory = []
+
                 points = []
                 pointHistory = [];
                 drawHelper.redraw();
@@ -1922,11 +1927,6 @@ function canvasresize(id){
                 context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.screenShare;
-
-            document.getElementById('screen_share').onclick = function() {
-                this.classList.toggle("on");
-                this.classList.toggle("selected-shape");
-            }
         }
 
         if (tools.clearCanvas === true) {
@@ -2128,7 +2128,7 @@ function canvasresize(id){
             markerHandler.mouseup(e);
         }
         else if (cache.isText) {
-            comamnd = "text";
+            command = "text";
             textHandler.mouseup(e);
         }
 
@@ -2379,64 +2379,28 @@ function canvasresize(id){
 
         if (!event.data.canvasDesignerSyncData) return;
 
-        // drawing is shared here (array of points)
-        var d = event.data.canvasDesignerSyncData;        
-
-        if(!d.points) {
-            if(!window.parent.connection.extra.roomOwner){
-                window.parent._points = d;
-            }
-            return;
-        }
-
         if(window.parent.connection.extra.roomOwner){
             var data = event.data.canvasDesignerSyncData;
-            var userid = data.userid;
-            var command = data.command;
-
-            console.log("receive",userid,command, data);
-
-            if(typeof(window.parent._points[userid]) == "undefined"){
-                window.parent._points[userid] = {};
-            }
-
-            if(typeof(window.parent._points[userid].point) == "undefined"){
-                window.parent._points[userid].point = [];
-            }
-
-            switch(command){
-                case "pen" :
-                    window.parent._points[userid].point.push(data.points);
+            switch (data.command) {
+                case "loaddata":
+                    var startIdx = 0;
+                    points = data.points;
+                    pointHistory = data.history;
+                    window.parent.currentPoints = points;
+                    window.parent.currentHistory = data.history;
                     break;
-                case "undo" :
-                    window.parent._points[userid].point.pop();
-                    break;
-                case "clear" :
-                    window.parent._points[userid].point = [];
-                    break;
-                case "eraser" :
-                    window.parent._points[userid].point.splice(data.idx, 1);
+                case "clearcanvas":
+                    points = [];
+                    pointHistory = []
+                    window.parent.currentPoints = [];
+                    window.parent.currentHistory = [];
                     break;
             }
-
-            window.parent._points[userid].history = data.history;
-        
-            if (d.startIndex !== 0) {
-                for (var i = 0; i < d.points.length; i++) {
-                    points[i + d.startIndex] = d.points[i];
-                }
-            } else {
-                points = d.points;
-            }
-            lastPointIndex = points.length;
-        
-            window.parent.postMessage({
-                SyncAllPoint: window.parent._points,
-                uid: uid
-            }, '*');
         }
         else{
             var data = event.data.canvasDesignerSyncData;
+            console.log(data);
+
             switch(data.command){
                 case "eraser" :
                     teacherPoints.splice(data.idx,1);
@@ -2445,12 +2409,66 @@ function canvasresize(id){
                     teacherPoints = [];
                     break;
                 case "default":
+                    var startIdx = 0;
+                    data.history.forEach(function(history){
+                        if(startIdx == history)
+                            return false;
+                        var points = data.points.slice(startIdx, history);
+                        var command = points[0][0];
+                        var startIndex = startIdx;
+                        startIdx = history;
+
+                        var d = {
+                            points : points,
+                            command : command,
+                            startIndex : startIndex,
+                            userid : data.userid,
+                        }
+                        teacherPoints.push(d);
+                    })
                     break;
+                case "loaddata":
+                    var startIdx = 0;
+                    points = data.points;
+                    pointHistory = data.history;
+                    window.parent.currentPoints = points;
+                    window.parent.currentHistory = data.history;
+                    break;
+                case "loadteacher":
+                    teacherPoints = [];
+                    data.history.forEach(function(history){
+                        if(startIdx == history)
+                            return false;
+                        var points = data.points.slice(startIdx, history);
+                        var command = points[0][0];
+                        var startIndex = startIdx;
+                        startIdx = history;
+
+                        var d = {
+                            points : points,
+                            command : command,
+                            startIndex : startIndex,
+                            userid : data.userid,
+                        }
+                        teacherPoints.push(d);
+                    })
+                    break;
+                case "clearteacher":
+                    teacherPoints = [];
+                    break;
+                case "clearcanvas" :
+                    points = [];
+                    pointHistory = []
+                    window.parent.currentPoints = [];
+                    window.parent.currentHistory = [];
+                    return;
                 default :
                     teacherPoints.push(data);
             }
-            console.log(teacherPoints)
+            console.log("teacherPoints", teacherPoints)
         }
+
+        lastPointIndex = points.length;
         drawHelper.redraw();
     }, false);
 
@@ -2459,15 +2477,20 @@ function canvasresize(id){
     function syncData(data) {
         // teacher....
         if(window.parent.connection.extra.roomOwner){
-            console.log("SEND",_uid, data);
+            data.pageidx = window.parent.PointerSaver.nowIdx;
             data.userid = _uid;
             data.history = pointHistory;
-    
+            data.startIndex = points.length;
+            lastPointIndex = points.length;
+            console.log("SEND",_uid, data);
             window.parent.postMessage({
                 canvasDesignerSyncData: data,
                 uid: uid
             }, '*');
         }
+
+        window.parent.currentPoints = points;
+        window.parent.currentHistory = pointHistory;
     }
 
     function syncPoints(isSyncAll, command = "default") {
@@ -2475,12 +2498,14 @@ function canvasresize(id){
             lastPointIndex = 0;
         }
 
+        window.parent.currentPoints = points;
+        window.parent.currentHistory = pointHistory;
+
         var pointsToShare = [];
         for (var i = lastPointIndex; i < points.length; i++) {
             pointsToShare[i - lastPointIndex] = points[i];
         }
 
-        console.log(pointsToShare);
         syncData({
             points: pointsToShare || [],
             command: command,
@@ -2700,9 +2725,6 @@ function SetShortcut(shortCut){
                 altdown = false;
             }
         }
-    })
-    
-    window.addEventListener("focusout" ,function(){
     })
 
     function MakeTooltip(shortcut){

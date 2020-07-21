@@ -25,7 +25,6 @@ console.log('Connection!');
 
 window._points = {};
 
-
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
 
@@ -113,7 +112,8 @@ function _3DCanvasOnOff(btn) {
 
   var visible = $(btn).hasClass('on');
   console.log(visible);
-
+  
+  ClearCanvas();
   if (params.open == 'true') {
     const isViewer = classroomInfo.share3D.state;
     if (false == isViewer) {
@@ -234,6 +234,7 @@ connection.onmessage = function (event) {
 
 
   if (event.data.showMainVideo) {
+    ClearCanvas();
     classroomInfoLocal.shareScreen.state = true;
     classroomInfo.shareScreen = {}
     classroomInfo.shareScreen.state = true;
@@ -288,7 +289,7 @@ connection.onmessage = function (event) {
 
   if (event.data.allControl) { 
       onAllControlValue (event.data.allControl);
-    return;
+      return;
   }
 
   if (event.data.alert) {
@@ -302,6 +303,21 @@ connection.onmessage = function (event) {
     if(connection.extra.roomOwner)
       attentionObj.submit({userid:event.data.alertResponse.userid, name :  params.userFullName, response : event.data.alertResponse.response });
     
+    return;
+  }
+
+  if(event.data.getpointer){
+    PointerSaver.send(event.data.idx);
+    return;
+  }
+
+  if(event.data.setpointer){
+    if(event.data.idx == "empty")
+      return;
+
+    console.log("Get Pointer Teacher's",event.data.idx)
+    event.data.idx.command = "loadteacher";
+    designer.syncData(event.data.idx);
     return;
   }
 
@@ -328,6 +344,7 @@ connection.onmessage = function (event) {
 
   //3d 모델링 Enable
   if (event.data.modelEnable) {
+    ClearCanvas();
     var enable = event.data.modelEnable.enable;
     setShared3DStateLocal (enable);
     //modelEnable(false);
@@ -352,6 +369,7 @@ connection.onmessage = function (event) {
   //동영상 공유
   if (event.data.MoiveURL) {
     console.log(event.data.MoiveURL);
+    ClearCanvas();
 
     var moveURL = event.data.MoiveURL;
     if (moveURL.type == 'YOUTUBE')
@@ -391,8 +409,9 @@ connection.onmessage = function (event) {
   // if(!connection.extra.roomOwner){
     // console.log(event.data);
   // }
-  designer.syncData(event.data);
 
+  if(event.data.pageidx == PointerSaver.nowIdx)
+    designer.syncData(event.data);
 };
 
 var stemp;
@@ -921,9 +940,8 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
 }
 
 function replaceScreenTrack(stream, btn) {
+  ClearCanvas();
   console.log("Stream Start",tempStream.streamid);
-
-
   classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
   classroomInfoLocal.shareScreen.fromme = true;
 
@@ -1068,7 +1086,6 @@ function SetStudent() {
   $(frame.document.getElementById("file")).remove();
   $(frame.document.getElementById("epub")).remove();
   
-  //$("#top_all_controll").hide();
 }
 
 SelectViewType();
@@ -1731,9 +1748,23 @@ else
         idx ++;
       }
     })
+
+
   });
 
+  var latestIdx = 0;
+
   rendition.on('relocated', function(locations) {    
+    console.log(latestIdx + " => " +locations.start.index);
+
+    PointerSaver.save(latestIdx)
+    latestIdx = locations.start.index
+    PointerSaver.load(latestIdx);
+
+    if(!connection.extra.roomOwner){
+      PointerSaver.get(latestIdx);
+    }
+
     var pre = document.getElementById("thumbnail-list").getElementsByClassName("selected")[0];
     if(pre)
       pre.classList.remove("selected");
@@ -1743,6 +1774,7 @@ else
       classroomCommand.sendEpubCmd('page', {
         page : locations.start.index
       });    
+
   });
 
   
@@ -1773,6 +1805,8 @@ else
 
 function unloadEpubViewer() {
   ClearCanvas();
+  ClearTeacherCanvas();
+  PointerSaver.empty();
 
   $("#thumbnail-list").empty();
   document.getElementById("epub-navi").style.display = "none";
@@ -2045,6 +2079,7 @@ function fileUploadModal(message, btn, callback) {
   loadFileInput();
 
   document.getElementById("confirm-title").addEventListener("click",function(){
+    console.log("CLICKED")
     ViewUploadList(this);
   })
 
@@ -2565,6 +2600,3 @@ function GetFrame(){
   return frame;
 }
 
-function ClearCanvas(){
-  GetFrame().document.getElementById("clearCanvas").click();
-}

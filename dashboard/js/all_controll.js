@@ -25,10 +25,12 @@ function onAllControlValue (_allControl) {
     classroomInfo.allControl = _allControl.state;  
     if(classroomInfo.allControl) {        
         //  전체제어하기가 걸리게 되면, 현재 상태와 동기화 시킨다.
+        console.log("All Controll On");
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
     else
     {
+        console.log("All Controll Off");
         classroomCommand.updateSyncRoom ();
         // updateControlView (false);   
     }
@@ -56,6 +58,7 @@ function SendAllControll(b)
 {
     if(b) {
         // true면 방의 정보를 다시 보낸다.
+        console.log("")
         connection.send({
             allControl: {
                 state : b,

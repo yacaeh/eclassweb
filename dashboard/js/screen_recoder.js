@@ -175,11 +175,13 @@ function ScreenShare(btn) {
     isSharingScreen = false;
     if(typeof(lastStream) !== "undefined")
       lastStream.getTracks().forEach((track) => track.stop());
+      btn.classList.remove("on");
     return false;
   }
-
+  
   if(classroomInfo.shareScreen.state){
     alert("다른 사람이 화면 공유를 사용 중 입니다.")
+    btn.classList.remove("on");
     $(btn).removeClass("on selected-shape")
     return;
   }
@@ -194,6 +196,10 @@ function ScreenShare(btn) {
   if (navigator.mediaDevices.getDisplayMedia) {
     navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
       (stream) => {
+        btn.classList.toggle("selected-shape");
+        btn.classList.toggle("on");
+
+
         isSharingScreen = true;
         lastStream = stream;
         replaceScreenTrack(stream, btn);
