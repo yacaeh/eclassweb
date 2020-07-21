@@ -1651,6 +1651,8 @@ function SetEpubNavigator(){
 function loadEpubViewer() {
   ClearCanvas();
 
+  PointerSaver.load(0);
+
   document.getElementById("epub-navi").style.display = "block";
   document.getElementById("epubidx").value = 1;
   
@@ -1806,7 +1808,7 @@ else
 function unloadEpubViewer() {
   ClearCanvas();
   ClearTeacherCanvas();
-  PointerSaver.empty();
+  PointerSaver.close();
 
   $("#thumbnail-list").empty();
   document.getElementById("epub-navi").style.display = "none";

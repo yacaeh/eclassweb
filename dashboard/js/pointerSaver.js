@@ -44,7 +44,6 @@ PointerSaver = {
                 return null;
             }
 
-            console.log(this.container[idx]);
             designer.syncData(this.container[idx]);
         }
         else{
@@ -79,6 +78,9 @@ PointerSaver = {
                 idx : "empty"
             })
         }
+    },
+    close : function(){
+        this.save(this.nowIdx);
     }
 }
 
