@@ -352,6 +352,12 @@ connection.onmessage = function (event) {
   }
 
   if(event.data.viewer) {
+    console.log(event.data)
+
+    ClearCanvas();
+    ClearStudentCanvas();
+    ClearTeacherCanvas();
+
     classroomCommand.updateViewer (event.data.viewer);
     return;    
   }
@@ -1522,7 +1528,13 @@ function HomeworkSubmit(btn) {
 }
 
 function unloadFileViewer() {
+  console.log("UNLOAD FILEVIEWER");
+
   ClearCanvas();
+  ClearStudentCanvas();
+  ClearTeacherCanvas();
+
+  PointerSaver.save();
 
   var btn = GetFrame().document.getElementById("file");
   btn.classList.remove("selected-shape");
@@ -1536,6 +1548,8 @@ function unloadFileViewer() {
 
 function loadFileViewer(url) {
   ClearCanvas();
+  ClearStudentCanvas();
+  ClearTeacherCanvas();
 
   console.log('loadFileViewer');
   var btn = GetFrame().document.getElementById("file");

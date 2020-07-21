@@ -305,8 +305,6 @@ function PDFViewerPlugin() {
     this.fitToHeight = function ( height ) {
         var zoomLevel;
 
-        console.log(height);
-
         if ( maxPageHeight === height ) {
             return;
         }
@@ -333,7 +331,6 @@ function PDFViewerPlugin() {
 
     this.setZoomLevel = function ( zoomLevel ) {
         var i, viewport;
-        console.log(zoomLevel);
         
         if ( scale !== zoomLevel ) {
             scale = zoomLevel;

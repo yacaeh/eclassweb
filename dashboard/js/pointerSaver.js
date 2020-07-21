@@ -56,6 +56,7 @@ PointerSaver = {
     },
     empty : function(){
         this.container = {};
+        this.nowIdx = 0;
     },
     get : function(){
         connection.send({
