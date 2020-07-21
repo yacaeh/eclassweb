@@ -105,6 +105,7 @@ src: url(/dashboard/css/NanumPen.ttf);
 }
 
 #titlebox{
+    z-index: 9999;
     width: auto;
     height: 20px;
     position: absolute;
@@ -204,12 +205,15 @@ h2 {
 }
 html,
 body {
+    background: rgb(255, 255,255) !important;
     background-color: transparent;
     font-size: 13px;
     height: 100%;
     cursor: default;
     color: Gray;
     overflow: hidden;
+  overscroll-behavior: none;
+
 }
 /* header */
 
@@ -251,9 +255,11 @@ a:hover {
 
 .design-surface {
     background-color: transparent;
+      overscroll-behavior: none;
 }
 .design-surface canvas {
     position: absolute;
+    overscroll-behavior: none;
 }
 .design-surface canvas:last-child {
     position: static;
@@ -261,6 +267,7 @@ a:hover {
 /* toolbox */
 
 .tool-box {
+    z-index: 10001;
     padding-top: 10px;
     border-right: 1px solid rgba(0, 0, 0, 0.2);
     position: absolute;
@@ -268,7 +275,7 @@ a:hover {
     width: 50px;
     background-color: #FBFBFB;
     overflow: hidden;
-    height: 100%;
+    height: calc(100% - 10px);
     overflow: hidden;
     overflow-y: auto;
     outline: 1px solid rgba(0, 0, 0, 0.1);
@@ -782,4 +789,105 @@ input:focus {
 
 .color_template > .on {
     box-shadow: 0 0 0pt 1.5pt #FFFFFF, 0px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+#screen-viewer {
+    position: fixed;
+    top: 0px !important;
+    left: 52px !important;
+    width: calc(100% - 52px);
+    height: 100%;
+    z-index: 99998;
+    display: none;
+  }
+
+  body:fullscreen {
+    background-color: rgb(255, 255, 255);
+  overscroll-behavior: none;
+
+  }
+  #body:-webkit-full-screen {
+    background-color: rgb(255, 255, 255);
+  overscroll-behavior: none;
+
+  }
+  #body:-moz-full-screen {
+    background-color: rgb(255, 255, 255);
+  overscroll-behavior: none;
+
+  }
+
+
+.fullscreen{
+display: block;
+position: absolute;
+bottom: 10px;
+}
+
+#main-video{
+position: absolute;
+display: block;
+width: 20%;
+z-index: 100000007;
+left: 55px;
+bottom: 55px;
+}
+
+.no-hover:hover{
+box-shadow: none !important;
+border-radius: 0px !important;
+background: rgb(204,204,204,0) !important;
+}
+
+#conversation-panel{
+    width: 30%;
+    right: 5px;
+    position: absolute;
+    z-index: 999999;
+    top: 10px;
+    margin-right: 20px;
+    overflow: hidden;
+    bottom: 10px;
+    pointer-events: none;
+    
+}
+
+#file-viewer{
+    border: 1px solid black;
+    width: calc(100% - 52px);
+    left: 50px;
+    position: absolute;
+    height: 100%;
+    direction: ltr;
+}
+
+#epub-viewer{
+    width: calc(100% - 50px);
+    left: 50px;
+    border: 1px solid black;
+    position: absolute;
+    height: 100%;
+    direction: ltr;
+    align-content: center;
+    display: flex;
+    justify-content: center;
+}
+
+.message{
+    font-weight: bold;
+    background-color: rgba(187, 187, 187, 0.64);
+    border-radius: 4px;
+    margin-bottom: 3px;
+    padding: 2px;
+    color: white;
+    -webkit-text-stroke-width: 0.6px;
+    -webkit-text-stroke-color: black;
+    font-size: 13px;
+}
+
+#temp-canvas,
+#main-canvas{
+    position: absolute;
+    left: 50px;
 }

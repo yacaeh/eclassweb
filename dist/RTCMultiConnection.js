@@ -3625,8 +3625,8 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     "maxWidth": 82,
                     "minHeight": 64,
                     "maxHeight": 64,
-                    "minFrameRate": 2,
-                    "maxFrameRate": 2
+                    "minFrameRate": 15,
+                    "maxFrameRate": 15
                 };
             }
             

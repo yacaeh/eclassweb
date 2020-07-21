@@ -193,7 +193,7 @@ examObj.updateExameTimer = function (_currentExamTimer) {
 
 examObj.receiveExamData = function(_data) {
    
-    if(_data.examStart) {               
+    if(_data.examStart) {    
         classroomInfo.exam = true;
         let examStart = _data.examStart;        
         examObj.isStart = true;        

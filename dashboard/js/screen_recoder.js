@@ -35,9 +35,8 @@ class sc {
         recordingTime.style.display = 'none';
         text.innerHTML = '0:00:00';
     }
-
-
-    mergeAudioStreams = () => {
+    constructor(){
+      this.mergeAudioStreams = () => {
         const context = new AudioContext();
         const destination = context.createMediaStreamDestination();
         let hasDesktop = false;
@@ -64,6 +63,9 @@ class sc {
 
         return (hasDesktop || hasVoice) ? destination.stream.getAudioTracks() : [];
     };
+    }
+
+   
 
     async _startCapturing() {
         this.start = true;
@@ -159,6 +161,8 @@ function ScreenShare(btn) {
     return;
   }
 
+  var on = $(btn).hasClass('on');
+  console.log(on);
 
   if (!connection.extra.roomOwner && 
     connection.userid != classroomInfo.classPermission) {
@@ -166,10 +170,6 @@ function ScreenShare(btn) {
     $(btn).removeClass("on selected-shape")
     return;
   }
-
-  var on = $(btn).hasClass('on');
-  console.log(on);
-  console.log(btn);
 
   if (on) {
     isSharingScreen = false;

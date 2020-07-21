@@ -758,9 +758,9 @@ html[dir='rtl'] .dropdownToolbarButton {
     position:         absolute;
     top:              32px;
     right:            0;
-    bottom:           32px;
+    bottom:           40px;
     left:             0;
-
+    z-index: 5;
     text-align:       center;
 
     background-color: #EFF1F0;

@@ -11,7 +11,9 @@
     params[d(match[1])] = d(match[2]);
   window.params = params;
 })();
+
 let uploadServerUrl = "https://files.primom.co.kr:1443";
+var conversationPanel = document.getElementById('conversation-panel');
 
 var connection = new RTCMultiConnection();
 console.log('Connection!');
@@ -20,6 +22,9 @@ console.log('Connection!');
 // function printDawnOfDead(){ console.log("Dawn Of Dead!"); }
 // module.exports.HarryPotter = printHarryPotter;
 // module.exports.DawnOfDead = printDawnOfDead;​
+
+window._points = {};
+
 
 connection.socketURL = '/';
 // connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -77,6 +82,9 @@ SetCanvasBtn('movie', Movie_Render_Button);
 SetCanvasBtn('file', LoadFile);
 SetCanvasBtn('epub', LoadEpub);
 SetCanvasBtn('callteacher', CallTeacher);
+SetCanvasBtn('homework', HomeworkSubmit);
+
+SetEpubNavigator();
 
 var isSharingScreen = false;
 var isSharing3D = false;
@@ -125,6 +133,8 @@ function _3DCanvasOnOff(btn) {
   }
 }
 
+
+
 // here goes RTCMultiConnection
 
 connection.chunkSize = 16000;
@@ -161,6 +171,7 @@ connection.onUserStatusChanged = function (event) {
 connection.onopen = function (event) {
   console.log('onopen!');
 
+
   SetStudentList(event,true);
 
   connection.onUserStatusChanged(event);
@@ -179,7 +190,7 @@ connection.onopen = function (event) {
   classroomCommand.onConnectionSession (event);
 
   if(classroomInfoLocal.shareScreen.fromme){
-    ReTrack(document.getElementById("screen-viewer").srcObject)
+    ReTrack(GetScreenViewer().srcObject)
   }
 };
 
@@ -193,10 +204,13 @@ connection.onmessage = function (event) {
 
   if(event.data.unmute){
     permissionManager.unmute(event.data.unmute);
+    return;
   }
 
   if(event.data.mute){
     permissionManager.mute();
+    return;
+
   }
 
   if(event.ReTrack){
@@ -229,13 +243,13 @@ connection.onmessage = function (event) {
     console.log("SCREEN SHARE START",event.data.showMainVideo)
     var stream = GetStream(event.data.showMainVideo)
     showScreenViewerUI();
-    document.getElementById("screen-viewer").srcObject = stream;
+    GetScreenViewer().srcObject = stream;
     return;
   }
 
   if (event.data.hideMainVideo) {
     console.log("SCREEN SHARE STOPED", event.userid)
-    $('#screen-viewer').hide();
+    $(GetScreenViewer()).hide();
     classroomCommand.setShareScreenLocal ({state : false , id : undefined});
     return;
   }
@@ -251,11 +265,13 @@ connection.onmessage = function (event) {
     return;
   }
   // 학생 접속시 싱크
-  if (event.data === 'plz-sync-points' && connection.extra.roomOwner) {
+  if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect !");
     designer.sync();
     return;
   }
+
+
 
   if (event.data.studentCmd)  {
     if(connection.extra.roomOwner)
@@ -267,7 +283,6 @@ connection.onmessage = function (event) {
   if(event.data.roomInfo) {
     classroomCommand.onReceiveRoomInfo (event.data);
     console.log("SYNC", classroomInfo);
-    LoadScreenShare();
     return;
   }
 
@@ -300,11 +315,6 @@ connection.onmessage = function (event) {
     classroomCommand.updateViewer (event.data.viewer);
     return;    
   }
-
-  // if(event.data.pdf) {    
-  //   classroomCommand.updateViewer (event.data.pdf);
-  //   return;
-  // }
 
   if (event.data.epub) {
     classroomCommand.receiveEpubMessage(event.data.epub);
@@ -351,9 +361,6 @@ connection.onmessage = function (event) {
     else iframeEdunetContent(moveURL.enable, moveURL.url, false);
     return;
   }
-  if(!connection.extra.roomOwner){
-    designer.syncData(event.data);
-  }
 
   // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
   if(event.data.onFocus){
@@ -375,7 +382,17 @@ connection.onmessage = function (event) {
     if(!connection.extra.roomOwner){
       $('#exam-board').hide(300);
     }
+    if(isMobile)
+      document.getElementById("widget-container").style.right = "0px";
+    else
+      document.getElementById("widget-container").removeAttribute("style")
   }
+
+  // if(!connection.extra.roomOwner){
+    // console.log(event.data);
+  // }
+  designer.syncData(event.data);
+
 };
 
 var stemp;
@@ -395,11 +412,11 @@ connection.onstream = function (event) {
 
   if (event.stream.isScreen && !event.stream.canvasStream) {
     if (!classroomInfoLocal.shareScreen.state) {
-      $('#screen-viewer').hide();
+      $(GetScreenViewer()).hide();
     }
   } 
   else if (event.extra.roomOwner === true) {
-    var video = document.getElementById('main-video');
+    var video = GetMainVideo();
     video.setAttribute('data-streamid', event.streamid);
     if (event.type === 'local') {
       video.muted = true;
@@ -407,14 +424,20 @@ connection.onstream = function (event) {
     }
 
     video.srcObject = event.stream;
-    // $('#main-video').show();
   } else {
+
     if(event.stream.isVideo){
       try{
+        if(event.streamid.includes("-") || !connection.extra.roomOwner){
+          return false;
+        }
+
         event.mediaElement.controls = false;
         event.mediaElement.style.width = "100%";
         event.mediaElement.style.height = "100%";
         event.mediaElement.style.pointerEvents = "none";
+        event.mediaElement.style.position = "absolute";
+
         var otherVideos = document.getElementById("student_list");
         var childern = otherVideos.children;
         for(var i =0 ; i< childern.length; i++){
@@ -427,13 +450,8 @@ connection.onstream = function (event) {
       }
       catch{
         console.log("No Cam")
-
       }
     }
-      
-    // event.mediaElement.dataset.id = event.userid;
-    // otherVideos.appendChild(event.mediaElement);
-
   }
 
   connection.onUserStatusChanged(event);
@@ -485,7 +503,6 @@ connection.onstreamended = function (event) {
 
 };
 
-var conversationPanel = document.getElementById('conversation-panel');
 
 function appendChatMessage(event, checkmark_id) {
   var div = document.createElement('div');
@@ -496,7 +513,7 @@ function appendChatMessage(event, checkmark_id) {
     if (event.extra.roomOwner) {
       var notice = document.getElementById('noticewindow');
       $(notice).append(
-        "<div> <font color='#C63EE8'> 선생님 </font> : " +
+        "<div class='teachermsg'> <font color='#C63EE8'> 선생님 </font> : " +
           ConvertChatMsg(event.data.chatMessage) +
           '</div>'
       );
@@ -505,14 +522,16 @@ function appendChatMessage(event, checkmark_id) {
     }
   } catch {}
 
+  // Another
   if (event.data) {
     var id = event.extra.userFullName || event.userid;
     if (event.extra.roomOwner == true) {
       id += '(선생님)';
+      id = '<font color="#C63EE8">' + id + '</font>';
     }
 
     div.innerHTML =
-      '<b>' + id + ' : </b>' + ConvertChatMsg(event.data.chatMessage);
+      '<b>' + id + '</b> : ' + ConvertChatMsg(event.data.chatMessage);
     if (event.data.checkmark_id) {
       connection.send({
         checkmark: 'received',
@@ -525,7 +544,7 @@ function appendChatMessage(event, checkmark_id) {
     if (params.open === 'true' || params.open === true) {
       var notice = document.getElementById('noticewindow');
       $(notice).append(
-        "<div> <font color='#C63EE8'> 선생님 </font> : " +
+        "<div class='teachermsg'> <font color='#C63EE8'> 선생님 </font> : " +
           ConvertChatMsg(event) +
           '</div>'
       );
@@ -538,7 +557,7 @@ function appendChatMessage(event, checkmark_id) {
 
   conversationPanel.scrollTop = conversationPanel.clientHeight;
   conversationPanel.scrollTop =
-    conversationPanel.scrollHeight - conversationPanel.scrollTop;
+  conversationPanel.scrollHeight - conversationPanel.scrollTop;
 }
 
 function ConvertChatMsg(_msg) {
@@ -752,26 +771,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('try joining!');
     connection.DetectRTC.load(function () {
       SetStudent();
-
-      // if (!connection.DetectRTC.hasMicrophone) {
-      //   connection.mediaConstraints.audio = false;
-      //   connection.session.audio = false;
-      //   console.log('user has no mic!');
-      //   // alert('마이크가 없습니다!');
-      // }
-
-      // if (!connection.DetectRTC.hasWebcam) {
-      //   connection.mediaConstraints.video = false;
-      //   connection.session.video = false;
-      //   console.log('user has no cam!');
-      //   // alert('캠이 없습니다!');
-      //   connection.session.oneway = true;
-      //   connection.sdpConstraints.mandatory = {
-      //     OfferToReceiveAudio: false,
-      //     OfferToReceiveVideo: false,
-      //   };
-      // }
-
     });
 
     connection.join(
@@ -829,6 +828,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       }
     );
   }
+
+  setTimeout(mobileHelper.Init(),1000);
 });
 
 function addStreamStopListener(stream, callback) {
@@ -926,8 +927,8 @@ function replaceScreenTrack(stream, btn) {
   classroomCommand.setShareScreenLocal ({state : true , id : tempStream.streamid});
   classroomInfoLocal.shareScreen.fromme = true;
 
-  // document.getElementById("screen-viewer").srcObject = tempStream;
-  $('#screen-viewer').get(0).srcObject = stream;
+
+  GetScreenViewer().srcObject = stream;
 
   if(connection.extra.roomOwner){
     classroomInfo.shareScreen = {}
@@ -973,7 +974,6 @@ function StreamingStart(stream, btn){
         $(btn).removeClass("selected-shape");
       }
       isSharingScreen = false;
-      // $('#main-video').hide();
       window.sharedStream = null;
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
@@ -999,11 +999,11 @@ function ReTrack(stream){
 
 function showScreenViewerUI() {
   CanvasResize();
-  $('#screen-viewer').show();
+  GetScreenViewer().style.display = 'block';
 }
 
 function hideScreenViewerUI() {
-  $('#screen-viewer').hide();
+  GetScreenViewer().style.display = 'none';
 }
 
 let classTimeIntervalHandle;
@@ -1043,16 +1043,18 @@ function SetTeacher(){
     $(".controll").show();
     $(".feature").show();
   $(frame.document.getElementById("callteacher")).remove();
+  $(frame.document.getElementById("homework")).remove();
 
 }
 
 function SetStudent() {
-  $('#session-id').text(
-    connection.extra.userFullName + '(' + params.sessionid + ')'
-  );
+
+  $('#session-id').text(connection.extra.userFullName + '(' + params.sessionid + ')');
+  $(".for_teacher").remove();
+
+  GetMainVideo().style.display = 'block';
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
-  $('#main-video').show();
   $(".for_teacher").show();
   $(".controll").remove();
   $(".feature").remove();
@@ -1131,11 +1133,11 @@ function SelectViewType() {
 
     switch (this.id) {
       case 'top_student':
-        $('#main-video').hide();
+        GetMainVideo().style.display = "none";
         $('#student_list').show();
         break;
-      case 'top_camera':
-        $('#main-video').show();
+        case 'top_camera':
+          GetMainVideo().style.display = "block";
         $('#student_list').hide();
         break;
     }
@@ -1143,8 +1145,10 @@ function SelectViewType() {
 }
 
 $('#top_test').click(function () {
+  
   if ($('#exam-board').is(':visible')) {
     if(examObj.closeTesting()){
+      document.getElementById("widget-container").removeAttribute("style")
       $('#exam-board').hide(300);
     }else{
       alert("시험 종료 후 닫을 수 있습니다");
@@ -1153,6 +1157,8 @@ $('#top_test').click(function () {
   else {
     // 선생님
     if (params.open === 'true') {
+      document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
+      CanvasResize();
       $('#exam-omr').hide();
       $('#exam-teacher-menu').show();
     }
@@ -1336,6 +1342,15 @@ function setQuestionAnswer(answerList) {
 
 // 학생들 OMR 세팅
 function setStudentOMR(quesCount, examTime) {
+  if(isMobile){
+    document.getElementById("widget-container").style.right = "max(0px, 290px)";
+  }
+  else{
+    document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
+  }
+  CanvasResize();
+
+
   $('#exam-omr').show();
   $('#exam-board').show();
 
@@ -1451,41 +1466,24 @@ function LoadFile(btn) {
     removeOnSelect(btn);
     return;
   }
-  
-  if(!connection.extra.roomOwner) return;
-  
-  fileUploadModal("파일 관리자",function(e){console.log(e)});
 
-  // classroomCommand.togglePdfStateServer ((state) => {
-  //   // if(state) 
-  //   // {
-  //   //   isSharingFile = true;
-  //   //   isFileViewer = true;
-  //   // }
-  //   // else
-  //   // {
-  //   //   isSharingFile = false;
-  //classroomCommand   //   isFileViewer = false;
-  //   // }
-  // }) 
-  
-  // if (isFileViewer === false) {
-  //   isSharingFile = true;
-  //   loadFileViewer();
-  //   $('#canvas-controller').show();
-  //   isFileViewer = true;
-  //   classroomCommand.sendOpenPdf ();
-  // } else {
-  //   isSharingFile = false;
-  //   unloadFileViewer();
-  //   $('#canvas-controller').hide();
-  //   isFileViewer = false;
-  //   classroomCommand.sendClosePdf ();
-  // }
+  if(!connection.extra.roomOwner) 
+    return;
+
+
+  fileUploadModal("파일 관리자", btn ,function(e){console.log(e)});
 }
 
 
+function HomeworkSubmit(btn) {
+  HomeworkUploadModal("숙제 제출",function(e){console.log(e)});
+}
+
 function unloadFileViewer() {
+  var btn = GetFrame().document.getElementById("file");
+  btn.classList.remove("selected-shape");
+  btn.classList.remove("on");
+
   isSharingFile = false;
   isFileViewer = false;
   classroomCommand.closeFile ();
@@ -1493,8 +1491,10 @@ function unloadFileViewer() {
 
 
 function loadFileViewer(url) {
-
   console.log('loadFileViewer');
+  var btn = GetFrame().document.getElementById("file");
+  btn.classList.add("selected-shape");
+  btn.classList.add("on");
   isSharingFile = true;
   isFileViewer = true;  
   classroomCommand.openFile (url);
@@ -1580,35 +1580,98 @@ function CallTeacher() {
 
 var renditionBuffer;
 
+
+function SetEpubNavigator(){
+  var navi = document.getElementById("epub-navi");
+  var thumblist = document.getElementById("thumbnail-list");
+  var epubidxinput = document.getElementById("epubidx");
+  epubidxinput.addEventListener("change", function(e){
+    var idx = Math.max(1, Math.min(document.getElementById("epubmaxidx").value, this.value));
+    this.value = idx;
+    rendition.display(idx-1);
+  })
+
+  navi.addEventListener("mousewheel", function(e){
+    thumblist.scrollLeft += e.deltaY;
+  })
+  
+
+  document.getElementById('prev').addEventListener('click',function () {
+    rendition.prev();  
+  });
+
+  document.getElementById('next').addEventListener('click',function(){
+    rendition.next();  
+  });
+
+  document.getElementById('lprev').addEventListener('click',function(){
+    rendition.display(0);
+
+  });
+
+  document.getElementById('lnext').addEventListener('click',function(){
+    rendition.display(document.getElementById("epubmaxidx").value-1);
+  });
+
+  document.getElementById("epub-collapse").addEventListener('click', function(){
+    if(this.classList.contains("closed")){
+      $(navi).animate({"height": "95%"});
+      this.classList.remove("closed")
+      this.style.transform = "rotate(-90deg)";
+    }
+    else{
+      $(navi).animate({"height": "93px"});
+      this.classList.add("closed")
+      this.style.transform = "rotate(90deg)";
+    }
+  })
+}
+
 function loadEpubViewer() {
+  document.getElementById("epub-navi").style.display = "block";
+  document.getElementById("epubidx").value = 1;
+  
+
   isSharingEpub = true;
   isEpubViewer = true;
   console.log("Load Epub viewer");
+  
+  document.getElementById("widget-container").style.width - 50;
+
   let epubViewer = document.createElement('div');
   epubViewer.setAttribute('id', 'epub-viewer');
   epubViewer.setAttribute('class', 'spread');
-  epubViewer.style.cssText = "width: 78%;height: 1024px;box-shadow: 0 0 4px #ccc;border-radius: 5px;padding: 0;position: relative;margin: 10px 3%;background: white url('/dashboard/img/loading.gif') center center no-repeat;";
-  let frame = document
+
+  if(isMobile)
+    epubViewer.style.width = "calc(100% - 52px)";
+
+    let frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
 
   frame.document
     .getElementsByClassName('design-surface')[0]
     .appendChild(epubViewer);
+
   frame.document.getElementById('main-canvas').style.zIndex = '1';
   frame.document.getElementById('temp-canvas').style.zIndex = '2';
   frame.document.getElementById('tool-box').style.zIndex = '3';
 
   var book = ePub(
-    'https://files.primom.co.kr:1443/uploads/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
+    'https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf'
   );
+  window.book = book;
+  console.log(book);
+  
   var rendition = book.renderTo(epubViewer, {
-    manager: 'continuous',
+    // manager: 'paginated',
     flow: 'paginated',
-    width: '100%',
-    height: 1024,
+    width: '50%',
+    height: "100%",
     snap: true
   });
+
+  window.rendition = rendition;
 
 
   renditionBuffer = rendition;
@@ -1626,77 +1689,90 @@ else
 
 
   displayed.then(function (renderer) {  
-    // console.log(renderer);
   });
 
   // Navigation loaded
   book.loaded.navigation.then(function (toc) {
-    // console.log(toc);    
+    var len = book.spine.length;
+    document.getElementById("epubmaxidx").value = len;
+    document.getElementById("epubmaxidx").innerHTML = " / " + len;
+
+    let origin = book.url.origin;
+    let path = book.path.directory;
+    let location = origin + path;
+    console.log(location);
+
+    let idx = 0;
+
+    Object.keys(book.package.manifest).forEach(function(e){
+      var href = book.package.manifest[e].href;
+      if(href.includes("thumbnail")){
+
+
+        var thumbnail = document.createElement("div");
+        thumbnail.setAttribute("idx",idx);
+
+        var img = document.createElement("img");
+        img.src = location + href;
+        thumbnail.className = "thumbnail";
+        thumbnail.appendChild(img);
+
+        thumbnail.addEventListener("click" ,function(){
+          rendition.display(this.getAttribute("idx"))
+        })
+
+        document.getElementById("thumbnail-list").appendChild(thumbnail);
+        idx ++;
+      }
+    })
   });
 
   rendition.on('relocated', function(locations) {    
-    // Tofix : 현재 페이지의 정보가 제대로 안 날라온다.
-    console.log(locations);
-    classroomCommand.sendEpubCmd('page', {
-      page : locations.start.index
-    });    
+    var pre = document.getElementById("thumbnail-list").getElementsByClassName("selected")[0];
+    if(pre)
+      pre.classList.remove("selected");
+      document.getElementById("thumbnail-list").children[locations.start.index].classList.add("selected");
+      document.getElementById("thumbnail-list").children[locations.start.index].scrollIntoView({block : "center"});
+      document.getElementById("epubidx").value = locations.start.index + 1;
+      classroomCommand.sendEpubCmd('page', {
+        page : locations.start.index
+      });    
   });
+
   
-
-
-  var next = document.getElementById('next');  
-  next.style.display = 'block';
-  next.addEventListener(
-    'click',
-    function () {
-      rendition.next(); 
-    },
-    false
-  );
-
-  var prev = document.getElementById('prev');
-  prev.style.display = 'block';
-  prev.addEventListener(
-    'click',
-    function () {   
-      rendition.prev();  
-    },
-    false
-  );
 
   var keyListener = function (e) {
     // Left Key
     if ((e.keyCode || e.which) == 37) {
-      rendition.prev();
+      prevPage();
     }
 
     // Right Key
     if ((e.keyCode || e.which) == 39) {
-      rendition.next();  
+      nextPage()
     }
   };
+
+  function nextPage(){
+    rendition.next();  
+  }
+  
+  function prevPage(){
+    rendition.prev();  
+  }
 
   rendition.on('keyup', keyListener);
   document.addEventListener('keyup', keyListener, false);
 }
 
 function unloadEpubViewer() {
+  $("#thumbnail-list").empty();
+  document.getElementById("epub-navi").style.display = "none";
 
   isSharingEpub = false;
   isEpubViewer = false;
 
   renditionBuffer = null;
-
-  var prev = document.getElementById('prev');
-  prev.style.display = 'none';
-  var prevClone = prev.cloneNode(true);
-  prev.parentNode.replaceChild(prevClone, prev);
-
-  var next = document.getElementById('next');
-  next.style.display = 'none';
-
-  var nextClone = next.cloneNode(true);
-  next.parentNode.replaceChild(nextClone, next);
 
   let frame = document
     .getElementById('widget-container')
@@ -1799,7 +1875,6 @@ $(window).click(function (e) {
 });
 
 
-
 window.addEventListener('resize', function () {
   rtime = new Date();
   if (timeout === false) {
@@ -1821,18 +1896,16 @@ function CanvasResize() {
   var frame = document
     .getElementById('widget-container')
     .getElementsByTagName('iframe')[0].contentWindow;
+    
   var canvas = frame.document.getElementById('main-canvas');
   var r = document.getElementsByClassName('lwindow')[0];
-  var rwidth = $(r).width();
 
-  var x = canvas.width - rwidth - 55;
-  var y = canvas.height - 60;
-
-  $('#screen-viewer').width(x);
-  $('#screen-viewer').height(y);
+  var x = canvas.width;
+  var y = canvas.height;
 
   var renderCanvas = frame.document.getElementById('renderCanvas');
   if (renderCanvas) {
+    renderCanvas.style.left = "50px";
     renderCanvas.width = x;
     renderCanvas.height = y;
   }
@@ -1891,11 +1964,40 @@ function GetStream(id){
 }
 
 
-
-function fileUploadModal(message, callback) {
+function HomeworkUploadModal(message, callback){
   console.log(message);
   extraPath = '';
+  $('#btn-confirm-close').hide();
+  $('#btn-confirm-file-close').hide();
+  $("#confirm-title2").hide();
+  $('#confirm-title').html(message).removeClass("selected");
+
+  $('#btn-confirm-action').html('닫기').unbind('click').bind('click', function (e) {
+      e.preventDefault();
+      $('#confirm-box').modal('hide');
+      $('#confirm-box-topper').hide();
+      callback(true);
+  });
+
+  $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
+  $('#confirm-box-topper').show();
+
+  $('#confirm-box').modal({
+      backdrop: 'static',
+      keyboard: false
+  });
+
+  loadFileInput();
+}
+
+
+function fileUploadModal(message, btn, callback) {
+  console.log(message);
+  extraPath = '';
+
   getUploadFileList();
+  $("#confirm-title2").show();
+
   $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
       e.preventDefault();
       $('#confirm-box').modal('hide');
@@ -1907,13 +2009,16 @@ function fileUploadModal(message, callback) {
 
   $('.btn-confirm-close').unbind('click').bind('click', function (e) {
       e.preventDefault();
+
+
       $('#confirm-box').modal('hide');
       $('#confirm-box-topper').hide();
       callback(false);
   });
 
   $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
-  $('#confirm-title').html('파일 관리자');
+  $('#confirm-title').html(message).addClass("selected");
+  $('#confirm-title2').html("과제").removeClass("selected");
   $('#confirm-box-topper').show();
 
   $('#confirm-box').modal({
@@ -1930,33 +2035,73 @@ function fileUploadModal(message, callback) {
     }
 
   loadFileInput();
+
+  document.getElementById("confirm-title").addEventListener("click",function(){
+    ViewUploadList(this);
+  })
+
+  document.getElementById("confirm-title2").addEventListener("click",function(){
+    ViewHomeworkList(this);
+  })
+}
+
+function ViewHomeworkList(btn){
+  btn.classList.add("selected");
+  document.getElementById("confirm-title").classList.remove("selected");
+  $("form[name=upload]").hide();
+  getUploadFileList("/homework");
+}
+
+function ViewUploadList(btn){
+  btn.classList.add("selected");
+  document.getElementById("confirm-title2").classList.remove("selected");
+  $("form[name=upload]").show();
+  getUploadFileList();
 }
 
 
-function getUploadFileList(){
+function getUploadFileList(extraPath){
+  if(typeof extraPath === "undefined")
+    extraPath = ""; 
+  $("#confirm-message .list-group-flush").remove();
+
   var xhr = new XMLHttpRequest();
-  console.log(uploadServerUrl);
   var url = uploadServerUrl+'/list';
   var data = { "userId" : params.sessionid ,"extraPath":extraPath};
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
   if (xhr.readyState == 4 && xhr.status == 200) {
-      // do something with response
-      updateFileList(JSON.parse(xhr.responseText));
+      updateFileList(JSON.parse(xhr.responseText), extraPath);
   }
   };
   data = JSON.stringify(data);
   xhr.send(data); 
 }
 
-function updateFileList(list){
-  console.log(list.files);
-  $("#confirm-message .list-group-flush").remove();
+function updateFileList(list, extraPath){
   var re = /(?:\.([^.]+))?$/;
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
-    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+'</label><button type="button" class="btn btn-primary btn-lg pull-right float-right" onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button><button type="button" class="btn btn-danger btn-lg pull-right float-right" onclick="deleteUploadedFile(\''+file.name+'\')"><i class="fa fa-trash float-right"></i></button></p></li>';
+
+    if(file.name == "homework")
+      return ;
+
+    var buttons = "";
+    if(extraPath == "/homework"){
+      buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
+      onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
+
+    } 
+
+    buttons +=  '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
+    onclick="loadFileViewer(\''+file.url+'\')"><i class="fa fa-folder float-right"></i></button> \
+    <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
+    onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
+
+    listElement+= '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">'+
+    getFileType(re.exec(file.name)[1])+'</span><label>'+file.name+ 
+    '</label>'  + buttons;
   })
   listElement+= '</ul>';
   var $listElement = $($.parseHTML(listElement));
@@ -2014,16 +2159,41 @@ function getFileType(ext){
   return element;
 }
 
-function deleteUploadedFile(filename){
+function downloadUploadedFile(url,name){
+  fetch(url)
+  .then(resp => resp.blob())
+  .then(blob => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+  })
+  .catch(() => alert('oh no!'));
+}
+
+function deleteUploadedFile(filename, extraPath){
+
+  console.log(extraPath);
+
   var xhr = new XMLHttpRequest();
+
   var url = uploadServerUrl+'/delete';
-  var data = {"userId":params.sessionid, "name":filename};
+  var data = {
+    "userId":params.sessionid, 
+    "name":filename,
+    "extraPath" : extraPath
+  };
+
   xhr.open("POST", url, true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onreadystatechange = function () {
       if (xhr.readyState == 4 && xhr.status == 200) {
           // do something with response
-          getUploadFileList();
+          getUploadFileList(extraPath);
       }
   };
   data = JSON.stringify(data);
@@ -2033,6 +2203,11 @@ function deleteUploadedFile(filename){
 function loadFileInput(){
 
   $(document).ready(function () {
+    var extraPath = "";
+
+    if(!connection.extra.roomOwner)
+      extraPath = "/homework";
+
     $("#test-upload").fileinput({
         'theme': 'fas',
         'showPreview': true,
@@ -2106,13 +2281,16 @@ function loadFileInput(){
        }
    },
    uploadExtraData: {
-    userId: params.sessionid
+    // userId: path
+    userId: params.sessionid,
+    extraPath : extraPath,
   },
 
     }).on('fileuploaded', function(event, previewId, index, fileId) {
       console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
       console.log(previewId.response);
-      getUploadFileList();
+      if(connection.extra.roomOwner)
+        getUploadFileList();
   }).on('fileuploaderror', function(event, data, msg) {
       console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
   }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
@@ -2216,6 +2394,7 @@ function LoadScreenShare(){
     !classroomInfoLocal.shareScreen.fromme){
     console.log("LOAD SCREEN")
     classroomCommand.openShare();
+    CanvasResize();
   }
 }
 
@@ -2344,4 +2523,36 @@ function removeClassInfo(){
   localStorage.removeItem('isSharingEpub', isSharingEpub);
   localStorage.removeItem('isFileViewer', isFileViewer);
 
+}
+
+function GetScreenViewer(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+
+  return frame.document.getElementById("screen-viewer");
+
+}
+
+function GetMainVideo(){
+  var video = document.getElementById("main-video");
+  console.log(video);
+  if(video){
+    return video;
+  }
+  else{
+     return document
+    .getElementById('widget-container')
+    .getElementsByTagName('iframe')[0].contentWindow.document.getElementById("main-video");
+  }
+}
+
+$(document).ready(function(){
+})
+
+function GetFrame(){
+  let frame = document
+  .getElementById('widget-container')
+  .getElementsByTagName('iframe')[0].contentWindow;
+  return frame;
 }
