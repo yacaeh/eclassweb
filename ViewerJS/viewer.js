@@ -179,17 +179,11 @@ function Viewer( viewerPlugin, parameters ) {
                 viewerPlugin.fitToWidth(maxWidth);
                 break;
             case 'page-height':
+                case 'auto':
                 viewerPlugin.fitToHeight(maxHeight);
                 break;
             case 'page-fit':
                 viewerPlugin.fitToPage(maxWidth, maxHeight);
-                break;
-            case 'auto':
-                if ( viewerPlugin.isSlideshow() ) {
-                    viewerPlugin.fitToPage(maxWidth + kScrollbarPadding, maxHeight + kScrollbarPadding);
-                } else {
-                    viewerPlugin.fitSmart(maxWidth);
-                }
                 break;
         }
 

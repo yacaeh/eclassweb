@@ -225,6 +225,7 @@ select {
     height:             40px;
     width:              100%;
     overflow:           hidden;
+    display:  none;
 
     -webkit-box-shadow: 0px 1px 3px rgba(50, 50, 50, 0.75);
     -moz-box-shadow:    0px 1px 3px rgba(50, 50, 50, 0.75);

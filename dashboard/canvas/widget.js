@@ -1096,7 +1096,6 @@ function canvasresize(id){
                 }
 
                 if(near){
-                    console.log(point);
                     for(var i = 0 ; i < pointHistory.length; i++){
                         if(idx < pointHistory[i]){
     
