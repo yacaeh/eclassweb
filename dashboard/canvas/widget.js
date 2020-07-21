@@ -9,7 +9,9 @@
 
 (function() {
 
-    var teacherPoints = []
+    var teacherPoints = [];
+    var studentPoints = [];
+
 
     document.addEventListener("click", function(){
         window.focus();
@@ -463,6 +465,10 @@ function canvasresize(id){
             context.clearRect(0, 0, innerWidth, innerHeight);
 
             var _this = this;
+
+            studentPoints.forEach(function(data){
+                drawpoint(data.points);
+            })
 
             teacherPoints.forEach(function(data){
                 drawpoint(data.points);
@@ -1121,14 +1127,12 @@ function canvasresize(id){
                                     userid : _uid,
                                 }
                                 
-                                if(window.parent.connection.extra.roomOwner){
-                                    console.log("SEND ERASER",_uid, data);
-                                    data.pageidx = window.parent.PointerSaver.nowIdx;
-                                    window.parent.postMessage({
-                                        canvasDesignerSyncData: data,
-                                        uid: uid
-                                    }, '*');
-                                }
+                                console.log("SEND ERASER",_uid, data);
+                                data.pageidx = window.parent.PointerSaver.nowIdx;
+                                window.parent.postMessage({
+                                    canvasDesignerSyncData: data,
+                                    uid: uid
+                                }, '*');
                             }
 
                             drawHelper.redraw();
@@ -2379,94 +2383,12 @@ function canvasresize(id){
 
         if (!event.data.canvasDesignerSyncData) return;
 
-        if(window.parent.connection.extra.roomOwner){
-            var data = event.data.canvasDesignerSyncData;
-            switch (data.command) {
-                case "loaddata":
-                    var startIdx = 0;
-                    points = data.points;
-                    pointHistory = data.history;
-                    window.parent.currentPoints = points;
-                    window.parent.currentHistory = data.history;
-                    break;
-                case "clearcanvas":
-                    points = [];
-                    pointHistory = []
-                    window.parent.currentPoints = [];
-                    window.parent.currentHistory = [];
-                    break;
-            }
-        }
-        else{
-            var data = event.data.canvasDesignerSyncData;
-            console.log(data);
+        var data = event.data.canvasDesignerSyncData;
+        if(data.isStudent)
+            PushPoints(data, studentPoints);
+        else 
+            PushPoints(data, teacherPoints);
 
-            switch(data.command){
-                case "eraser" :
-                    teacherPoints.splice(data.idx,1);
-                    break;
-                case "clear" :
-                    teacherPoints = [];
-                    break;
-                case "default":
-                    var startIdx = 0;
-                    data.history.forEach(function(history){
-                        if(startIdx == history)
-                            return false;
-                        var points = data.points.slice(startIdx, history);
-                        var command = points[0][0];
-                        var startIndex = startIdx;
-                        startIdx = history;
-
-                        var d = {
-                            points : points,
-                            command : command,
-                            startIndex : startIndex,
-                            userid : data.userid,
-                        }
-                        teacherPoints.push(d);
-                    })
-                    break;
-                case "loaddata":
-                    var startIdx = 0;
-                    points = data.points;
-                    pointHistory = data.history;
-                    window.parent.currentPoints = points;
-                    window.parent.currentHistory = data.history;
-                    break;
-                case "loadteacher":
-                    teacherPoints = [];
-                    data.history.forEach(function(history){
-                        if(startIdx == history)
-                            return false;
-                        var points = data.points.slice(startIdx, history);
-                        var command = points[0][0];
-                        var startIndex = startIdx;
-                        startIdx = history;
-
-                        var d = {
-                            points : points,
-                            command : command,
-                            startIndex : startIndex,
-                            userid : data.userid,
-                        }
-                        teacherPoints.push(d);
-                    })
-                    break;
-                case "clearteacher":
-                    teacherPoints = [];
-                    break;
-                case "clearcanvas" :
-                    points = [];
-                    pointHistory = []
-                    window.parent.currentPoints = [];
-                    window.parent.currentHistory = [];
-                    return;
-                default :
-                    teacherPoints.push(data);
-            }
-            console.log("teacherPoints", teacherPoints)
-        }
 
         lastPointIndex = points.length;
         drawHelper.redraw();
@@ -2474,20 +2396,86 @@ function canvasresize(id){
 
     var _uid = window.parent.connection.userid;
 
+    function PushPoints(data, array){
+        switch(data.command){
+            case "eraser" :
+                array.splice(data.idx,1);
+                break;
+            case "clear" :
+                array.length = 0;
+                break;
+            case "my" :
+                points = data.points;
+                pointHistory = data.history;
+                window.parent.currentPoints = points;
+                window.parent.currentHistory = pointHistory;
+                break;
+
+            case "default":
+            case "loaddata":
+                var startIdx = 0;
+                data.history.forEach(function(history){
+                    if(startIdx == history)
+                        return false;
+                    var points = data.points.slice(startIdx, history);
+                    var command = points[0][0];
+                    var startIndex = startIdx;
+                    startIdx = history;
+
+                    var d = {
+                        points : points,
+                        command : command,
+                        startIndex : startIndex,
+                        userid : data.userid,
+                    }
+                    array.push(d);
+                })
+                break;
+            case "load":
+                array.length = 0;
+                data.history.forEach(function(history){
+                    if(startIdx == history)
+                        return false;
+                    var points = data.points.slice(startIdx, history);
+                    var command = points[0][0];
+                    var startIndex = startIdx;
+                    startIdx = history;
+
+                    var d = {
+                        points : points,
+                        command : command,
+                        startIndex : startIndex,
+                        userid : data.userid,
+                    }
+                    array.push(d);
+                })
+                break;
+            case "clearcanvas" :
+                points.length = 0;
+                pointHistory.length = 0
+                window.parent.currentPoints = points;
+                window.parent.currentHistory = pointHistory;
+            case "clearteacher":
+            case "clearstudent":
+                array.length = 0;
+                break;
+            default :
+                array.push(data);
+        }
+    }
+
     function syncData(data) {
         // teacher....
-        if(window.parent.connection.extra.roomOwner){
-            data.pageidx = window.parent.PointerSaver.nowIdx;
-            data.userid = _uid;
-            data.history = pointHistory;
-            data.startIndex = points.length;
-            lastPointIndex = points.length;
-            console.log("SEND",_uid, data);
-            window.parent.postMessage({
-                canvasDesignerSyncData: data,
-                uid: uid
-            }, '*');
-        }
+        data.pageidx = window.parent.PointerSaver.nowIdx;
+        data.userid = _uid;
+        data.history = pointHistory;
+        data.startIndex = points.length;
+        lastPointIndex = points.length;
+        // console.log("SEND",_uid, data);
+        window.parent.postMessage({
+            canvasDesignerSyncData: data,
+            uid: uid
+        }, '*');
 
         window.parent.currentPoints = points;
         window.parent.currentHistory = pointHistory;

@@ -31,9 +31,10 @@ PointerSaver = {
         this.nowIdx = idx;
         ClearCanvas();
         ClearTeacherCanvas();
+        ClearStudentCanvas();
 
         if(this.container[idx]){
-            this.container[idx].command = "loaddata";
+            this.container[idx].command = "my";
 
             window.currentPoints = this.container[idx].points;
             window.currentHistory = this.container[idx].history;
@@ -61,16 +62,18 @@ PointerSaver = {
         });
     },
     send : function(idx){
-    if(!connection.extra.roomOwner){
+    if(!(connection.extra.roomOwner || connection.userid == classroomInfo.canvasPermission)){
         return;
     }
+    
     if(idx == this.nowIdx)
     this.save(idx);
 
         if(this.container[idx])
             connection.send({
                 setpointer: true,
-                idx : this.container[idx]
+                idx : idx,
+                data : this.container[idx],
             })
         else{
             connection.send({
@@ -99,3 +102,25 @@ designer.syncData({
     })
 }
   
+function ClearStudentCanvas(){
+    designer.syncData({
+        command : "clearstudent",
+        isStudent : true,
+        uid: connection.userid,
+      })
+}
+
+function SendStudentPointData(){
+    connection.send({
+
+    })
+
+    designer.syncData({
+        command : "default",
+        isStudent : true,
+        points : currentPoints ,
+        history : currentHistory,
+        uid: connection.userid,
+      })
+}
+

@@ -201,7 +201,6 @@ connection.onclose = connection.onerror = connection.onleave = function (event){
 };
 
 connection.onmessage = function (event) {
-
   if(event.data.unmute){
     permissionManager.unmute(event.data.unmute);
     return;
@@ -217,8 +216,16 @@ connection.onmessage = function (event) {
     ReTrack(GetStream(classroomInfoLocal.shareScreen.id));
   }
 
+  if(event.data.sendStudentPoint){
+    event.data.command = "default";
+    designer.syncData(event.data);
+    console.log(event.data)
+  }
+
   if(event.data.permissionChanged){
     classroomInfo = event.data.permissionChanged;
+
+    console.log(event.data.permissionChanged);
 
     if(event.data.permissionChanged.classPermission)
       permissionManager.setClassPermission(event.data.permissionChanged.classPermission);
@@ -229,6 +236,12 @@ connection.onmessage = function (event) {
       permissionManager.setMicPermission(event.data.permissionChanged.micPermission);
     else
       permissionManager.disableMicPermission();
+  
+    if(event.data.permissionChanged.canvasPermission)
+      permissionManager.setCanvasPermission(event.data.permissionChanged.canvasPermission);
+    else{
+      permissionManager.disableCanvasPermission();
+    }
   }
 
 
@@ -314,10 +327,21 @@ connection.onmessage = function (event) {
   if(event.data.setpointer){
     if(event.data.idx == "empty")
       return;
+      event.data.data.command = "load";
+    
+    if(event.extra.roomOwner && !connection.extra.roomOwner){
+      if(PointerSaver.nowIdx == event.data.idx){
+        designer.syncData(event.data.data);
+      }
+    }
+    else{
+      event.data.data.isStudent = true;
+      if(PointerSaver.nowIdx == event.data.idx){
+        designer.syncData(event.data.data);
+      }
+    }
 
-    console.log("Get Pointer Teacher's",event.data.idx)
-    event.data.idx.command = "loadteacher";
-    designer.syncData(event.data.idx);
+
     return;
   }
 
@@ -410,15 +434,16 @@ connection.onmessage = function (event) {
     // console.log(event.data);
   // }
 
-  if(event.data.pageidx == PointerSaver.nowIdx)
+  if(event.data.pageidx == PointerSaver.nowIdx){
     designer.syncData(event.data);
+  }
 };
 
 var stemp;
 
 // extra code
 connection.onstream = function (event) {
-  console.log('onstream!',event);
+  console.log('onstream!');
 
   if(params.open === 'true' || params.open === true){
     CanvasResize();
@@ -1763,9 +1788,7 @@ else
     latestIdx = locations.start.index
     PointerSaver.load(latestIdx);
 
-    if(!connection.extra.roomOwner){
-      PointerSaver.get(latestIdx);
-    }
+    PointerSaver.get(latestIdx);
 
     var pre = document.getElementById("thumbnail-list").getElementsByClassName("selected")[0];
     if(pre)
@@ -1808,6 +1831,8 @@ else
 function unloadEpubViewer() {
   ClearCanvas();
   ClearTeacherCanvas();
+  ClearStudentCanvas();
+
   PointerSaver.close();
 
   $("#thumbnail-list").empty();
@@ -2448,91 +2473,9 @@ function syncWithTeacher(){
   console.log("Sync!");
 }
 
-
-$(".perbtn").click(function () {
-  var circle = this.getElementsByClassName("circle")[0];
-  var pid = nowSelectStudent.dataset.id;
-
-  if (this.id == "classP") {
-    if (this.classList.contains("off")) {
-      if (classroomInfo.classPermission != undefined) {
-        alert('이미 다른 학생에게 권한이 있습니다.');
-        return false;
-      }
-
-      classroomInfo.classPermission = pid;
-      nowSelectStudent.dataset.classPermission = true;
-
-      if (classroomInfo.micPermission !== pid) {
-        if (classroomInfo.micPermission === undefined) {
-          classroomInfo.micPermission = pid;
-        }
-        else {
-          $(`[data-id='${classroomInfo.micPermission}']`).attr('data-mic-Permission', false);
-        }
-        $('#micP').animate({ 'background-color': "#18dbbe" }, 'fast')
-        $('#micP').children('.circle').animate({ left: "22px" }, 'fast')
-        $('#micP').toggleClass("on off");
-        classroomInfo.micPermission = pid;
-        nowSelectStudent.dataset.micPermission = true;
-      }
-      $(this).animate({ 'background-color': '#18dbbe' }, 'fast');
-      $(circle).animate({left: '22px'},'fast');
-      $(nowSelectStudent).find(".bor").show();
-    }
-    else {
-      if (classroomInfo.micPermission == classroomInfo.classPermission) {
-        $('#micP').animate({
-          'background-color': "gray"
-        }, 'fast')
-        $('#micP').children('.circle').animate({
-          left: "2px"
-        }, 'fast')
-        classroomInfo.micPermission = undefined;
-        nowSelectStudent.dataset.micPermission = false;
-        $('#micP').toggleClass("on off");
-      }
-      classroomInfo.classPermission = undefined;
-      nowSelectStudent.dataset.classPermission = false;
-
-      $(this).animate({'background-color':'gray'},'fast');
-      $(circle).animate({ left: '2px' }, 'fast');
-      $(nowSelectStudent).find('.bor').hide();
-    }
-  }
-
-  else if (this.id == "micP") {
-    if (this.classList.contains("off")) {
-      if (classroomInfo.micPermission != undefined) {
-        alert('이미 다른 학생에게 권한이 있습니다.');
-        return false;
-      }
-      classroomInfo.micPermission = pid;
-      nowSelectStudent.dataset.micPermission = true;
-      $(this).animate({'background-color':'#18dbbe'},'fast');
-      $(circle).animate({left: '22px'},'fast');
-    }
-    else {
-      classroomInfo.micPermission = undefined;
-      nowSelectStudent.dataset.micPermission = false;
-      $(this).animate({ 'background-color': 'gray' }, 'fast');
-      $(circle).animate({ left: '2px' }, 'fast');
-    }
-  }
-
-  this.classList.toggle('on');
-  this.classList.toggle('off');
+PermissionButtonSetting();
 
 
-  connection.send({ permissionChanged: classroomInfo });
-  
-  if (this.classList.contains("on")) {
-    permissionManager.unmute(classroomInfo.micPermission);
-  }
-  else {
-    permissionManager.mute();
-  }
-});
 // Save classinfo on user exit
 function saveClassInfo(){
 console.log();
@@ -2581,7 +2524,6 @@ function GetScreenViewer(){
 
 function GetMainVideo(){
   var video = document.getElementById("main-video");
-  console.log(video);
   if(video){
     return video;
   }
