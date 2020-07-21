@@ -170,11 +170,12 @@ function PDFViewerPlugin() {
     function completeLoading() {
         var allPagesVisible = !self.isSlideshow();
         domPages.forEach(function ( domPage ) {
-            if ( allPagesVisible ) {
-                domPage.style.display = "block";
-            }
+            // if ( allPagesVisible ) {
+            //     domPage.style.display = "block";
+            // }
             container.appendChild(domPage);
         });
+        domPages[0].style.display = "block";
 
         self.showPage(1);
         self.onLoad();
@@ -273,7 +274,6 @@ function PDFViewerPlugin() {
             PDFJS.getDocument(location, null, passwordCallback).then(function loadPDF( doc ) {
                 pdfDocument = doc;
                 container   = viewContainer;
-
                 for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
                     pdfDocument.getPage(i + 1).then(createPage);
                 }
@@ -305,6 +305,8 @@ function PDFViewerPlugin() {
     this.fitToHeight = function ( height ) {
         var zoomLevel;
 
+        console.log(height);
+
         if ( maxPageHeight === height ) {
             return;
         }
@@ -331,7 +333,8 @@ function PDFViewerPlugin() {
 
     this.setZoomLevel = function ( zoomLevel ) {
         var i, viewport;
-
+        console.log(zoomLevel);
+        
         if ( scale !== zoomLevel ) {
             scale = zoomLevel;
 
@@ -371,14 +374,10 @@ function PDFViewerPlugin() {
     };
 
     this.showPage = function ( n ) {
-        if ( self.isSlideshow() ) {
-            domPages[currentPage - 1].style.display = "none";
-            currentPage                             = n;
-            ensurePageRendered(pages[n - 1]);
-            domPages[n - 1].style.display = "block";
-        } else {
-            scrollIntoView(domPages[n - 1]);
-        }
+        domPages[currentPage - 1].style.display = "none";
+        currentPage                             = n;
+        ensurePageRendered(pages[n - 1]);
+        domPages[n - 1].style.display = "block";
     };
 
     this.getPluginName = function () {
