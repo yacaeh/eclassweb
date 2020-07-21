@@ -1644,7 +1644,6 @@ function SetEpubNavigator(){
   navi.addEventListener("mousewheel", function(e){
     thumblist.scrollLeft += e.deltaY;
   })
-  
 
   document.getElementById('prev').addEventListener('click',function () {
     rendition.prev();  
