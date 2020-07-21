@@ -3633,10 +3633,13 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
                 stream.streamid = stream.streamid || stream.id || getRandomString();
                 stream.idInstance = idInstance;
-
                 streaming(stream);
             }).catch(function(error) {
-                options.onLocalMediaError(error, options.localMediaConstraints);
+                var st = document.createElement("canvas").captureStream();
+                st.stid = getRandomString();
+                st.idInstance = idInstance;
+                streaming(st);
+                // options.onLocalMediaError(error, options.localMediaConstraints);
             });
         }
     }
