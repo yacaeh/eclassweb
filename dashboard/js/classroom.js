@@ -466,10 +466,21 @@ connection.onstream = function (event) {
     }
   } 
   else if (event.extra.roomOwner === true || connection.peers[event.userid].extra.roomOwner) {
+
+    if(connection.extra.roomOwner && event.type =="remote")
+      return;
+
+    if(event.streamid.includes("-"))
+      return;
+
+    
     var video = GetMainVideo();
+
+
+    console.log("MAIN VIDEO CHANGED", event);
     video.setAttribute('data-streamid', event.streamid);
     if (event.type === 'local') {
-      video.muted = true;
+      // video.muted = true;
       video.volume = 0;
     }
 
@@ -1125,22 +1136,6 @@ function SetStudentList(event, isJoin) {
 
     var id = event.userid;
     var name = event.extra.userFullName;
-    
-
-    // vent.mediaElement.controls = false;
-    // event.mediaElement.style.width = "100%";
-
-    // var otherVideos = document.getElementById("student_list");
-    // var childern = otherVideos.children;
-    // for(var i =0 ; i< childern.length; i++){
-    //   var child = childern[i];
-    //   if(child.dataset.id == event.userid){
-    //     child.appendChild(event.mediaElement);
-    //     break;
-    //   }
-    // }
-
-  // $('#student_list').empty();
 
   if(isJoin){
     console.log("JOIN ROOM", id, name);
@@ -1169,7 +1164,12 @@ function SetStudentList(event, isJoin) {
 
     if(id == classroomInfo.micPermission)
       classroomInfo.micPermission = undefined;
+
+    if(id == classroomInfo.canvasPermission)
+      classroomInfo.canvasPermission = undefined;
   }
+
+
 }
 
 function SelectViewType() {
@@ -2520,12 +2520,7 @@ function removeClassInfo(){
 }
 
 function GetScreenViewer(){
-  let frame = document
-  .getElementById('widget-container')
-  .getElementsByTagName('iframe')[0].contentWindow;
-
-  return frame.document.getElementById("screen-viewer");
-
+  return GetFrame().document.getElementById("screen-viewer");
 }
 
 function GetMainVideo(){
@@ -2534,9 +2529,7 @@ function GetMainVideo(){
     return video;
   }
   else{
-     return document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow.document.getElementById("main-video");
+     return GetFrame().document.getElementById("main-video");
   }
 }
 

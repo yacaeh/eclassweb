@@ -8,6 +8,7 @@ function OnClickStudent(div) {
 
     SetBtn("classP", e.target.dataset.classPermission);
     SetBtn("micP", e.target.dataset.micPermission);
+    SetBtn("canP", e.target.dataset.canvasPermission);
     
     function SetBtn(id, ispermission){
       $('#' + id).clearQueue();
