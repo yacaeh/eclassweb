@@ -2069,7 +2069,6 @@ function HomeworkUploadModal(message, callback){
   loadFileInput();
 }
 
-
 function fileUploadModal(message, btn, callback) {
   console.log(message);
   extraPath = '';
@@ -2088,8 +2087,6 @@ function fileUploadModal(message, btn, callback) {
 
   $('.btn-confirm-close').unbind('click').bind('click', function (e) {
       e.preventDefault();
-
-
       $('#confirm-box').modal('hide');
       $('#confirm-box-topper').hide();
       callback(false);
@@ -2115,15 +2112,16 @@ function fileUploadModal(message, btn, callback) {
 
   loadFileInput();
 
-  document.getElementById("confirm-title").addEventListener("click",function(){
-    console.log("CLICKED")
-    ViewUploadList(this);
-  })
-
-  document.getElementById("confirm-title2").addEventListener("click",function(){
-    ViewHomeworkList(this);
-  })
 }
+
+document.getElementById("confirm-title").addEventListener("click",function(){
+  console.log("CLICKED")
+  ViewUploadList(this);
+})
+
+document.getElementById("confirm-title2").addEventListener("click",function(){
+  ViewHomeworkList(this);
+})
 
 function ViewHomeworkList(btn){
   btn.classList.add("selected");
