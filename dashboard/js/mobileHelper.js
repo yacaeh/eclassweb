@@ -5,8 +5,7 @@ var isMobile = false;
 
 mobileHelper = {
     Init : function(){
-        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-        ) {
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             SetMobile();
         }
     },
@@ -32,7 +31,7 @@ function ToolSetting(){
 }
 
 function MainCamSetting(){
-    var video = document.getElementById("main-video");
+    var video = GetMainVideo();
     var x = 0;
     var y = 0;
     var lastleft = 0;

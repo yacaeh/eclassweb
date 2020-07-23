@@ -26,10 +26,12 @@ function onAllControlValue (_allControl) {
     if(classroomInfo.allControl) {        
         //  전체제어하기가 걸리게 되면, 현재 상태와 동기화 시킨다.
         console.log("All Controll On");
+        document.getElementById("student-isallcontrol").style.display = "block";
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
     else
     {
+        document.getElementById("student-isallcontrol").style.display = "none";
         console.log("All Controll Off");
         classroomCommand.updateSyncRoom ();
         // updateControlView (false);   

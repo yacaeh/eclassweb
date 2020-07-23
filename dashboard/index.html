@@ -25,9 +25,8 @@
 
 <body background="/dashboard/img/new_login_bg.png">
   <header>
-    <!-- <img class="logo" src="/dashboard/ai_icon.png" alt="RTCMultiConnection" /> -->
     <div id="header-left-box">
-      <span class="display-none" class="top-span">Active rooms: <span id="active-rooms">0</span></span>
+      <!-- <span class="top-span">Active rooms: <span id="active-rooms">0</span></span> -->
     </div>
   </header>
 
@@ -170,7 +169,7 @@
   <section>
 
     <!-- Login Form -->
-    <div class="modal-dialog" style="max-width: 430px;">
+    <!-- <div class="modal-dialog" style="max-width: 430px;">
       <div class="modal-content" style="margin-top: 20vh;">
         <div class="login-header login-text login-bottom-border">로그인</div>
         <div class="login-body login-bottom-border">
@@ -193,8 +192,17 @@
         <div style="height: 10px;"></div>
       </div>
     </div>
+     -->
+    <table id="time_table">
+      <tbody>
+      </tbody>
+    </table>
+    <input placeholder="이름" id="user-name">
+
   </section>
+
   <script src="/dashboard/js/index.js"></script>
+  <script src="/dashboard/js/time_table.js"></script>
 
 
 </body>

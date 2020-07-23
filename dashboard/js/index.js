@@ -53,82 +53,13 @@ function checkCamAndMicExist(){
 
 
 function looper() {
-    if (!$('#rooms-list').length) return;
     connection.socket.emit('get-public-rooms', publicRoomIdentifier, function (listOfRooms) {
-        updateListOfRooms(listOfRooms);
-
-        setTimeout(looper, 3000);
+        ActiveClass(listOfRooms);
+        setTimeout(looper, 1000);
     });
 }
 
-function updateListOfRooms(rooms) {
-    $('#active-rooms').html(rooms.length);
 
-    $('#rooms-list').html('');
-
-    if (!rooms.length) {
-        $('#rooms-list').html('<tr><td colspan=9>No active room found for this demo.</td></tr>');
-        return;
-    }
-
-    rooms.forEach(function (room, idx) {
-        var tr = document.createElement('tr');
-        var html = '';
-        if (!room.isPasswordProtected) {
-            html += '<td>' + (idx + 1) + '</td>';
-        }
-        else {
-            html += '<td>' + (idx + 1) + ' <img src="https://www.webrtc-experiment.com/images/password-protected.png" style="height: 15px; vertical-align: middle;" title="Password Protected Room"></td>';
-        }
-
-        html += '<td><span class="max-width" title="' + room.sessionid + '">' + room.sessionid + '</span></td>';
-        html += '<td><span class="max-width" title="' + room.owner + '">' + room.owner + '</span></td>';
-
-        html += '<td>';
-        Object.keys(room.session || {}).forEach(function (key) {
-            html += '<pre><b>' + key + ':</b> ' + room.session[key] + '</pre>';
-        });
-        html += '</td>';
-
-        html += '<td><span class="max-width" title="' + JSON.stringify(room.extra || {}).replace(/"/g, '`') + '">' + JSON.stringify(room.extra || {}) + '</span></td>';
-
-        html += '<td>';
-        room.participants.forEach(function (pid) {
-            html += '<span class="userinfo"><span class="max-width" title="' + pid + '">' + pid + '</span></span><br>';
-        });
-        html += '</td>';
-
-        // check if room is full
-        if (room.isRoomFull) {
-            // room.participants.length >= room.maxParticipantsAllowed
-            html += '<td><span style="border-bottom: 1px dotted red; color: red;">Room is full</span></td>';
-        }
-        else {
-            html += '<td><button class="btn join-room" data-roomid="' + room.sessionid + '" data-password-protected="' + (room.isPasswordProtected === true ? 'true' : 'false') + '">Join</button></td>';
-        }
-
-        $(tr).html(html);
-        $('#rooms-list').append(tr);
-
-        $(tr).find('.join-room').click(function () {
-            $(tr).find('.join-room').prop('disabled', true);
-
-            var roomid = $(this).attr('data-roomid');
-            $('#txt-roomid-hidden').val(roomid);
-
-            $('#btn-show-join-hidden-room').click();
-
-            if ($(this).attr('data-password-protected') === 'true') {
-                $('#txt-room-password-hidden').parent().show();
-            }
-            else {
-                $('#txt-room-password-hidden').parent().hide();
-            }
-
-            $(tr).find('.join-room').prop('disabled', false);
-        });
-    });
-}
 $('#btn-open-create-room-modal').click(function(e) {
     checkCamAndMicExist();
 });
@@ -323,25 +254,3 @@ $('#chk-room-password').change(function () {
     $('#txt-room-password').parent().css('display', this.checked === true ? 'block' : 'none');
     $('#txt-room-password').focus();
 });
-
-var txtRoomId = document.getElementById('txt-roomid');
-
-txtRoomId.onkeyup = txtRoomId.onblur = txtRoomId.oninput = txtRoomId.onpaste = function () {
-    localStorage.setItem('canvas-designer-roomid', txtRoomId.value);
-};
-
-if (localStorage.getItem('canvas-designer-roomid')) {
-    txtRoomId.value = localStorage.getItem('canvas-designer-roomid');
-    $('#txt-roomid-hidden').val(txtRoomId.value);
-}
-
-var userFullName = document.getElementById('txt-user-name');
-
-userFullName.onkeyup = userFullName.onblur = userFullName.oninput = userFullName.onpaste = function () {
-    localStorage.setItem('canvas-designer-user-full-name', userFullName.value);
-};
-
-if (localStorage.getItem('canvas-designer-user-full-name')) {
-    userFullName.value = localStorage.getItem('canvas-designer-user-full-name');
-    $('#txt-user-name-hidden').val(userFullName.value);
-}
