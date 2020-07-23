@@ -1,5 +1,13 @@
 
 DayKor = ["월" , "화", "수", "목", "금", "토", "일"];
+DaySubject = [["사회" , "미술", "과학", "과학", "수학", "토", "일"],
+              ["과학" , "체육", "수학", "국어", "기가", "토", "일"],
+              ["영어" , "사회", "영어", "영어", "국어", "토", "일"],
+              ["국어" , "역사", "국어", "도덕", "도덕", "토", "일"],
+              ["진로" , "기주", "기가", "사회", "체육", "토", "일"],
+              ["수학" , "소주", "체육", "음악", "역사", "토", "일"],
+              ["" , "과주", "", "스클", "", "토", "일"]              
+              ];
 Colors = {};
 Colors.names = {
     aqua: "#00ffff",
@@ -77,14 +85,17 @@ function MakeTimeTable(id, time, day){
         var cell = row.insertCell(0);
         cell.innerHTML = i + "교시";
         cell.className = "time";
-
+        
         for(var z = 1 ; z <= day ; z++){
             var box = row.insertCell(z);
+            
             box.className = "class";
             box.dataset.id = DayKor[z-1] + "-" + i;
             box.setAttribute("onclick", 'ClickClass(\'' + DayKor[z-1] + i + '\')');
             ClassList[DayKor[z-1] + i] = {};
             ClassList[DayKor[z-1] + i].element = box;
+            //ClassList[DayKor[z-1] + i].element.innerHTML = "국어"
+            box.innerHTML = DaySubject[i-1][z-1];            
         }
     }
 }
