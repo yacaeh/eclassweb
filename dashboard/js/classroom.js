@@ -449,7 +449,7 @@ var stemp;
 
 // extra code
 connection.onstream = function (event) {
-  console.log('onstream!');
+  console.log('onstream!',event);
 
   if(params.open === 'true' || params.open === true){
     CanvasResize();
@@ -465,7 +465,7 @@ connection.onstream = function (event) {
       $(GetScreenViewer()).hide();
     }
   } 
-  else if (event.extra.roomOwner === true) {
+  else if (event.extra.roomOwner === true || connection.peers[event.userid].extra.roomOwner) {
     var video = GetMainVideo();
     video.setAttribute('data-streamid', event.streamid);
     if (event.type === 'local') {
@@ -474,33 +474,31 @@ connection.onstream = function (event) {
     }
 
     video.srcObject = event.stream;
-  } else {
+  } 
+  else if(event.stream.isVideo){
+    try{
+      if(event.streamid.includes("-") || !connection.extra.roomOwner){
+        return false;
+      }
 
-    if(event.stream.isVideo){
-      try{
-        if(event.streamid.includes("-") || !connection.extra.roomOwner){
-          return false;
-        }
+      event.mediaElement.controls = false;
+      event.mediaElement.style.width = "100%";
+      event.mediaElement.style.height = "100%";
+      event.mediaElement.style.pointerEvents = "none";
+      event.mediaElement.style.position = "absolute";
 
-        event.mediaElement.controls = false;
-        event.mediaElement.style.width = "100%";
-        event.mediaElement.style.height = "100%";
-        event.mediaElement.style.pointerEvents = "none";
-        event.mediaElement.style.position = "absolute";
-
-        var otherVideos = document.getElementById("student_list");
-        var childern = otherVideos.children;
-        for(var i =0 ; i< childern.length; i++){
-          var child = childern[i];
-          if(child.dataset.id == event.userid){
-            child.appendChild(event.mediaElement);
-            break;
-          }
+      var otherVideos = document.getElementById("student_list");
+      var childern = otherVideos.children;
+      for(var i =0 ; i< childern.length; i++){
+        var child = childern[i];
+        if(child.dataset.id == event.userid){
+          child.appendChild(event.mediaElement);
+          break;
         }
       }
-      catch{
-        console.log("No Cam")
-      }
+    }
+    catch{
+      console.log("No Cam")
     }
   }
 
