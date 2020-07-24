@@ -75,13 +75,6 @@ function CreateTopTooltip(data){
 }
 CreateTopTooltip(topButtonContents);
 
-SetCanvasBtn('screen_share', ScreenShare);
-SetCanvasBtn('3d_view', _3DCanvasOnOff);
-SetCanvasBtn('movie', Movie_Render_Button);
-SetCanvasBtn('file', LoadFile);
-SetCanvasBtn('epub', LoadEpub);
-SetCanvasBtn('callteacher', CallTeacher);
-SetCanvasBtn('homework', HomeworkSubmit);
 
 SetEpubNavigator();
 
@@ -399,7 +392,7 @@ connection.onmessage = function (event) {
   //동영상 공유
   if (event.data.MoiveURL) {
     console.log(event.data.MoiveURL);
-    ClearCanvas();
+    // ClearCanvas();
 
     var moveURL = event.data.MoiveURL;
     if (moveURL.type == 'YOUTUBE')
@@ -888,7 +881,16 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     );
   }
 
-  setTimeout(mobileHelper.Init(),1000);
+  
+SetCanvasBtn('screen_share', ScreenShare);
+SetCanvasBtn('3d_view', _3DCanvasOnOff);
+SetCanvasBtn('movie', Movie_Render_Button);
+SetCanvasBtn('file', LoadFile);
+SetCanvasBtn('epub', LoadEpub);
+SetCanvasBtn('callteacher', CallTeacher);
+SetCanvasBtn('homework', HomeworkSubmit);
+
+setTimeout(mobileHelper.Init(),1000);
 });
 
 function addStreamStopListener(stream, callback) {
@@ -1707,8 +1709,8 @@ function loadEpubViewer() {
   epubViewer.setAttribute('id', 'epub-viewer');
   epubViewer.setAttribute('class', 'spread');
 
-  if(isMobile)
-    epubViewer.style.width = "calc(100% - 52px)";
+  // if(isMobile)
+    // epubViewer.style.width = "calc(100% - 52px)";
 
     let frame = document
     .getElementById('widget-container')
@@ -1731,8 +1733,9 @@ function loadEpubViewer() {
   var rendition = book.renderTo(epubViewer, {
     // manager: 'paginated',
     flow: 'paginated',
-    width: '50%',
+    // width: '50%',
     height: "100%",
+    minSpreadWidth: '768px',
     snap: true
   });
 
@@ -1795,6 +1798,8 @@ else
   });
 
   rendition.on('relocated', function(locations) {    
+    console.log(locations);
+
     PointerSaver.save()
     PointerSaver.load(locations.start.index);
 
@@ -1808,9 +1813,9 @@ else
         page : locations.start.index
       });    
 
+      EpubPositionSetting();
   });
 
-  
 
   var keyListener = function (e) {
     // Left Key
@@ -1986,6 +1991,9 @@ function CanvasResize() {
     renderCanvas.width = x;
     renderCanvas.height = y;
   }
+
+  if(GetFrame().document.getElementById("epub-viewer"))
+  EpubPositionSetting()
 }
 
 document.getElementById('collapse').addEventListener('click', function () {
@@ -2139,7 +2147,7 @@ function ViewUploadList(btn){
 function getUploadFileList(extraPath){
   if(typeof extraPath === "undefined")
     extraPath = ""; 
-  $("#confirm-message .list-group-flush").remove();
+  // $("#confirm-message .list-group-flush").remove();
 
   var xhr = new XMLHttpRequest();
   var url = uploadServerUrl+'/list';
@@ -2156,6 +2164,8 @@ function getUploadFileList(extraPath){
 }
 
 function updateFileList(list, extraPath){
+  $("#confirm-message .list-group-flush").remove();
+
   var re = /(?:\.([^.]+))?$/;
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
@@ -2543,3 +2553,12 @@ function GetFrame(){
   return frame;
 }
 
+
+function EpubPositionSetting(){
+
+  var viewer = GetFrame().document.getElementById("epub-viewer");
+  var can = GetFrame().document.getElementById("main-canvas");
+  var wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0].getBoundingClientRect();
+  viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
+  console.log( (can.width * 0.5) - (wrapsize.width * 0.5));
+}
