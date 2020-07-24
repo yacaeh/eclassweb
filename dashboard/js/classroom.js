@@ -1707,8 +1707,8 @@ function loadEpubViewer() {
   epubViewer.setAttribute('id', 'epub-viewer');
   epubViewer.setAttribute('class', 'spread');
 
-  if(isMobile)
-    epubViewer.style.width = "calc(100% - 52px)";
+  // if(isMobile)
+    // epubViewer.style.width = "calc(100% - 52px)";
 
     let frame = document
     .getElementById('widget-container')
@@ -1731,8 +1731,9 @@ function loadEpubViewer() {
   var rendition = book.renderTo(epubViewer, {
     // manager: 'paginated',
     flow: 'paginated',
-    width: '50%',
+    // width: '50%',
     height: "100%",
+    minSpreadWidth: '768px',
     snap: true
   });
 
@@ -1795,6 +1796,8 @@ else
   });
 
   rendition.on('relocated', function(locations) {    
+    console.log(locations);
+
     PointerSaver.save()
     PointerSaver.load(locations.start.index);
 
@@ -1808,9 +1811,9 @@ else
         page : locations.start.index
       });    
 
+      EpubPositionSetting();
   });
 
-  
 
   var keyListener = function (e) {
     // Left Key
@@ -1986,6 +1989,9 @@ function CanvasResize() {
     renderCanvas.width = x;
     renderCanvas.height = y;
   }
+
+  if(GetFrame().document.getElementById("epub-viewer"))
+  EpubPositionSetting()
 }
 
 document.getElementById('collapse').addEventListener('click', function () {
@@ -2545,3 +2551,12 @@ function GetFrame(){
   return frame;
 }
 
+
+function EpubPositionSetting(){
+
+  var viewer = GetFrame().document.getElementById("epub-viewer");
+  var can = GetFrame().document.getElementById("main-canvas");
+  var wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0].getBoundingClientRect();
+  viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
+  console.log( (can.width * 0.5) - (wrapsize.width * 0.5));
+}
