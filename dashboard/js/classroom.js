@@ -75,13 +75,6 @@ function CreateTopTooltip(data){
 }
 CreateTopTooltip(topButtonContents);
 
-SetCanvasBtn('screen_share', ScreenShare);
-SetCanvasBtn('3d_view', _3DCanvasOnOff);
-SetCanvasBtn('movie', Movie_Render_Button);
-SetCanvasBtn('file', LoadFile);
-SetCanvasBtn('epub', LoadEpub);
-SetCanvasBtn('callteacher', CallTeacher);
-SetCanvasBtn('homework', HomeworkSubmit);
 
 SetEpubNavigator();
 
@@ -888,7 +881,16 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     );
   }
 
-  setTimeout(mobileHelper.Init(),1000);
+  
+SetCanvasBtn('screen_share', ScreenShare);
+SetCanvasBtn('3d_view', _3DCanvasOnOff);
+SetCanvasBtn('movie', Movie_Render_Button);
+SetCanvasBtn('file', LoadFile);
+SetCanvasBtn('epub', LoadEpub);
+SetCanvasBtn('callteacher', CallTeacher);
+SetCanvasBtn('homework', HomeworkSubmit);
+
+setTimeout(mobileHelper.Init(),1000);
 });
 
 function addStreamStopListener(stream, callback) {
