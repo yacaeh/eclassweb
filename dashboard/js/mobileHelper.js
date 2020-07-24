@@ -5,9 +5,7 @@ var isMobile = false;
 
 mobileHelper = {
     Init : function(){
-        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-        || !connection.extra.roomOwner
-        ) {
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             SetMobile();
         }
     },
