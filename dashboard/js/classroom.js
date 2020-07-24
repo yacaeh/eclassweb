@@ -399,7 +399,7 @@ connection.onmessage = function (event) {
   //동영상 공유
   if (event.data.MoiveURL) {
     console.log(event.data.MoiveURL);
-    ClearCanvas();
+    // ClearCanvas();
 
     var moveURL = event.data.MoiveURL;
     if (moveURL.type == 'YOUTUBE')
@@ -2139,7 +2139,7 @@ function ViewUploadList(btn){
 function getUploadFileList(extraPath){
   if(typeof extraPath === "undefined")
     extraPath = ""; 
-  $("#confirm-message .list-group-flush").remove();
+  // $("#confirm-message .list-group-flush").remove();
 
   var xhr = new XMLHttpRequest();
   var url = uploadServerUrl+'/list';
@@ -2156,6 +2156,8 @@ function getUploadFileList(extraPath){
 }
 
 function updateFileList(list, extraPath){
+  $("#confirm-message .list-group-flush").remove();
+
   var re = /(?:\.([^.]+))?$/;
   var listElement = '<ul class="list-group-flush">';
   list.files.forEach(file => {
