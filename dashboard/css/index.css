@@ -463,15 +463,23 @@ form .form-control:placeholder {
 
 #time_table{
   position: absolute;
+  top: 70px;
   color: black;
   background: white;
-  left: calc(50% - 400px);
-  top: 8%;
   text-align: center;
   font-family: roboto;
   font-weight: 800;
   border-radius: 8px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.11), 0 2px 2px rgba(0, 0, 0, 0.11), 0 4px 4px rgba(0, 0, 0, 0.11), 0 8px 8px rgba(0, 0, 0, 0.11), 0 16px 16px rgba(0, 0, 0, 0.11), 0 32px 32px rgba(0, 0, 0, 0.11);
+}
+
+.wrap{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-content: center;
+  vertical-align: middle;
 }
 
 .day{
@@ -484,8 +492,8 @@ form .form-control:placeholder {
 }
 
 .class{
-  width: 150px;
-  height: 125px;
+  width: 80px;
+  height: 80px;
   border: solid 1px rgba(0,0,0,0.2);
 }
 
@@ -496,12 +504,13 @@ form .form-control:placeholder {
 
 #user-name{
   position: absolute;
-  top: 50%;
-  left: 10%;
+  top: 15px;
+  left: calc(50% - 50px);
   border-radius: 8px;
   font-family: roboto;
   font-weight: 800;
   font-size: 16px;
   padding-left: 10px;
   width: 100px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.11), 0 2px 2px rgba(0, 0, 0, 0.11), 0 4px 4px rgba(0, 0, 0, 0.11), 0 8px 8px rgba(0, 0, 0, 0.11), 0 16px 16px rgba(0, 0, 0, 0.11), 0 32px 32px rgba(0, 0, 0, 0.11);
 }
