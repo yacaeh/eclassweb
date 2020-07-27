@@ -12,37 +12,6 @@
   window.params = params;
 })();
 
-let uploadServerUrl = "https://files.primom.co.kr:1443";
-var conversationPanel = document.getElementById('conversation-panel');
-
-var connection = new RTCMultiConnection();
-console.log('Connection!');
-
-// function printHarryPotter(){ console.log("Harry Potter!"); }
-// function printDawnOfDead(){ console.log("Dawn Of Dead!"); }
-// module.exports.HarryPotter = printHarryPotter;
-// module.exports.DawnOfDead = printDawnOfDead;​
-
-window._points = {};
-
-connection.socketURL = '/';
-// connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
-
-connection.extra.userFullName = params.userFullName;
-
-/// make this room public
-connection.publicRoomIdentifier = params.publicRoomIdentifier;
-
-connection.socketMessageEvent = 'canvas-dashboard-demo';
-
-// keep room opened even if owner leaves
-connection.autoCloseEntireSession = false;
-
-// https://www.rtcmulticonnection.org/docs/maxParticipantsAllowed/
-connection.maxParticipantsAllowed = 1000;
-// set value 2 for one-to-one connection
-// connection.maxParticipantsAllowed = 2;
-
 var topButtonContents = {
   top_all_controll : "전체 제어",
   top_test         : "시험",
@@ -52,84 +21,19 @@ var topButtonContents = {
   top_save_alert   : "알림 기록 저장",
   top_record_video : "화면 녹화"
 }
+let uploadServerUrl = "https://files.primom.co.kr:1443";
+var conversationPanel = document.getElementById('conversation-panel');
 
-function CreateTopTooltip(data){
-  Object.keys(data).forEach(function(id){
-    var element = document.getElementById(id);
-      element.addEventListener("mouseover" ,function(e){
-      document.getElementById("toptooltip").style.display = 'block';
+//=============================================================================================
 
-      var tooltip = document.getElementById("toptooltip")
-      tooltip.children[0].innerHTML  = data[id];
-      var x = e.target.x;
-      var width = tooltip.getBoundingClientRect().width / 2;
-      tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width /2) - width  + "px";
-        
-      element.addEventListener("mouseleave", function(){
-        document.getElementById("toptooltip").style.display = 'none';
-
-      })
-    
-    })
-  });
-}
-CreateTopTooltip(topButtonContents);
-
-
-SetEpubNavigator();
-
-var isSharingScreen = false;
-var isSharing3D = false;
-var isSharingMovie = false;
-var isSharingFile = false;
-var isSharingEpub = false;
-let isFileViewer = false;
-let extraPath = '';
-let currentPdfPage = 0;
-
-function checkSharing() {
-  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
-}
-
-function removeOnSelect(btn) {
-  alert('동시에 여러 기능을 공유할 수 없습니다');
-  $(btn).removeClass('on');
-  $(btn).removeClass('selected-shape');
-}
-
-function _3DCanvasOnOff(btn) {
-  if (!isSharing3D && checkSharing()) {
-    removeOnSelect(btn);
-    return;
-  }
-
-  var visible = $(btn).hasClass('on');
-  console.log(visible);
-  
-  ClearCanvas();
-  if (params.open == 'true') {
-    const isViewer = classroomInfo.share3D.state;
-    if (false == isViewer) {
-      isSharing3D = true;
-      //modelEnable(send=true);
-      setShared3DStateServer (true);
-    }
-    else
-    {
-      isSharing3D = false;
-      setShared3DStateServer (false);
-      // remove3DCanvas();                
-      // connection.send({
-      //     modelDisable : true
-      // });
-    }          
-  }
-}
-
-
-
-// here goes RTCMultiConnection
-
+var connection = new RTCMultiConnection();
+console.log('Connection!');
+connection.socketURL = '/';
+connection.extra.userFullName = params.userFullName;
+connection.publicRoomIdentifier = params.publicRoomIdentifier;
+connection.socketMessageEvent = 'canvas-dashboard-demo';
+connection.autoCloseEntireSession = false;
+connection.maxParticipantsAllowed = 1000;
 connection.chunkSize = 16000;
 connection.enableFileSharing = true;
 
@@ -139,6 +43,7 @@ connection.session = {
   data: true,
   screen: false,
 };
+
 connection.sdpConstraints.mandatory = {
   OfferToReceiveAudio: false,
   OfferToReceiveVideo: false,
@@ -157,9 +62,6 @@ connection.onUserStatusChanged = function (event) {
   }
 
 };
-
-
-
 
 connection.onopen = function (event) {
   console.log('onopen!');
@@ -438,9 +340,6 @@ connection.onmessage = function (event) {
   }
 };
 
-var stemp;
-
-// extra code
 connection.onstream = function (event) {
   console.log('onstream!',event);
 
@@ -511,12 +410,10 @@ connection.onstream = function (event) {
 
 connection.setUserPreferences = function (userPreferences) {
   if (connection.dontAttachStream) {
-    // current user's streams will NEVER be shared with any other user
     userPreferences.dontAttachLocalStream = true;
   }
 
   if (connection.dontGetRemoteStream) {
-    // current user will NEVER receive any stream from any other user
     userPreferences.dontGetRemoteStream = true;
   }
 
@@ -555,8 +452,54 @@ connection.onstreamended = function (event) {
 
 };
 
+PermissionButtonSetting();
+CreateTopTooltip(topButtonContents);
+SetEpubNavigator();
 
-function appendChatMessage(event, checkmark_id) {
+var isSharingScreen = false;
+var isSharing3D = false;
+var isSharingMovie = false;
+var isSharingFile = false;
+var isSharingEpub = false;
+let isFileViewer = false;
+let extraPath = '';
+let currentPdfPage = 0;
+
+function checkSharing() {
+  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
+}
+
+function removeOnSelect(btn) {
+  alert('동시에 여러 기능을 공유할 수 없습니다');
+  $(btn).removeClass('on');
+  $(btn).removeClass('selected-shape');
+}
+
+function _3DCanvasOnOff(btn) {
+  if (!isSharing3D && checkSharing()) {
+    removeOnSelect(btn);
+    return;
+  }
+
+  var visible = $(btn).hasClass('on');
+  
+  ClearCanvas();
+  if (params.open == 'true') {
+    const isViewer = classroomInfo.share3D.state;
+    if (false == isViewer) {
+      isSharing3D = true;
+      setShared3DStateServer (true);
+    }
+    else
+    {
+      isSharing3D = false;
+      setShared3DStateServer (false);
+    }          
+  }
+}
+
+
+function appendChatMessage(event) {
   var div = document.createElement('div');
 
   div.className = 'message';
@@ -656,7 +599,7 @@ window.onkeyup = function (e) {
     $('.emojionearea-editor').html('');
     if (!chatMessage || !chatMessage.replace(/ /g, '').length) return;
     var checkmark_id = connection.userid + connection.token();
-    appendChatMessage(chatMessage, checkmark_id);
+    appendChatMessage(chatMessage);
     connection.send({
       chatMessage: chatMessage,
       checkmark_id: checkmark_id,
@@ -880,17 +823,16 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       }
     );
   }
-
   
-SetCanvasBtn('screen_share', ScreenShare);
-SetCanvasBtn('3d_view', _3DCanvasOnOff);
-SetCanvasBtn('movie', Movie_Render_Button);
-SetCanvasBtn('file', LoadFile);
-SetCanvasBtn('epub', LoadEpub);
-SetCanvasBtn('callteacher', CallTeacher);
-SetCanvasBtn('homework', HomeworkSubmit);
-
-setTimeout(mobileHelper.Init(),1000);
+  SetCanvasBtn('screen_share', ScreenShare);
+  SetCanvasBtn('3d_view', _3DCanvasOnOff);
+  SetCanvasBtn('movie', Movie_Render_Button);
+  SetCanvasBtn('file', LoadFile);
+  SetCanvasBtn('epub', LoadEpub);
+  SetCanvasBtn('callteacher', CallTeacher);
+  SetCanvasBtn('homework', HomeworkSubmit);
+  // BabylonInit();
+  setTimeout(mobileHelper.Init(),1000);
 });
 
 function addStreamStopListener(stream, callback) {
@@ -1712,9 +1654,7 @@ function loadEpubViewer() {
   // if(isMobile)
     // epubViewer.style.width = "calc(100% - 52px)";
 
-    let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
+    let frame = GetFrame();
 
   frame.document
     .getElementsByClassName('design-surface')[0]
@@ -1856,9 +1796,7 @@ function unloadEpubViewer() {
 
   renditionBuffer = null;
 
-  let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
+  let frame = GetFrame();
   frame.document.getElementById('main-canvas').style.zIndex = '1';
   frame.document.getElementById('temp-canvas').style.zIndex = '2';
   frame.document.getElementById('tool-box').style.zIndex = '3';
@@ -1975,9 +1913,7 @@ function resizeend() {
 }
 
 function CanvasResize() {
-  var frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
+  var frame = GetFrame();
     
   var canvas = frame.document.getElementById('main-canvas');
   var r = document.getElementsByClassName('lwindow')[0];
@@ -2389,10 +2325,6 @@ function loadFileInput(){
 var isFocused = true;
 var isIframeFocused = false;
 
-let widgetIframe = document
-.getElementById('widget-container')
-.getElementsByTagName('iframe')[0].contentWindow;
-
 
 function sendFocus(state){
   if(!connection.extra.roomOwner){
@@ -2422,7 +2354,7 @@ function focusCheck(e){
   }
 }
 
-$(widgetIframe).on("blur focus", focusCheck);
+$(GetFrame()).on("blur focus", focusCheck);
 $(window).on("blur focus", focusCheck);
 
 
@@ -2454,22 +2386,18 @@ function syncWithTeacher(){
   console.log("Sync!");
 }
 
-PermissionButtonSetting();
-
 
 // Save classinfo on user exit
 function saveClassInfo(){
-console.log();
-localStorage.setItem('sessionid', params.sessionid);
-localStorage.setItem('points', params.sessionid);
-localStorage.setItem('currentPage', currentPdfPage);
-localStorage.setItem('isSharingScreen', isSharingScreen);
-localStorage.setItem('isSharing3D', isSharing3D);
-localStorage.setItem('isSharingMovie', isSharingMovie);
-localStorage.setItem('isSharingFile', isSharingFile);
-localStorage.setItem('isSharingEpub', isSharingEpub);
-localStorage.setItem('isFileViewer', isFileViewer);
-
+  localStorage.setItem('sessionid', params.sessionid);
+  localStorage.setItem('points', params.sessionid);
+  localStorage.setItem('currentPage', currentPdfPage);
+  localStorage.setItem('isSharingScreen', isSharingScreen);
+  localStorage.setItem('isSharing3D', isSharing3D);
+  localStorage.setItem('isSharingMovie', isSharingMovie);
+  localStorage.setItem('isSharingFile', isSharingFile);
+  localStorage.setItem('isSharingEpub', isSharingEpub);
+  localStorage.setItem('isFileViewer', isFileViewer);
 }
 
 function loadClassInfo(){
@@ -2480,7 +2408,6 @@ function loadClassInfo(){
   localStorage.getItem('isSharingFile', isSharingFile);
   localStorage.getItem('isSharingEpub', isSharingEpub);
   localStorage.getItem('isFileViewer', isFileViewer);
-  
 }
 
 function removeClassInfo(){
@@ -2511,6 +2438,7 @@ function GetMainVideo(){
 $(document).ready(function(){
 })
 
+
 function GetFrame(){
   let frame = document
   .getElementById('widget-container')
@@ -2518,12 +2446,31 @@ function GetFrame(){
   return frame;
 }
 
-
+// 창 크기가 바뀔 때 E-pub 의 크기를 조정한다
 function EpubPositionSetting(){
-
   var viewer = GetFrame().document.getElementById("epub-viewer");
   var can = GetFrame().document.getElementById("main-canvas");
   var wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0].getBoundingClientRect();
   viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
   console.log( (can.width * 0.5) - (wrapsize.width * 0.5));
+}
+
+// 상단 메뉴에 마우스 호버시 도움말을 띄운다 
+function CreateTopTooltip(data){
+  Object.keys(data).forEach(function(id){
+    var element = document.getElementById(id);
+      element.addEventListener("mouseover" ,function(e){
+      document.getElementById("toptooltip").style.display = 'block';
+
+      var tooltip = document.getElementById("toptooltip")
+      tooltip.children[0].innerHTML  = data[id];
+      var x = e.target.x;
+      var width = tooltip.getBoundingClientRect().width / 2;
+      tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width /2) - width  + "px";
+        
+      element.addEventListener("mouseleave", function(){
+        document.getElementById("toptooltip").style.display = 'none';
+      })
+    })
+  });
 }
