@@ -40,20 +40,6 @@ var createScene = function (_canvas) {
 
 
 
-    function SendStateData(_position, _rotation)
-    {
-        if(params.open == "true")
-        {            
-            updateShared3DData (_position, _rotation);
-            connection.send({
-                ModelState : {
-                    position : _position,
-                    rotation : _rotation
-                }
-            });
-        }
-    }
-
 
     engine.runRenderLoop(function () {
         scene.render();
@@ -126,6 +112,22 @@ function engineInit(canvas){
     engine.doNotHandleContextLost = true;
     scene = new BABYLON.Scene(engine);
     light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
+
+    function SendStateData(_position, _rotation)
+    {
+        if(params.open == "true")
+        {            
+            updateShared3DData (_position, _rotation);
+            connection.send({
+                ModelState : {
+                    position : _position,
+                    rotation : _rotation
+                }
+            });
+        }
+    }
+
+
 
     scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
