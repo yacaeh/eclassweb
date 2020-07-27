@@ -156,7 +156,7 @@ function engineInit(canvas){
 
 function remove3DCanvas(){
     scene.removeMesh(mesh);
-    scene.meshes[0].dispose()
+    scene.meshes.forEach(element => element.dispose());
     // console.log(scene.meshes);
     // console.log(scene.onPointerObservable);
     // console.log(scene.rootNodes);
