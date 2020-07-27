@@ -2413,57 +2413,22 @@ function sendFocus(state){
   }
 }
 
-$(widgetIframe).on("blur focus", function(e){
-  var prevType = $(this).data("prevType");
-
-  if (prevType != e.type) {   //  reduce double fire issues
-      switch (e.type) {
-        case "blur":
-          isIframeFocused = false;
-          setTimeout(function(){
-            if(!isFocused && !isIframeFocused){
-              sendFocus(false);  
-            }
-            else{
-              sendFocus(true);
-            }  
-          },100);
-          break;
-        case "focus":
-          isIframeFocused = true;
-          sendFocus(true);
-          break;
-      }
-    }
-
-  $(this).data("prevType", e.type);
-
-})
-
-$(window).on("blur focus", function(e) {
-  var prevType = $(this).data("prevType");
-
-  if (prevType != e.type) {   //  reduce double fire issues
-      switch (e.type) {
-          case "blur":
-            isFocused = false;
-            console.log("blur");
-            if(document.activeElement !== frame){
-            }
-            else{
-              isFocused = true;
-              sendFocus(true);
-            }
-            break;
-          case "focus":
-            isFocused = true;
-            sendFocus(true);
-            break;
-      }
+var checkInterval = undefined;
+function focusCheck(e){
+  if(e.type == "blur"){
+    checkInterval = setTimeout(function(){
+      sendFocus(false);
+    }, 100);
   }
+  else if (e.type == "focus"){
+    sendFocus(true);
+    clearTimeout(checkInterval);
+  }
+}
 
-  $(this).data("prevType", e.type);
-})
+$(widgetIframe).on("blur focus", focusCheck);
+$(window).on("blur focus", focusCheck);
+
 
 document.getElementById("top_save_alert").addEventListener('click' ,function(){
    if(!attentionObj.exportAttention())
