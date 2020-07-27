@@ -399,7 +399,11 @@ connection.onmessage = function (event) {
       embedYoutubeContent(moveURL.enable, moveURL.url, false);
     else if (moveURL.type == 'VIDEO')
       VideoEdunetContent(moveURL.enable, moveURL.url, false);
-    else iframeEdunetContent(moveURL.enable, moveURL.url, false);
+    else if (moveURL.type == 'GOOGLE_DOC_PRESENTATION') 
+      iframeGoogleDoc_Presentation(moveURL.enable, moveURL.url, false);
+    else
+      iframeEdunetContent(moveURL.enable, moveURL.url, false);
+
     return;
   }
 
