@@ -205,6 +205,8 @@ function PDFViewerPlugin() {
         textLayerDiv.className = 'textLayer';
         textLayerDiv.id        = 'textLayer' + pageNumber;
 
+
+
         domPage.appendChild(canvas);
         domPage.appendChild(textLayerDiv);
 
@@ -240,6 +242,25 @@ function PDFViewerPlugin() {
         if ( createdPageCount === (pdfDocument.numPages) ) {
             completeLoading();
         }
+
+
+        
+        var thumblist = window.parent.parent.document.getElementById("thumbnail-list");
+        var thumbnail = canvas.cloneNode(true);  
+        thumbnail.className = "thumbnail";
+        thumblist.appendChild(thumbnail);
+        page.render({
+            canvasContext: thumbnail.getContext('2d'),
+            viewport:      page.getViewport(1)
+        }).promise.then(function () {
+            if ( getRenderingStatus(page) === RENDERING.RUNNINGOUTDATED ) {
+                // setRenderingStatus(page, RENDERING.BLANK);
+                ensurePageRendered(page);
+            }
+        });
+
+
+
     }
 
     function passwordCallback( providePassword, reasonCode ) {
