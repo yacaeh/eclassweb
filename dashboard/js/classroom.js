@@ -1580,7 +1580,7 @@ function loadEpubViewer() {
     epubViewer.setAttribute('class', 'spread');
   
   let loadingWindow = document.createElement("div");
-  
+  loadingWindow.setAttribute('id', 'loading-window');
   let loadingIcon = document.createElement("img");
   loadingIcon.src = "/dashboard/img/loading.gif";
   loadingIcon.className = "loading";
@@ -1706,6 +1706,8 @@ function unloadEpubViewer() {
 
   let epubViewer = frame.document.getElementById('epub-viewer');
   epubViewer.remove();
+  let loadingwindow = frame.document.getElementById('loading-window');
+  loadingwindow.remove();
 }
 
 
