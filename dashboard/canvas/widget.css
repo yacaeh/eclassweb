@@ -894,3 +894,12 @@ background: rgb(204,204,204,0) !important;
     position: absolute;
     left: 50px;
 }
+
+.loading{
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    z-index: 0;
+    left: calc(50% - 20px);
+    top: calc(50% - 20px);
+}

@@ -286,8 +286,7 @@ function Viewer( viewerPlugin, parameters ) {
      */
     this.showNextPage = function () {
         if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
-            window.top.showNextPage();
-        self.showPage(parseInt(currentPage) + 1);
+            self.showPage(parseInt(currentPage) + 1);
     };
 
     /**
@@ -296,8 +295,7 @@ function Viewer( viewerPlugin, parameters ) {
      */
     this.showPreviousPage = function () {
         if(window.top.connection.extra.roomOwner || !window.top.classroomInfo.allControl) 
-            window.top.showPreviousPage();
-        self.showPage(parseInt(currentPage) - 1);
+            self.showPage(parseInt(currentPage) - 1);
     };
 
     /**

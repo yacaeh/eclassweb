@@ -245,10 +245,8 @@ function PDFViewerPlugin() {
 
 
         
-        var thumblist = window.parent.parent.document.getElementById("thumbnail-list");
         var thumbnail = canvas.cloneNode(true);  
-        thumbnail.className = "thumbnail";
-        thumblist.appendChild(thumbnail);
+        thumbnail.style.width = "100%"
         page.render({
             canvasContext: thumbnail.getContext('2d'),
             viewport:      page.getViewport(1)
@@ -258,9 +256,12 @@ function PDFViewerPlugin() {
                 ensurePageRendered(page);
             }
         });
-
-
-
+        
+        window.parent.parent.PageNavigator.push(thumbnail, function(){
+            var idx = (this.getAttribute("idx") * 1) + 1;
+            self.showPage(idx)
+            window.parent.parent.showPage(idx);
+        })
     }
 
     function passwordCallback( providePassword, reasonCode ) {
@@ -298,6 +299,8 @@ function PDFViewerPlugin() {
                 for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
                     pdfDocument.getPage(i + 1).then(createPage);
                 }
+                window.parent.parent.PageNavigator.set(pdfDocument.numPages);
+                window.parent.parent.PageNavigator.pdfsetting();
             });
         });
     };

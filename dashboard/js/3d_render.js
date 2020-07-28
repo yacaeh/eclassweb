@@ -4,17 +4,13 @@ var engine;
 var scene;
 var interval;
 var mesh;
-var meshes = [];
 var light;
 var camera;
 
 /******* Add the create scene function ******/
 var createScene = function (_canvas) {
-    let canvas = _canvas; // Get the canvas element
-
 
     // Add a camera to the scene and attach it to the canvas
-
     // Add lights to the scene
 
     mesh = BABYLON.SceneLoader.ImportMesh("","./assets/models/scenes/", "skull.babylon", scene, function (newMeshes, particleSystems, skeletons) {
@@ -22,7 +18,6 @@ var createScene = function (_canvas) {
         newPosition = camera.position;
         newRotation = camera.absoluteRotation;
     });
-    meshes.push(mesh);
 
     scene.registerBeforeRender(function () {
         light.position = camera.position;
@@ -37,9 +32,6 @@ var createScene = function (_canvas) {
                 camera.absoluteRotation = new BABYLON.Vector3.Lerp(camera.absoluteRotation,newRotation,0.2);
         }
     }, 10);
-
-
-
 
     engine.runRenderLoop(function () {
         scene.render();
@@ -126,8 +118,6 @@ function engineInit(canvas){
             });
         }
     }
-
-
 
     scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
