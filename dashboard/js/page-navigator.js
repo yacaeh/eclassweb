@@ -106,12 +106,12 @@ PageNavigator = {
       
         document.getElementById("epub-collapse").addEventListener('click', function(){
           if(this.classList.contains("closed")){
-            $(this.obj).animate({"height": "95%"});
+            $(self.obj).animate({"height": "95%"});
             this.classList.remove("closed")
             this.style.transform = "rotate(-90deg)";
           }
           else{
-            $(this.obj).animate({"height": "93px"});
+            $(self.obj).animate({"height": "93px"});
             this.classList.add("closed")
             this.style.transform = "rotate(90deg)";
           }
