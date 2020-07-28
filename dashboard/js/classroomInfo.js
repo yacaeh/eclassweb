@@ -395,9 +395,6 @@ classroomCommand.syncViewer = function () {
     mfileViewer.syncViewer ();
 }
 
-
-
-
 /*
     Epub
 */

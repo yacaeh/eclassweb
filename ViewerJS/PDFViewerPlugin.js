@@ -205,6 +205,8 @@ function PDFViewerPlugin() {
         textLayerDiv.className = 'textLayer';
         textLayerDiv.id        = 'textLayer' + pageNumber;
 
+
+
         domPage.appendChild(canvas);
         domPage.appendChild(textLayerDiv);
 
@@ -240,6 +242,26 @@ function PDFViewerPlugin() {
         if ( createdPageCount === (pdfDocument.numPages) ) {
             completeLoading();
         }
+
+
+        
+        var thumbnail = canvas.cloneNode(true);  
+        thumbnail.style.width = "100%"
+        page.render({
+            canvasContext: thumbnail.getContext('2d'),
+            viewport:      page.getViewport(1)
+        }).promise.then(function () {
+            if ( getRenderingStatus(page) === RENDERING.RUNNINGOUTDATED ) {
+                // setRenderingStatus(page, RENDERING.BLANK);
+                ensurePageRendered(page);
+            }
+        });
+        
+        window.parent.parent.PageNavigator.push(thumbnail, function(){
+            var idx = (this.getAttribute("idx") * 1) + 1;
+            self.showPage(idx)
+            window.parent.parent.showPage(idx);
+        })
     }
 
     function passwordCallback( providePassword, reasonCode ) {
@@ -277,6 +299,8 @@ function PDFViewerPlugin() {
                 for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
                     pdfDocument.getPage(i + 1).then(createPage);
                 }
+                window.parent.parent.PageNavigator.set(pdfDocument.numPages);
+                window.parent.parent.PageNavigator.pdfsetting();
             });
         });
     };
