@@ -12,7 +12,8 @@ ClassList = {};
 ActiveClassList = [];
 
 
-// MakeTimeTable("time_table", 7, 5);
+if(ver_time_table)
+MakeTimeTable("time_table", 7, 5);
 
 function MakeTimeTable(id, time, day){
     var table = document.getElementById(id);

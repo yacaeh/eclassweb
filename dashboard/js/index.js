@@ -1,3 +1,13 @@
+var ver_time_table = false;
+
+if(ver_time_table){
+    document.getElementById("login_form").parentElement.removeChild(document.getElementById("login_form"));
+}
+else{
+    document.getElementById("time_table").parentElement.removeChild(document.getElementById("time_table"));
+    document.getElementById("user-name").parentElement.removeChild(document.getElementById("user-name"));
+}
+
 // this object is used to get uniquie rooms based on this demo
 // i.e. only those rooms that are created on this page
 var publicRoomIdentifier = 'dashboard';
@@ -87,8 +97,9 @@ function checkCamAndMicExist(){
 
 
 function looper() {
+    if(ver_time_table)
     connection.socket.emit('get-public-rooms', publicRoomIdentifier, function (listOfRooms) {
-        // ActiveClass(listOfRooms);
+        ActiveClass(listOfRooms);
         setTimeout(looper, 1000);
     });
 }
