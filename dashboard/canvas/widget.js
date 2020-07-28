@@ -9,6 +9,8 @@
 
 (function() {
 
+
+
     var teacherPoints = [];
     var studentPoints = [];
 
@@ -2673,6 +2675,21 @@ function canvasresize(id){
     }
 
 
+
+    setTimeout(function(){
+        var sendCanvas = setInterval(function(){
+            if(window.parent.connection.extra.roomOwner)
+                clearInterval(sendCanvas);
+                
+            var context = document.getElementById('main-canvas').toDataURL();
+            window.parent.connection.send({
+                canvassend : true,
+                canvas : context
+            })
+        }, 1000)        
+    },5000    )
+
+        
 })();
 
 // -----------------------------------------------------------------------
@@ -2831,3 +2848,5 @@ function SliderSetting(element, targetinput, defaultv, callback){
 function handleDragDropEvent(oEvent) {
     oEvent.preventDefault();
   }
+
+

@@ -65,6 +65,10 @@
 <body ondragstart="return false" style="height: 1080px;">
 <a id="downloadLink" type="video/webm" style="display: none"></a>
 
+  <div style="display: none;" class="shadow-4" id="bigcanvas">
+    <img style="width: 100%; height: 100%;" id="bigcanvas-img">
+  </div>
+
   <div id="toptooltip">
     <span class="text"></span>
     <span class="sq"> </span>
@@ -218,6 +222,8 @@
         
         <div class="lwindow">
           <span class="nos">
+            <span id="showcam" >캠</span>
+            <span id="showcanvas">판서</span>
             <span class="now_selected_student">
               <!-- <span class="name">지이잉</span> -->
               <!-- <span class="status_img"></span> -->
@@ -236,6 +242,7 @@
                 </span>
                 
               <div class="for_teacher" style="display: none;">
+
                 <div id="student_list">
             </div>
             </div>

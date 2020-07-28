@@ -625,7 +625,7 @@ hr {
   background: #ffffff;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
-  z-index: 100;
+  z-index: 1000000;
 }
 
 .student-menu > .line1 {
@@ -879,7 +879,7 @@ hr {
 }
 
 .student {
-  background-color: rgb(55, 55, 55);
+  background-color: rgb(255, 255, 255);
   display: inline-block;
   margin: 1px;
   cursor: pointer;
@@ -1719,4 +1719,19 @@ body:fullscreen {
   color: #fff;
   background-color: #18DBBE;
   border-color: #18DBBE;
+}
+
+#showcam, #showcanvas {
+  z-index:  100;
+}
+
+#bigcanvas{
+  width: calc(16px * 30);
+  height: calc(9px * 30);
+  background-color: white;
+  border: solid;
+  position: absolute;
+  right: 19%;
+  top: 20%;
+  z-index: 10000;
 }
