@@ -12,7 +12,7 @@ ClassList = {};
 ActiveClassList = [];
 
 
-MakeTimeTable("time_table", 7, 5);
+// MakeTimeTable("time_table", 7, 5);
 
 function MakeTimeTable(id, time, day){
     var table = document.getElementById(id);
@@ -45,7 +45,6 @@ function MakeTimeTable(id, time, day){
         }
     }
 }
-
 
 function ClickClass(roomid){
     var fullName = $('#user-name').val().toString();
@@ -103,8 +102,6 @@ function ActiveClass(rooms){
     })
 }
 
-  
-
 var Color = function(hue, sat, light) {
     // Settings
     // Play with these to change the types of colors generated
@@ -132,8 +129,8 @@ var Color = function(hue, sat, light) {
 
     this.hsl = 'hsl(' + this.hue + ', ' + this.sat + '%, ' + this.light + '%)';
     return this.hsl;
-  };
+};
 
-  var randomNum = function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
+var randomNum = function(min, max) {
+return Math.floor(Math.random() * (max - min + 1)) + min;
+};
