@@ -173,6 +173,25 @@ connection.onmessage = function (event) {
   // 학생 접속시 싱크
   if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect !");
+
+    var context = GetFrame().document.getElementById('main-canvas').toDataURL();
+    connection.send({
+        canvassend : true,
+        canvas : context
+    })
+    
+    var sendCanvas = setInterval(function(){
+      if(connection.extra.roomOwner)
+          clearInterval(sendCanvas);
+          
+      var context = GetFrame().document.getElementById('main-canvas').toDataURL();
+      connection.send({
+          canvassend : true,
+          canvas : context
+      })
+  }, 1000)        
+
+
     designer.sync();
     return;
   }
@@ -1055,8 +1074,8 @@ function SetTeacher(){
   document.getElementById("showcam").addEventListener("click" ,function(){
     var childern = document.getElementById("student_list").children;
     for(var i = 0 ; i < childern.length; i++){
-      var child = childern[i].getElementsByTagName("video")[0];
-      child.style.display = "block";
+      childern[i].getElementsByTagName("video")[0].style.display = 'block';
+      childern[i].getElementsByTagName("img")[0].style.display = 'none';
     }
     classroomInfoLocal.showcanvas = false;
   })
@@ -1064,8 +1083,8 @@ function SetTeacher(){
   document.getElementById("showcanvas").addEventListener("click" ,function(){
     var childern = document.getElementById("student_list").children;
     for(var i = 0 ; i < childern.length; i++){
-      var child = childern[i].getElementsByTagName("video")[0];
-      child.style.display = "none";
+      childern[i].getElementsByTagName("video")[0].style.display = 'none';
+      childern[i].getElementsByTagName("img")[0].style.display = 'block';
     }
     classroomInfoLocal.showcanvas = true;
   })
@@ -1111,6 +1130,10 @@ function SetStudentList(event, isJoin) {
 
   if(isJoin){
     var img = document.createElement("img");
+
+    if(!classroomInfo.showcanvas)
+      img.style.display = 'none';
+      
     canvas_array[id] = img;
 
     console.log("JOIN ROOM", id, name);
@@ -1127,7 +1150,6 @@ function SetStudentList(event, isJoin) {
     div[0].addEventListener("mouseover",function(){
       document.getElementById("bigcanvas").style.display = "block";
       document.getElementById("bigcanvas-img").src = canvas_array[id].src;
-
       interval = setInterval(function(){
         document.getElementById("bigcanvas-img").src = canvas_array[id].src;
       },1000);

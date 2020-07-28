@@ -1723,6 +1723,9 @@ body:fullscreen {
 
 #showcam, #showcanvas {
   z-index:  100;
+  border-radius: 8px;
+  font-family: roboto;
+  font-weight: 800;
 }
 
 #bigcanvas{
