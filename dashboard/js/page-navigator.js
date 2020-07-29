@@ -149,6 +149,7 @@ PageNavigator = {
       document.getElementById("epubidx").value = idx + 1;
     },
     removethumbnail : function(){
+      this.idx = 0;
       while(this.list.children.length){
         this.list.removeChild(this.list.children[0]);
       }
