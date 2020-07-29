@@ -1603,9 +1603,6 @@ function loadFileViewer(url) {
 // 로딩이 다 된 후에 페이지 동기화
 function pdfOnLoaded () {
   console.log("PDF ON");
-  PageNavigator.on();
-  PageNavigator.pdfsetting();
-  PageNavigator.select(0);
 
   classroomCommand.onViewerLoaded ();
 }
