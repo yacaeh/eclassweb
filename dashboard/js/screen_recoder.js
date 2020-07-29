@@ -156,7 +156,7 @@ var screen_recorder = new sc();
 
 
 function ScreenShare(btn) {
-  if (!isSharingScreen && checkSharing()) {
+  if (!classroomInfo.shareScreen.state && checkSharing()) {
     removeOnSelect(btn);
     return;
   }

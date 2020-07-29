@@ -248,6 +248,9 @@ connection.onmessage = function (event) {
 
   if(event.data.viewer) {
     console.log(event.data)
+    if(event.data.viewer.cmd == "close"){
+      PageNavigator.off();
+    }
 
     ClearCanvas();
     ClearStudentCanvas();
@@ -272,7 +275,6 @@ connection.onmessage = function (event) {
     ClearCanvas();
     var enable = event.data.modelEnable.enable;
     setShared3DStateLocal (enable);
-    //modelEnable(false);
     return;
   }
 
@@ -283,7 +285,6 @@ connection.onmessage = function (event) {
 
   //3d 모델링 상대값
   if (event.data.ModelState) {
-    //console.log(event.data.ModelState);
     set3DModelStateData(
       event.data.ModelState.position,
       event.data.ModelState.rotation
@@ -295,6 +296,7 @@ connection.onmessage = function (event) {
   if (event.data.MoiveURL) {
     console.log(event.data.MoiveURL);
     // ClearCanvas();
+    isSharingMovie = event.data.MoiveURL.enable;
 
     var moveURL = event.data.MoiveURL;
     if (moveURL.type == 'YOUTUBE')
@@ -460,7 +462,6 @@ PermissionButtonSetting();
 CreateTopTooltip(topButtonContents);
 PageNavigator.init();
 
-var isSharingScreen = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
@@ -470,7 +471,11 @@ let extraPath = '';
 let currentPdfPage = 0;
 
 function checkSharing() {
-  return isSharingScreen || isSharing3D || isSharingMovie || isSharingFile ||isSharingEpub;
+  return classroomInfo.shareScreen.state || 
+  classroomInfo.share3D.state || 
+  isSharingMovie || 
+  isSharingFile ||
+  isSharingEpub;
 }
 
 function removeOnSelect(btn) {
@@ -480,13 +485,11 @@ function removeOnSelect(btn) {
 }
 
 function _3DCanvasOnOff(btn) {
-  if (!isSharing3D && checkSharing()) {
+  if (!classroomInfo.share3D.state && checkSharing()) {
     removeOnSelect(btn);
     return;
   }
 
-  var visible = $(btn).hasClass('on');
-  
   ClearCanvas();
   if (params.open == 'true') {
     const isViewer = classroomInfo.share3D.state;
@@ -970,16 +973,13 @@ function StreamingStart(stream, btn){
 
   addStreamStopListener(stream, function () {    
     console.log("STOP SHARE")
-
     classroomCommand.StopScreenShare();
-
     classroomCommand.setShareScreenServer(false, () => {
       connection.send({hideMainVideo: true});
       if(btn != undefined){
         $(btn).removeClass("on");
         $(btn).removeClass("selected-shape");
       }
-      isSharingScreen = false;
       window.sharedStream = null;
       hideScreenViewerUI();
       replaceTrack(tempStream.getTracks()[0], screenTrackId);
@@ -1901,22 +1901,18 @@ function HomeworkUploadModal(message, callback){
   $('#btn-confirm-file-close').hide();
   $("#confirm-title2").hide();
   $('#confirm-title').html(message).removeClass("selected");
-
   $('#btn-confirm-action').html('닫기').unbind('click').bind('click', function (e) {
       e.preventDefault();
       $('#confirm-box').modal('hide');
       $('#confirm-box-topper').hide();
       callback(true);
   });
-
   $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
   $('#confirm-box-topper').show();
-
   $('#confirm-box').modal({
       backdrop: 'static',
       keyboard: false
   });
-
   loadFileInput();
 }
 
@@ -2301,7 +2297,7 @@ function saveClassInfo(){
   localStorage.setItem('sessionid', params.sessionid);
   localStorage.setItem('points', params.sessionid);
   localStorage.setItem('currentPage', currentPdfPage);
-  localStorage.setItem('isSharingScreen', isSharingScreen);
+  localStorage.setItem('isSharingScreen', classroomInfo.shareScreen.state);
   localStorage.setItem('isSharing3D', isSharing3D);
   localStorage.setItem('isSharingMovie', isSharingMovie);
   localStorage.setItem('isSharingFile', isSharingFile);
@@ -2311,7 +2307,7 @@ function saveClassInfo(){
 
 function loadClassInfo(){
   localStorage.getItem('sessionid', params.sessionid);
-  localStorage.getItem('isSharingScreen', isSharingScreen);
+  localStorage.getItem('isSharingScreen', classroomInfo.shareScreen.state);
   localStorage.getItem('isSharing3D', isSharing3D);
   localStorage.getItem('isSharingMovie', isSharingMovie);
   localStorage.getItem('isSharingFile', isSharingFile);
@@ -2321,13 +2317,12 @@ function loadClassInfo(){
 
 function removeClassInfo(){
   localStorage.removeItem('sessionid', params.sessionid);
-  localStorage.removeItem('isSharingScreen', isSharingScreen);
+  localStorage.removeItem('isSharingScreen', classroomInfo.shareScreen.state);
   localStorage.removeItem('isSharing3D', isSharing3D);
   localStorage.removeItem('isSharingMovie', isSharingMovie);
   localStorage.removeItem('isSharingFile', isSharingFile);
   localStorage.removeItem('isSharingEpub', isSharingEpub);
   localStorage.removeItem('isFileViewer', isFileViewer);
-
 }
 
 function GetScreenViewer(){
@@ -2349,9 +2344,7 @@ $(document).ready(function(){
 
 
 function GetFrame(){
-  let frame = document
-  .getElementById('widget-container')
-  .getElementsByTagName('iframe')[0].contentWindow;
+  let frame = document.getElementById('widget-container').getElementsByTagName('iframe')[0].contentWindow;
   return frame;
 }
 
