@@ -256,12 +256,13 @@ function Viewer( viewerPlugin, parameters ) {
                 window.top.PageNavigator.off();
             }
             else if(mimetype == "application/pdf"){
-                window.top.pdfOnLoaded ();
+                window.top.PageNavigator.on();
+                window.top.PageNavigator.pdfsetting();
+                window.top.PageNavigator.select(0);
             }else{
                 window.top.PageNavigator.off();
             }
-
-
+            window.top.pdfOnLoaded ();
             initialized = true;
         };
 
