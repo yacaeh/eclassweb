@@ -248,6 +248,9 @@ connection.onmessage = function (event) {
 
   if(event.data.viewer) {
     console.log(event.data)
+    if(event.data.viewer.cmd == "close"){
+      PageNavigator.off();
+    }
 
     ClearCanvas();
     ClearStudentCanvas();
