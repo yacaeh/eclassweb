@@ -9,6 +9,8 @@
 
 (function() {
 
+
+
     var teacherPoints = [];
     var studentPoints = [];
 
@@ -2672,7 +2674,7 @@ function canvasresize(id){
         }
     }
 
-
+        
 })();
 
 // -----------------------------------------------------------------------
@@ -2831,3 +2833,5 @@ function SliderSetting(element, targetinput, defaultv, callback){
 function handleDragDropEvent(oEvent) {
     oEvent.preventDefault();
   }
+
+

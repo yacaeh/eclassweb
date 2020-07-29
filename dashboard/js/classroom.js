@@ -66,7 +66,6 @@ connection.onUserStatusChanged = function (event) {
 connection.onopen = function (event) {
   console.log('onopen!');
 
-
   SetStudentList(event,true);
 
   connection.onUserStatusChanged(event);
@@ -76,14 +75,7 @@ connection.onopen = function (event) {
     }, 1000);
   }
 
-  // 접속시 방정보 동기화.
-  if (connection.extra.roomOwner) {
-    //  mute();
-  }
-
-  //  session 연결 완료
   classroomCommand.onConnectionSession (event);
-
   if(classroomInfoLocal.shareScreen.fromme){
     ReTrack(GetScreenViewer().srcObject)
   }
@@ -95,7 +87,20 @@ connection.onclose = connection.onerror = connection.onleave = function (event){
   SetStudentList(event, false);
 };
 
+debug = false;
+
 connection.onmessage = function (event) {
+  if(debug)
+  console.log(event);
+  
+  if(event.data.canvassend){
+    if(connection.extra.roomOwner){
+      canvas_array[event.userid].src = event.data.canvas;
+      
+
+    }
+  }
+
   if(event.data.unmute){
     permissionManager.unmute(event.data.unmute);
     return;
@@ -347,7 +352,7 @@ connection.onmessage = function (event) {
 };
 
 connection.onstream = function (event) {
-  console.log('onstream!',event);
+  console.log('onstream!' , event.extra.userFullName, event.userid, event);
 
   if(params.open === 'true' || params.open === true){
     CanvasResize();
@@ -377,8 +382,8 @@ connection.onstream = function (event) {
 
     console.log("MAIN VIDEO CHANGED", event);
     video.setAttribute('data-streamid', event.streamid);
+    console.error(event.type);
     if (event.type === 'local') {
-      // video.muted = true;
       video.volume = 0;
     }
 
@@ -401,6 +406,10 @@ connection.onstream = function (event) {
       for(var i =0 ; i< childern.length; i++){
         var child = childern[i];
         if(child.dataset.id == event.userid){
+          if(classroomInfoLocal.showcanvas)
+            event.mediaElement.style.display = 'none';
+
+
           child.appendChild(event.mediaElement);
           break;
         }
@@ -818,7 +827,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           alert(error);
         }
 
-        classroomCommand.joinRoom ();
+        classroomCommand.joinRoom();
 
         connection.socket.on('disconnect', function () {
           console.log('disconnect Class!');
@@ -827,10 +836,40 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
         console.log('isRoomJoined', isRoomJoined);
         console.log(classroomInfo);
+
+        if (!connection.extra.roomOwner)
+          SendCanvasDataToOwner();
       }
     );
   }
-  
+
+  function SendCanvasDataToOwner(){
+    console.error("START SEND CANVAS");
+    var canvas = GetFrame().document.getElementById('main-canvas');
+    var ownerid;
+
+    setTimeout(function () {
+      var interval = setTimeout(function () {
+        ownerid = GetOwnerId();
+        if (ownerid != undefined) {
+          clearInterval(interval);
+          setInterval(function () {
+            if (debug) {
+              console.log("SENDING", connection.userid);
+            }
+            var context = canvas.toDataURL();
+            connection.send({
+              canvassend: true,
+              canvas: context
+            }, ownerid);
+          }, 1000)
+        }
+      })
+    }, 3000)
+
+
+  }
+
   SetCanvasBtn('screen_share', ScreenShare);
   SetCanvasBtn('3d_view', _3DCanvasOnOff);
   SetCanvasBtn('movie', Movie_Render_Button);
@@ -1050,6 +1089,24 @@ function SetTeacher(){
     $(".feature").show();
   $(frame.document.getElementById("callteacher")).remove();
   $(frame.document.getElementById("homework")).remove();
+  
+  document.getElementById("showcam").addEventListener("click" ,function(){
+    var childern = document.getElementById("student_list").children;
+    for(var i = 0 ; i < childern.length; i++){
+      childern[i].getElementsByTagName("video")[0].style.display = 'block';
+      childern[i].getElementsByTagName("img")[0].style.display = 'none';
+    }
+    classroomInfoLocal.showcanvas = false;
+  })
+  
+  document.getElementById("showcanvas").addEventListener("click" ,function(){
+    var childern = document.getElementById("student_list").children;
+    for(var i = 0 ; i < childern.length; i++){
+      childern[i].getElementsByTagName("video")[0].style.display = 'none';
+      childern[i].getElementsByTagName("img")[0].style.display = 'block';
+    }
+    classroomInfoLocal.showcanvas = true;
+  })
 
 }
 
@@ -1064,6 +1121,8 @@ function SetStudent() {
   $(".for_teacher").show();
   $(".controll").remove();
   $(".feature").remove();
+  $("#showcam").remove();
+  $("#showcanvas").remove();
 
   let frame = document
   .getElementById('widget-container')
@@ -1078,6 +1137,9 @@ function SetStudent() {
 
 SelectViewType();
 
+var canvas_array = {};
+
+
 function SetStudentList(event, isJoin) {
   if(!connection.extra.roomOwner)
     return;
@@ -1086,13 +1148,40 @@ function SetStudentList(event, isJoin) {
     var name = event.extra.userFullName;
 
   if(isJoin){
+    var img = document.createElement("img");
+
+    if(!classroomInfoLocal.showcanvas)
+      img.style.display = 'none';
+      
+    canvas_array[id] = img;
+
     console.log("JOIN ROOM", id, name);
     var div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
                 <span class="student-overlay"></span> \
                 <span class="bor"></span> \
                 <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
+    
     OnClickStudent(div,id,name);
+   
+    var interval;
+
+
+    div[0].addEventListener("mouseover",function(){
+      clearInterval(interval);
+      document.getElementById("bigcanvas").style.display = "block";
+      document.getElementById("bigcanvas-img").src = canvas_array[id].src;
+      interval = setInterval(function(){
+        document.getElementById("bigcanvas-img").src = canvas_array[id].src;
+      },1000);
+    })
+    
+    div[0].addEventListener("mouseleave",function(){
+      document.getElementById("bigcanvas").style.display = "none";
+      clearInterval(interval);
+    })
+
     $("#student_list").append(div);
+    $(div).append(img);
   }
   else{
 
@@ -2371,4 +2460,15 @@ function CreateTopTooltip(data){
       })
     })
   });
+}
+
+function GetOwnerId(){
+  var id;
+  connection.peers.forEach(function(e){
+    if(e.extra.roomOwner){
+      id = e.userid
+    }
+  })
+
+    return id;
 }
