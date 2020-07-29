@@ -256,7 +256,6 @@ function PDFViewerPlugin() {
                 ensurePageRendered(page);
             }
         });
-        
         window.parent.parent.PageNavigator.push(thumbnail, function(){
             var idx = (this.getAttribute("idx") * 1) + 1;
             self.showPage(idx)
@@ -296,6 +295,7 @@ function PDFViewerPlugin() {
             PDFJS.getDocument(location, null, passwordCallback).then(function loadPDF( doc ) {
                 pdfDocument = doc;
                 container   = viewContainer;
+                window.parent.parent.PageNavigator.removethumbnail();
                 for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
                     pdfDocument.getPage(i + 1).then(createPage);
                 }
