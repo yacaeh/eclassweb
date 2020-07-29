@@ -252,7 +252,10 @@ function Viewer( viewerPlugin, parameters ) {
             var loading = document.getElementById('loading-document');
             loading.parentNode.removeChild(loading);
             
-            if(mimetype == "application/pdf"){
+            if(typeof mimetype == "undefined"){
+                window.top.PageNavigator.off();
+            }
+            else if(mimetype == "application/pdf"){
                 window.top.pdfOnLoaded ();
             }else{
                 window.top.PageNavigator.off();
