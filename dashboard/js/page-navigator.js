@@ -127,11 +127,9 @@ PageNavigator = {
     },
     off : function(){
         this.obj.style.display = 'none';
-        while(this.list.children.length){
-          this.list.removeChild(this.list.children[0]);
-        }
         this.idx = 0;
         this.obj.value = 1;
+        this.removethumbnail();
     },
     push : function(element, clickevent){
         var box = document.createElement("div");
@@ -150,4 +148,10 @@ PageNavigator = {
       this.list.children[idx].scrollIntoView({block : "center"});
       document.getElementById("epubidx").value = idx + 1;
     },
+    removethumbnail : function(){
+      this.idx = 0;
+      while(this.list.children.length){
+        this.list.removeChild(this.list.children[0]);
+      }
+    }
 }
