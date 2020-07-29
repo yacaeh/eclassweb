@@ -238,7 +238,7 @@ function Viewer( viewerPlugin, parameters ) {
             }
 
             
-            pages                                         = getPages();
+            pages = getPages();
             document.getElementById('numPages').innerHTML = 'of ' + pages.length;
 
             self.showPage(readStartPageParameter(parameters.startpage));
@@ -252,8 +252,14 @@ function Viewer( viewerPlugin, parameters ) {
             var loading = document.getElementById('loading-document');
             loading.parentNode.removeChild(loading);
             
-            window.top.pdfOnLoaded ();
-            initialized                                   = true;
+            if(mimetype == "application/pdf"){
+                window.top.pdfOnLoaded ();
+            }else{
+                window.top.PageNavigator.off();
+            }
+
+
+            initialized = true;
         };
 
         viewerPlugin.initialize(canvasContainer, url);
@@ -816,7 +822,6 @@ function Viewer( viewerPlugin, parameters ) {
                             if ( pluginData.supportsMimetype(mimetype) ) {
                                 matchingPluginData = pluginData;
                                 console.log('Found plugin by mimetype and xhr head: ' + mimetype);
-                                // store the mimetype globally
                                 window.mimetype = mimetype;
                                 return true;
                             }
