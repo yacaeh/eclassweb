@@ -242,7 +242,7 @@ classroomCommand.receivedOnFocusResponse = (_response) => {
                 else{
                     student_overlay.css('background','none');
                 }
-                console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
+                // console.log( "ReceivedOnFocus Respose : " +  userId + ", " + boolOnFocus );    
             }
         };
     }

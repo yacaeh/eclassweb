@@ -87,10 +87,18 @@ connection.onclose = connection.onerror = connection.onleave = function (event){
   SetStudentList(event, false);
 };
 
+debug = false;
+
 connection.onmessage = function (event) {
+  if(debug)
+  console.log(event);
+  
   if(event.data.canvassend){
-    if(connection.extra.roomOwner)
+    if(connection.extra.roomOwner){
       canvas_array[event.userid].src = event.data.canvas;
+      
+
+    }
   }
 
   if(event.data.unmute){
@@ -173,25 +181,6 @@ connection.onmessage = function (event) {
   // 학생 접속시 싱크
   if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect !");
-
-    var context = GetFrame().document.getElementById('main-canvas').toDataURL();
-    connection.send({
-        canvassend : true,
-        canvas : context
-    })
-    
-    var sendCanvas = setInterval(function(){
-      if(connection.extra.roomOwner)
-          clearInterval(sendCanvas);
-          
-      var context = GetFrame().document.getElementById('main-canvas').toDataURL();
-      connection.send({
-          canvassend : true,
-          canvas : context
-      })
-  }, 1000)        
-
-
     designer.sync();
     return;
   }
@@ -363,7 +352,7 @@ connection.onmessage = function (event) {
 };
 
 connection.onstream = function (event) {
-  console.log('onstream!',event);
+  console.log('onstream!' , event.extra.userFullName, event.userid, event);
 
   if(params.open === 'true' || params.open === true){
     CanvasResize();
@@ -393,8 +382,8 @@ connection.onstream = function (event) {
 
     console.log("MAIN VIDEO CHANGED", event);
     video.setAttribute('data-streamid', event.streamid);
+    console.error(event.type);
     if (event.type === 'local') {
-      // video.muted = true;
       video.volume = 0;
     }
 
@@ -838,7 +827,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           alert(error);
         }
 
-        classroomCommand.joinRoom ();
+        classroomCommand.joinRoom();
 
         connection.socket.on('disconnect', function () {
           console.log('disconnect Class!');
@@ -847,10 +836,40 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
         console.log('isRoomJoined', isRoomJoined);
         console.log(classroomInfo);
+
+        if (!connection.extra.roomOwner)
+          SendCanvasDataToOwner();
       }
     );
   }
-  
+
+  function SendCanvasDataToOwner(){
+    console.error("START SEND CANVAS");
+    var canvas = GetFrame().document.getElementById('main-canvas');
+    var ownerid;
+
+    setTimeout(function () {
+      var interval = setTimeout(function () {
+        ownerid = GetOwnerId();
+        if (ownerid != undefined) {
+          clearInterval(interval);
+          setInterval(function () {
+            if (debug) {
+              console.log("SENDING", connection.userid);
+            }
+            var context = canvas.toDataURL();
+            connection.send({
+              canvassend: true,
+              canvas: context
+            }, ownerid);
+          }, 1000)
+        }
+      })
+    }, 3000)
+
+
+  }
+
   SetCanvasBtn('screen_share', ScreenShare);
   SetCanvasBtn('3d_view', _3DCanvasOnOff);
   SetCanvasBtn('movie', Movie_Render_Button);
@@ -1131,7 +1150,7 @@ function SetStudentList(event, isJoin) {
   if(isJoin){
     var img = document.createElement("img");
 
-    if(!classroomInfo.showcanvas)
+    if(!classroomInfoLocal.showcanvas)
       img.style.display = 'none';
       
     canvas_array[id] = img;
@@ -1148,6 +1167,7 @@ function SetStudentList(event, isJoin) {
 
 
     div[0].addEventListener("mouseover",function(){
+      clearInterval(interval);
       document.getElementById("bigcanvas").style.display = "block";
       document.getElementById("bigcanvas-img").src = canvas_array[id].src;
       interval = setInterval(function(){
@@ -2443,4 +2463,15 @@ function CreateTopTooltip(data){
       })
     })
   });
+}
+
+function GetOwnerId(){
+  var id;
+  connection.peers.forEach(function(e){
+    if(e.extra.roomOwner){
+      id = e.userid
+    }
+  })
+
+    return id;
 }
