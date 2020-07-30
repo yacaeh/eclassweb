@@ -101,12 +101,12 @@ SettingForChatting();
 examObj.init();
 
 
-AddEvent("confirm-title", "click", function () {
-  ViewUploadList(this);
+AddEvent("confirm-title", "click", function (self) {
+  ViewUploadList(self);
 })
 
-AddEvent("confirm-title2", "click", function () {
-  ViewHomeworkList(this);
+AddEvent("confirm-title2", "click", function (self) {
+  ViewHomeworkList(self);
 })
 
 AddEvent("top_save_alert", "click", function () {
@@ -131,13 +131,13 @@ AddEvent("top_alert", "click", function () {
   });
 })
 
-AddEvent("top_record_video", "click", function () {
-  if (!this.classList.contains("on")) {
+AddEvent("top_record_video", "click", function (self) {
+  if (!self.classList.contains("on")) {
     screen_recorder._startCapturing();
   }
   else {
     screen_recorder._stopCapturing();
-    this.classList.remove("on");
+    self.classList.remove("on");
   }
 })
 

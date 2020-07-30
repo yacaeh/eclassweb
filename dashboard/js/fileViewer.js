@@ -649,16 +649,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
-
-
-document.getElementById("confirm-title").addEventListener("click", function(){
-    ViewUploadList(this);
-  });
-  
-  document.getElementById("confirm-title2").addEventListener("click", function(){
-    ViewHomeworkList(this);
-  });
-
 function HomeworkUploadModal(message, callback) {
     console.log(message);
     extraPath = '';
