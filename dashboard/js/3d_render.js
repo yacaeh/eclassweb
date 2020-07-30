@@ -76,11 +76,11 @@ top_3d_render_jthis = $("#top_3d");
 
 function modelEnable()
 {
-    let frame = GetFrame();
+    let frame = GetWidgetFrame();
 
     if(frame.document.getElementById("renderCanvas")){
         let _3d_canvas = frame.document.getElementById("renderCanvas");
-        GetFrame().document.getElementById("renderCanvas").style.display = "block";
+        GetWidgetFrame().document.getElementById("renderCanvas").style.display = "block";
         createScene(_3d_canvas); //Call the createScene function
     }
     else{
@@ -155,7 +155,7 @@ function remove3DCanvas(){
     scene.cleanCachedTextureBuffer();
     scene.clearCachedVertexData();
     clearInterval(interval);
-    GetFrame().document.getElementById("renderCanvas").style.display = "none";
+    GetWidgetFrame().document.getElementById("renderCanvas").style.display = "none";
 }
 
 function CanvasResize() {
@@ -231,3 +231,23 @@ function setShared3DStateLocal (_state) {
         remove3DCanvas ();
     }
 }
+
+
+function _3DCanvasOnOff(btn) {
+    if (!classroomInfo.share3D.state && checkSharing()) {
+      removeOnSelect(btn);
+      return;
+    }
+    ClearCanvas();
+    if (params.open == 'true') {
+      const isViewer = classroomInfo.share3D.state;
+      if (false == isViewer) {
+        isSharing3D = true;
+        setShared3DStateServer(true);
+      }
+      else {
+        isSharing3D = false;
+        setShared3DStateServer(false);
+      }
+    }
+  }

@@ -299,3 +299,6 @@ $('#chk-room-password').change(function () {
     $('#txt-room-password').parent().css('display', this.checked === true ? 'block' : 'none');
     $('#txt-room-password').focus();
 });
+
+if(ver_time_table)
+    MakeTimeTable("time_table", 7, 5);

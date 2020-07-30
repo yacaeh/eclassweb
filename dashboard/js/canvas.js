@@ -1,7 +1,10 @@
+/////////////////////////////////////////////////
+// Canvas 관련 //////////////////////////////////
+/////////////////////////////////////////////////
+
 var designer = new CanvasDesigner();
 designer.widgetHtmlURL = './canvas/widget.html';
 designer.widgetJsURL = './widget.js';
-
 designer.icons.pencil = '/dashboard/newimg/pen.png';
 designer.icons.marker = '/dashboard/newimg/pen2.png';
 designer.icons.eraser = '/dashboard/newimg/eraser.png';
@@ -18,11 +21,8 @@ designer.icons.text = '/dashboard/newimg/text.png';
 designer.icons.epub = '/dashboard/newimg/epub.png';
 designer.icons.callteacher = '/dashboard/newimg/handsup.png';
 designer.icons.homework = '/dashboard/newimg/homework.png';
-
 designer.icons.fulloff = '/dashboard/img/cam_min.png';
 designer.icons.fullon = '/dashboard/img/cam_max.png';
-
-
 
 designer.addSyncListener(function (data) {
     var isStudent = data.userid == classroomInfo.canvasPermission;
@@ -31,7 +31,6 @@ designer.addSyncListener(function (data) {
         connection.send(data);
     }
 });
-
 
 designer.setTools({
   pencil: true,
@@ -63,20 +62,35 @@ designer.setTools({
   homework : true,
 });
 
-function SetCanvasBtn(btnid, callback){
+function SetCanvasBtn(data){
+
     function checkf(){
         if(designer.iframe != null){
             clearInterval(inter)
-            
-            let frame = document
-            .getElementById('widget-container')
-            .getElementsByTagName('iframe')[0].contentWindow;
-            var btn = frame.document.getElementById(btnid);
-            if(btn)
-            btn.addEventListener("click", function(){
-                callback(btn);
+            var frame = GetWidgetFrame();
+
+            Object.keys(data).forEach(function(e){
+                var btn = frame.document.getElementById(e);
+                if(btn)
+                btn.addEventListener("click", function(){
+                    data[e](btn);
+                })
             })
         }
     }
     var inter = setInterval(checkf, 1000);
 }
+
+function checkSharing() {
+    return classroomInfo.shareScreen.state ||
+      classroomInfo.share3D.state ||
+      isSharingMovie ||
+      isSharingFile ||
+      isSharingEpub;
+  }
+  
+function removeOnSelect(btn) {
+    alert('동시에 여러 기능을 공유할 수 없습니다');
+    btn.classList.remove("on");
+    btn.classList.remove("selected-shape");
+  }

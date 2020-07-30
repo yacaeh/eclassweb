@@ -39,7 +39,7 @@ function PDFViewerPlugin() {
     function init( callback ) {
 
         loadScript('./compatibility.js', function () {
-            loadScript('./pdf.js', callback);
+            loadScript('./lib/pdf.js', callback);
             loadScript('./ui_utils.js');
             loadScript('./text_layer_builder.js');
         });

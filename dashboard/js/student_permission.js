@@ -1,55 +1,8 @@
-function OnClickStudent(div) {
-  div.click(function (e) {
-    var menu = document.getElementById('student-menu');
-    nowSelectStudent = e.target;
+/////////////////////////////////////
+// 학생 권한 ////////////////////////
+/////////////////////////////////////
 
-    var name = e.target.dataset.name;
-    var pid = e.target.dataset.id;
-
-    SetBtn("classP", e.target.dataset.classPermission);
-    SetBtn("micP", e.target.dataset.micPermission);
-    SetBtn("canP", e.target.dataset.canvasPermission);
-    
-    function SetBtn(id, ispermission){
-      $('#' + id).clearQueue();
-      $('#' +  id + '> .circle').clearQueue();
-  
-      if (ispermission == 'true') {
-        $('#' + id).css({
-          'background-color': '#18dbbe',
-        });
-        $('#' +  id + '> .circle').css({
-          left: '22px',
-        });
-        $('#' + id).addClass('on');
-        $('#' + id).removeClass('off');
-      } else {
-        $('#' + id).css({
-          'background-color': 'gray',
-        });
-        $('#' + id + '> .circle').css({
-          left: '2px',
-        });
-        $('#' + id).addClass('off');
-        $('#' + id).removeClass('on');
-      }
-    }
-    
-    $(menu).css({
-      right: document.body.clientWidth - e.clientX,
-      top: e.clientY,
-    });
-
-    if (!$('#student-menu').is(':visible')) {
-      $('#student-menu').show('blind', {}, 150, function () { });
-    }
-
-    menu.getElementsByClassName('stuname')[0].innerHTML = name;
-  });
-}
-
-
-
+var nowSelectStudent = undefined;
 
 permissionManager = {
   setClassPermission: function (id) {
@@ -134,8 +87,57 @@ permissionManager = {
   }
 }
 
-function PermissionButtonSetting(){
+function OnClickStudent(div) {
+  div.click(function (e) {
+    var menu = document.getElementById('student-menu');
+    nowSelectStudent = e.target;
 
+    var name = e.target.dataset.name;
+    var pid = e.target.dataset.id;
+
+    SetBtn("classP", e.target.dataset.classPermission);
+    SetBtn("micP", e.target.dataset.micPermission);
+    SetBtn("canP", e.target.dataset.canvasPermission);
+    
+    function SetBtn(id, ispermission){
+      $('#' + id).clearQueue();
+      $('#' +  id + '> .circle').clearQueue();
+  
+      if (ispermission == 'true') {
+        $('#' + id).css({
+          'background-color': '#18dbbe',
+        });
+        $('#' +  id + '> .circle').css({
+          left: '22px',
+        });
+        $('#' + id).addClass('on');
+        $('#' + id).removeClass('off');
+      } else {
+        $('#' + id).css({
+          'background-color': 'gray',
+        });
+        $('#' + id + '> .circle').css({
+          left: '2px',
+        });
+        $('#' + id).addClass('off');
+        $('#' + id).removeClass('on');
+      }
+    }
+    
+    $(menu).css({
+      right: document.body.clientWidth - e.clientX,
+      top: e.clientY,
+    });
+
+    if (!$('#student-menu').is(':visible')) {
+      $('#student-menu').show('blind', {}, 150, function () { });
+    }
+
+    menu.getElementsByClassName('stuname')[0].innerHTML = name;
+  });
+}
+
+function PermissionButtonSetting(){
   $(".perbtn").click(function () {
     var circle = this.getElementsByClassName("circle")[0];
     var pid = nowSelectStudent.dataset.id;

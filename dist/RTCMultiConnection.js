@@ -3609,7 +3609,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
 
-            console.error(params)
             if (params.open == "true") {
                 console.error("OWNER")
                 options.localMediaConstraints.video.mandatory = {
