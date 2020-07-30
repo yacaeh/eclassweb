@@ -69,7 +69,6 @@ $('#btn-join-hidden-room').click(function () {
     return;
 });
 
-
 function checkCamAndMicExist(){
     connection.DetectRTC.load(function() {
         if (!connection.DetectRTC.hasMicrophone) {
@@ -116,38 +115,6 @@ $('#btn-show-join-hidden-room').click(function(e) {
   $('#joinRoomModel').modal('show');
 });
 
-$('#btn-join-hidden-room').click(function () {
-    var roomid = $('#txt-roomid').val().toString();
-    if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox('방 번호를 입력해주세요.', '에러');
-        return;
-    }
-
-    var fullName = $('#txt-user-name').val().toString();
-    if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox('이름을 입력해주세요.', '에러');
-        return;
-    }
-
-    connection.extra.userFullName = fullName;
-
-    var roomPassword = $('#txt-room-password').val().toString();
-    if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox('방 비밀번호를 입력해주세요.', '에러');
-        return;
-    }
-    connection.password = roomPassword;
-
-    connection.socket.emit('is-valid-password', connection.password, roomid, function (isValidPassword, roomid, error) {
-        if (isValidPassword === true) {
-            joinAHiddenRoom(roomid);
-        }
-        else {
-            alertBox('방 정보를 확인해주세요.', '에러');
-        }
-    });
-    return;
-});
 
 function joinAHiddenRoom(roomid) {
     var initialHTML = $('#btn-join-hidden-room').html();

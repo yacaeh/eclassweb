@@ -76,6 +76,11 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: false,
 };
 
+if (!!params.password) {
+  connection.password = params.password;
+}
+
+
 // 상단 도움말 추가
 CreateTopTooltip(topButtonContents);
 
