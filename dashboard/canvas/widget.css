@@ -131,13 +131,13 @@ src: url(/dashboard/css/NanumPen.ttf);
     margin: 10px;
 }
 
-
-  body {
+body {
     font-family: "Roboto";
     font-size: 17px;
     line-height: 1.5em;
     overflow: hidden;
-  }
+}
+
 .pen{
     cursor: url('/dashboard/img/cursor_pen.png') 6 38,pointer;
 }

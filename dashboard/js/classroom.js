@@ -28,24 +28,24 @@ let currentPdfPage = 0;
 
 // 상단 버튼 도움말
 var topButtonContents = {
-    top_all_controll: "전체 제어",
-    top_test: "시험",
-    top_alert: "알림",
-    top_student: "학생 목록",
-    top_camera: "선생님 카메라",
-    top_save_alert: "알림 기록 저장",
-    top_record_video: "화면 녹화"
+  top_all_controll: "전체 제어",
+  top_test: "시험",
+  top_alert: "알림",
+  top_student: "학생 목록",
+  top_camera: "선생님 카메라",
+  top_save_alert: "알림 기록 저장",
+  top_record_video: "화면 녹화"
 }
 
 // 좌측 버튼 기능
 var canvasButtonContents = {
-  'screen_share'  : ScreenShare,
-  '3d_view'       : _3DCanvasOnOff,
-  'movie'         : Movie_Render_Button,
-  'file'          : LoadFile,
-  'epub'          : LoadEpub,
-  'callteacher'   : CallTeacher,
-  'homework'      : HomeworkSubmit,
+  'screen_share': ScreenShare,
+  '3d_view': _3DCanvasOnOff,
+  'movie': Movie_Render_Button,
+  'file': LoadFile,
+  'epub': LoadEpub,
+  'callteacher': CallTeacher,
+  'homework': HomeworkSubmit,
 }
 
 let uploadServerUrl = "https://files.primom.co.kr:1443";
@@ -101,27 +101,27 @@ SettingForChatting();
 examObj.init();
 
 
-AddEvent("confirm-title", "click", function(){
+AddEvent("confirm-title", "click", function () {
   ViewUploadList(this);
 })
 
-AddEvent("confirm-title2", "click", function(){
+AddEvent("confirm-title2", "click", function () {
   ViewHomeworkList(this);
 })
 
-AddEvent("top_save_alert", "click", function(){
+AddEvent("top_save_alert", "click", function () {
   if (!attentionObj.exportAttention())
     alert("저장할 데이터가 없습니다")
 })
 
-AddEvent("icon_exit", "click", function(){
+AddEvent("icon_exit", "click", function () {
   classroomCommand.exitAlert(function () {
     var href = location.protocol + "//" + location.host + "/dashboard/";
     window.open(href, "_self");
   });
 })
-  
-AddEvent("top_alert", "click", function(){
+
+AddEvent("top_alert", "click", function () {
   classroomCommand.sendAlert(function () {
     var chilldren = document.getElementById('student_list').children;
     for (var i = 0; i < chilldren.length; i++) {
@@ -131,7 +131,7 @@ AddEvent("top_alert", "click", function(){
   });
 })
 
-AddEvent("top_record_video", "click", function(){
+AddEvent("top_record_video", "click", function () {
   if (!this.classList.contains("on")) {
     screen_recorder._startCapturing();
   }
@@ -150,7 +150,7 @@ window.addEventListener('resize', function () {
 });
 
 // 캔버스가 불러와졌을 때
-window.onWidgetLoaded = function (){
+window.onWidgetLoaded = function () {
   WindowFocusChecker();
   SendCanvasDataToOwner();
   SetCanvasBtn(canvasButtonContents);
@@ -209,6 +209,8 @@ connection.onmessage = function (event) {
   }
 
   if (event.data.showMainVideo) {
+    console.log("SCREEN SHARE START", event.data.showMainVideo)
+
     ClearCanvas();
     classroomInfoLocal.shareScreen.state = true;
     classroomInfo.shareScreen = {}
@@ -216,7 +218,6 @@ connection.onmessage = function (event) {
     classroomInfo.shareScreen.id = event.data.showMainVideo;
     classroomInfo.shareScreen.userid = event.userid;
 
-    console.log("SCREEN SHARE START", event.data.showMainVideo)
     var stream = GetStream(event.data.showMainVideo)
     showScreenViewerUI();
     GetScreenSharingCanvas().srcObject = stream;
@@ -452,7 +453,7 @@ connection.onstream = function (event) {
       for (var i = 0; i < childern.length; i++) {
         var child = childern[i];
         if (child.dataset.id == event.userid) {
-          if (classroomInfoLocal.showcanvas){
+          if (classroomInfoLocal.showcanvas) {
             event.mediaElement.style.display = 'none';
           }
           child.appendChild(event.mediaElement);
@@ -534,9 +535,11 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     });
 
     connection.join(
-      { sessionid: params.sessionid,
+      {
+        sessionid: params.sessionid,
         userid: connection.channel,
-        session: connection.session},
+        session: connection.session
+      },
       function (isRoomJoined, roomid, error) {
         console.log('Joing Class!');
 
@@ -587,7 +590,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
 //==============================================================================================
 
-// 선생
 function SetTeacher() {
   let frame = GetWidgetFrame();
 
@@ -599,7 +601,7 @@ function SetTeacher() {
   $(frame.document.getElementById("callteacher")).remove();
   $(frame.document.getElementById("homework")).remove();
 
-  AddEvent("showcam", "click", function(){
+  AddEvent("showcam", "click", function () {
     var childern = document.getElementById("student_list").children;
     classroomInfoLocal.showcanvas = false;
     for (var i = 0; i < childern.length; i++) {
@@ -608,7 +610,7 @@ function SetTeacher() {
     }
   })
 
-  AddEvent("showcanvas", "click", function(){
+  AddEvent("showcanvas", "click", function () {
     var childern = document.getElementById("student_list").children;
     classroomInfoLocal.showcanvas = true;
     for (var i = 0; i < childern.length; i++) {
@@ -619,9 +621,10 @@ function SetTeacher() {
 }
 
 function SetStudent() {
+  GetMainVideo().style.display = 'block';
+
   $('#session-id').text(connection.extra.userFullName + '(' + params.sessionid + ')');
   $(".for_teacher").remove();
-  GetMainVideo().style.display = 'block';
   $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
   $(".for_teacher").show();
@@ -655,7 +658,7 @@ function SetStudentList(event, isJoin) {
                 <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
     OnClickStudent(div, id, name);
     var interval;
-   
+
     div[0].addEventListener("mouseover", function () {
       clearInterval(interval);
       Show("bigcanvas");
@@ -705,77 +708,19 @@ function ToggleViewType() {
 
     switch (this.id) {
       case 'top_student':
-        GetMainVideo().style.display = "none";
-        Show("student_list");
+        Hide(GetMainVideo());
+        $('#student_list').show();
         break;
       case 'top_camera':
-        GetMainVideo().style.display = "block";
-        Hide("student_list")
+        Show(GetMainVideo());
+        $('#student_list').hide();
         break;
     }
   });
 }
 
 function CallTeacher() {
-  connection.send({callTeacher: { userid: connection.userid}}, GetOwnerId());
-}
-
-// 알림 박스 생성
-function alertBox(message, title, callback_yes, callback_no) {
-  callback_yes = callback_yes || function () { };
-  callback_no = callback_no || function () { };
-
-  var clickCount = 0;
-
-  $('.btn-alert-yes').unbind('click').bind('click', function (e) {
-      if (clickCount++ == 0) {
-        e.preventDefault();
-        $('#alert-box').fadeOut(300);
-        callback_yes();
-      }
-    });
-  $('.btn-alert-no').unbind('click').bind('click', function (e) {
-      if (clickCount++ == 0) {
-        e.preventDefault();
-        $('#alert-box').fadeOut(300);
-        callback_no();
-      }
-    });
-
-  $('#alert-title').html(title || '알림');
-  $('#alert-content').html(message);
-  $('#alert-box').fadeIn(300);
-}
-
-// 알림 박스 생성
-function alert_exit_Box(message, title, callback_yes, callback_no) {
-  callback_yes = callback_yes || function () { };
-  callback_no = callback_no || function () { };
-
-  var clickCount = 0;
-
-  $('.btn-alert-exit-yes')
-    .unbind('click')
-    .bind('click', function (e) {
-      if (clickCount++ == 0) {
-        e.preventDefault();
-        $('#alert-exit').fadeOut(300);
-        callback_yes();
-      }
-    });
-  $('.btn-alert-exit-no')
-    .unbind('click')
-    .bind('click', function (e) {
-      if (clickCount++ == 0) {
-        e.preventDefault();
-        $('#alert-exit').fadeOut(300);
-        callback_no();
-      }
-    });
-
-  $('#alert-exit-title').html(title || '알림');
-  $('#alert-exit-content').html(message);
-  $('#alert-exit').fadeIn(300);
+  connection.send({ callTeacher: { userid: connection.userid } }, GetOwnerId());
 }
 
 // Save classinfo on user exit
@@ -811,20 +756,21 @@ function removeClassInfo() {
   localStorage.removeItem('isFileViewer', isFileViewer);
 }
 
-function WindowFocusChecker(){
+function WindowFocusChecker() {
   function sendFocus(state) {
     if (!connection.extra.roomOwner) {
       connection.send({
         onFocus: {
           userid: connection.userid,
           focus: state
-        }},GetOwnerId());
+        }
+      }, GetOwnerId());
       // if (!state) {
       //   console.log("You left class!");
       // }
     }
   }
-  
+
   var checkInterval = undefined;
   function focusCheck(e) {
     if (e.type == "blur") {
@@ -837,7 +783,7 @@ function WindowFocusChecker(){
       clearTimeout(checkInterval);
     }
   }
-  
+
   $(GetWidgetFrame()).on("blur focus", focusCheck);
   $(window).on("blur focus", focusCheck);
 }
