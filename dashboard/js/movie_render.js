@@ -1,19 +1,6 @@
 var top_movie_jthis;
 var move_url_div =  $("#urlform");
 
-function _Movie_Render_Button_Func()
-{
-    top_movie_jthis = $("#top_share_video");    
-
-    if(params.open == "true")
-    {
-        top_movie_jthis.click(function(){
-            //_3dcanvas.toggle();
-            Movie_Render_Button();
-        })
-    }
-}
-
 function Movie_Render_Button(btn){
     if(!isSharingMovie && checkSharing()){
       removeOnSelect(btn);

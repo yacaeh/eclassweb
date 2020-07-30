@@ -1,3 +1,9 @@
+/////////////////////////////////////
+// 스크린 공유, 스크린 저장 관련 //////
+/////////////////////////////////////
+
+// 스크린 저장 //////////////////////////////
+
 class sc {
     RecordingStart() {
         var now = 0;
@@ -152,8 +158,7 @@ class sc {
 
 var screen_recorder = new sc();
 
-    // -----------------------------------------------------
-
+// 스크린 공유 //////////////////////////////
 
 function ScreenShare(btn) {
   if (!classroomInfo.shareScreen.state && checkSharing()) {
@@ -185,8 +190,6 @@ function ScreenShare(btn) {
     $(btn).removeClass("on selected-shape")
     return;
   }
-
-
 
   screen_constraints = {
     screen: true,
@@ -225,5 +228,193 @@ function ScreenShare(btn) {
   }
 }
 
+function addStreamStopListener(stream, callback) {
+  stream.addEventListener(
+    'ended',
+    function () {
+      callback();
+      callback = function () { };
+    },
+    false
+  );
+
+  stream.addEventListener(
+    'inactive',
+    function () {
+      classroomInfo.shareScreen.state = false;
+      classroomInfoLocal.shareScreen.fromme = false;
+      console.log("Off Sharing");
+      callback();
+      callback = function () { };
+    },
+    false
+  );
+
+  stream.getTracks().forEach(function (track) {
+    track.addEventListener(
+      'ended',
+      function () {
+        console.log("3");
+        callback();
+        callback = function () { };
+      },
+      false
+    );
+
+    track.addEventListener(
+      'inactive',
+      function () {
+        console.log("4");
+        callback();
+        callback = function () { };
+      },
+      false
+    );
+  });
+}
+
+function replaceTrack(videoTrack, screenTrackId) {
+  if (!videoTrack) return;
+  if (videoTrack.readyState === 'ended') {
+    alert(
+      'Can not replace an "ended" track. track.readyState: ' +
+      videoTrack.readyState
+    );
+    return;
+  }
+  connection.getAllParticipants().forEach(function (pid) {
+    replaceTrackToPeer(pid, videoTrack, screenTrackId);
+  });
+}
+
+function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
+  if (!connection.peers[pid]) {
+    console.error('connection peer error');
+    return;
+  }
+
+  var peer = connection.peers[pid].peer;
+  if (!peer.getSenders) return;
+  var trackToReplace = videoTrack;
+  peer.getSenders().forEach(function (sender) {
+    if (!sender || !sender.track) return;
+    if (screenTrackId) {
+      if (trackToReplace && sender.track.id === screenTrackId) {
+        sender.replaceTrack(trackToReplace);
+        trackToReplace = null;
+      }
+      return;
+    }
+
+    if (sender.track.id !== tempStream.getTracks()[0].id) return;
+    if (sender.track.kind === 'video' && trackToReplace) {
+      sender.replaceTrack(trackToReplace);
+      trackToReplace = null;
+    }
+  });
+}
+
+function replaceScreenTrack(stream, btn) {
+  ClearCanvas();
+  console.log("Stream Start", tempStream.streamid);
+  classroomCommand.setShareScreenLocal({ state: true, id: tempStream.streamid });
+  classroomInfoLocal.shareScreen.fromme = true;
+  GetScreenSharingCanvas().srcObject = stream;
+
+  if (connection.extra.roomOwner) {
+    classroomInfo.shareScreen = {}
+    classroomInfo.shareScreen.state = true
+    classroomInfo.shareScreen.id = tempStream.streamid
+  }
+
+  classroomCommand.setShareScreenServer(true, result => {
+    stream.isScreen = true;
+    stream.streamid = stream.id;
+    stream.type = 'local';
 
 
+    connection.onstream({
+      stream: stream,
+      type: 'local',
+      ScreenShare: true,
+      streamid: stream.id,
+    });
+
+    connection.send({
+      showMainVideo: tempStream.streamid,
+    });
+
+    StreamingStart(stream, btn);
+  });
+}
+
+function StreamingStart(stream, btn) {
+  window.shareStream = stream;
+  var screenTrackId = stream.getTracks()[0].id;
+
+  addStreamStopListener(stream, function () {
+    console.log("STOP SHARE")
+    classroomCommand.StopScreenShare();
+    classroomCommand.setShareScreenServer(false, () => {
+      connection.send({ hideMainVideo: true });
+      if (btn != undefined) {
+        $(btn).removeClass("on");
+        $(btn).removeClass("selected-shape");
+      }
+      window.sharedStream = null;
+      hideScreenViewerUI();
+      replaceTrack(tempStream.getTracks()[0], screenTrackId);
+    });
+  });
+  ReTrack(stream);
+  showScreenViewerUI();
+}
+
+function ReTrack(stream) {
+  console.log("RE TRACK", stream.streamid);
+  stream.getTracks().forEach(function (track) {
+    if (track.kind === 'video' && track.readyState === 'live') {
+      replaceTrack(track);
+    }
+  });
+}
+
+function SettingForScreenShare(){
+  var tempStreamCanvas = document.createElement('canvas');
+  var tempStream = tempStreamCanvas.captureStream();
+  tempStream.isScreen = true;
+  tempStream.streamid = tempStream.id;
+  tempStream.type = 'local';
+  connection.attachStreams.push(tempStream);
+  window.tempStream = tempStream;
+}
+
+function GetStream(id) {
+  try {
+    return connection.streamEvents[id].stream;
+  }
+  catch{
+    console.error("Can't find stream", id);
+    console.log(connection.streamEvents)
+    return undefined;
+  }
+}
+
+function LoadScreenShare() {
+  if (classroomInfo.shareScreen.state &&
+    classroomInfo.shareScreen.id != undefined &&
+    !classroomInfoLocal.shareScreen.fromme) {
+    console.log("LOAD SCREEN")
+    classroomCommand.openShare();
+    CanvasResize();
+  }
+}
+
+function showScreenViewerUI() {
+  CanvasResize();
+  GetScreenSharingCanvas().style.display = 'block';
+}
+
+function hideScreenViewerUI() {
+  GetScreenSharingCanvas().style.display = 'none';
+}
