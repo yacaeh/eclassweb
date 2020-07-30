@@ -90,9 +90,54 @@ function checkSharing() {
 }
 
 function removeOnSelect(btn) {
-    alert('동시에 여러 기능을 공유할 수 없습니다');
-    btn.classList.remove("on");
-    btn.classList.remove("selected-shape");
+    if(!connection.extra.roomOwner){
+        alert("선생님이 다른 기능을 사용 중 입니다")
+        return;
+    }
+
+    if(classroomInfoLocal.shareScreenByStudent){
+        alert("학생이 화면 공유 중 입니다.");
+        btn.classList.remove("on");
+        btn.classList.remove("selected-shape");
+        return;
+    }
+
+    alertBox("현재 기능을 종료합니까?", "알림", function(){
+        if(classroomInfo.share3D.state){
+            GetWidgetFrame().document.getElementById("3d_view").click();
+            classroomInfo.share3D.state = false;
+        }
+        
+        if(classroomInfo.shareScreen.state){
+            GetWidgetFrame().document.getElementById("screen_share").click();
+            classroomInfo.shareScreen.state = false;
+        }
+
+        if(isSharingMovie){
+            GetWidgetFrame().document.getElementById("movie").click();
+            isSharingMovie = false;
+        }
+
+        if(isSharingFile){
+            unloadFileViewer();
+            isSharingFile = false;
+        }
+
+        if(isSharingEpub){
+            GetWidgetFrame().document.getElementById("epub").click();
+            isSharingEpub = false;
+        }
+
+        setTimeout(function(){
+            btn.classList.remove("on");
+            btn.classList.remove("selected-shape");
+            btn.click();
+        },50)
+    },
+    function(){
+        btn.classList.remove("on");
+        btn.classList.remove("selected-shape");
+    })
 }
 
 function SendCanvasDataToOwner() {

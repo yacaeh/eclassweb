@@ -217,6 +217,7 @@ connection.onmessage = function (event) {
     console.log("SCREEN SHARE START", event.data.showMainVideo)
 
     ClearCanvas();
+    classroomInfoLocal.shareScreenByStudent = true;
     classroomInfoLocal.shareScreen.state = true;
     classroomInfo.shareScreen = {}
     classroomInfo.shareScreen.state = true;
@@ -231,6 +232,7 @@ connection.onmessage = function (event) {
 
   if (event.data.hideMainVideo) {
     console.log("SCREEN SHARE STOPED", event.userid)
+    classroomInfoLocal.shareScreenByStudent = false;
     $(GetScreenSharingCanvas()).hide();
     classroomCommand.setShareScreenLocal({ state: false, id: undefined });
     return;
