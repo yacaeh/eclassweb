@@ -39,3 +39,21 @@ function GetMainVideo() {
       return GetWidgetFrame().document.getElementById("main-video");
     }
 }
+
+function Show(element){
+    if(typeof element == "string"){
+        document.getElementById(element).style.display = "block";
+    }
+    else{
+        element.style.display = "block";
+    }
+}
+
+function Hide(element){
+    if(typeof element == "string"){
+        document.getElementById(element).style.display = "none";
+    }
+    else{
+        element.style.display = "none";
+    }
+}

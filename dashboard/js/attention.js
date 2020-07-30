@@ -1,3 +1,7 @@
+/*
+    학생 알림 관련
+*/
+
 var attentionObj = {
     isStart : false,    
     totalCount : 0,
@@ -6,10 +10,8 @@ var attentionObj = {
     studentsAnswer : {}    
 };
 
-
 attentionObj.callAttend = (message) => {    
     console.log( "Attention Call Attend : " + JSON.stringify(message));
-
     attentionObj.totalCount++;
     attentionObj.teacherRequest[attentionObj.totalCount] = {
         name : message.msg,

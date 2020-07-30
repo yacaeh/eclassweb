@@ -5,6 +5,24 @@
 var nowSelectStudent = undefined;
 
 permissionManager = {
+  onPermissionChange : function(data){
+    if (data.permissionChanged.classPermission)
+      permissionManager.setClassPermission(data.permissionChanged.classPermission);
+    else
+      permissionManager.disableClassPermission();
+
+    if (data.permissionChanged.micPermission)
+      permissionManager.setMicPermission(data.permissionChanged.micPermission);
+    else
+      permissionManager.disableMicPermission();
+
+    if (data.permissionChanged.canvasPermission)
+      permissionManager.setCanvasPermission(data.permissionChanged.canvasPermission);
+    else {
+      permissionManager.disableCanvasPermission();
+    }
+  },
+
   setClassPermission: function (id) {
     if (connection.userid == id) {
       console.log("GET CLASS PERMISSION");
@@ -26,7 +44,8 @@ permissionManager = {
   setCanvasPermission : function(id){
     if(connection.userid == id){
       console.log("GET CANVAS PERMISSION");
-      connection.send({sendStudentPoint : true,
+      connection.send({
+        sendStudentPoint : true,
         isStudent : true,
         points : currentPoints ,
         history : currentHistory,
@@ -34,6 +53,7 @@ permissionManager = {
       })
     }
   },
+
   disableCanvasPermission : function(id){
     console.log("LOST CANVAS PERMISSION");
     ClearStudentCanvas();
@@ -138,6 +158,12 @@ function OnClickStudent(div) {
 }
 
 function PermissionButtonSetting(){
+  $(window).click(function (e) {
+    if (document.getElementById('student-menu').contains(e.target)) return false;
+    if ($(e.target).hasClass('student')) return false;
+    if ($('#student-menu').show()) $('#student-menu').hide();
+  });
+
   $(".perbtn").click(function () {
     var circle = this.getElementsByClassName("circle")[0];
     var pid = nowSelectStudent.dataset.id;

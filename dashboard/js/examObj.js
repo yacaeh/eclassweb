@@ -36,6 +36,36 @@ var examObj = {
       */
 };
 
+examObj.init = function(){
+    SettingForExam();
+
+    AddEvent("top_test", "click" ,function(){
+        if ($('#exam-board').is(':visible')) {
+          if (examObj.closeTesting()) {
+            document.getElementById("widget-container").removeAttribute("style")
+            $('#exam-board').hide(300);
+          } else {
+            alert("시험 종료 후 닫을 수 있습니다");
+          }
+        }
+        else {
+          // 선생님
+          if (params.open === 'true') {
+            document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
+            CanvasResize();
+            $('#exam-omr').hide();
+            $('#exam-teacher-menu').show();
+          }
+          // 학생
+          else {
+            $('#exam-omr').show();
+            $('#exam-teacher-menu').hide();
+          }
+          $('#exam-board').show(300);
+        }
+    })
+}
+
 examObj.closeTesting = function () {
     if (this.isStart) {
         return false;
@@ -178,7 +208,6 @@ examObj.updateExamAnswerStatistics = function () {
     }
 };
 
-// 현재 시험 update
 examObj.updateExameTimer = function (_currentExamTimer) {
     examObj.currentExamTime = _currentExamTimer;
 }

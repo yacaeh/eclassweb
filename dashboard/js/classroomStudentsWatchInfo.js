@@ -8,8 +8,6 @@ classroomStudentsWatchInfo = {
     onPdfPage : function(student) {},       // pdf page 호출 되는 이벤트
     onEpubPage : function(student) {},  
 
-
-
     setPdfPage : function (_userid, _page) {
         var student = this.getStudent (_userid);
         student.pdfViewPage = _page;
@@ -44,12 +42,9 @@ classroomStudentsWatchInfo = {
         return this.students[_userid];
     },
 
-
     // 방에서 학생이 나가면 삭제를 해야 한다.
     removeStudent : function (_userid) {
-
     },
-
 };
 
 

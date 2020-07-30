@@ -151,8 +151,6 @@ class fileViewerLoader {
         }
     }
 }
-
-
 class pdfViewer {
 
     constructor() {
@@ -195,9 +193,7 @@ class pdfViewer {
         return this.page == _page;
     }
 }
-
 class mediaViewer {
-
     constructor() {
         this.cacheMediaPlayer;
         this.onplay = null;
@@ -293,9 +289,6 @@ class mediaViewer {
             this.onended();
     }
 }
-
-
-
 class fileViewer {
     constructor() {
         this.mViewerLoader = new fileViewerLoader();
@@ -448,12 +441,10 @@ class fileViewer {
     }
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 var mfileViewer = new fileViewer();
 
@@ -502,7 +493,6 @@ mfileViewer.onloaded = function (_type) {
     classroomInfo.viewer.loaded = true;
 }
 
-
 mfileViewer.onsync = function () {
     if (!connection.extra.roomOwner) {
         if (classroomInfo.allControl)
@@ -534,31 +524,6 @@ mfileViewer.onupdateeachtype[pdfString] = function (_data) {
     console.log('onupdate pdf');
     const cmd = _data.cmd;
     switch (cmd) {
-        // case "first-page" :            
-        //     fileJQuery = $("#widget-container").find("#iframe").contents().find("#file-viewer");
-        //     fileJQuery.scrollTop();
-        //     break;
-        // case 'next' :
-        //     fileViewer.contentWindow.document.getElementById('next').click();
-        //     break;
-        // case 'prev' :
-        //     fileViewer.contentWindow.document.getElementById('previous').click();
-        //     break;
-        // case 'last-page' :
-        //     fileViewer.contentWindow.document.getElementById('previous').click();
-        //     break;
-        // case 'fullscreen' :
-        //     fileViewer.contentWindow.document.getElementById('fullscreen').click();
-        //     break;
-        // case 'presentation' :
-        //     fileViewer.contentWindow.document.getElementById('presentation').click();
-        //     break;
-        // case 'zoomIn' :
-        //     fileViewer.contentWindow.document.getElementById('zoomIn').click();
-        //     break;
-        // case 'zoomOut' :
-        //     fileViewer.contentWindow.document.getElementById('zoomOut').click();
-        //     break;
         case 'page':
             const page = _data.page;
             mfileViewer.getCurrentViewer().showPage(page);
@@ -601,8 +566,6 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
         }
     }
 }
-
-
 
 /*
     Video Viewer
@@ -687,6 +650,15 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
 }
 
 
+
+document.getElementById("confirm-title").addEventListener("click", function(){
+    ViewUploadList(this);
+  });
+  
+  document.getElementById("confirm-title2").addEventListener("click", function(){
+    ViewHomeworkList(this);
+  });
+
 function HomeworkUploadModal(message, callback) {
     console.log(message);
     extraPath = '';
@@ -751,7 +723,6 @@ function fileUploadModal(message, btn, callback) {
     loadFileInput();
 
 }
-
 
 function ViewHomeworkList(btn) {
     btn.classList.add("selected");
@@ -1003,7 +974,6 @@ function loadFileInput() {
 
 }
 
-
 function LoadFile(btn) {
     if (!isSharingFile && checkSharing()) {
         removeOnSelect(btn);
@@ -1049,4 +1019,20 @@ function loadFileViewer(url) {
     isSharingFile = true;
     isFileViewer = true;
     classroomCommand.openFile(url);
+}
+
+// Pdf가 처음 로딩이 다 되었는지 확인.
+// 로딩이 다 된 후에 페이지 동기화
+function pdfOnLoaded() {
+    console.log("PDF ON");
+    classroomCommand.onViewerLoaded();
+}
+
+function showPage(n) {
+    PointerSaver.save()
+    PointerSaver.load(n - 1);
+    PageNavigator.select(n - 1);
+    currentPdfPage = n;
+    if (connection.extra.roomOwner || !classroomInfo.allControl)
+        classroomCommand.onShowPage(n);
 }

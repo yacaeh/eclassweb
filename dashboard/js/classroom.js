@@ -1,3 +1,7 @@
+/*
+  메인
+*/
+
 (function () {
   var params = {},
     r = /([^&=]+)=?([^&]*)/g;
@@ -72,16 +76,38 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: false,
 };
 
+// 상단 도움말 추가
 CreateTopTooltip(topButtonContents);
+
+// 학생 권한 Form 세팅
 PermissionButtonSetting();
+
+// 페이지 탐색기 초기화
 PageNavigator.init();
+
+// 스크린 공유 초기화
 SettingForScreenShare();
+
+// 선생님 학생 <-> 캠 보기 Toggle
 ToggleViewType();
-_3DCanvasFunc();
+
+// 전체 제어 On OFF
 _AllCantrallFunc();
-_Movie_Render_Button_Func();
-SettingForExam();
+
+// 채팅 초기화
 SettingForChatting();
+
+//시험치기 초기화
+examObj.init();
+
+
+AddEvent("confirm-title", "click", function(){
+  ViewUploadList(this);
+})
+
+AddEvent("confirm-title2", "click", function(){
+  ViewHomeworkList(this);
+})
 
 AddEvent("top_save_alert", "click", function(){
   if (!attentionObj.exportAttention())
@@ -115,38 +141,6 @@ AddEvent("top_record_video", "click", function(){
   }
 })
 
-AddEvent("top_test", "click" ,function(){
-  if ($('#exam-board').is(':visible')) {
-    if (examObj.closeTesting()) {
-      document.getElementById("widget-container").removeAttribute("style")
-      $('#exam-board').hide(300);
-    } else {
-      alert("시험 종료 후 닫을 수 있습니다");
-    }
-  }
-  else {
-    // 선생님
-    if (params.open === 'true') {
-      document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
-      CanvasResize();
-      $('#exam-omr').hide();
-      $('#exam-teacher-menu').show();
-    }
-    // 학생
-    else {
-      $('#exam-omr').show();
-      $('#exam-teacher-menu').hide();
-    }
-    $('#exam-board').show(300);
-  }
-})
-
-$(window).click(function (e) {
-  if (document.getElementById('student-menu').contains(e.target)) return false;
-  if ($(e.target).hasClass('student')) return false;
-  if ($('#student-menu').show()) $('#student-menu').hide();
-});
-
 window.addEventListener('resize', function () {
   rtime = new Date();
   if (timeout === false) {
@@ -158,6 +152,7 @@ window.addEventListener('resize', function () {
 // 캔버스가 불러와졌을 때
 window.onWidgetLoaded = function (){
   WindowFocusChecker();
+  SendCanvasDataToOwner();
   SetCanvasBtn(canvasButtonContents);
   setTimeout(mobileHelper.Init(), 1000);
 }
@@ -204,27 +199,12 @@ connection.onmessage = function (event) {
   if (event.data.sendStudentPoint) {
     event.data.command = "default";
     designer.syncData(event.data);
-    console.log(event.data)
     return;
   }
 
   if (event.data.permissionChanged) {
     classroomInfo = event.data.permissionChanged;
-    if (event.data.permissionChanged.classPermission)
-      permissionManager.setClassPermission(event.data.permissionChanged.classPermission);
-    else
-      permissionManager.disableClassPermission();
-
-    if (event.data.permissionChanged.micPermission)
-      permissionManager.setMicPermission(event.data.permissionChanged.micPermission);
-    else
-      permissionManager.disableMicPermission();
-
-    if (event.data.permissionChanged.canvasPermission)
-      permissionManager.setCanvasPermission(event.data.permissionChanged.canvasPermission);
-    else {
-      permissionManager.disableCanvasPermission();
-    }
+    permissionManager.onPermissionChange(event.data);
     return;
   }
 
@@ -394,7 +374,6 @@ connection.onmessage = function (event) {
     if (connection.extra.roomOwner) {
       classroomCommand.receivedOnFocusResponse({ userId: event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
     }
-
     return;
   }
 
@@ -446,13 +425,10 @@ connection.onstream = function (event) {
     if (event.streamid.includes("-"))
       return;
 
-
     var video = GetMainVideo();
-
-
     console.log("MAIN VIDEO CHANGED", event);
     video.setAttribute('data-streamid', event.streamid);
-    console.error(event.type);
+
     if (event.type === 'local') {
       video.volume = 0;
     }
@@ -552,9 +528,9 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       });
     });
   } else {
+    SetStudent();
     console.log('try joining!');
     connection.DetectRTC.load(function () {
-      SetStudent();
     });
 
     connection.join(
@@ -571,7 +547,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
             // 'This room does not exist. Please either create it or wait for moderator to enter in the room.'
             // );
             location.reload();
-
             return;
           }
           if (error === connection.errors.ROOM_FULL) {
@@ -599,15 +574,11 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         }
 
         classroomCommand.joinRoom();
-
         connection.socket.on('disconnect', function () {
           console.log('disconnect Class!');
           location.reload();
         });
-
         console.log('isRoomJoined', isRoomJoined);
-        console.log(classroomInfo);
-        SendCanvasDataToOwner();
       }
     );
   }
@@ -616,6 +587,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
 //==============================================================================================
 
+// 선생
 function SetTeacher() {
   let frame = GetWidgetFrame();
 
@@ -629,20 +601,20 @@ function SetTeacher() {
 
   AddEvent("showcam", "click", function(){
     var childern = document.getElementById("student_list").children;
-    for (var i = 0; i < childern.length; i++) {
-      childern[i].getElementsByTagName("video")[0].style.display = 'block';
-      childern[i].getElementsByTagName("img")[0].style.display = 'none';
-    }
     classroomInfoLocal.showcanvas = false;
+    for (var i = 0; i < childern.length; i++) {
+      Show(childern[i].getElementsByTagName("video")[0]);
+      Hide(childern[i].getElementsByTagName("img")[0]);
+    }
   })
 
   AddEvent("showcanvas", "click", function(){
     var childern = document.getElementById("student_list").children;
-    for (var i = 0; i < childern.length; i++) {
-      childern[i].getElementsByTagName("video")[0].style.display = 'none';
-      childern[i].getElementsByTagName("img")[0].style.display = 'block';
-    }
     classroomInfoLocal.showcanvas = true;
+    for (var i = 0; i < childern.length; i++) {
+      Show(childern[i].getElementsByTagName("img")[0]);
+      Hide(childern[i].getElementsByTagName("video")[0]);
+    }
   })
 }
 
@@ -686,7 +658,7 @@ function SetStudentList(event, isJoin) {
    
     div[0].addEventListener("mouseover", function () {
       clearInterval(interval);
-      document.getElementById("bigcanvas").style.display = "block";
+      Show("bigcanvas");
       document.getElementById("bigcanvas-img").src = canvas_array[id].src;
       interval = setInterval(function () {
         document.getElementById("bigcanvas-img").src = canvas_array[id].src;
@@ -694,7 +666,7 @@ function SetStudentList(event, isJoin) {
     })
 
     div[0].addEventListener("mouseleave", function () {
-      document.getElementById("bigcanvas").style.display = "none";
+      Hide("bigcanvas");
       clearInterval(interval);
     })
 
@@ -734,30 +706,14 @@ function ToggleViewType() {
     switch (this.id) {
       case 'top_student':
         GetMainVideo().style.display = "none";
-        $('#student_list').show();
+        Show("student_list");
         break;
       case 'top_camera':
         GetMainVideo().style.display = "block";
-        $('#student_list').hide();
+        Hide("student_list")
         break;
     }
   });
-}
-
-// Pdf가 처음 로딩이 다 되었는지 확인.
-// 로딩이 다 된 후에 페이지 동기화
-function pdfOnLoaded() {
-  console.log("PDF ON");
-  classroomCommand.onViewerLoaded();
-}
-
-function showPage(n) {
-  PointerSaver.save()
-  PointerSaver.load(n - 1);
-  PageNavigator.select(n - 1);
-  currentPdfPage = n;
-  if (connection.extra.roomOwner || !classroomInfo.allControl)
-    classroomCommand.onShowPage(n);
 }
 
 function CallTeacher() {
@@ -771,18 +727,14 @@ function alertBox(message, title, callback_yes, callback_no) {
 
   var clickCount = 0;
 
-  $('.btn-alert-yes')
-    .unbind('click')
-    .bind('click', function (e) {
+  $('.btn-alert-yes').unbind('click').bind('click', function (e) {
       if (clickCount++ == 0) {
         e.preventDefault();
         $('#alert-box').fadeOut(300);
         callback_yes();
       }
     });
-  $('.btn-alert-no')
-    .unbind('click')
-    .bind('click', function (e) {
+  $('.btn-alert-no').unbind('click').bind('click', function (e) {
       if (clickCount++ == 0) {
         e.preventDefault();
         $('#alert-box').fadeOut(300);
@@ -826,38 +778,6 @@ function alert_exit_Box(message, title, callback_yes, callback_no) {
   $('#alert-exit').fadeIn(300);
 }
 
-function resizeend() {
-  if (new Date() - rtime < delta) {
-    setTimeout(resizeend, delta);
-  } else {
-    timeout = false;
-    CanvasResize();
-  }
-}
-
-function CanvasResize() {
-  var frame = GetWidgetFrame();
-  var canvas = frame.document.getElementById('main-canvas');
-  var x = canvas.width;
-  var y = canvas.height;
-  var renderCanvas = frame.document.getElementById('renderCanvas');
-  if (renderCanvas) {
-    renderCanvas.style.left = "50px";
-    renderCanvas.width = x;
-    renderCanvas.height = y;
-  }
-  if (GetWidgetFrame().document.getElementById("epub-viewer"))
-    EpubPositionSetting()
-}
-
-document.getElementById("confirm-title").addEventListener("click", function(){
-  ViewUploadList(this);
-});
-
-document.getElementById("confirm-title2").addEventListener("click", function(){
-  ViewHomeworkList(this);
-});
-
 // Save classinfo on user exit
 function saveClassInfo() {
   localStorage.setItem('sessionid', params.sessionid);
@@ -891,23 +811,6 @@ function removeClassInfo() {
   localStorage.removeItem('isFileViewer', isFileViewer);
 }
 
-function CreateTopTooltip(data) {
-  Object.keys(data).forEach(function (id) {
-    var element = document.getElementById(id);
-    element.addEventListener("mouseover", function (e) {
-      document.getElementById("toptooltip").style.display = 'block';
-      var tooltip = document.getElementById("toptooltip")
-      tooltip.children[0].innerHTML = data[id];
-      var x = e.target.x;
-      var width = tooltip.getBoundingClientRect().width / 2;
-      tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width / 2) - width + "px";
-      element.addEventListener("mouseleave", function () {
-        document.getElementById("toptooltip").style.display = 'none';
-      })
-    })
-  });
-}
-
 function WindowFocusChecker(){
   function sendFocus(state) {
     if (!connection.extra.roomOwner) {
@@ -916,9 +819,9 @@ function WindowFocusChecker(){
           userid: connection.userid,
           focus: state
         }},GetOwnerId());
-      if (!state) {
-        console.log("You left class!");
-      }
+      // if (!state) {
+      //   console.log("You left class!");
+      // }
     }
   }
   
@@ -939,25 +842,26 @@ function WindowFocusChecker(){
   $(window).on("blur focus", focusCheck);
 }
 
-function SendCanvasDataToOwner() {
-  var canvas = GetWidgetFrame().document.getElementById('main-canvas');
-  var ownerid;
-  setTimeout(function () {
-    var interval = setTimeout(function () {
-      ownerid = GetOwnerId();
-      if (ownerid != undefined) {
-        clearInterval(interval);
-        setInterval(function () {
-          if (debug) {
-            console.log("SENDING", connection.userid);
-          }
-          var context = canvas.toDataURL();
-          connection.send({
-            canvassend: true,
-            canvas: context
-          }, ownerid);
-        }, 1000)
-      }
-    })
-  }, 3000)
+function resizeend() {
+  if (new Date() - rtime < delta) {
+    setTimeout(resizeend, delta);
+  } else {
+    timeout = false;
+    CanvasResize();
+  }
+}
+
+function CanvasResize() {
+  var frame = GetWidgetFrame();
+  var canvas = frame.document.getElementById('main-canvas');
+  var x = canvas.width;
+  var y = canvas.height;
+  var renderCanvas = frame.document.getElementById('renderCanvas');
+  if (renderCanvas) {
+    renderCanvas.style.left = "50px";
+    renderCanvas.width = x;
+    renderCanvas.height = y;
+  }
+  if (GetWidgetFrame().document.getElementById("epub-viewer"))
+    EpubPositionSetting()
 }

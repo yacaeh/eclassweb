@@ -77,7 +77,7 @@ src: url(/dashboard/css/NanumPen.ttf);
     left: -5px;
     top: -3px;
     position: absolute;
-    content: url(/dashboard/newimg/circle.png);
+    content: url(/dashboard/img/circle.png);
 }
 
 .slider_btn:hover{
@@ -139,14 +139,13 @@ src: url(/dashboard/css/NanumPen.ttf);
     overflow: hidden;
   }
 .pen{
-    cursor: url('/dashboard/img/pen.png') 6 38,pointer;
-
+    cursor: url('/dashboard/img/cursor_pen.png') 6 38,pointer;
 }
 .marker{
-    cursor: url('/dashboard/img/pen2.png') 6 38,pointer;
+    cursor: url('/dashboard/img/cursor_pen2.png') 6 38,pointer;
 }
 .eraser{
-    cursor: url('/dashboard/img/eraser.png') 6 38,pointer;
+    cursor: url('/dashboard/img/cursor_eraser.png') 6 38,pointer;
 }
 
 textarea::-webkit-scrollbar {
@@ -321,7 +320,7 @@ a:hover {
     background: rgb(204,204,204);
 }
 .selected-shape {
-    content: url(/dashboard/newimg/click_box.png);
+    content: url(/dashboard/img/click_box.png);
     background: #dde1e3!important;
 }
 /* surface */

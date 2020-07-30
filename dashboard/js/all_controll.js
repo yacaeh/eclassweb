@@ -1,3 +1,6 @@
+/*
+    전체 제어 관련
+*/
 
 var top_all_controll_jthis;
 
@@ -20,7 +23,6 @@ function updateControlView(send)
     }
 }
 
-
 function onAllControlValue (_allControl) {    
     classroomInfo.allControl = _allControl.state;  
     if(classroomInfo.allControl) {        
@@ -38,10 +40,7 @@ function onAllControlValue (_allControl) {
     }
 }
 
-
-
 function _AllCantrallFunc() {
-
     top_all_controll_jthis = $("#top_all_controll");
     if(params.open == "true")
     {
@@ -54,7 +53,6 @@ function _AllCantrallFunc() {
         })
     }
 }
-
 
 function SendAllControll(b)
 {
