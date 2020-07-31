@@ -766,6 +766,8 @@ function removeClassInfo() {
 }
 
 function WindowFocusChecker() {
+  window.focus();
+
   function sendFocus(state) {
     if (!connection.extra.roomOwner) {
       connection.send({
@@ -782,8 +784,11 @@ function WindowFocusChecker() {
 
   var checkInterval = undefined;
   function focusCheck(e) {
+    console.log(e);
     if (e.type == "blur") {
+      console.log("REMOVE")
       RemoveTooltip();
+
       checkInterval = setTimeout(function () {
         sendFocus(false);
       }, 100);
