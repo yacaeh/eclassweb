@@ -2588,22 +2588,7 @@ function canvasresize(id){
         })
     }
 
-    var shortCut = [
-        {"onoff-icon" : "a"},
-        {"pencilIcon" : "q"},
-        {"markerIcon" : "w"},
-        {"eraserIcon" : "e"},
-        {"textIcon" : "r"},
-        {"undo" : "z"},
-        {"clearCanvas" : "x"},
-        {"screen_share" : "1"},
-        {"3d_view" : "2"},
-        {"movie" : "3"},
-        {"file" : "4"},
-        {"epub" : "5"},
-    ]
 
-    SetShortcut(shortCut);
 
     MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
     MakeTitlePop("pencilIcon", "연필");
@@ -2680,67 +2665,6 @@ function canvasresize(id){
 // -----------------------------------------------------------------------
 
 
-function SetShortcut(shortCut){
-    var altdown = false;
-    var tooltips = [];
-
-    document.addEventListener("keydown", function(key){
-        if(key.altKey){
-            if(!altdown){
-                MakeTooltip(shortCut);
-                altdown = true;
-            }
-            key.preventDefault();
-            shortCut.forEach(function(cut){
-                if(key.key == Object.values(cut)){
-                    if(Object.keys(cut) == "screen_share"){
-                        RemoveTooltip();
-                        altdown = false;
-                    }
-                    try{
-                        document.getElementById(Object.keys(cut)).click();
-                    }
-                    catch{
-                    }
-                }
-            });
-        }
-    })
-
-    document.addEventListener("keyup", function(key){
-        if(key.key == "Alt"){
-            if(altdown){
-                RemoveTooltip();
-                altdown = false;
-            }
-        }
-    })
-
-    function MakeTooltip(shortcut){
-        shortcut.forEach(function(cut){
-            try {
-                var btn = document.getElementById(Object.keys(cut));
-                var top = btn.getBoundingClientRect().top;
-                var div = document.createElement("div");
-                div.className = "tooltip";
-                div.innerHTML = Object.values(cut)[0];
-                div.style.top = top + 15 + 'px';
-                tooltips.push(div);
-                document.body.appendChild(div);
-            }
-            catch{
-                return false;
-            }
-
-
-        });
-    }
-
-    function RemoveTooltip(){
-        tooltips.forEach(element => document.body.removeChild(element));
-        tooltips = [] ;
-    }
-}
 
 function MakeTitlePop(element, contents){
     var ele = document.getElementById(element);

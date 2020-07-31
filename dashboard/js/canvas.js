@@ -2,6 +2,25 @@
     캔버스, 판서 관련
 */
 
+
+var shortCut = [
+    {"onoff-icon" : "a"},
+    {"pencilIcon" : "q"},
+    {"markerIcon" : "w"},
+    {"eraserIcon" : "e"},
+    {"textIcon" : "r"},
+    {"undo" : "z"},
+    {"clearCanvas" : "x"},
+    {"screen_share" : "1"},
+    {"3d_view" : "2"},
+    {"movie" : "3"},
+    {"file" : "4"},
+    {"epub" : "5"},
+    {"callteacher" : "2"},
+    {"homework" : "3"},
+]
+
+
 var designer = new CanvasDesigner();
 designer.widgetHtmlURL = './canvas/widget.html';
 designer.widgetJsURL = './widget.js';
@@ -23,6 +42,7 @@ designer.icons.callteacher = '/dashboard/img/handsup.png';
 designer.icons.homework = '/dashboard/img/homework.png';
 designer.icons.fulloff = '/dashboard/img/cam_min.png';
 designer.icons.fullon = '/dashboard/img/cam_max.png';
+
 
 designer.addSyncListener(function (data) {
     var isStudent = data.userid == classroomInfo.canvasPermission;
@@ -181,4 +201,76 @@ function CreateTopTooltip(data) {
         })
       })
     });
-  }
+}
+
+
+
+
+var tooltips = [];
+var altdown = false;
+
+function SetShortcut(shortCut){
+
+    $(GetWidgetFrame()).on("keydown", down);
+    $(window).on("keydown", down);
+
+    $(GetWidgetFrame()).on("keyup", up);
+    $(window).on("keyup", up);
+
+
+    function down(key){
+        if(key.altKey){
+            if(!altdown){
+                MakeTooltip(shortCut);
+                altdown = true;
+            }
+            key.preventDefault();
+
+            shortCut.forEach(function(cut){
+                if(key.key == Object.values(cut)){
+                    if(Object.keys(cut) == "screen_share"){
+                        RemoveTooltip();
+                        altdown = false;
+                    }
+                    try{
+                        GetWidgetFrame().document.getElementById(Object.keys(cut)).click();
+                    }
+                    catch{
+                    }
+                }
+            });
+
+        }
+    }
+
+    function up(key){
+        if(key.key == "Alt"){
+            if(altdown){
+                RemoveTooltip();
+                altdown = false;
+            }
+        }
+    }
+
+    function MakeTooltip(shortcut){
+        shortcut.forEach(function(cut){
+            var btn = GetWidgetFrame().document.getElementById(Object.keys(cut));
+            if(!btn)
+                return false;
+
+            var top = btn.getBoundingClientRect().top;
+            var div = GetWidgetFrame().document.createElement("div");
+            div.className = "tooltip";
+            div.innerHTML = Object.values(cut)[0];
+            div.style.top = top + 15 + 'px';
+            tooltips.push(div);
+            GetWidgetFrame().document.getElementById("tool-box").appendChild(div);
+        });
+    }
+}
+
+function RemoveTooltip(){
+    altdown = false;
+    tooltips.forEach(element => GetWidgetFrame().document.getElementById("tool-box").removeChild(element));
+    tooltips = [] ;
+}
