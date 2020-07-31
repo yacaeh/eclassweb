@@ -21,6 +21,7 @@ function SetMobile(){
     FullScreenBtnInit();
     ToolSetting();
     $(".right-tab").css({display:"none", width : "0px"})
+    CanvasResize();
 }
 
 function ToolSetting(){
@@ -30,6 +31,7 @@ function ToolSetting(){
     doc.getElementById("tool-box").removeChild(doc.getElementById("textIcon"))
     doc.getElementById("tool-box").removeChild(doc.getElementById("clearCanvas"))
     doc.getElementById("tool-box").removeChild(doc.getElementById("undo"))
+    doc.getElementById("tool-box").removeChild(doc.getElementById("homework"))
 }
 
 function MainCamSetting(){
@@ -171,24 +173,30 @@ function FullScreenBtnInit() {
     };
 
     btn.addEventListener('click' ,function(){
+        
         if(btn.classList.contains("off")){
-            document.getElementById("widget-container").requestFullscreen();
+            var promise = document.getElementById("widget-container").requestFullscreen();
             image.src = "/dashboard/img/cam_min.png";
         }
         else{
-            document.exitFullscreen();
+            var promise = document.exitFullscreen();
+
             image.src = "/dashboard/img/cam_max.png";
         }
+
+        promise.then(function(){
+            CanvasResize();
+        })
         btn.classList.toggle("off");
         btn.classList.toggle("on");
+
     })
 
     // AppendInFrame(btn);
 }
 
 function AppendInFrame(element){
-    document.getElementById('widget-container').getElementsByTagName('iframe')[0].
-    contentWindow.document.body.appendChild(element);
+    GetWidgetFrame().document.body.appendChild(element);
 }
 
 function addEvent(element, eventType, callback) {
@@ -217,5 +225,31 @@ function GetDoc(){
 }
 
 function ChatSetting(){
+    var widget = document.getElementById("widget-container");
+    var chatinput = document.getElementsByClassName("emojionearea-inline")[0]
+    widget.insertBefore( chatinput ,widget.firstChild)
     AppendInFrame(conversationPanel);
+    var div = document.createElement("div");
+    div.className = "chatonoff";
+
+    var img = document.createElement("img");
+    img.src = "/dashboard/img/openchat.png";
+    div.appendChild(img);
+
+    widget.insertBefore(div,widget.firstChild)
+
+    div.addEventListener("click", function(){
+        this.classList.toggle("off");
+
+        if(this.classList.contains("off")){
+            $(conversationPanel).hide("Blind");
+            $(chatinput).hide("Fade");
+            div.style.transform = "rotate(90deg)";
+        }
+        else{
+            div.style.transform = "rotate(-90deg)";
+            $(conversationPanel).show("Blind");
+            $(chatinput).show("Fade");
+        }
+    })
 }

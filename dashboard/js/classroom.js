@@ -161,8 +161,7 @@ window.onWidgetLoaded = function () {
   SetCanvasBtn(canvasButtonContents);
   SetShortcut(shortCut);
   mobileHelper.Init();
-
-}
+  }
 
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
@@ -812,8 +811,9 @@ function resizeend() {
 }
 
 function CanvasResize() {
+  console.log("RESIZED")
   var frame = GetWidgetFrame();
-  GetWidgetFrame().window.resize();
+  frame.window.resize();
 
   var canvas = frame.document.getElementById('main-canvas');
   var x = canvas.width;
@@ -824,7 +824,7 @@ function CanvasResize() {
     renderCanvas.width = x;
     renderCanvas.height = y;
   }
-  if (GetWidgetFrame().document.getElementById("epub-viewer"))
+  if (frame.document.getElementById("epub-viewer"))
     EpubPositionSetting()
 
 
