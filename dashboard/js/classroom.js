@@ -784,9 +784,7 @@ function WindowFocusChecker() {
 
   var checkInterval = undefined;
   function focusCheck(e) {
-    console.log(e);
     if (e.type == "blur") {
-      console.log("REMOVE")
       RemoveTooltip();
 
       checkInterval = setTimeout(function () {
