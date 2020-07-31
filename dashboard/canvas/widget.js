@@ -2595,7 +2595,7 @@ function canvasresize(id){
 
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
 
-    SliderSetting("pencileslider", "pencil-stroke-style", 10, function(v){
+    SliderSetting("pencileslider", "pencil-stroke-style",1 , 22, 3, function(v){
         var pencilDrawHelper = clone(drawHelper);
         pencilDrawHelper.getOptions = function() {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
@@ -2603,7 +2603,7 @@ function canvasresize(id){
         pencilLineWidth = v;
     });
 
-    SliderSetting("markerslider", "marker-stroke-style", 16, function(v){
+    SliderSetting("markerslider", "marker-stroke-style",14, 40, 21, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
             return [markerLineWidth, markerStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
@@ -2676,8 +2676,9 @@ function MakeTitlePop(element, contents){
 }
 
 
-function SliderSetting(element, targetinput, defaultv, callback){
-    var maxSlider = 48;
+function SliderSetting(element, targetinput, min, max, defaultv, callback){
+    max -= min;
+
     var slider = document.getElementById(element);
     var bar = slider.getElementsByClassName("slider_btn")[0];
     var back = slider.getElementsByClassName("slider-back")[0];
@@ -2686,12 +2687,14 @@ function SliderSetting(element, targetinput, defaultv, callback){
 
     Set(defaultv);
     function Set(v){
-        var ratio = v / maxSlider;
+        slider.parentElement.style.display = "block";
+        var ratio = (v - min) / max;
         var sliderWidth = slider.getBoundingClientRect().width;
         // back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
         back.style.width = (ratio * sliderWidth) + 'px';
         bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
-        sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
+        sliderval.value = (max * ratio).toFixed(0) * 1 + min;
+        slider.parentElement.style.display = "none";
         callback(v);
     }
 
@@ -2708,7 +2711,7 @@ function SliderSetting(element, targetinput, defaultv, callback){
             ratio = Math.min(Math.max(0, ratio), 1);
             back.style.width = (ratio * sliderWidth) + 'px';
             bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
-            sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
+            sliderval.value = (max * ratio).toFixed(0) * 1 + min;
         }
     })
 
@@ -2738,7 +2741,7 @@ function SliderSetting(element, targetinput, defaultv, callback){
         ratio = Math.min(Math.max(0, ratio), 1);
         back.style.width = (ratio * sliderWidth) + 'px';
         bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
-        sliderval.value = (maxSlider * ratio).toFixed(0) * 1 + 1;
+        sliderval.value = (max * ratio).toFixed(0) * 1 + min;
     })
 }
 
