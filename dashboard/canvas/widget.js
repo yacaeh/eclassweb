@@ -109,24 +109,12 @@ function resizePoint (point) {
     return [p0, p1, p2, p3];
 }
 
-window.addEventListener("resize", function() {
-    rtime = new Date();
-    if (timeout === false) {
-        timeout = true;
-        setTimeout(resizeend, delta);
-    }
-});
-
-function resizeend() {
-    if (new Date() - rtime < delta) {
-        setTimeout(resizeend, delta);
-    } else {
-        timeout = false;
-        canvasresize('main-canvas');
-        canvasresize('temp-canvas');
-        drawHelper.redraw();
-    }               
+window.resize = function(){
+    canvasresize('main-canvas');
+    canvasresize('temp-canvas');
+    drawHelper.redraw();
 }
+
 function canvasresize(id){
     var canv = find(id);
     if(!canv)
