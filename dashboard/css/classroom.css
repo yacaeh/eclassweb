@@ -1739,14 +1739,13 @@ body:fullscreen {
 }
 
 #bigcanvas{
-  width: calc(16px * 30);
-  height: calc(9px * 30);
-  background-color: white;
-  border: solid;
+  left: 50px;
   position: absolute;
-  right: 19%;
-  top: 20%;
+  right: 17.7%;
+  top: 50px;
+  bottom: 0px;
   z-index: 10000;
+  pointer-events: none;
 }
 
 #right-tab-collapse{
