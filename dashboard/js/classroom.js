@@ -397,6 +397,7 @@ connection.onmessage = function (event) {
   if (event.data.closeTesting) {
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);
+      $(".right-tab").css("z-index", 3);
     }
     if (isMobile)
       document.getElementById("widget-container").style.right = "0px";
