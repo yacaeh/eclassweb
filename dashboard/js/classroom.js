@@ -31,8 +31,8 @@ var topButtonContents = {
   top_all_controll: "전체 제어",
   top_test: "시험",
   top_alert: "알림",
-  top_student: "학생 목록",
-  top_camera: "선생님 카메라",
+  top_student: "학생 판서",
+  top_camera: "학생 카메라",
   top_save_alert: "알림 기록 저장",
   top_record_video: "화면 녹화"
 }
@@ -40,12 +40,12 @@ var topButtonContents = {
 // 좌측 버튼 기능
 var canvasButtonContents = {
   'screen_share': ScreenShare,
-  '3d_view': _3DCanvasOnOff,
-  'movie': Movie_Render_Button,
-  'file': LoadFile,
-  'epub': LoadEpub,
-  'callteacher': CallTeacher,
-  'homework': HomeworkSubmit,
+  '3d_view'     : _3DCanvasOnOff,
+  'movie'       : Movie_Render_Button,
+  'file'        : LoadFile,
+  'epub'        : LoadEpub,
+  'callteacher' : CallTeacher,
+  'homework'    : HomeworkSubmit,
 }
 
 let uploadServerUrl = "https://files.primom.co.kr:1443";
@@ -610,23 +610,7 @@ function SetTeacher() {
   $(frame.document.getElementById("callteacher")).remove();
   $(frame.document.getElementById("homework")).remove();
 
-  AddEvent("showcam", "click", function () {
-    var childern = document.getElementById("student_list").children;
-    classroomInfoLocal.showcanvas = false;
-    for (var i = 0; i < childern.length; i++) {
-      Show(childern[i].getElementsByTagName("video")[0]);
-      Hide(childern[i].getElementsByTagName("img")[0]);
-    }
-  })
 
-  AddEvent("showcanvas", "click", function () {
-    var childern = document.getElementById("student_list").children;
-    classroomInfoLocal.showcanvas = true;
-    for (var i = 0; i < childern.length; i++) {
-      Show(childern[i].getElementsByTagName("img")[0]);
-      Hide(childern[i].getElementsByTagName("video")[0]);
-    }
-  })
 }
 
 function SetStudent() {
@@ -717,12 +701,28 @@ function ToggleViewType() {
 
     switch (this.id) {
       case 'top_student':
-        Hide(GetMainVideo());
+
+        var childern = document.getElementById("student_list").children;
+        classroomInfoLocal.showcanvas = true;
+        for (var i = 0; i < childern.length; i++) {
+          Show(childern[i].getElementsByTagName("img")[0]);
+          Hide(childern[i].getElementsByTagName("video")[0]);
+        }
+
+        // Hide(GetMainVideo());
         $('#student_list').show();
         break;
       case 'top_camera':
-        Show(GetMainVideo());
-        $('#student_list').hide();
+        // Show(GetMainVideo());
+
+        var childern = document.getElementById("student_list").children;
+        classroomInfoLocal.showcanvas = false;
+        for (var i = 0; i < childern.length; i++) {
+          Show(childern[i].getElementsByTagName("video")[0]);
+          Hide(childern[i].getElementsByTagName("img")[0]);
+        }
+
+        // $('#student_list').hide();
         break;
     }
   });
@@ -811,7 +811,6 @@ function resizeend() {
 }
 
 function CanvasResize() {
-  console.log("RESIZED")
   var frame = GetWidgetFrame();
   frame.window.resize();
 
@@ -850,3 +849,16 @@ document.getElementById("right-tab-collapse").addEventListener("click",function(
     })
   }
 })
+
+var showcam = false;
+function CamOnOff(){
+  if(!showcam){
+    Show(GetMainVideo());
+    $('#student_list').hide();
+  }
+  else{
+    Hide(GetMainVideo());
+    $('#student_list').show();
+  }
+  showcam = !showcam
+}

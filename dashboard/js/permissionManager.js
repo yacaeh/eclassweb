@@ -124,21 +124,13 @@ function OnClickStudent(div) {
       $('#' +  id + '> .circle').clearQueue();
   
       if (ispermission == 'true') {
-        $('#' + id).css({
-          'background-color': '#18dbbe',
-        });
-        $('#' +  id + '> .circle').css({
-          left: '22px',
-        });
+        $('#' + id).css({'background-color': '#18dbbe'});
+        $('#' +  id + '> .circle').css({left: '22px'});
         $('#' + id).addClass('on');
         $('#' + id).removeClass('off');
       } else {
-        $('#' + id).css({
-          'background-color': 'gray',
-        });
-        $('#' + id + '> .circle').css({
-          left: '2px',
-        });
+        $('#' + id).css({'background-color': 'gray',});
+        $('#' + id + '> .circle').css({left: '2px',});
         $('#' + id).addClass('off');
         $('#' + id).removeClass('on');
       }
@@ -164,13 +156,29 @@ function PermissionButtonSetting(){
     if ($('#student-menu').show()) $('#student-menu').hide();
   });
 
+  function ButtonOn(element){
+    $('#' + element).animate({ 'background-color': "#18dbbe" }, 'fast')
+    $('#' + element).children('.circle').animate({ left: "22px" }, 'fast')
+    $('#' + element).addClass("on");
+    $('#' + element).removeClass("off");
+  }
+
+  function ButtonOff(element){
+    $('#' + element).animate({ 'background-color': "gray" }, 'fast')
+    $('#' + element).children('.circle').animate({ left: "2px" }, 'fast')
+    $('#' + element).removeClass("on");
+    $('#' + element).addClass("off");
+  }
+
   $(".perbtn").click(function () {
     var circle = this.getElementsByClassName("circle")[0];
     var pid = nowSelectStudent.dataset.id;
   
     if (this.id == "classP") {
       if (this.classList.contains("off")) {
-        if (classroomInfo.classPermission != undefined) {
+        if (classroomInfo.classPermission != undefined ||
+          (classroomInfo.canvasPermission != undefined && classroomInfo.canvasPermission != pid) || 
+          (classroomInfo.micPermission != undefined  && classroomInfo.micPermission != pid )) {
           alert('이미 다른 학생에게 권한이 있습니다.');
           return false;
         }
@@ -185,9 +193,7 @@ function PermissionButtonSetting(){
           else {
             $(`[data-id='${classroomInfo.micPermission}']`).attr('data-mic-Permission', false);
           }
-          $('#micP').animate({ 'background-color': "#18dbbe" }, 'fast')
-          $('#micP').children('.circle').animate({ left: "22px" }, 'fast')
-          $('#micP').toggleClass("on off");
+          ButtonOn("micP");
           classroomInfo.micPermission = pid;
           nowSelectStudent.dataset.micPermission = true;
         }
@@ -197,34 +203,27 @@ function PermissionButtonSetting(){
             classroomInfo.canvasPermission = pid;
           }
           else {
-            $(`[data-id='${classroomInfo.canvasPermission}']`).attr('data-mic-Permission', false);
+            $(`[data-id='${classroomInfo.canvasPermission}']`).attr('data-canvas-Permission', false);
           }
-          $('#canP').animate({ 'background-color': "#18dbbe" }, 'fast')
-          $('#canP').children('.circle').animate({ left: "22px" }, 'fast')
-          $('#canP').toggleClass("on off");
+          ButtonOn("canP");
           classroomInfo.canvasPermission = pid;
           nowSelectStudent.dataset.canvasPermission = true;
         }
 
         $(this).animate({ 'background-color': '#18dbbe' }, 'fast');
         $(circle).animate({left: '22px'},'fast');
-        $(nowSelectStudent).find(".bor").show();
       }
       else {
         if (classroomInfo.micPermission == classroomInfo.classPermission) {
-          $('#micP').animate({'background-color': "gray"}, 'fast')
-          $('#micP').children('.circle').animate({left: "2px"}, 'fast')
+          ButtonOff("micP");
           classroomInfo.micPermission = undefined;
           nowSelectStudent.dataset.micPermission = false;
-          $('#micP').toggleClass("on off");
         }
 
         if (classroomInfo.canvasPermission == classroomInfo.classPermission) {
-          $('#canP').animate({'background-color': "gray"}, 'fast')
-          $('#canP').children('.circle').animate({left: "2px"}, 'fast')
+          ButtonOff("canP");
           classroomInfo.canvasPermission = undefined;
           nowSelectStudent.dataset.canvasPermission = false;
-          $('#canP').toggleClass("on off");
         }
 
         classroomInfo.classPermission = undefined;
@@ -232,7 +231,6 @@ function PermissionButtonSetting(){
   
         $(this).animate({'background-color':'gray'},'fast');
         $(circle).animate({ left: '2px' }, 'fast');
-        $(nowSelectStudent).find('.bor').hide();
       }
     }
   
@@ -274,9 +272,25 @@ function PermissionButtonSetting(){
       }
     }
   
+    var cp = nowSelectStudent.dataset.classPermission;
+    var cap = nowSelectStudent.dataset.canvasPermission;
+    var mp = nowSelectStudent.dataset.micPermission;
+
+    $(nowSelectStudent).find(".bor")[0].className = "bor";
+    
+    if(cp === "true"){
+      $(nowSelectStudent).find(".bor")[0].classList.add("class")
+    }
+    else if(mp === "true"){
+      $(nowSelectStudent).find(".bor")[0].classList.add("mic")
+    }
+    else if(cap === "true"){
+      $(nowSelectStudent).find(".bor")[0].classList.add("canvas")
+    }
+
+
     this.classList.toggle('on');
     this.classList.toggle('off');
-  
   
     connection.send({ permissionChanged: classroomInfo });
     
