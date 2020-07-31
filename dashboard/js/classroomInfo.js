@@ -153,8 +153,8 @@ classroomCommand = {
 classroomCommand.openShare = function (callback){
     var s = GetStream(classroomInfoLocal.shareScreen.id)
     if(s != undefined){
-        GetScreenViewer().srcObject = s;
-        GetScreenViewer().style.display = 'block';
+        GetScreenSharingCanvas().srcObject = s;
+        GetScreenSharingCanvas().style.display = 'block';
     }
     
     console.log("OPEN SHARE",s)
@@ -566,6 +566,30 @@ studentCommand = {
     },
 }
 
+let classTimeIntervalHandle;
+
+function updateClassTime() {
+  var now = new Date().getTime() - classroomInfo.roomOpenTime;
+  now = parseInt(now / 1000);
+
+  if (!classTimeIntervalHandle)
+    classTimeIntervalHandle = setInterval(Sec, 1000);
+
+  function Sec() {
+    now++;
+    var time = now;
+    var hour = Math.floor(time / 3600);
+    time %= 3600;
+
+    var min = Math.floor(time / 60);
+    time %= 60;
+
+    if (min < 10) min = '0' + min;
+    if (time < 10) time = '0' + time;
+
+    $('#current-time').text(hour + ':' + min + ':' + time);
+  }
+}
 
 
 

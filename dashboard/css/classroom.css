@@ -250,6 +250,7 @@ button[disabled] {
   border-bottom: 1px solid #b8b8b8;
   align-content: center;
   vertical-align: middle;
+  white-space:nowrap;
 }
 
 .chatbackground {
@@ -359,6 +360,7 @@ hr {
 }
 
 #widget-container {
+  background-color: white;
   position: fixed;
   top: 50px;
   bottom: 0;
@@ -371,6 +373,8 @@ hr {
   overscroll-behavior: none;
   z-index: 2;
 }
+
+
 
 #temp-stream-canvas {
   display: none;
@@ -397,7 +401,7 @@ hr {
 }
 
 
-.lwindow {
+.right-tab {
   position: absolute;
   width: 17.7%;
   bottom: 0px;
@@ -406,7 +410,7 @@ hr {
   background-color: white;
   border-left: solid 1px rgba(0, 0, 0, 0.2);
   outline: solid 1px rgba(0, 0, 0, 0.1);
-  z-index: 1;
+  z-index: 2;
 }
 
 
@@ -444,11 +448,11 @@ hr {
 }
 
 .top_all_controll_on {
-  content: url(/dashboard/newimg/lock.png);
+  content: url(/dashboard/img/lock.png);
 }
 
 .top_all_controll_off {
-  content: url(/dashboard/newimg/unlock.png);
+  content: url(/dashboard/img/unlock.png);
 }
 
 #top_load_book {
@@ -456,11 +460,11 @@ hr {
 }
 
 #top_test {
-  content: url(/dashboard/newimg/ex.png);
+  content: url(/dashboard/img/ex.png);
 }
 
 #top_alert {
-  content: url(/dashboard/newimg/alert.png);
+  content: url(/dashboard/img/alert.png);
 }
 
 #top_share_screen {
@@ -482,28 +486,28 @@ hr {
   content: url(/dashboard/img/top_share_video_off.png);
 }
 #top_record_video {
-  content: url(/dashboard/newimg/recordoff.png);
+  content: url(/dashboard/img/recordoff.png);
 }
 #top_save_alert {
-  content: url(/dashboard/newimg/download.png);
+  content: url(/dashboard/img/download.png);
 }
 #top_pdf {
   content: url(/dashboard/img/pdf.png);
 }
 
 #top_student {
-  content: url(/dashboard/newimg/student.png);
+  content: url(/dashboard/img/student.png);
 }
 #top_camera {
-  content: url(/dashboard/newimg/cam.png);
+  content: url(/dashboard/img/cam.png);
 }
 
 #fullscreen {
-  content: url(/dashboard/newimg/fullscreen.png);
+  content: url(/dashboard/img/fullscreen.png);
 }
 
 #presentation {
-  content: url(/dashboard/newimg/presentation.png);
+  content: url(/dashboard/img/presentation.png);
 }
 
 #session-id {
@@ -542,7 +546,7 @@ hr {
 }
 
 #icon_exit {
-  content: url(/dashboard/newimg/exit.png);
+  content: url(/dashboard/img/exit.png);
   cursor: pointer;
   left: 10px;
   top: 10px;
@@ -893,7 +897,7 @@ hr {
   width: 100%;
   height: 100%;
   border: 3px solid #67ef1d;
-  z-index: 1;
+  z-index: 2;
   display: none;
   pointer-events: none;
 }
@@ -991,14 +995,14 @@ input[type=radio] + label {
   font-size: 12px;
   line-height: 28px; 
   padding-right: 22px;
-  background: url(/dashboard/newimg/radio_base.png) right/22px no-repeat; 
+  background: url(/dashboard/img/radio_base.png) right/22px no-repeat; 
   margin-left: 15px;
   margin-right: 5px;
   margin-top: 0.5rem;
 }
 
 input[type='radio']:checked + label {
-  background-image: url(/dashboard/newimg/radio_on.png);
+  background-image: url(/dashboard/img/radio_on.png);
 }
 
 .btn-exam {
@@ -1331,11 +1335,11 @@ input[type='number']:focus {
 
 @keyframes record {
   from {
-    content: url(/dashboard/newimg/recordoff.png);
+    content: url(/dashboard/img/recordoff.png);
   }
 
   to {
-    content: url(/dashboard/newimg/record.png);
+    content: url(/dashboard/img/record.png);
   }
 }
 
@@ -1460,8 +1464,6 @@ input[type='number']:focus {
 video::-webkit-media-controls{
   pointer-events: none;
 }
-video::-webkit-media-controls-fullscreen-button {
-}
 video::-webkit-media-controls-play-button {
   display: none;
 }
@@ -1534,7 +1536,7 @@ margin: 10px;
 /* 
 
 @media(max-width:700px){
-  .lwindow,
+  .right-tab,
   .nos_student_text,
   .nos_student_icon {
     display: none;
@@ -1569,20 +1571,20 @@ body:fullscreen {
 }
 
 #lprev{
-  content: url(/dashboard/newimg/lastpage.png);
+  content: url(/dashboard/img/lastpage.png);
 }
 
 #prev{
-  content: url(/dashboard/newimg/nextpage.png);
+  content: url(/dashboard/img/nextpage.png);
 }
 
 #next{
-  content: url(/dashboard/newimg/nextpage.png);
+  content: url(/dashboard/img/nextpage.png);
   transform: rotate(180deg);
 }
 
 #lnext{
-  content: url(/dashboard/newimg/lastpage.png);
+  content: url(/dashboard/img/lastpage.png);
   transform: rotate(180deg);
 }
 
@@ -1670,7 +1672,7 @@ body:fullscreen {
 }
 
 #epub-collapse{
-  content: url(/dashboard/newimg/nextpage.png);
+  content: url(/dashboard/img/nextpage.png);
   transform: rotate(-90deg);
   position: absolute;
   right: 5px;
@@ -1737,4 +1739,41 @@ body:fullscreen {
   right: 19%;
   top: 20%;
   z-index: 10000;
+}
+
+#right-tab-collapse{
+  position: absolute;
+  left: -30px;
+  top: calc(50% - 15px);
+  border-radius: 2px;
+  transform: rotate(-90deg);
+  cursor: pointer;
+  border: solid 1px rgba(0, 0, 0, 0.2);
+  height: 30px;
+  width: 30px;
+  align-content: center;
+  text-align: center;
+  background-color: white;
+}
+
+#widget-container > .emojionearea-inline{
+  width: 30%;
+  right: 25px;
+  bottom: 5px;
+  left: auto;
+}
+
+
+.chatonoff{
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  border: solid 1px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  right: 10px;
+  top: 10px;
+  background-color: white;
+  text-align: center;
+  vertical-align: middle;
+  transform: rotate(-90deg);
 }

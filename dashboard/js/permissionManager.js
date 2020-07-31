@@ -1,57 +1,28 @@
-function OnClickStudent(div) {
-  div.click(function (e) {
-    var menu = document.getElementById('student-menu');
-    nowSelectStudent = e.target;
+/////////////////////////////////////
+// 학생 권한 ////////////////////////
+/////////////////////////////////////
 
-    var name = e.target.dataset.name;
-    var pid = e.target.dataset.id;
-
-    SetBtn("classP", e.target.dataset.classPermission);
-    SetBtn("micP", e.target.dataset.micPermission);
-    SetBtn("canP", e.target.dataset.canvasPermission);
-    
-    function SetBtn(id, ispermission){
-      $('#' + id).clearQueue();
-      $('#' +  id + '> .circle').clearQueue();
-  
-      if (ispermission == 'true') {
-        $('#' + id).css({
-          'background-color': '#18dbbe',
-        });
-        $('#' +  id + '> .circle').css({
-          left: '22px',
-        });
-        $('#' + id).addClass('on');
-        $('#' + id).removeClass('off');
-      } else {
-        $('#' + id).css({
-          'background-color': 'gray',
-        });
-        $('#' + id + '> .circle').css({
-          left: '2px',
-        });
-        $('#' + id).addClass('off');
-        $('#' + id).removeClass('on');
-      }
-    }
-    
-    $(menu).css({
-      right: document.body.clientWidth - e.clientX,
-      top: e.clientY,
-    });
-
-    if (!$('#student-menu').is(':visible')) {
-      $('#student-menu').show('blind', {}, 150, function () { });
-    }
-
-    menu.getElementsByClassName('stuname')[0].innerHTML = name;
-  });
-}
-
-
-
+var nowSelectStudent = undefined;
 
 permissionManager = {
+  onPermissionChange : function(data){
+    if (data.permissionChanged.classPermission)
+      permissionManager.setClassPermission(data.permissionChanged.classPermission);
+    else
+      permissionManager.disableClassPermission();
+
+    if (data.permissionChanged.micPermission)
+      permissionManager.setMicPermission(data.permissionChanged.micPermission);
+    else
+      permissionManager.disableMicPermission();
+
+    if (data.permissionChanged.canvasPermission)
+      permissionManager.setCanvasPermission(data.permissionChanged.canvasPermission);
+    else {
+      permissionManager.disableCanvasPermission();
+    }
+  },
+
   setClassPermission: function (id) {
     if (connection.userid == id) {
       console.log("GET CLASS PERMISSION");
@@ -73,7 +44,8 @@ permissionManager = {
   setCanvasPermission : function(id){
     if(connection.userid == id){
       console.log("GET CANVAS PERMISSION");
-      connection.send({sendStudentPoint : true,
+      connection.send({
+        sendStudentPoint : true,
         isStudent : true,
         points : currentPoints ,
         history : currentHistory,
@@ -81,6 +53,7 @@ permissionManager = {
       })
     }
   },
+
   disableCanvasPermission : function(id){
     console.log("LOST CANVAS PERMISSION");
     ClearStudentCanvas();
@@ -134,7 +107,62 @@ permissionManager = {
   }
 }
 
+function OnClickStudent(div) {
+  div.click(function (e) {
+    var menu = document.getElementById('student-menu');
+    nowSelectStudent = e.target;
+
+    var name = e.target.dataset.name;
+    var pid = e.target.dataset.id;
+
+    SetBtn("classP", e.target.dataset.classPermission);
+    SetBtn("micP", e.target.dataset.micPermission);
+    SetBtn("canP", e.target.dataset.canvasPermission);
+    
+    function SetBtn(id, ispermission){
+      $('#' + id).clearQueue();
+      $('#' +  id + '> .circle').clearQueue();
+  
+      if (ispermission == 'true') {
+        $('#' + id).css({
+          'background-color': '#18dbbe',
+        });
+        $('#' +  id + '> .circle').css({
+          left: '22px',
+        });
+        $('#' + id).addClass('on');
+        $('#' + id).removeClass('off');
+      } else {
+        $('#' + id).css({
+          'background-color': 'gray',
+        });
+        $('#' + id + '> .circle').css({
+          left: '2px',
+        });
+        $('#' + id).addClass('off');
+        $('#' + id).removeClass('on');
+      }
+    }
+    
+    $(menu).css({
+      right: document.body.clientWidth - e.clientX,
+      top: e.clientY,
+    });
+
+    if (!$('#student-menu').is(':visible')) {
+      $('#student-menu').show('blind', {}, 150, function () { });
+    }
+
+    menu.getElementsByClassName('stuname')[0].innerHTML = name;
+  });
+}
+
 function PermissionButtonSetting(){
+  $(window).click(function (e) {
+    if (document.getElementById('student-menu').contains(e.target)) return false;
+    if ($(e.target).hasClass('student')) return false;
+    if ($('#student-menu').show()) $('#student-menu').hide();
+  });
 
   $(".perbtn").click(function () {
     var circle = this.getElementsByClassName("circle")[0];

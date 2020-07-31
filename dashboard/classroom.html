@@ -19,19 +19,41 @@
   <link href="/dashboard/fileInput/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" crossorigin="anonymous">
   <link href="/dashboard/fileInput/themes/explorer-fas/theme.css" media="all" rel="stylesheet" type="text/css"/>
+
+  <!-- ================================================================================ -->
   
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <script src="/dashboard/js/jquery-ui.min.js"></script>
-  <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
   <script src="/dist/RTCMultiConnection.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
+   
+  <script src="/dashboard/js/lib/pep.js"></script>
+  <script src="/dashboard/js/lib/xlsx.full.min.js"></script>
+  <script src="/dashboard/js/lib/babylon.js"></script>
+  <script src="/dashboard/js/lib/babylonjs.loaders.min.js"></script>
+  <script src="/dashboard/js/lib/jquery-3.3.1.min.js"></script>
+  <script src="/dashboard/js/lib/jquery-ui.min.js"></script>
+  <script src="/dashboard/js/lib/bootstrap.min.js"></script>
+  <script src="/dashboard/js/lib/epub.min.js"></script>
+  <script src="/dashboard/js/lib/FileSaver.min.js"></script>
+  
   <script src="/node_modules/fbr/FileBufferReader.js"></script>
-  <script src="/dashboard/js/xlsx.full.min.js"></script>
-  <script src="/dashboard/js/FileSaver.min.js"></script>
-  <script src="/dashboard/js/bootstrap.min.js"></script>
+  <script src="/node_modules/webrtc-adapter/out/adapter.js"></script>
   <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
+  
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+
+  <script src="/dashboard/fileInput/js/plugins/piexif.js" type="text/javascript"></script>
+  <script src="/dashboard/fileInput/js/plugins/sortable.js" type="text/javascript"></script>
+  <script src="/dashboard/fileInput/js/fileinput.js" type="text/javascript"></script>
+  <script src="/dashboard/fileInput/js/locales/kr.js" type="text/javascript"></script>
+  <script src="/dashboard/fileInput/js/locales/es.js" type="text/javascript"></script>
+  <script src="/dashboard/fileInput/themes/fas/theme.js" type="text/javascript"></script>
+  <script src="/dashboard/fileInput/themes/explorer-fas/theme.js" type="text/javascript"></script>
+
+  <!-- ================================================================================ -->
+
+  <script src="/dashboard/js/lib.js" ></script>
   <script src="/dashboard/canvas/canvas-designer-widget.js"></script>
-  <script src="/dashboard/js/emojionearea.min.js"></script>
   <script src="/dashboard/js/classroomStudentsWatchInfo.js"></script>    
   <script src="/dashboard/js/fileViewer.js"></script>
   <script src="/dashboard/js/examObj.js"></script>
@@ -44,26 +66,19 @@
   <script src="/dashboard/js/mobileHelper.js"></script>
   <script src="/dashboard/js/pointerSaver.js" ></script>
   <script src="/dashboard/js/page-navigator.js" ></script>
+  <script src="/dashboard/js/epub.js" ></script>
   <script defer src="/dashboard/js/classroom.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
-  <script src="/dashboard/js/epub.min.js"></script>
-  <script src="/dashboard/js/student_permission.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-  <script src="/dashboard/fileInput/js/plugins/piexif.js" type="text/javascript"></script>
-  <script src="/dashboard/fileInput/js/plugins/sortable.js" type="text/javascript"></script>
-  <script src="/dashboard/fileInput/js/fileinput.js" type="text/javascript"></script>
-  <script src="/dashboard/fileInput/js/locales/kr.js" type="text/javascript"></script>
-  <script src="/dashboard/fileInput/js/locales/es.js" type="text/javascript"></script>
-  <script src="/dashboard/fileInput/themes/fas/theme.js" type="text/javascript"></script>
-  <script src="/dashboard/fileInput/themes/explorer-fas/theme.js" type="text/javascript"></script>
-  <script src="/dashboard/js/babylon.js"></script>
-  <script src="/dashboard/js/babylonjs.loaders.min.js"></script>
-  <script src="/dashboard/js/pep.js"></script>
+  <script src="/dashboard/js/chatting.js" ></script>
+  <script src="/dashboard/js/permissionManager.js"></script>
   <script src=/dashboard/js/3d_render.js></script>
+
+  <script src="/dashboard/js/lib/emojionearea.min.js"></script>
 </head>
 
 <body ondragstart="return false" style="height: 1080px;">
 <a id="downloadLink" type="video/webm" style="display: none"></a>
+
+
 
   <div style="display: none;" class="shadow-4" id="bigcanvas">
     <img style="width: 100%; height: 100%;" id="bigcanvas-img">
@@ -72,7 +87,6 @@
   <div id="toptooltip">
     <span class="text"></span>
     <span class="sq"> </span>
-
   </div>
 
 <div id="confirm-box" class="modal fade">
@@ -101,12 +115,13 @@
     <span class="back"></span>
     <input id="urlinput" onkeyup="_Movie_Render_key_event();" type="text" placeholder="URL을 입력하세요">
   </div>
+
     <header id="header">
       <img id="icon_exit">
       <img style="display: none;" id="top_logo">
       <span id="my-name"></span>
       <span id="session-id"></span>
-      <img id="student-isallcontrol" src="/dashboard/newimg/lock.png" style="
+      <img id="student-isallcontrol" src="/dashboard/img/lock.png" style="
       display: none;
       right: 60px;
       position: absolute;
@@ -130,9 +145,7 @@
           <span class="time">
               <span id="current-time"></span>
               <span id="recording-time">
-                <img src="/dashboard/newimg/recording.png" style="
-                      margin-right: 7px;
-                      margin-bottom: 2px;">
+                <img src="/dashboard/img/recording.png" style="margin-right: 7px; margin-bottom: 2px;">
                 <span class="text">0:00:00</span>
           </span>
         </div>
@@ -215,61 +228,59 @@
             <div class="canper">판서 공유 <span id="canP" class="perbtn off"><span class="circle"></span> </span> </div>
             <!-- <div class="line2" ></div> -->
             <!-- <div class="out"> -->
-              <!-- <img src="/dashboard/newimg/getout.png"> -->
+              <!-- <img src="/dashboard/img/getout.png"> -->
               <!-- <span class="outtext">내보내기</span> -->
             <!-- </div> -->
         </div>
         
-        <div class="lwindow">
-          <span class="nos">
-            <button id="showcam" >캠</button>
-            <button id="showcanvas">판서</button>
-            <span class="now_selected_student">
-              <!-- <span class="name">지이잉</span> -->
-              <!-- <span class="status_img"></span> -->
-              <!-- <span class="status_text">접속중</span> -->
-             
-            
-            </span>
-              <span id="student_permission">
-                <div id='class_permission'>
-                </div>
-                <div id="mic_permission">
-                </div>
-              </span>
-                  <span class="nos_student_text" id="nos">0</span>
-                  <img class="nos_student_icon" src="/dashboard/newimg/student2.png">
-                </span>
-                
-              <div class="for_teacher" style="display: none;">
 
-                <div id="student_list">
-            </div>
-            </div>
-            <video style="display: none;"  id="main-video" playsinline autoplay></video>
-
-
-
-      <div class="chatting">
-
-        <div id="notice" class="on">
-          <span class="text">선생님 채팅</span>
-          <div class="scroll" id="noticewindow"></div>
-          <div id="collapse">
-            <img class="btn" src="/dashboard/newimg/openchat.png">
-          </div>
-        </div>
-
-        <div class="conversation-panel">
-          <div class="chatbackground"></div>
-            <div class="scroll" id="conversation-panel"></div>
-            <textarea id="txt-chat-message"></textarea>
-        </div>
-      </div>
-      </div>
     </article>
 
     <div id="other-videos"></div>
+    <div class="right-tab">
+      <div id="right-tab-collapse">
+        <img src="/dashboard/img/openchat.png" >
+      </div>
+    
+      <span class="nos">
+        <button id="showcam" >캠</button>
+        <button id="showcanvas">판서</button>
+        <span class="now_selected_student"></span>
+          <span id="student_permission">
+            <div id='class_permission'>
+            </div>
+            <div id="mic_permission">
+            </div>
+          </span>
+              <span class="nos_student_text" id="nos">0</span>
+              <img class="nos_student_icon" src="/dashboard/img/student2.png">
+            </span>
+     
+            <div class="for_teacher" style="display: none;">
+          <div id="student_list"></div>
+        </div>
+        <video style="display: none;"  id="main-video" playsinline autoplay></video>
+    
+    
+    
+    <div class="chatting">
+    
+    <div id="notice" class="on">
+      <span class="text">선생님 채팅</span>
+      <div class="scroll" id="noticewindow"></div>
+      <div id="collapse">
+        <img class="btn" src="/dashboard/img/openchat.png">
+      </div>
+    </div>
+    
+    <div class="conversation-panel">
+      <div class="chatbackground"></div>
+        <div class="scroll" id="conversation-panel"></div>
+        <textarea id="txt-chat-message"></textarea>
+    </div>
+    </div>
+    </div>
+
   <div id="alert-exit" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
     <div id="alert-dialog">
       <div id="alert-header"><span id="alert-exit-title">경고</span></div>

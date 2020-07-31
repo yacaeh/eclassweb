@@ -141,6 +141,8 @@ PageNavigator = {
         this.idx ++;
     },
     select : function(idx){
+      console.log(idx);
+      console.log(this.list);
       var pre = this.list.getElementsByClassName("selected")[0];
       if(pre)
         pre.classList.remove("selected");
