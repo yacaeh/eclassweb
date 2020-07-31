@@ -159,7 +159,9 @@ window.onWidgetLoaded = function () {
   WindowFocusChecker();
   SendCanvasDataToOwner();
   SetCanvasBtn(canvasButtonContents);
-  setTimeout(mobileHelper.Init(), 1000);
+  SetShortcut(shortCut);
+  mobileHelper.Init();
+
 }
 
 connection.onopen = function (event) {
@@ -764,6 +766,8 @@ function removeClassInfo() {
 }
 
 function WindowFocusChecker() {
+  window.focus();
+
   function sendFocus(state) {
     if (!connection.extra.roomOwner) {
       connection.send({
@@ -781,6 +785,8 @@ function WindowFocusChecker() {
   var checkInterval = undefined;
   function focusCheck(e) {
     if (e.type == "blur") {
+      RemoveTooltip();
+
       checkInterval = setTimeout(function () {
         sendFocus(false);
       }, 100);
