@@ -20,7 +20,7 @@ function SetMobile(){
     MainCamSetting();
     FullScreenBtnInit();
     ToolSetting();
-    $(".lwindow").css({display:"none", width : "0px"})
+    $(".right-tab").css({display:"none", width : "0px"})
 }
 
 function ToolSetting(){

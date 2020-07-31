@@ -397,6 +397,7 @@ connection.onmessage = function (event) {
   if (event.data.closeTesting) {
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);
+      $(".right-tab").css("z-index", 3);
     }
     if (isMobile)
       document.getElementById("widget-container").style.right = "0px";
@@ -812,6 +813,8 @@ function resizeend() {
 
 function CanvasResize() {
   var frame = GetWidgetFrame();
+  GetWidgetFrame().window.resize();
+
   var canvas = frame.document.getElementById('main-canvas');
   var x = canvas.width;
   var y = canvas.height;
@@ -823,4 +826,27 @@ function CanvasResize() {
   }
   if (GetWidgetFrame().document.getElementById("epub-viewer"))
     EpubPositionSetting()
+
+
 }
+
+document.getElementById("right-tab-collapse").addEventListener("click",function(){
+  this.classList.toggle("off");
+  
+  if(this.classList.contains("off")){
+    this.style.transform = "rotate(90deg)";
+    $(".right-tab").animate({width : "0%"})
+    $("#widget-container").animate({right : "0%"},
+    function(){
+      CanvasResize();
+    })
+  }
+  else{
+    this.style.transform = "rotate(-90deg)";
+    $(".right-tab").animate({width : "17.7%"})
+    $("#widget-container").animate({right : "17.7%"},
+    function(){
+      CanvasResize();
+    })
+  }
+})

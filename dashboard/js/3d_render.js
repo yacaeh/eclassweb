@@ -145,7 +145,7 @@ function CanvasResize() {
     _3dcanvas = frame.document.getElementById("renderCanvas")
 
     var canvas = frame.document.getElementById("main-canvas");
-    var r = document.getElementsByClassName("lwindow")[0];
+    var r = document.getElementsByClassName("right-tab")[0];
     var rwidth = $(r).width();
 
     _3dcanvas.width = canvas.width - rwidth - 50;

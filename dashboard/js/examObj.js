@@ -43,7 +43,9 @@ examObj.init = function(){
         if ($('#exam-board').is(':visible')) {
           if (examObj.closeTesting()) {
             document.getElementById("widget-container").removeAttribute("style")
-            $('#exam-board').hide(300);
+            $('#exam-board').hide(300,function(){
+                $(".right-tab").css("z-index", 3);
+            });
           } else {
             alert("시험 종료 후 닫을 수 있습니다");
           }
@@ -55,11 +57,7 @@ examObj.init = function(){
             CanvasResize();
             $('#exam-omr').hide();
             $('#exam-teacher-menu').show();
-          }
-          // 학생
-          else {
-            $('#exam-omr').show();
-            $('#exam-teacher-menu').hide();
+            $(".right-tab").css("z-index", -1);
           }
           $('#exam-board').show(300);
         }
@@ -557,6 +555,7 @@ function setStudentOMR(quesCount, examTime) {
         document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
     }
     CanvasResize();
+    $(".right-tab").css("z-index", -1);
 
     $('#exam-omr').show();
     $('#exam-board').show();
