@@ -208,6 +208,8 @@ connection.onmessage = function (event) {
     console.log("SCREEN SHARE START", event.data.showMainVideo)
 
     ClearCanvas();
+    ClearStudentCanvas();
+    ClearTeacherCanvas();
     classroomInfoLocal.shareScreenByStudent = true;
     classroomInfoLocal.shareScreen.state = true;
     classroomInfo.shareScreen = {}
@@ -329,6 +331,9 @@ connection.onmessage = function (event) {
 
   if (event.data.modelEnable) {
     ClearCanvas();
+    ClearStudentCanvas();
+    ClearTeacherCanvas();
+
     var enable = event.data.modelEnable.enable;
     setShared3DStateLocal(enable);
     return;

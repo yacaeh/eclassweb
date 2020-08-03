@@ -2374,9 +2374,20 @@ function canvasresize(id){
        
         if(data.isStudent){
             var id = data.userid;
-            if(!studentPoints[id])
-                studentPoints[id] = []
-            PushPoints(data, studentPoints[id]);
+
+            console.log(data,studentPoints);
+
+            if(id == undefined){
+                Object.keys(studentPoints).forEach(function(key){
+                    studentPoints[key].length = 0;
+                })
+            }
+            else{
+                if(!studentPoints[id])
+                    studentPoints[id] = []
+    
+                PushPoints(data, studentPoints[id]);
+            }
         }
         else 
             PushPoints(data, teacherPoints);

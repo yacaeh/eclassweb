@@ -890,7 +890,7 @@ hr {
   background-color: rgba(0,0,0,0.5);
   height: 16px;
   pointer-events: none;
-  z-index: 100;
+  z-index: 1;
 }
 
 .student > .permissions > .img{
