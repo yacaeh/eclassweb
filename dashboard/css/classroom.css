@@ -890,7 +890,7 @@ hr {
   background-color: rgba(0,0,0,0.5);
   height: 16px;
   pointer-events: none;
-  z-index: 1;
+  z-index: 3;
 }
 
 .student > .permissions > .img{
@@ -916,7 +916,7 @@ hr {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 2;
+  z-index: 4;
   pointer-events: none;
 }
 
@@ -959,7 +959,7 @@ hr {
   align-content: center;
   font-size: 12px;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
 }
 
 .student .name .alert {

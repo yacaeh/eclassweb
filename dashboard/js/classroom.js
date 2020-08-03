@@ -636,7 +636,7 @@ function JoinStudent(event){
   canvas_array[id] = img;
   console.log("JOIN ROOM", id, name);
   var div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
-              <span class="permissions"></span> \
+              <span style="display:none;" class="permissions"></span> \
               <span class="student-overlay"></span> \
               <span class="bor"></span> \
               <span class="name">' + name + '</span></span>')

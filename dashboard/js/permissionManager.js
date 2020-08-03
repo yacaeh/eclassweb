@@ -336,10 +336,16 @@ function MakeIcon(id, type){
 
   var perlist = FindInList(id).getElementsByClassName("permissions")[0];
   perlist.appendChild(img);
+
+  perlist.style.display = 'block';
 }
 
 function DeleteIcon(id, type){
   var node = FindInList(id)
   console.log(node.getElementsByClassName(type)[0]);
   node.getElementsByClassName(type)[0].parentElement.removeChild(node.getElementsByClassName(type)[0])
+
+  if(FindInList(id).getElementsByClassName("permissions")[0].children.length == 0){
+    FindInList(id).getElementsByClassName("permissions")[0].style.display = "none";
+  }
 }

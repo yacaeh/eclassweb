@@ -60,6 +60,7 @@ function Hide(element){
 
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {
+  $(".right-tab").css("z-index",1);
     callback_yes = callback_yes || function () { };
     callback_no = callback_no || function () { };
   
@@ -68,14 +69,22 @@ function alertBox(message, title, callback_yes, callback_no) {
     $('.btn-alert-yes').unbind('click').bind('click', function (e) {
       if (clickCount++ == 0) {
         e.preventDefault();
-        $('#alert-box').fadeOut(300);
+        
+        $.when($('#alert-box').fadeOut(300)).done(function(){
+          $(".right-tab").css("z-index",2);
+        });
+
         callback_yes();
       }
     });
     $('.btn-alert-no').unbind('click').bind('click', function (e) {
       if (clickCount++ == 0) {
         e.preventDefault();
-        $('#alert-box').fadeOut(300);
+        
+        $.when($('#alert-box').fadeOut(300)).done(function(){
+          $(".right-tab").css("z-index",2);
+        });
+
         callback_no();
       }
     });
