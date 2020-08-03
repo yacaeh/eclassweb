@@ -45,7 +45,7 @@ designer.icons.fullon = '/dashboard/img/cam_max.png';
 
 
 designer.addSyncListener(function (data) {
-    var isStudent = data.userid == classroomInfo.canvasPermission;
+    var isStudent = permissionManager.IsCanvasPermission(data.userid);
     if (connection.extra.roomOwner || isStudent) {
         data.isStudent = isStudent;
         connection.send(data);

@@ -562,7 +562,7 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
                     cmd: 'pdf-page',
                     data: page
                 }
-            });
+            },GetOwnerId());
         }
     }
 }

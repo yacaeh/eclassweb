@@ -10,7 +10,6 @@
   <meta name="description" content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
   
   <link rel="stylesheet" href="/dashboard/css/classroom.css">
-  <link rel="shortcut icon" href="/dashboard/logo.png">
   <link href ="/favicon.ico" rel="shortcut icon" />
   <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
@@ -155,7 +154,6 @@
     <article id="article">
         <div id="widget-container">
 
-          
           <div id="epub-navi" style="display: none;" class="shadow-5">
             <span id="navi-top">
               <input id="epubidx" autocomplete="off">
@@ -171,9 +169,9 @@
             </span>
           </div>
 
+          <!-- 시험 Window -->
           <div id="exam-board" class="scroll">
             <div id="exam-teacher-menu" style="display: none;">
-              <!-- 시험 만들기 -->
               <div id="exam-setting-bar">
                 <div id="exam-title" class="exam-border-bottom">문제출제</div>
                 <div style="display: flex; width: 100%; height: 37px; background: #EFF1F0;" class="exam-border-bottom">
@@ -185,10 +183,8 @@
                 </div>
                 <div id="exam-question-list" class="exam-border-bottom exam-overflow" style="text-align: center;">
                 </div>
-                <!--button id="exam-add-question" class="btn btn-primary">문제 추가</button-->
                 <button id="exam-start" class="btn btn-exam exam-80-button">시험 시작</button>
               </div>
-              <!-- 정답률 표시 -->
               <div id="exam-state" style="display: none;">
               </div>
             </div>
@@ -196,6 +192,7 @@
             </div>
           </div>
           
+          <!-- 알림 Window -->
           <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
             <div id="alert-dialog">
               <div id="alert-header"><span id="alert-title">알림</span></div>
@@ -213,24 +210,15 @@
           </div>
         
           <div id="edunetContent"></div>
-
         </div>
-        <!--Epub-->
-        <!-- <div id="viewer" class="spreads"></div> -->
-        <!--End Epub-->
-        <!-- <video id="screen-viewer" style="display: none;" controls playsinline autoplay></video> -->
-        <div id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
+
+        <!-- 학생 권한 Window -->
+        <div onmousedown="return false" id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
             <div class="stuname">이름</div>
-            <!-- <div class="status" >접속중</div> -->
             <div class="line1" ></div>
-            <div class="permission">수업권한 <span id="classP" class="perbtn off"><span class="circle"></span> </span> </div>
+            <div class="permission">화면 공유 <span id="classP" class="perbtn off"><span class="circle"></span> </span> </div>
             <div class="mic">마이크 <span id="micP" class="perbtn off"><span class="circle"></span> </span> </div>
             <div class="canper">판서 공유 <span id="canP" class="perbtn off"><span class="circle"></span> </span> </div>
-            <!-- <div class="line2" ></div> -->
-            <!-- <div class="out"> -->
-              <!-- <img src="/dashboard/img/getout.png"> -->
-              <!-- <span class="outtext">내보내기</span> -->
-            <!-- </div> -->
         </div>
         
 

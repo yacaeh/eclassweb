@@ -85,7 +85,7 @@ if (!!params.password) {
 CreateTopTooltip(topButtonContents);
 
 // 학생 권한 Form 세팅
-PermissionButtonSetting();
+permissionManager.init();
 
 // 페이지 탐색기 초기화
 PageNavigator.init();
@@ -130,7 +130,8 @@ AddEvent("top_alert", "click", function () {
   classroomCommand.sendAlert(function () {
     var chilldren = document.getElementById('student_list').children;
     for (var i = 0; i < chilldren.length; i++) {
-      var al = chilldren[i].getElementsByClassName('alert')[0];
+      var al = chilldren[i].getElementsByClassName('bor')[0];
+      al.className = "bor";
       al.classList.add('alert_wait');
     }
   });
@@ -161,11 +162,11 @@ window.onWidgetLoaded = function () {
   SetCanvasBtn(canvasButtonContents);
   SetShortcut(shortCut);
   mobileHelper.Init();
-  }
+}
 
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
-  SetStudentList(event, true);
+  JoinStudent(event);
   connection.send('plz-sync-points');
   classroomCommand.onConnectionSession(event);
   if (classroomInfoLocal.shareScreen.fromme) {
@@ -175,25 +176,19 @@ connection.onopen = function (event) {
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
   console.log('onclose!', event);
-  SetStudentList(event, false);
+  LeftStudent(event);
 };
 
 connection.onmessage = function (event) {
   if (debug)
     console.log(event);
 
+  if(permissionManager.eventListener(event))
+    return;
+
+
   if (event.data.canvassend) {
     canvas_array[event.userid].src = event.data.canvas;
-    return;
-  }
-
-  if (event.data.unmute) {
-    permissionManager.unmute(event.data.unmute);
-    return;
-  }
-
-  if (event.data.mute) {
-    permissionManager.mute();
     return;
   }
 
@@ -208,11 +203,6 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data.permissionChanged) {
-    classroomInfo = event.data.permissionChanged;
-    permissionManager.onPermissionChange(event.data);
-    return;
-  }
 
   if (event.data.showMainVideo) {
     console.log("SCREEN SHARE START", event.data.showMainVideo)
@@ -257,8 +247,7 @@ connection.onmessage = function (event) {
   }
 
   if (event.data.studentCmd) {
-    if (connection.extra.roomOwner)
-      classroomCommand.onStudentCommand(event.data.studentCmd);
+    classroomCommand.onStudentCommand(event.data.studentCmd);
     return;
   }
 
@@ -378,17 +367,14 @@ connection.onmessage = function (event) {
     return;
   }
 
-  // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
   if (event.data.onFocus) {
-    if (connection.extra.roomOwner) {
-      classroomCommand.receivedOnFocusResponse({ userId: event.data.onFocus.userid, onFocus: event.data.onFocus.focus });
-    }
+      classroomCommand.receivedOnFocusResponse({ 
+        userId: event.data.onFocus.userid, 
+        onFocus: event.data.onFocus.focus });
     return;
   }
 
-  // 학생이 선생님에게 권한 요청을 한다.
   if (event.data.callTeacher) {
-    if (connection.extra.roomOwner)
       classroomCommand.receivedCallTeacherResponse(event.data.callTeacher.userid);
     return;
   }
@@ -601,24 +587,19 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
 function SetTeacher() {
   let frame = GetWidgetFrame();
-
-  $('#session-id').text(connection.extra.userFullName + " (" + params.sessionid + ")");
+  document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
   $("#my-name").remove();
   $(".for_teacher").show();
   $(".controll").show();
   $(".feature").show();
   $(frame.document.getElementById("callteacher")).remove();
   $(frame.document.getElementById("homework")).remove();
-
-
 }
 
 function SetStudent() {
   GetMainVideo().style.display = 'block';
-
-  $('#session-id').text(connection.extra.userFullName + '(' + params.sessionid + ')');
+  document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
   $(".for_teacher").remove();
-  $('#my-name').text('학생 이름 : ' + connection.extra.userFullName);
   $('.for_teacher').hide();
   $(".for_teacher").show();
   $(".controll").remove();
@@ -634,65 +615,76 @@ function SetStudent() {
 }
 
 function SetStudentList(event, isJoin) {
-  $('#nos').text(connection.getAllParticipants().length);
-  if (!connection.extra.roomOwner)
-    return;
-  var id = event.userid;
-  var name = event.extra.userFullName;
-  if (isJoin) {
-    var img = document.createElement("img");
-    if (!classroomInfoLocal.showcanvas)
-      img.style.display = 'none';
-    canvas_array[id] = img;
-    console.log("JOIN ROOM", id, name);
-    var div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
-                <span class="student-overlay"></span> \
-                <span class="bor"></span> \
-                <span class="name"><span class="alert alert_wait"></span>' + name + '</span></span>')
-    OnClickStudent(div, id, name);
-    var interval;
-
-    div[0].addEventListener("mouseover", function () {
-      clearInterval(interval);
-      Show("bigcanvas");
-      document.getElementById("bigcanvas-img").src = canvas_array[id].src;
-      interval = setInterval(function () {
-        document.getElementById("bigcanvas-img").src = canvas_array[id].src;
-      }, 1000);
-    })
-
-    div[0].addEventListener("mouseleave", function () {
-      Hide("bigcanvas");
-      clearInterval(interval);
-    })
-
-    $("#student_list").append(div);
-    $(div).append(img);
-  }
-  else {
-    var childern = document.getElementById("student_list").children;
-    for (var i = 0; i < childern.length; i++) {
-      var child = childern[i];
-      if (child.dataset.id == id) {
-        document.getElementById("student_list").removeChild(child);
-        delete canvas_array[id];
-        console.log("EXIT ROOM", id, name);
-        break;
-      }
-    }
-
-    if (id == classroomInfo.classPermission)
-      classroomInfo.classPermission = undefined;
-
-    if (id == classroomInfo.micPermission)
-      classroomInfo.micPermission = undefined;
-
-    if (id == classroomInfo.canvasPermission)
-      classroomInfo.canvasPermission = undefined;
-  }
 
 
 }
+
+function JoinStudent(event){
+  document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
+  if (!connection.extra.roomOwner) return;
+  var id = event.userid;
+  var name = event.extra.userFullName;
+
+  var img = document.createElement("img");
+  if (!classroomInfoLocal.showcanvas)
+    img.style.display = 'none';
+  canvas_array[id] = img;
+  console.log("JOIN ROOM", id, name);
+  var div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
+              <span class="permissions"></span> \
+              <span class="student-overlay"></span> \
+              <span class="bor"></span> \
+              <span class="name">' + name + '</span></span>')
+  OnClickStudent(div, id, name);
+  var interval;
+
+  div[0].addEventListener("mouseover", function () {
+    clearInterval(interval);
+    Show("bigcanvas");
+    document.getElementById("bigcanvas-img").src = canvas_array[id].src;
+    interval = setInterval(function () {
+      document.getElementById("bigcanvas-img").src = canvas_array[id].src;
+    }, 1000);
+  })
+
+  div[0].addEventListener("mouseleave", function () {
+    Hide("bigcanvas");
+    clearInterval(interval);
+  })
+
+  $("#student_list").append(div);
+  $(div).append(img);
+
+}
+
+function LeftStudent(event){
+  document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
+  if (!connection.extra.roomOwner) return;
+  var id = event.userid;
+  var name = event.extra.userFullName;
+
+  if (id == classroomInfo.classPermission)
+    classroomInfo.classPermission = undefined;
+
+  if (id == classroomInfo.micPermission)
+    classroomInfo.micPermission = undefined;
+
+  if (permissionManager.IsCanvasPermission(id))
+  permissionManager.DeleteCanvasPermission(id);
+
+  
+  var childern = document.getElementById("student_list").children;
+  for (var i = 0; i < childern.length; i++) {
+    var child = childern[i];
+    if (child.dataset.id == id) {
+      document.getElementById("student_list").removeChild(child);
+      delete canvas_array[id];
+      console.log("EXIT ROOM", id, name);
+      break;
+    }
+  }
+}
+
 
 function ToggleViewType() {
   $('.view_type').click(function () {
@@ -729,7 +721,7 @@ function ToggleViewType() {
 }
 
 function CallTeacher() {
-  connection.send({ callTeacher: { userid: connection.userid } }, GetOwnerId());
+  connection.send({callTeacher: { userid: connection.userid } }, GetOwnerId());
 }
 
 // Save classinfo on user exit
@@ -776,9 +768,6 @@ function WindowFocusChecker() {
           focus: state
         }
       }, GetOwnerId());
-      // if (!state) {
-      //   console.log("You left class!");
-      // }
     }
   }
 

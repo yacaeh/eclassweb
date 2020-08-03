@@ -559,14 +559,6 @@ hr {
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-#top_logo {
-  content: url(/dashboard/ai_icon.png);
-  left: 60px;
-  position: absolute;
-  top: 10px;
-  width: 120px;
-}
-
 #top_attach-file {
   content: url(/dashboard/img/iconfinder_File.png);
 }
@@ -883,7 +875,7 @@ hr {
 }
 
 .student {
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(0, 0, 0);
   display: inline-block;
   margin: 1px;
   cursor: pointer;
@@ -891,6 +883,34 @@ hr {
   vertical-align: bottom;
   position: relative;
 }
+
+.student > .permissions{
+  position: absolute;
+  width: 100%;
+  background-color: rgba(0,0,0,0.5);
+  height: 16px;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.student > .permissions > .img{
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  margin-right: 3px;
+  margin-top: 2px;
+}
+
+.student > .permissions > .img.screen{
+  right: 35px;
+}
+.student > .permissions > .img.canvas{
+  right: 2px;
+}
+.student > .permissions > .img.mic{
+  right: 18px;
+}
+
 
 .student > .bor {
   position: absolute;
@@ -900,13 +920,13 @@ hr {
   pointer-events: none;
 }
 
-.student > .bor.canvas{
-  border: 3px solid #007bff;
+.student > .bor.alert_wait{
+  border: 3px solid yellow;
 }
-.student > .bor.mic{
+.student > .bor.alert_no{
   border: 3px solid #ff5959;
 }
-.student > .bor.class{
+.student > .bor.alert_yes{
   border: 3px solid #67ef1d;
 }
 
@@ -933,7 +953,7 @@ hr {
   position: absolute;
   bottom: 0px;
   left: 0px;
-  background-color: black;
+  background-color: rgba(0,0,0,0.5);
   text-align: center;
   right: 0px;
   align-content: center;
@@ -954,17 +974,6 @@ hr {
   border: 0px solid transparent;
 }
 
-.student .name .alert_yes {
-  background-color: mediumspringgreen;
-}
-
-.student .name .alert_no {
-  background-color: red;
-}
-
-.student .name .alert_wait {
-  background-color: yellow;
-}
 
 .no_student {
   width: 100%;

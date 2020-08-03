@@ -8,11 +8,8 @@
 'use strict';
 
 (function() {
-
-
-
     var teacherPoints = [];
-    var studentPoints = [];
+    var studentPoints = {};
 
 
     document.addEventListener("click", function(){
@@ -456,13 +453,16 @@ function canvasresize(id){
 
             var _this = this;
 
-            studentPoints.forEach(function(data){
-                drawpoint(data.points);
+            Object.keys(studentPoints).forEach(function(e){
+                studentPoints[e].forEach(function(data){
+                    drawpoint(data.points);
+                })
             })
 
             teacherPoints.forEach(function(data){
                 drawpoint(data.points);
             })
+
             drawpoint(points);
 
             function drawpoint(points) {
@@ -528,8 +528,6 @@ function canvasresize(id){
                 }
 
             }
-
-
         },
 
         getOptions: function(opt) {
@@ -2373,8 +2371,13 @@ function canvasresize(id){
         if (!event.data.canvasDesignerSyncData) return;
 
         var data = event.data.canvasDesignerSyncData;
-        if(data.isStudent)
-            PushPoints(data, studentPoints);
+       
+        if(data.isStudent){
+            var id = data.userid;
+            if(!studentPoints[id])
+                studentPoints[id] = []
+            PushPoints(data, studentPoints[id]);
+        }
         else 
             PushPoints(data, teacherPoints);
 
@@ -2399,7 +2402,6 @@ function canvasresize(id){
                 window.parent.currentPoints = points;
                 window.parent.currentHistory = pointHistory;
                 break;
-
             case "default":
             case "loaddata":
                 var startIdx = 0;
