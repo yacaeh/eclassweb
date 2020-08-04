@@ -402,13 +402,10 @@ connection.onmessage = function (event) {
 };
 
 connection.onstream = function (event) {
-  console.log('onstream!');
+  console.log('onstream!',event);
 
   if (params.open === 'true' || params.open === true) {
-    CanvasResize();
     permissionManager.mute();
-  }
-  else {
   }
 
   LoadScreenShare();
@@ -418,7 +415,9 @@ connection.onstream = function (event) {
       $(GetScreenSharingCanvas()).hide();
     }
   }
-  else if (event.extra.roomOwner === true || connection.peers[event.userid].extra.roomOwner) {
+
+  // 학생들 선생의 캠 세팅
+  else if (event.extra.roomOwner || connection.peers[event.userid].extra.roomOwner) {
 
     if (connection.extra.roomOwner && event.type == "remote")
       return;
@@ -436,6 +435,8 @@ connection.onstream = function (event) {
 
     video.srcObject = event.stream;
   }
+
+  // 학생들 캠 추가
   else if (event.stream.isVideo) {
     try {
       if (event.streamid.includes("-") || !connection.extra.roomOwner) {
@@ -448,18 +449,20 @@ connection.onstream = function (event) {
       event.mediaElement.style.pointerEvents = "none";
       event.mediaElement.style.position = "absolute";
 
-      var otherVideos = document.getElementById("student_list");
-      var childern = otherVideos.children;
+      if (classroomInfoLocal.showcanvas) {
+        event.mediaElement.style.display = 'none';
+      }
+
+      var childern = document.getElementById("student_list").children;
+
       for (var i = 0; i < childern.length; i++) {
         var child = childern[i];
         if (child.dataset.id == event.userid) {
-          if (classroomInfoLocal.showcanvas) {
-            event.mediaElement.style.display = 'none';
-          }
           child.appendChild(event.mediaElement);
           break;
         }
       }
+
     }
     catch{
       console.log("No Cam")
@@ -497,16 +500,13 @@ connection.onstreamended = function (event) {
     video.style.display = 'none';
   }
 
-  if (connection.extra.roomOwner &&
-    classroomInfo.shareScreen.id == event.streamid) {
+  if (connection.extra.roomOwner && classroomInfo.shareScreen.id == event.streamid) {
     console.error("Streamer has exited");
     event.stream.getTracks().forEach((track) => track.stop());
     hideScreenViewerUI();
     connection.send({ hideMainVideo: true });
     classroomCommand.StopScreenShare();
-    classroomCommand.setShareScreenServer(false, () => {
-      console.log("Streaming Finish")
-    });
+    classroomCommand.setShareScreenServer(false, () => {console.log("Streaming Finish")});
   }
 
 };
@@ -605,8 +605,6 @@ function SetStudent() {
   GetMainVideo().style.display = 'block';
   document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
   $(".for_teacher").remove();
-  $('.for_teacher').hide();
-  $(".for_teacher").show();
   $(".controll").remove();
   $(".feature").remove();
   $("#showcam").remove();
@@ -617,11 +615,6 @@ function SetStudent() {
   $(frame.document.getElementById("movie")).remove();
   $(frame.document.getElementById("file")).remove();
   $(frame.document.getElementById("epub")).remove();
-}
-
-function SetStudentList(event, isJoin) {
-
-
 }
 
 function JoinStudent(event){
@@ -698,28 +691,21 @@ function ToggleViewType() {
 
     switch (this.id) {
       case 'top_student':
-
         var childern = document.getElementById("student_list").children;
         classroomInfoLocal.showcanvas = true;
         for (var i = 0; i < childern.length; i++) {
           Show(childern[i].getElementsByTagName("img")[0]);
           Hide(childern[i].getElementsByTagName("video")[0]);
         }
-
-        // Hide(GetMainVideo());
         $('#student_list').show();
         break;
       case 'top_camera':
-        // Show(GetMainVideo());
-
         var childern = document.getElementById("student_list").children;
         classroomInfoLocal.showcanvas = false;
         for (var i = 0; i < childern.length; i++) {
           Show(childern[i].getElementsByTagName("video")[0]);
           Hide(childern[i].getElementsByTagName("img")[0]);
         }
-
-        // $('#student_list').hide();
         break;
     }
   });
@@ -819,8 +805,6 @@ function CanvasResize() {
   }
   if (frame.document.getElementById("epub-viewer"))
     EpubPositionSetting()
-
-
 }
 
 document.getElementById("right-tab-collapse").addEventListener("click",function(){
