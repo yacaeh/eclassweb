@@ -310,9 +310,12 @@ connection.onmessage = function (event) {
       PageNavigator.off();
     }
 
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
+
+    if(!(event.data.viewer.cmd == "pause" || event.data.viewer.cmd == "play")){
+      ClearCanvas();
+      ClearStudentCanvas();
+      ClearTeacherCanvas();
+    }
 
     classroomCommand.updateViewer(event.data.viewer);
     return;
