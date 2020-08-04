@@ -741,7 +741,12 @@ function getUploadFileList(extraPath) {
         if (xhr.readyState == 4 && xhr.status == 200) {
             updateFileList(JSON.parse(xhr.responseText), extraPath);
         }
+        else {
+            console.log("directory doesn't exist!");
+            updateFileList([], extraPath);
+        }
     };
+
     data = JSON.stringify(data);
     xhr.send(data);
 }
@@ -751,26 +756,31 @@ function updateFileList(list, extraPath) {
 
     var re = /(?:\.([^.]+))?$/;
     var listElement = '<ul class="list-group-flush">';
-    list.files.forEach(file => {
-
-        if (file.name == "homework")
-            return;
-
-        var buttons = "";
-        if (extraPath == "/homework") {
-            buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
-        onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
-        }
-
-        buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
-      onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
-      <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
-      onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
-
-        listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
-            getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
-            '</label>' + buttons;
-    })
+    if (list.length == 0){
+        listElement += '아직 파일이 없습니다!';
+    }
+    else {
+        list.files.forEach(file => {
+        
+            if (file.name == "homework")
+                return;
+    
+            var buttons = "";
+            if (extraPath == "/homework") {
+                buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
+            onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
+            }
+    
+            buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
+          onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
+          <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
+          onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
+    
+            listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
+                getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
+                '</label>' + buttons;
+        })    
+    }
     listElement += '</ul>';
     var $listElement = $($.parseHTML(listElement));
     $("#confirm-message").prepend($listElement);
