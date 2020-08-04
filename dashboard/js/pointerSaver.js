@@ -65,7 +65,8 @@ PointerSaver = {
         });
     },
     send : function(idx){
-    if(!(connection.extra.roomOwner || connection.userid == classroomInfo.canvasPermission)){
+    if(!(connection.extra.roomOwner || 
+        permissionManager.IsCanvasPermission(connection.userid))){
         return;
     }
     
@@ -104,19 +105,15 @@ designer.syncData({
     })
 }
   
-function ClearStudentCanvas(){
+function ClearStudentCanvas(studentid){
     designer.syncData({
         command : "clearstudent",
         isStudent : true,
-        uid: connection.userid,
-      })
+        userid: studentid,
+    })
 }
 
 function SendStudentPointData(){
-    connection.send({
-
-    })
-
     designer.syncData({
         command : "default",
         isStudent : true,

@@ -25,6 +25,7 @@ classroomInfo = {
     exam : false,
     classPermission : undefined,
     micPermission : undefined,
+    canvasPermission : [],
 };
 
 classroomInfoLocal = {
@@ -171,16 +172,8 @@ classroomCommand.exitAlert = function (callback) {
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
-        alertBox("<span>학생들에게 알림을 보내겠습니까? \<label class='label_stu' for='view_stu'><input checked id='view_stu' type='checkbox'>학생 보기</label> \
-        </span>  ", "알림", () => { //callback yes
-           // classroomInfo.alert
-            // console.log(connection.getAllParticipants());
-            // console.log(connection.getAllParticipants().length);
+        alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => { //callback yes
             callback();
-            if(document.getElementById("view_stu").checked){
-                document.getElementById("top_student").click();
-            }
-
             attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
             connection.send ({
                 alert : true
@@ -295,9 +288,9 @@ classroomCommand.receiveAlertResponse = function (_response) {
             
         for(var i = 0; i < chilldren.length; i++){
             if(chilldren[i].dataset.id == userId){
-                var al = chilldren[i].getElementsByClassName("alert")[0];
+                var al = chilldren[i].getElementsByClassName("bor")[0];
                 al.className = "";
-                al.classList.add("alert");
+                al.classList.add("bor");
 
                 if(response == "yes")
                     al.classList.add("alert_yes");
@@ -305,8 +298,6 @@ classroomCommand.receiveAlertResponse = function (_response) {
                     al.classList.add("alert_no");
             }
         }
-        // 체크 알림...
-        //console.log(event.data.alertConfirm);            
     }
 }
 
@@ -558,7 +549,7 @@ studentCommand = {
                 cmd : _cmd,
                 data : _data
             }        
-        })
+        }, GetOwnerId())
     },
 
     sendPdfPage : function (_page) {        
@@ -590,21 +581,3 @@ function updateClassTime() {
     $('#current-time').text(hour + ':' + min + ':' + time);
   }
 }
-
-
-
-/*
-    학생이 선생님한테 보내는 메시지    
-*/
-// classroomCommand.sendStudentToTeachCmd = function (_cmd, _data) {
-//     if(connection.extra.roomOwner)  return;
-
-//     connection.send ({
-//         studentCmd : {
-//             from : connection.userid,
-//             cmd : _cmd,
-//             data : _data
-//         }        
-//     })
-// }
-

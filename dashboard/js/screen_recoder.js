@@ -316,6 +316,8 @@ function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
 
 function replaceScreenTrack(stream, btn) {
   ClearCanvas();
+  ClearStudentCanvas();
+  ClearTeacherCanvas();
   console.log("Stream Start", tempStream.streamid);
   classroomCommand.setShareScreenLocal({ state: true, id: tempStream.streamid });
   classroomInfoLocal.shareScreen.fromme = true;
