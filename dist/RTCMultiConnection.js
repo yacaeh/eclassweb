@@ -510,7 +510,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                             connection.renegotiate(remoteUserId);
                             setTimeout(function() {
                                 that.send(data, remoteUserId);
-                            }, 3000);
+                            }, 100);
                             return;
                         }
 
@@ -529,7 +529,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                             that[participant].channels.forEach(function(channel) {
                                 channel.send(data);
                             });
-                        }, 3000);
+                        }, 100);
                         return;
                     }
 
@@ -2800,7 +2800,8 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
             peer.setRemoteDescription(new RTCSessionDescription(remoteSdp)).then(cb, function(error) {
                 if (!!connection.enableLogs) {
-                    console.error('setRemoteDescription failed', '\n', error, '\n', remoteSdp.sdp);
+                    // temp...
+                    // console.error('setRemoteDescription failed', '\n', error, '\n', remoteSdp.sdp);
                 }
 
                 cb();
@@ -3589,7 +3590,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     navigator.mediaDevices.getDisplayMedia(options.localMediaConstraints).then(function(stream) {
                         stream.streamid = stream.streamid || stream.id || getRandomString();
                         stream.idInstance = idInstance;
-
                         streaming(stream);
                     }).catch(function(error) {
                         options.onLocalMediaError(error, options.localMediaConstraints);
@@ -3598,7 +3598,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     navigator.getDisplayMedia(options.localMediaConstraints).then(function(stream) {
                         stream.streamid = stream.streamid || stream.id || getRandomString();
                         stream.idInstance = idInstance;
-
                         streaming(stream);
                     }).catch(function(error) {
                         options.onLocalMediaError(error, options.localMediaConstraints);
@@ -3608,28 +3607,32 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 }
                 return;
             }
-
+           
+            // if (params.open == "true") {
+            //     console.error("OWNER")
+            //     options.localMediaConstraints.video.mandatory = {
+            //         "minWidth": 640,
+            //         "maxWidth": 1280,
+            //         "minHeight": 480,
+            //         "maxHeight": 960,
+            //         "maxFrameRate": 30
+            //     };
+            // }
+            // else {
+            //     console.error("Not OWNER")
+            //     options.localMediaConstraints.video.mandatory = {
+            //         "minWidth": 82,
+            //         "maxWidth": 82,
+            //         "minHeight": 64,
+            //         "maxHeight": 64,
+            //         "maxFrameRate": 5
+            //     };
+            // }   
+            
             if (params.open == "true") {
-                console.error("OWNER")
-                options.localMediaConstraints.video.mandatory = {
-                    "minWidth": 640,
-                    "maxWidth": 1280,
-                    "minHeight": 480,
-                    "maxHeight": 960,
-                    "maxFrameRate": 30
-                };
                 ForOwner();
             }
-            else {
-                options.localMediaConstraints.video.mandatory = {
-                    "minWidth": 82,
-                    "maxWidth": 82,
-                    "minHeight": 64,
-                    "maxHeight": 64,
-                    "minFrameRate": 15,
-                    "maxFrameRate": 15
-                };
-
+            else{
                 navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
                     stream.streamid = stream.streamid || stream.id || getRandomString();
                     stream.idInstance = idInstance;
@@ -3639,30 +3642,48 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     st.stid = getRandomString();
                     st.idInstance = idInstance;
                     streaming(st);
+
                     // options.onLocalMediaError(error, options.localMediaConstraints);
                 });
-
             }
 
-            
 
-
-            function ForOwner(){
-                navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
+            function ForOwner() {
+                navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function (stream) {
                     stream.streamid = stream.streamid || stream.id || getRandomString();
                     stream.idInstance = idInstance;
-                    console.error("TEACHER CAM : ",stream);
                     streaming(stream);
-                }).catch(function(error) {
-                    console.error("FAILED TO FIND CAM... RETRY",error);
+                }).catch(function (error) {
+                    console.error("FAILED TO FIND CAM... RETRY", error);
                     ForOwner();
                 });
-    
             }
 
         }
     }
 
+
+//     navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
+//         stream.streamid = stream.streamid || stream.id || getRandomString();
+//         stream.idInstance = idInstance;
+//         streaming(stream);
+//     }).catch(function(error) {
+//         var st = document.createElement("canvas").captureStream();
+//         st.stid = getRandomString();
+//         st.idInstance = idInstance;
+//         streaming(st);
+//         // options.onLocalMediaError(error, options.localMediaConstraints);
+//     });
+
+// }
+
+
+
+
+
+
+
+// }
     // StreamsHandler.js
 
     var StreamsHandler = (function() {
@@ -3835,12 +3856,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             if (data.last) {
                 var message = content[uuid].join('');
                 if (data.isobject) {
-                    try{
-                        message = JSON.parse(message);
-                    }
-                    catch{
-                        return
-                    }
+                    message = JSON.parse(message);
                 }
 
                 // latency detection
@@ -4160,7 +4176,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 try {
                     setHarkEvents(connection, connection.streamEvents[stream.streamid]);
                     setMuteHandlers(connection, connection.streamEvents[stream.streamid]);
-
+                    console.error("MAIN CAM ON STREAM",stream)
                     connection.onstream(connection.streamEvents[stream.streamid]);
                 } catch (e) {
                     //
@@ -4512,6 +4528,9 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 extra: connection.extra,
                 password: typeof connection.password !== 'undefined' && typeof connection.password !== 'object' ? connection.password : ''
             }, function(isRoomJoined, error) {
+                if(error){
+                    console.log(error);
+                }
                 if (isRoomJoined === true) {
                     if (connection.enableLogs) {
                         console.log('isRoomJoined: ', isRoomJoined, ' roomid: ', connection.sessionid);
@@ -4755,20 +4774,20 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
         connection.enableFileSharing = false;
 
-        // all values in kbps 
-        // 기본값 
-        // connection.bandwidth = {
-        //     screen: false,
-        //     audio: false,
-        //     video: false
-        // };
-        // 최적값
+        // all values in kbps
         connection.bandwidth = {
-            screen: 64,
-            audio: 128,
-            video: 254
+            screen: false,
+            audio: false,
+            video: false
         };
 
+
+        // reverted
+        // connection.bandwidth = {
+        //     screen: 64,
+        //     audio: 128,
+        //     video: 254
+        // };
 
         connection.codecs = {
             audio: 'opus',
@@ -5419,8 +5438,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                             streams.push(s);
                         }
                     });
-
-                    console.log("ASDzz")
                     connection.peers[streamEvent.userid].streams = streams;
                 }
 
