@@ -207,16 +207,13 @@ function canvasresize(id){
                 var marking = false;
                 var lastmarkpos = undefined;
                 var isText = false;
-
+                var isBegin = false;
+                
                 points.forEach(function (point) {
                     if (point == null) {
                         return false;
                     }
 
-                    if(point[0] == "text"){
-                        context.font = point[2][7];
-                        isText = true;
-                    }
 
                     if (point[0] == "marker") {
                         if (!marking) {
@@ -330,6 +327,7 @@ function canvasresize(id){
         },
         text: function(context, point, options) {
             const normal = resizePoint( [point[1], point[2]]);
+            context.font = options[7];
             this.handleOptions(context, options);
             context.fillStyle = textHandler.getFillColor(options[2]);
             context.fillText(point[0].substr(1, point[0].length - 2), normal[0], normal[1]);
