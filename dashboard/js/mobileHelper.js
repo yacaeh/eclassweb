@@ -128,6 +128,23 @@ function MainCamSetting(){
 
     })
 
+    window.addEventListener("orientationchange", function(e){
+        setTimeout(function(){
+            var canvaswidth = GetDoc().body.getBoundingClientRect().width;
+            var canvasheight = GetDoc().body.getBoundingClientRect().height;
+            var rect = video.getBoundingClientRect();
+
+            var x = rect.x + rect.width;
+            var y = rect.y + rect.height; 
+            if(x > canvaswidth){
+                video.style.left = canvaswidth - rect.width + "px";
+            }
+            if(y > canvasheight){
+                video.style.top = canvasheight - rect.height + "px";
+            }
+        }, 1000)
+
+    })
 
     var i = setInterval(function(){
         if(video.srcObject){
