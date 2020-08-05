@@ -17,11 +17,11 @@ function SetMobile(){
     isMobile = true;
     document.getElementById("widget-container").style.right = "0px";
     ChatSetting();
-    MainCamSetting();
     FullScreenBtnInit();
     ToolSetting();
     $(".right-tab").css({display:"none", width : "0px"})
     CanvasResize();
+    MainCamSetting();
 }
 
 function ToolSetting(){
@@ -128,7 +128,15 @@ function MainCamSetting(){
 
     })
 
-    AppendInFrame(video);
+
+    var i = setInterval(function(){
+        if(video.srcObject){
+            AppendInFrame(video);
+            video.muted = "muted"
+            video.play();
+            clearInterval(i)
+        }
+    }, 500)
 }
 
 function TouchConverter(e){
