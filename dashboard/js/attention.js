@@ -11,7 +11,7 @@ var attentionObj = {
 };
 
 attentionObj.callAttend = (message) => {    
-    console.log( "Attention Call Attend : " + JSON.stringify(message));
+    //console.log( "Attention Call Attend : " + JSON.stringify(message));
     attentionObj.totalCount++;
     attentionObj.teacherRequest[attentionObj.totalCount] = {
         name : message.msg,
@@ -19,7 +19,7 @@ attentionObj.callAttend = (message) => {
 }
 
 attentionObj.submit = (submitStudent) => {
-    console.log( "Attention submit : " + JSON.stringify(submitStudent) );
+    //console.log( "Attention submit : " + JSON.stringify(submitStudent) );
     
     let userid = submitStudent.userid;
     let name = submitStudent.name;
@@ -41,7 +41,7 @@ attentionObj.submit = (submitStudent) => {
     studentAnswerInfo.userAnswers[attentionObj.totalCount] = submitStudent.response;
     studentAnswerInfo.count++;
 
-    console.log( "Attention submit : " + JSON.stringify(attentionObj.studentsAnswer) );
+    //console.log( "Attention submit : " + JSON.stringify(attentionObj.studentsAnswer) );
 };
 
 attentionObj.exportAttention = () => {
@@ -52,10 +52,10 @@ attentionObj.exportAttention = () => {
 
     if(connection.extra.roomOwner) {
         let now = new Date();
-        const excelFileName = `${now}_attention.xlsx`;
-        const sheetName = connection.sessionid;
+        let excelFileName = `${now}_attention.xlsx`;
+        let sheetName = connection.sessionid;
 
-        const workData = getSubmitData();
+        let workData = getSubmitData();
 
         // step 1. workbook 생성
         let wb = XLSX.utils.book_new();
@@ -69,31 +69,29 @@ attentionObj.exportAttention = () => {
         // step 5. 엑셀 파일 내보내기 
         saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelFileName);
 
-        console.log("집중모드 저장하였습니다.");
+        //console.log("집중모드 저장하였습니다.");
         return true
     }  
 
      // export excel data
     function getSubmitData () {
-        var contents = [];        
+        let contents = [];        
         contents[0] = ['이름', '응답'];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
-        for(var i = 0; i < attentionObj.totalCount; ++i) {
+        for(let i = 0; i < attentionObj.totalCount; ++i) {
             contents[0][i+prefix] = `${i+1}번`;
         }        
         
-        var row = 1;
+        let row = 1;
         for(id in attentionObj.studentsAnswer)
         {
             const submit = attentionObj.studentsAnswer[id];
-            var content = contents[row];
+            let content = contents[row];
             content = [submit.name];        
             content[1] = submit.count;
             
-            var answerCount = 2;            
-            console.log( '응답횟수 : ' + submit.userAnswers.length)
-
+            let answerCount = 2;
             for( let i = 1 ; i < submit.userAnswers.length ; i++ )         
             {   
                 let result = submit.userAnswers[i];
