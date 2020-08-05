@@ -7,6 +7,21 @@
 
 'use strict';
 
+const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/css/NanumPen.ttf)');
+penFont.load().then((font) => {
+  document.fonts.add(font);
+});
+
+const gothicFont = new FontFace('나눔고딕', 'url(/dashboard/css/NanumBarunGothic.ttf)');
+gothicFont.load().then((font) => {
+  document.fonts.add(font);
+});
+  
+const HYFont = new FontFace('HY중고딕', 'url(/dashboard/css/H2GTRE.TTF)');
+HYFont.load().then((font) => {
+  document.fonts.add(font);
+});
+
 (function() {
     var teacherPoints = [];
     var studentPoints = {};
@@ -67,7 +82,6 @@
         globalCompositeOperation = 'source-over',
         lineCap = 'round',
         font = '500px "나눔펜글씨"',
-        font = '',
         lineJoin = 'round';
 
     function getContext(id) {
@@ -331,8 +345,8 @@ function canvasresize(id){
             this.handleOptions(context, options);
             context.fillStyle = textHandler.getFillColor(options[2]);
             context.fillText(point[0].substr(1, point[0].length - 2), normal[0], normal[1]);
+            context.font = options[7];
         },
-      
     };
 
     var pencilHandler = {
