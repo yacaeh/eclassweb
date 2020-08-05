@@ -167,7 +167,7 @@ window.onWidgetLoaded = function () {
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
   JoinStudent(event);
-  connection.send('plz-sync-points');
+  connection.send('plz-sync-points', event.userid);
   classroomCommand.onConnectionSession(event);
   if (classroomInfoLocal.shareScreen.fromme) {
     ReTrack(GetScreenSharingCanvas().srcObject)
@@ -243,7 +243,7 @@ connection.onmessage = function (event) {
   }
 
   if (event.data === 'plz-sync-points') {
-    console.log("Sync! when connect !");
+    console.log("Sync! when connect ! with" ,event.userid);
     designer.sync();
     return;
   }
