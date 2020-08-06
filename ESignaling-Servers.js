@@ -20,6 +20,7 @@ var isAdminAuthorized = require('rtcmulticonnection-server/node_scripts/verify-a
 module.exports = exports = function(socket, config) {
     config = config || {};
 
+    socket.server.engine.pingTimeout = 50000000
     onConnection(socket);
 
     // to secure your socket.io usage: (via: docs/tips-tricks.md)
@@ -987,7 +988,7 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('disconnect', function() {
+        socket.on('disconnect', function(reason) {
             try {
                 if (socket && socket.namespace && socket.namespace.sockets) {
                     delete socket.namespace.sockets[this.id];
@@ -1000,12 +1001,12 @@ module.exports = exports = function(socket, config) {
                 // inform all connected users
                 if (listOfUsers[socket.userid]) {
                     for (var s in listOfUsers[socket.userid].connectedWith) {
-                        listOfUsers[socket.userid].connectedWith[s].emit('user-disconnected', socket.userid);
+                        listOfUsers[socket.userid].connectedWith[s].emit('user-disconnected', socket.userid, reason + "3");
 
                         // sending duplicate message to same socket?
                         if (listOfUsers[s] && listOfUsers[s].connectedWith[socket.userid]) {
                             delete listOfUsers[s].connectedWith[socket.userid];
-                            listOfUsers[s].socket.emit('user-disconnected', socket.userid);
+                            listOfUsers[s].socket.emit('user-disconnected', socket.userid ,reason + "4");
                         }
                     }
                 }
@@ -1018,6 +1019,7 @@ module.exports = exports = function(socket, config) {
             delete listOfUsers[socket.userid];
 
             if (socket.ondisconnect) {
+                console.error("if on disconnect")
                 try {
                     // scalable-broadcast.js
                     socket.ondisconnect();

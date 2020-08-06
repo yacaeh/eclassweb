@@ -384,7 +384,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             connection.onSocketError(event);
         });
 
-        connection.socket.on('user-disconnected', function(remoteUserId) {
+        connection.socket.on('user-disconnected', function(remoteUserId, reason) {
             if (remoteUserId === connection.userid) {
                 return;
             }
@@ -5967,7 +5967,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
         connection.onSocketDisconnect = function(event) {
             if (connection.enableLogs) {
-                console.warn('socket.io connection is closed');
+                console.warn('socket.io connection is closed',event);
             }
         };
 
