@@ -31,7 +31,7 @@ function ToolSetting(){
     doc.getElementById("tool-box").removeChild(doc.getElementById("textIcon"))
     doc.getElementById("tool-box").removeChild(doc.getElementById("clearCanvas"))
     doc.getElementById("tool-box").removeChild(doc.getElementById("undo"))
-    doc.getElementById("tool-box").removeChild(doc.getElementById("homework"))
+    // doc.getElementById("tool-box").removeChild(doc.getElementById("homework"))
 }
 
 function MainCamSetting(){
