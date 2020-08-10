@@ -522,14 +522,28 @@ designer.appendTo(document.getElementById('widget-container'), function () {
 
     connection.extra.roomOwner = true;
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-      if (error) {
-        connection.rejoin(params.sessionid);
+
+
+      if(!isRoomOpened){
+        alert("이미 존재하는 방입니다.");
+        var href = location.protocol + "//" + location.host + "/dashboard/";
+        window.open(href, "_self");
+      }
+      else {
+        console.error(isRoomOpened, roomid, error)
+        if (error) {
+          connection.rejoin(params.sessionid);
+        }
+  
+        classroomCommand.joinRoom();
+       
+        connection.socket.on('disconnect', function () {
+          console.log(isRoomOpened, roomid, error);
+            location.reload();
+        });
       }
 
-      classroomCommand.joinRoom();
-      connection.socket.on('disconnect', function () {
-        location.reload();
-      });
+
     });
   } else {
     SetStudent();
@@ -660,7 +674,10 @@ function JoinStudent(event){
 
 function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
-  if (!connection.extra.roomOwner) return;
+  if (!connection.extra.roomOwner) {
+    console.log("Teacher left class")
+    return;
+  }
   var id = event.userid;
   var name = event.extra.userFullName;
 
