@@ -650,7 +650,7 @@ module.exports = exports = function(socket, config) {
 
                             if (firstParticipant) {
                                 // reset owner priviliges
-                                // listOfRooms[roomid].owner = firstParticipant.socket.userid;
+                                listOfRooms[roomid].owner = firstParticipant.socket.userid;
 
                                 // redundant?
                                 firstParticipant.socket.emit('set-isInitiator-true', roomid);

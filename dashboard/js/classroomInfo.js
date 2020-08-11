@@ -130,6 +130,10 @@ classroomCommand = {
             classroomCommand.syncViewer ();
         }
 
+        if(classroomInfo.showcanvas){
+            sendMyCanvas = true;
+        }
+
         // if(classroomInfo.shareScreen.state){
         //     classroomCommand.openShare();
         // }

@@ -420,3 +420,14 @@ function showScreenViewerUI() {
 function hideScreenViewerUI() {
   GetScreenSharingCanvas().style.display = 'none';
 }
+
+function MainVideoStarter(callback){
+  var inter = setInterval(function(){
+    if(GetMainVideo().readyState == 4){
+      GetMainVideo().start;
+      clearInterval(inter);
+      if(callback)
+        callback();
+    }
+  },200)
+}

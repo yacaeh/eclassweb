@@ -127,6 +127,7 @@ function canvasresize(id){
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
 
+
     var common = {
         updateTextArea: function() {
             var c = common;
