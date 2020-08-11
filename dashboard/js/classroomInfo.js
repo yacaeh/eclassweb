@@ -207,6 +207,7 @@ classroomCommand.receivAlert = function () {
         connection.send({                
             alertResponse :  {
                 userid : connection.userid,
+                name: params.userFullName,
                 response : yesOrno
             }
         }); 
