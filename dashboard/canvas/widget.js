@@ -17,10 +17,10 @@ gothicFont.load().then((font) => {
   document.fonts.add(font);
 });
   
-const HYFont = new FontFace('HY중고딕', 'url(/dashboard/css/H2GTRE.TTF)');
-HYFont.load().then((font) => {
-  document.fonts.add(font);
-});
+// const HYFont = new FontFace('HY중고딕', 'url(/dashboard/css/H2GTRE.ttf)');
+// HYFont.load().then((font) => {
+//   document.fonts.add(font);
+// });
 
 (function() {
     var teacherPoints = [];
@@ -126,6 +126,7 @@ function canvasresize(id){
 
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
+
 
     var common = {
         updateTextArea: function() {

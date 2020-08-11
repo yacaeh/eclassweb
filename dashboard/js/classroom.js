@@ -25,6 +25,9 @@ var isSharingEpub = false;
 let isFileViewer = false;
 let extraPath = '';
 let currentPdfPage = 0;
+var sendMyCanvas = false;
+var showingCanvasId = undefined;
+
 
 // 상단 버튼 도움말
 var topButtonContents = {
@@ -121,8 +124,7 @@ AddEvent("top_save_alert", "click", function () {
 
 AddEvent("icon_exit", "click", function () {
   classroomCommand.exitAlert(function () {
-    var href = location.protocol + "//" + location.host + "/dashboard/";
-    window.open(href, "_self");
+    GoToMain();
   });
 })
 
@@ -158,10 +160,11 @@ window.addEventListener('resize', function () {
 // 캔버스가 불러와졌을 때
 window.onWidgetLoaded = function () {
   WindowFocusChecker();
-  SendCanvasDataToOwner();
   SetCanvasBtn(canvasButtonContents);
   SetShortcut(shortCut);
   mobileHelper.Init();
+  canvasinit();
+  SendCanvasDataToOwner();
 }
 
 connection.onopen = function (event) {
@@ -186,9 +189,18 @@ connection.onmessage = function (event) {
   if(permissionManager.eventListener(event))
     return;
 
+  if(event.data.sendcanvasdata){
+    sendMyCanvas = event.data.state;
+    SendCanvasDataToOwnerOneTime();
+  }
 
   if (event.data.canvassend) {
+    // console.log("RECIVE CANVAS DATA", event.data.canvas.length/ 1000 + "Kb");
+
     canvas_array[event.userid].src = event.data.canvas;
+    if(event.userid = showingCanvasId)
+      document.getElementById("bigcanvas-img").src = canvas_array[event.userid].src;
+      
     return;
   }
 
@@ -430,13 +442,21 @@ connection.onstream = function (event) {
 
     var video = GetMainVideo();
     console.log("MAIN VIDEO CHANGED", event);
-    video.setAttribute('data-streamid', event.streamid);
+    
+    // if(!connection.extra.roomOwner)
+    console.log(GetMainVideo().readyState)
+
+    if(!connection.extra.roomOwner)
+      GetMainVideo().style.display = "block";
+    
+      video.setAttribute('data-streamid', event.streamid);
 
     if (event.type === 'local') {
       video.volume = 0;
     }
 
     video.srcObject = event.stream;
+    MainVideoStarter();
   }
 
   // 학생들 캠 추가
@@ -452,7 +472,7 @@ connection.onstream = function (event) {
       event.mediaElement.style.pointerEvents = "none";
       event.mediaElement.style.position = "absolute";
 
-      if (classroomInfoLocal.showcanvas) {
+      if (classroomInfo.showcanvas) {
         event.mediaElement.style.display = 'none';
       }
 
@@ -521,31 +541,64 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     SetTeacher();
 
     connection.extra.roomOwner = true;
-    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
 
-
-      if(!isRoomOpened){
-        alert("이미 존재하는 방입니다.");
-        var href = location.protocol + "//" + location.host + "/dashboard/";
-        window.open(href, "_self");
-      }
-      else {
-        console.error(isRoomOpened, roomid, error)
-        if (error) {
-          connection.rejoin(params.sessionid);
-        }
+    /*
+    connection.checkPresence(params.sessionid, function(a,b,extra){
+      console.log(extra._room.teacher_rejoin)
+      if(extra._room.teacher_rejoin){
+        Teacher_rejoin_manager.rejoin();
+      } 
+      else{
+        connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+          console.log(isRoomOpened, roomid, error)
+          if(!isRoomOpened){
+            alert("이미 존재하는 방입니다.");
+            GoToMain();
+          }
+          else {
+            console.error(isRoomOpened, roomid, error)
+            if (error) {
+              connection.rejoin(params.sessionid);
+            }
   
         classroomCommand.joinRoom();
        
-        connection.socket.on('disconnect', function () {
-          console.log(isRoomOpened, roomid, error);
-            location.reload();
+            connection.socket.on('disconnect', function () {
+              console.log(isRoomOpened, roomid, error);
+                location.reload();
+            });
+          }
+    
+    
         });
       }
+    })
+  } */
+  connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+    if(!isRoomOpened){
+      alert("이미 존재하는 방입니다.");
+      var href = location.protocol + "//" + location.host + "/dashboard/";
+      window.open(href, "_self");
+    }
+    else {
+      console.error(isRoomOpened, roomid, error)
+      if (error) {
+        connection.rejoin(params.sessionid);
+      }
+
+      classroomCommand.joinRoom();
+     
+      connection.socket.on('disconnect', function () {
+        console.log(isRoomOpened, roomid, error);
+          location.reload();
+      });
+    }
 
 
-    });
-  } else {
+  });
+} 
+  //----------------------------------------------------------------
+  else {
     SetStudent();
     console.log('try joining!');
     connection.DetectRTC.load(function () {
@@ -563,9 +616,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            // alert(
-            // 'This room does not exist. Please either create it or wait for moderator to enter in the room.'
-            // );
+              alert("방이 존재하지 않습니다.");
             location.reload();
             return;
           }
@@ -641,7 +692,7 @@ function JoinStudent(event){
   var name = event.extra.userFullName;
 
   var img = document.createElement("img");
-  if (!classroomInfoLocal.showcanvas)
+  if (!classroomInfo.showcanvas)
     img.style.display = 'none';
   canvas_array[id] = img;
   console.log("JOIN ROOM", id, name);
@@ -651,31 +702,37 @@ function JoinStudent(event){
               <span class="bor"></span> \
               <span class="name">' + name + '</span></span>')
   OnClickStudent(div, id, name);
-  var interval;
 
   div[0].addEventListener("mouseover", function () {
-    clearInterval(interval);
+    connection.send({
+      sendcanvasdata : true,
+      state : true
+    }, id)
+
+    showingCanvasId = id;
     Show("bigcanvas");
-    document.getElementById("bigcanvas-img").src = canvas_array[id].src;
-    interval = setInterval(function () {
-      document.getElementById("bigcanvas-img").src = canvas_array[id].src;
-    }, 1000);
   })
 
   div[0].addEventListener("mouseleave", function () {
+    if(!classroomInfo.showcanvas)
+      connection.send({
+        sendcanvasdata : true,
+        state : false
+      }, id)
+
+    showingCanvasId = undefined;
     Hide("bigcanvas");
-    clearInterval(interval);
+    document.getElementById("bigcanvas-img").src = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
   })
 
   $("#student_list").append(div);
   $(div).append(img);
-
 }
 
 function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   if (!connection.extra.roomOwner) {
-    console.log("Teacher left class")
+    console.log(event);
     return;
   }
   var id = event.userid;
@@ -710,22 +767,37 @@ function ToggleViewType() {
     $(this).addClass('view_type-on');
 
     switch (this.id) {
+      // 학생 판서
       case 'top_student':
         var childern = document.getElementById("student_list").children;
-        classroomInfoLocal.showcanvas = true;
+        classroomInfo.showcanvas = true;
+
         for (var i = 0; i < childern.length; i++) {
           Show(childern[i].getElementsByTagName("img")[0]);
           Hide(childern[i].getElementsByTagName("video")[0]);
         }
+
         $('#student_list').show();
+        connection.send({
+          sendcanvasdata : true,
+          state : true
+        })
         break;
+      //학생 캠
       case 'top_camera':
         var childern = document.getElementById("student_list").children;
-        classroomInfoLocal.showcanvas = false;
+        
+        classroomInfo.showcanvas = false;
         for (var i = 0; i < childern.length; i++) {
           Show(childern[i].getElementsByTagName("video")[0]);
           Hide(childern[i].getElementsByTagName("img")[0]);
         }
+
+        connection.send({
+          sendcanvasdata : true,
+          state : false
+        })
+        
         break;
     }
   });
@@ -860,3 +932,37 @@ function CamOnOff(){
   }
   showcam = !showcam
 }
+
+
+function GoToMain(){
+  var href = location.protocol + "//" + location.host + "/dashboard/";
+  window.open(href, "_self");
+}
+
+
+Teacher_rejoin_manager = {
+  left : function(){
+
+  },
+  rejoin : function(){
+    connection.socket.emit("owner-change", params.sessionid, connection.userid);
+    connection.join({
+      sessionid: params.sessionid,
+      userid: connection.channel,
+      session: connection.session
+    }, function(isRoomJoined, roomid, error){
+      console.log("Joined Room");
+      classroomCommand.joinRoom();
+      connection.socket.on('disconnect', function () {
+        console.log('disconnect Class!');
+        location.reload();
+      });
+    })
+
+  },
+
+  eventListener : function(event){
+  }
+}
+
+

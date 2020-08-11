@@ -146,14 +146,9 @@ function MainCamSetting(){
 
     })
 
-    var i = setInterval(function(){
-        if(video.srcObject){
-            AppendInFrame(video);
-            video.muted = "muted"
-            video.play();
-            clearInterval(i)
-        }
-    }, 500)
+    MainVideoStarter(function(){
+        AppendInFrame(video);
+    });
 }
 
 function TouchConverter(e){

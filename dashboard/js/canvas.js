@@ -1,7 +1,11 @@
 /*
     캔버스, 판서 관련
 */
+var canvas;
+var ctx;
 
+var tooltips = [];
+var altdown = false;
 
 var shortCut = [
     {"onoff-icon" : "a"},
@@ -163,27 +167,34 @@ function removeOnSelect(btn) {
 function SendCanvasDataToOwner() {
     if(connection.extra.roomOwner)
         return;
-        
-    var canvas = GetWidgetFrame().document.getElementById('main-canvas');
-    var ownerid;
-    setTimeout(function () {
-        var interval = setTimeout(function () {
-            ownerid = GetOwnerId();
-            if (ownerid != undefined) {
-                clearInterval(interval);
-                setInterval(function () {
-                    if (debug) {
-                        console.log("SENDING", connection.userid);
-                    }
-                    var context = canvas.toDataURL();
-                    connection.send({
-                        canvassend: true,
-                        canvas: context
-                    }, ownerid);
-                }, 1000)
-            }
-        })
-    }, 3000)
+    setInterval(function () {
+        if (sendMyCanvas) {
+            SendCanvasDataToOwnerOneTime();
+        }
+    }, 1000)
+}
+
+function SendCanvasDataToOwnerOneTime(){
+    var newcanvas = document.createElement("canvas");
+    var width = Math.max(canvas.width / 4 , 480);
+    var height = Math.max(canvas.width / 4, 380)
+    newcanvas.width = width;
+    newcanvas.height = height;
+    
+    var newctx = newcanvas.getContext("2d");
+    newctx.drawImage(canvas,0,0,newcanvas.width,newcanvas.height);
+
+    var data = newcanvas.toDataURL();
+    
+    connection.send({
+        canvassend: true,
+        canvas: data
+    }, GetOwnerId());
+
+    if (debug) {
+        console.log(data)
+        console.log("SENDING", connection.userid);
+    }
 }
 
 function CreateTopTooltip(data) {
@@ -202,12 +213,6 @@ function CreateTopTooltip(data) {
       })
     });
 }
-
-
-
-
-var tooltips = [];
-var altdown = false;
 
 function SetShortcut(shortCut){
 
@@ -273,4 +278,9 @@ function RemoveTooltip(){
     altdown = false;
     tooltips.forEach(element => GetWidgetFrame().document.getElementById("tool-box").removeChild(element));
     tooltips = [] ;
+}
+
+function canvasinit(){
+    canvas = GetWidgetFrame().document.getElementById('main-canvas');
+    ctx = canvas.getContext('2d');
 }
