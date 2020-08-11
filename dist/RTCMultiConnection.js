@@ -3608,26 +3608,24 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
            
-            // if (params.open == "true") {
-            //     console.error("OWNER")
-            //     options.localMediaConstraints.video.mandatory = {
-            //         "minWidth": 640,
-            //         "maxWidth": 1280,
-            //         "minHeight": 480,
-            //         "maxHeight": 960,
-            //         "maxFrameRate": 30
-            //     };
-            // }
-            // else {
-            //     console.error("Not OWNER")
-            //     options.localMediaConstraints.video.mandatory = {
-            //         "minWidth": 82,
-            //         "maxWidth": 82,
-            //         "minHeight": 64,
-            //         "maxHeight": 64,
-            //         "maxFrameRate": 5
-            //     };
-            // }   
+            if (params.open == "true") {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 640,
+                    "maxWidth": 1280,
+                    "minHeight": 480,
+                    "maxHeight": 960,
+                    "maxFrameRate": 30
+                };
+            }
+            else {
+                options.localMediaConstraints.video.mandatory = {
+                    "minWidth": 82,
+                    "maxWidth": 82,
+                    "minHeight": 64,
+                    "maxHeight": 64,
+                    "maxFrameRate": 5
+                };
+            }   
             
             if (params.open == "true") {
                 ForOwner();
@@ -3655,7 +3653,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     streaming(stream);
                 }).catch(function (error) {
                     console.error("FAILED TO FIND CAM... RETRY", error);
-                    ForOwner();
+                    setTimeout(ForOwner, 1000);
                 });
             }
 
@@ -4176,7 +4174,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 try {
                     setHarkEvents(connection, connection.streamEvents[stream.streamid]);
                     setMuteHandlers(connection, connection.streamEvents[stream.streamid]);
-                    console.error("MAIN CAM ON STREAM",stream)
                     connection.onstream(connection.streamEvents[stream.streamid]);
                 } catch (e) {
                     //

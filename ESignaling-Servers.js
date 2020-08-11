@@ -455,7 +455,7 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('check-presence', function(roomid, callback) {           
+        socket.on('check-presence', function(roomid, callback) {     
             try {
                 if (!listOfRooms[roomid] || !listOfRooms[roomid].participants.length) {
                     callback(false, roomid, {
@@ -464,7 +464,11 @@ module.exports = exports = function(socket, config) {
                             isPasswordProtected: false
                         }
                     });
-                } else {
+                } 
+                else {
+                    console.log("Room already exist")
+                    
+
                     var extra = listOfRooms[roomid].extra;
                     if(typeof extra !== 'object' || !extra) {
                         extra = {
@@ -475,12 +479,23 @@ module.exports = exports = function(socket, config) {
                         isFull: listOfRooms[roomid].participants.length >= listOfRooms[roomid].maxParticipantsAllowed,
                         isPasswordProtected: listOfRooms[roomid].password && listOfRooms[roomid].password.toString().replace(/ /g, '').length
                     };
+
+                    if(listOfRooms[roomid].participants.indexOf(listOfRooms[roomid].owner) == -1 ){
+                        console.log("But owner isn't joined")
+                        extra._room.teacher_rejoin = true
+                    }
+
                     callback(true, roomid, extra);
                 }
             } catch (e) {
                 pushLogs(config, 'check-presence', e);
             }
         });
+
+        socket.on('owner-change',function(roomid, ownerid, callback){
+            console.log("Owner change :",listOfRooms[roomid].owner + " => " + ownerid)
+            listOfRooms[roomid].owner = ownerid;
+        })
 
         function onMessageCallback(message) {
             try {
@@ -635,7 +650,7 @@ module.exports = exports = function(socket, config) {
 
                             if (firstParticipant) {
                                 // reset owner priviliges
-                                listOfRooms[roomid].owner = firstParticipant.socket.userid;
+                                // listOfRooms[roomid].owner = firstParticipant.socket.userid;
 
                                 // redundant?
                                 firstParticipant.socket.emit('set-isInitiator-true', roomid);

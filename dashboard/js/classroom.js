@@ -121,8 +121,7 @@ AddEvent("top_save_alert", "click", function () {
 
 AddEvent("icon_exit", "click", function () {
   classroomCommand.exitAlert(function () {
-    var href = location.protocol + "//" + location.host + "/dashboard/";
-    window.open(href, "_self");
+    GoToMain();
   });
 })
 
@@ -430,13 +429,21 @@ connection.onstream = function (event) {
 
     var video = GetMainVideo();
     console.log("MAIN VIDEO CHANGED", event);
-    video.setAttribute('data-streamid', event.streamid);
+    
+    // if(!connection.extra.roomOwner)
+    console.log(GetMainVideo().readyState)
+
+    if(!connection.extra.roomOwner)
+      GetMainVideo().style.display = "block";
+    
+      video.setAttribute('data-streamid', event.streamid);
 
     if (event.type === 'local') {
       video.volume = 0;
     }
 
     video.srcObject = event.stream;
+    MainVideoStarter();
   }
 
   // 학생들 캠 추가
@@ -521,31 +528,64 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     SetTeacher();
 
     connection.extra.roomOwner = true;
-    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
 
-
-      if(!isRoomOpened){
-        alert("이미 존재하는 방입니다.");
-        var href = location.protocol + "//" + location.host + "/dashboard/";
-        window.open(href, "_self");
-      }
-      else {
-        console.error(isRoomOpened, roomid, error)
-        if (error) {
-          connection.rejoin(params.sessionid);
-        }
+    /*
+    connection.checkPresence(params.sessionid, function(a,b,extra){
+      console.log(extra._room.teacher_rejoin)
+      if(extra._room.teacher_rejoin){
+        Teacher_rejoin_manager.rejoin();
+      } 
+      else{
+        connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+          console.log(isRoomOpened, roomid, error)
+          if(!isRoomOpened){
+            alert("이미 존재하는 방입니다.");
+            GoToMain();
+          }
+          else {
+            console.error(isRoomOpened, roomid, error)
+            if (error) {
+              connection.rejoin(params.sessionid);
+            }
   
         classroomCommand.joinRoom();
        
-        connection.socket.on('disconnect', function () {
-          console.log(isRoomOpened, roomid, error);
-            location.reload();
+            connection.socket.on('disconnect', function () {
+              console.log(isRoomOpened, roomid, error);
+                location.reload();
+            });
+          }
+    
+    
         });
       }
+    })
+  } */
+  connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+    if(!isRoomOpened){
+      alert("이미 존재하는 방입니다.");
+      var href = location.protocol + "//" + location.host + "/dashboard/";
+      window.open(href, "_self");
+    }
+    else {
+      console.error(isRoomOpened, roomid, error)
+      if (error) {
+        connection.rejoin(params.sessionid);
+      }
+
+      classroomCommand.joinRoom();
+     
+      connection.socket.on('disconnect', function () {
+        console.log(isRoomOpened, roomid, error);
+          location.reload();
+      });
+    }
 
 
-    });
-  } else {
+  });
+} 
+  //----------------------------------------------------------------
+  else {
     SetStudent();
     console.log('try joining!');
     connection.DetectRTC.load(function () {
@@ -563,9 +603,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            // alert(
-            // 'This room does not exist. Please either create it or wait for moderator to enter in the room.'
-            // );
+              alert("방이 존재하지 않습니다.");
             location.reload();
             return;
           }
@@ -675,7 +713,7 @@ function JoinStudent(event){
 function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   if (!connection.extra.roomOwner) {
-    console.log("Teacher left class")
+    console.log(event);
     return;
   }
   var id = event.userid;
@@ -859,4 +897,49 @@ function CamOnOff(){
     $('#student_list').show();
   }
   showcam = !showcam
+}
+
+
+function GoToMain(){
+  var href = location.protocol + "//" + location.host + "/dashboard/";
+  window.open(href, "_self");
+}
+
+
+Teacher_rejoin_manager = {
+  left : function(){
+
+  },
+  rejoin : function(){
+    connection.socket.emit("owner-change", params.sessionid, connection.userid);
+    connection.join({
+      sessionid: params.sessionid,
+      userid: connection.channel,
+      session: connection.session
+    }, function(isRoomJoined, roomid, error){
+      console.log("Joined Room");
+      classroomCommand.joinRoom();
+      connection.socket.on('disconnect', function () {
+        console.log('disconnect Class!');
+        location.reload();
+      });
+    })
+
+  },
+
+  eventListener : function(event){
+  }
+}
+
+
+function MainVideoStarter(callback){
+  var inter = setInterval(function(){
+    if(GetMainVideo().readyState == 4){
+      GetMainVideo().start;
+      clearInterval(inter);
+  
+      if(callback)
+        callback();
+    }
+  },200)
 }

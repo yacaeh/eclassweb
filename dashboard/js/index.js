@@ -239,21 +239,20 @@ $('#btn-create-room').click(function () {
 
     $('#btn-create-room').html('Please wait...').prop('disabled', true);
 
-    connection.checkPresence(roomid, function (isRoomExist) {
-        if (isRoomExist === true) {
+    connection.checkPresence(roomid, function (isRoomExist,a,extra) {
+        console.log(isRoomExist,a,extra);
+
+        if (isRoomExist === true && !extra._room.teacher_rejoin) {
             alertBox('이미 존재하는 방입니다.', '에러');
             $('#btn-create-room').html(initialHTML).prop('disabled', false);
             return;
         }
 
-        if ($('#chk-hidden-room').prop('checked') === true) {
-            // either make it unique!
-            // connection.publicRoomIdentifier = connection.token() + connection.token();
-
-            // or set an empty value (recommended)
-            connection.publicRoomIdentifier = '';
+        if(extra._room.teacher_rejoin){
+            connection.teacher_rejoin = true;
         }
 
+        // connection.publicRoomIdentifier = '';
         connection.sessionid = roomid;
         connection.isInitiator = true;
         connection.session.oneway = true;
