@@ -423,8 +423,11 @@ function hideScreenViewerUI() {
 
 function MainVideoStarter(callback){
   var inter = setInterval(function(){
+
+
     if(GetMainVideo().readyState == 4){
-      GetMainVideo().start;
+      GetMainVideo().muted = true;
+      GetMainVideo().play();
       clearInterval(inter);
       if(callback)
         callback();
