@@ -24,22 +24,6 @@ function GetWidgetFrame() {
     return frame;
 }
 
-// 화면 공유 스크린 Get
-function GetScreenSharingCanvas() {
-    return GetWidgetFrame().document.getElementById("screen-viewer");
-}
-
-// Get 선생 캠
-function GetMainVideo() {
-    var video = document.getElementById("main-video");
-    if (video) {
-      return video;
-    }
-    else {
-      return GetWidgetFrame().document.getElementById("main-video");
-    }
-}
-
 function Show(element){
     if(typeof element === "string"){
         document.getElementById(element).style.display = "block";
