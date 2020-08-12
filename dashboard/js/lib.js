@@ -25,6 +25,9 @@ function GetWidgetFrame() {
 }
 
 function Show(element){
+  if(!element)
+    return;
+
     if(typeof element === "string"){
         document.getElementById(element).style.display = "block";
     }
@@ -34,6 +37,9 @@ function Show(element){
 }
 
 function Hide(element){
+  if(!element)
+  return;
+  
     if(typeof element === "string"){
         document.getElementById(element).style.display = "none";
     }
