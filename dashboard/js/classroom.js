@@ -442,26 +442,27 @@ designer.appendTo(document.getElementById('widget-container'), function () {
       }
     })
   } */
-  connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-    if(!isRoomOpened){
-      alert("이미 존재하는 방입니다.");
-      var href = location.protocol + "//" + location.host + "/dashboard/";
-      window.open(href, "_self");
-    }
-    else {
-      if (error) {
-        connection.rejoin(params.sessionid);
+
+    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+      if (!isRoomOpened) {
+        alert("이미 존재하는 방입니다.");
+        var href = location.protocol + "//" + location.host + "/dashboard/";
+        window.open(href, "_self");
       }
-      classroomCommand.joinRoom();
-      connection.socket.on('disconnect', function () {
-        console.log(isRoomOpened, roomid, error);
+      else {
+        if (error) {
+          connection.rejoin(params.sessionid);
+        }
+
+        classroomCommand.joinRoom();
+
+        connection.socket.on('disconnect', function () {
+          console.log(isRoomOpened, roomid, error);
           location.reload();
-      });
-    }
-
-
-  });
-} 
+        });
+      }
+    });
+  }
   //----------------------------------------------------------------
   else {
     SetStudent();
@@ -469,19 +470,17 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     connection.DetectRTC.load(function () {
     });
 
-    connection.join(
-      {
+    connection.join({
         sessionid: params.sessionid,
         userid: connection.channel,
         session: connection.session
-      },
-      function (isRoomJoined, roomid, error) {
+      }, function (isRoomJoined, roomid, error) {
         console.log('Joing Class!');
 
         if (error) {
           console.log('Joing Error!');
           if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-              alert("방이 존재하지 않습니다.");
+            alert("방이 존재하지 않습니다.");
             location.reload();
             return;
           }
@@ -515,6 +514,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
           location.reload();
         });
         console.log('isRoomJoined', isRoomJoined);
+
+
       }
     );
   }

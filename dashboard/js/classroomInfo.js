@@ -492,10 +492,6 @@ classroomCommand.syncEpub = function () {
 /*
     방 오픈 경과 시간 동기화
 */
-classroomCommand.syncClassroomOpenTime =  function () {    
-    updateClassTime ();
-};
-
 
 //--------------------------------------------------------------------------------//
 
@@ -529,8 +525,13 @@ function updateClassTime() {
   var now = new Date().getTime() - classroomInfo.roomOpenTime;
   now = parseInt(now / 1000);
 
-  if (!classTimeIntervalHandle)
+  if (!classTimeIntervalHandle){
+      setTimeout(function () {
+          document.getElementById("loading-screen").style.display = "none";
+      },1000
+    )
     classTimeIntervalHandle = setInterval(Sec, 1000);
+  }
 
   function Sec() {
     now++;
