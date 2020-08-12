@@ -71,6 +71,7 @@ $('#btn-join-hidden-room').click(function () {
 
 function checkCamAndMicExist(){
     connection.DetectRTC.load(function() {
+        
         if (!connection.DetectRTC.hasMicrophone) {
             connection.mediaConstraints.audio = false;
             connection.session.audio = false;
@@ -84,6 +85,7 @@ function checkCamAndMicExist(){
             console.log("user has no cam!");
             alert("캠이 없습니다!");
         }
+
     });
 }
 
@@ -242,22 +244,40 @@ $('#btn-create-room').click(function () {
     connection.checkPresence(roomid, function (isRoomExist,a,extra) {
         console.log(isRoomExist,a,extra);
 
-        if (isRoomExist === true && !extra._room.teacher_rejoin) {
-            alertBox('이미 존재하는 방입니다.', '에러');
+        connection.DetectRTC.load(function() {
+            if (!connection.DetectRTC.hasMicrophone) {
+                console.log("user has no mic!");
+                alertBox('마이크가 없습니다', '에러');
+                $('#btn-create-room').html(initialHTML).prop('disabled', false);
+                return;
+            }
+        
+            if (!connection.DetectRTC.hasWebcam) {
+                console.log("user has no cam!");
+                alertBox('웹캠이 없습니다', '에러');
+                $('#btn-create-room').html(initialHTML).prop('disabled', false);
+                return;
+            }
+
+            if (isRoomExist === true && !extra._room.teacher_rejoin) {
+                alertBox('이미 존재하는 방입니다.', '에러');
+                $('#btn-create-room').html(initialHTML).prop('disabled', false);
+                return;
+            }
+    
+            if(extra._room.teacher_rejoin){
+                connection.teacher_rejoin = true;
+            }
+    
+            // connection.publicRoomIdentifier = '';
+            connection.sessionid = roomid;
+            connection.isInitiator = true;
+            connection.session.oneway = true;
+            openCanvasDesigner();
             $('#btn-create-room').html(initialHTML).prop('disabled', false);
-            return;
-        }
+        });
 
-        if(extra._room.teacher_rejoin){
-            connection.teacher_rejoin = true;
-        }
-
-        // connection.publicRoomIdentifier = '';
-        connection.sessionid = roomid;
-        connection.isInitiator = true;
-        connection.session.oneway = true;
-        openCanvasDesigner();
-        $('#btn-create-room').html(initialHTML).prop('disabled', false);
+       
     });
 });
 
