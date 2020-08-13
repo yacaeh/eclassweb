@@ -363,19 +363,22 @@ ScreenshareManager = {
       return;
     }
 
-    screen_constraints = {
-      screen: true,
-      oneway: true,
-    };
-
     // screen_constraints = {
-    //   audio: true, // or true
-    //   oneway : true,
-    //   video: {
-    //     mandatory: {
-    //     }
-    //   }
-    // }
+    //   screen: true,
+    //   oneway: true,
+    // };
+
+    screen_constraints = {
+      audio: false, // or true
+      oneway : true,
+      video: {
+        mandatory: {
+          // maxWidth : 1280,
+          // maxHeight : 720,
+          maxFrameRate : 12,
+        }
+      }
+    }
 
 
     if (navigator.mediaDevices.getDisplayMedia) {

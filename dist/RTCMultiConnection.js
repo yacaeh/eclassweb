@@ -3608,13 +3608,14 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
            
+            console.log(options.localMediaConstraints);
             if (params.open == "true") {
                 options.localMediaConstraints.video.mandatory = {
-                    "minWidth": 640,
-                    "maxWidth": 1280,
-                    "minHeight": 480,
-                    "maxHeight": 960,
-                    "maxFrameRate": 30
+                    "minWidth": 320,
+                    "maxWidth": 640,
+                    "minHeight": 180,
+                    "maxHeight": 480,
+                    "maxFrameRate": 24
                 };
             }
             else {
@@ -3632,6 +3633,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             // }
             // else{
                 navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
+                    console.error(stream);
                     stream.streamid = stream.streamid || stream.id || getRandomString();
                     stream.idInstance = idInstance;
                     streaming(stream);
@@ -4767,19 +4769,19 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         connection.enableFileSharing = false;
 
         // all values in kbps
-        connection.bandwidth = {
-            screen: false,
-            audio: false,
-            video: false
-        };
+        // connection.bandwidth = {
+        //     screen: false,
+        //     audio: false,
+        //     video: false
+        // };
 
 
         // reverted
-        // connection.bandwidth = {
-        //     screen: 64,
-        //     audio: 128,
-        //     video: 254
-        // };
+        connection.bandwidth = {
+            screen: 300,
+            audio: 6,
+            video: 100
+        };
 
         connection.codecs = {
             audio: 'opus',
