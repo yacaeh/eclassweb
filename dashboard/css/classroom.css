@@ -433,7 +433,7 @@ hr {
 
 .chatting {
   position: absolute;
-  top: 30%;
+  top: 29%;
   width: 100%;
   bottom: 0px;
 }
@@ -864,14 +864,13 @@ hr {
 #student_list {
   float: left;
   width: 100%;
-  height: 25%;
+  height: 24%;
   overflow-x: hidden;
   background: #b8b8b8;
   top: max(30px, 5%);
   position: absolute;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
+  overflow-y: hidden;
+  z-index: 1;
 }
 
 .student {
@@ -882,6 +881,8 @@ hr {
   color: white;
   vertical-align: bottom;
   position: relative;
+  width:  calc(25% - 2px);
+  height: min(calc(25% - 2px),58.2px);
 }
 
 .student > .permissions{
@@ -1803,4 +1804,22 @@ body:fullscreen {
   align-items: center;
   justify-content: center;
   display: flex;
+}
+
+#student_list_button{
+  cursor: pointer;
+  border: solid 2px rgba(0,0,0,0.5);
+  width: calc(25% - 2px);
+  height: min(calc(25% - 2px),58.2px);
+  position: relative;
+  display: none;
+  margin: 1px;
+  vertical-align: bottom;
+  float: right;
+  text-align: center;
+  font-family: Roboto;
+  font-weight: 800;
+  border-radius: 8px;
+  background-color: white;
+  line-height: 52px;
 }

@@ -149,6 +149,34 @@ AddEvent("top_record_video", "click", function (self) {
   }
 })
 
+AddEvent("student_list_button", "click" ,function(self){
+  let on = self.classList.contains("on");
+  let list = document.getElementById("student_list");
+  let len = list.children.length;
+  let line = Math.ceil(len / 4);
+  
+  if(!on){
+    list.appendChild(self);
+    line = Math.max(4,line);
+    $(list).animate({
+      gridAutoRows : 100 / line + "%",
+      height : 6 * line + "%"
+    })
+    self.innerHTML = "…";
+  }
+  else{
+    self.innerHTML = "+" + (len - 16);
+    list.insertBefore(self, list.children[15]);
+    line = 4;
+    $(list).animate({
+      gridAutoRows : 100 / line + "%",
+      height : 6 * line + "%"
+    })
+  }
+
+  self.classList.toggle("on");
+})
+
 window.addEventListener('resize', function () {
   rtime = new Date();
   if (timeout === false) {
@@ -171,8 +199,11 @@ connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
   connection.send('plz-sync-points', event.userid);
   classroomCommand.onConnectionSession(event);
+  tempe = event;
   JoinStudent(event);
 };
+
+var tempe ;
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
   console.log('onclose!');
@@ -542,6 +573,7 @@ function SetStudent() {
   $(".feature").remove();
   $("#showcam").remove();
   $("#showcanvas").remove();
+  $("#student_list").remove();
 
   let frame = GetWidgetFrame();
   $(frame.document.getElementById("3d_view")).remove();
@@ -590,7 +622,58 @@ function JoinStudent(event){
   })
 
   $("#student_list").append(div);
+
+  StudentListResize();
   $(div).append(img);
+}
+
+function testjoin(num){
+  for(var i= 0 ; i < num ; i++)
+    JoinStudent(tempe);
+}
+
+function testleft(){
+  document.getElementById("student_list").removeChild(document.getElementById("student_list").children[2]);
+  StudentListResize();
+}
+
+function StudentListResize(){
+  let btn = document.getElementById("student_list_button")
+  let list = document.getElementById("student_list");
+  let len = list.children.length - 1;
+  let on = btn.classList.contains("on");
+  
+  if(on && len != 16)
+    len++;
+  let line = Math.ceil(len / 4);
+
+  if(on){
+    line = Math.max(4,line);
+    $(list).css({
+      gridAutoRows : 100 / line + "%",
+      height : 6 * line + "%"
+    })
+  }
+  else{
+    btn.innerHTML = "+" + (len - 15);
+    $(list).css({
+      gridAutoRows : 100 / 4 + "%",
+      height : 6 * 4 + "%"
+    })
+  }
+
+  if(line <= 4){
+    Hide(btn);
+  }
+  else if(line >= 5){
+    if(!on)
+      list.insertBefore(btn, list.children[15])
+    else 
+      list.appendChild(btn)
+
+    btn.style.display = "inline-block";
+  }
+  
 }
 
 function LeftStudent(event){
@@ -622,6 +705,8 @@ function LeftStudent(event){
       break;
     }
   }
+
+  StudentListResize();
 }
 
 
