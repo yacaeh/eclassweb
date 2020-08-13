@@ -871,6 +871,8 @@ hr {
   position: absolute;
   overflow-y: hidden;
   z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .student {
@@ -881,8 +883,22 @@ hr {
   color: white;
   vertical-align: bottom;
   position: relative;
-  width:  calc(25% - 2px);
-  height: min(calc(25% - 2px),58.2px);
+}
+
+#student_list_button{
+  cursor: pointer;
+  border: solid 2px rgba(0,0,0,0.5);
+  position: relative;
+  display: none;
+  margin: 1px;
+  vertical-align: bottom;
+  float: right;
+  text-align: center;
+  font-family: Roboto;
+  font-weight: 800;
+  border-radius: 8px;
+  background-color: white;
+  line-height: 52px;
 }
 
 .student > .permissions{
@@ -1806,20 +1822,3 @@ body:fullscreen {
   display: flex;
 }
 
-#student_list_button{
-  cursor: pointer;
-  border: solid 2px rgba(0,0,0,0.5);
-  width: calc(25% - 2px);
-  height: min(calc(25% - 2px),58.2px);
-  position: relative;
-  display: none;
-  margin: 1px;
-  vertical-align: bottom;
-  float: right;
-  text-align: center;
-  font-family: Roboto;
-  font-weight: 800;
-  border-radius: 8px;
-  background-color: white;
-  line-height: 52px;
-}

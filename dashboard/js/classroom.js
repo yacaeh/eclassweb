@@ -158,22 +158,18 @@ AddEvent("student_list_button", "click" ,function(self){
   if(!on){
     list.appendChild(self);
     line = Math.max(4,line);
-    $(list).animate({
-      gridAutoRows : 100 / line + "%",
-      height : 6 * line + "%"
-    })
     self.innerHTML = "…";
   }
   else{
     self.innerHTML = "+" + (len - 16);
     list.insertBefore(self, list.children[15]);
     line = 4;
-    $(list).animate({
-      gridAutoRows : 100 / line + "%",
-      height : 6 * line + "%"
-    })
   }
-
+  
+  $(list).css({
+    gridAutoRows : 100 / line + "%",
+    height : 6 * line + "%"
+  })
   self.classList.toggle("on");
 })
 
@@ -667,7 +663,7 @@ function StudentListResize(){
   }
   else if(line >= 5){
     if(!on)
-      list.insertBefore(btn, list.children[15])
+      list.insertBefore(btn, list.children[16])
     else 
       list.appendChild(btn)
 
