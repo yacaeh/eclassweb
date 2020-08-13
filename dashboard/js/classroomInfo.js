@@ -73,11 +73,6 @@ classroomCommand = {
     onConnectionSession : function (_data) {
         if(!connection.extra.roomOwner) return;
 
-        //  shareScreen은 선생님이 연결을 해주어야 한다.
-        if(classroomInfo.shareScreen.state) {
-            classroomCommand.syncScreenShare (_data.userid);
-        };
-        
         // 로컬에서만 사용하는 데이터를 동기화 시켜 준다.
         // 학생들은 선생님한테 룸 정보를 받아서, 선생님 정보를 동기화 시켜준다.
         // 선생님이 로컬에서만 저장하는 데이터만 있을 수 있기 때문..
@@ -96,7 +91,6 @@ classroomCommand = {
             this.copyGlobalToLocal ();        
             this.updateSyncRoom ();
         }
-        LoadScreenShare();
     },
     
     
@@ -134,9 +128,9 @@ classroomCommand = {
             sendMyCanvas = true;
         }
 
-        // if(classroomInfo.shareScreen.state){
-        //     classroomCommand.openShare();
-        // }
+        if(classroomInfo.shareScreen.state){
+            ScreenshareManager.rejoin();
+        }
     },
 
 
@@ -153,24 +147,10 @@ classroomCommand = {
     }
 };
 
-
-
-classroomCommand.openShare = function (callback){
-    var s = GetStream(classroomInfoLocal.shareScreen.id)
-    if(s != undefined){
-        GetScreenSharingCanvas().srcObject = s;
-        GetScreenSharingCanvas().style.display = 'block';
-    }
-    
-    console.log("OPEN SHARE",s)
-}
-
 classroomCommand.exitAlert = function (callback) {    
-    
     alert_exit_Box("나가시겠습니까?", "경고", () => {
         callback()
     });
-    
 };
 
 classroomCommand.sendAlert = function (callback) {    
@@ -306,19 +286,6 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
-
-
-classroomCommand.StopScreenShare = function(){
-    classroomInfo.shareScreen = {};
-    classroomInfo.shareScreen.state = false
-    classroomInfo.shareScreen.id = undefined
-    classroomInfo.shareScreen.stream = undefined
-
-    classroomInfoLocal.shareScreen.state = false;
-    classroomInfoLocal.shareScreen.id = false;
-}
-
-
 /*
     공유 스크린 설정
 */
@@ -337,19 +304,13 @@ classroomCommand.setShareScreenServer = function (_data, success, error) {
 classroomCommand.setShareScreenLocal = function (_data) {
     classroomInfo.shareScreen.state = _data.state;
     classroomInfo.shareScreen.id = _data.id;
+    // classroomInfo.shareScreen.streamer = _data.streamer;
     classroomInfoLocal.shareScreen.state = _data.state;
     classroomInfoLocal.shareScreen.id = _data.id;
 };
 /*
     Screen share
  */
-
-classroomCommand.syncScreenShare = function (_userid) {
-    // connection.peers.forEach(function(e){
-        // console.log(e);
-    // })
-    // currentScreenViewShare (_userid);
-};
 
 
 /*
@@ -531,10 +492,6 @@ classroomCommand.syncEpub = function () {
 /*
     방 오픈 경과 시간 동기화
 */
-classroomCommand.syncClassroomOpenTime =  function () {    
-    updateClassTime ();
-};
-
 
 //--------------------------------------------------------------------------------//
 
@@ -568,8 +525,13 @@ function updateClassTime() {
   var now = new Date().getTime() - classroomInfo.roomOpenTime;
   now = parseInt(now / 1000);
 
-  if (!classTimeIntervalHandle)
+  if (!classTimeIntervalHandle){
+      setTimeout(function () {
+          document.getElementById("loading-screen").style.display = "none";
+      },1000
+    )
     classTimeIntervalHandle = setInterval(Sec, 1000);
+  }
 
   function Sec() {
     now++;

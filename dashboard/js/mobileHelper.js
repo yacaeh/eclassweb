@@ -35,7 +35,7 @@ function ToolSetting(){
 }
 
 function MainCamSetting(){
-    var video = GetMainVideo();
+    var video = MaincamManager.get();
     var x = 0;
     var y = 0;
     var lastleft = 0;
@@ -146,7 +146,7 @@ function MainCamSetting(){
 
     })
 
-    MainVideoStarter(function(){
+    MaincamManager.start(function(){
         AppendInFrame(video);
     });
 }

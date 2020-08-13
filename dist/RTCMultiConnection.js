@@ -3627,10 +3627,10 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 };
             }   
             
-            if (params.open == "true") {
-                ForOwner();
-            }
-            else{
+            // if (params.open == "true") {
+            //     ForOwner();
+            // }
+            // else{
                 navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
                     stream.streamid = stream.streamid || stream.id || getRandomString();
                     stream.idInstance = idInstance;
@@ -3640,22 +3640,22 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     st.stid = getRandomString();
                     st.idInstance = idInstance;
                     streaming(st);
+                })
+            //         // options.onLocalMediaError (error, options.localMediaConstraints);
+            //     });
+            // }?
 
-                    // options.onLocalMediaError(error, options.localMediaConstraints);
-                });
-            }
 
-
-            function ForOwner() {
-                navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function (stream) {
-                    stream.streamid = stream.streamid || stream.id || getRandomString();
-                    stream.idInstance = idInstance;
-                    streaming(stream);
-                }).catch(function (error) {
-                    console.error("FAILED TO FIND CAM... RETRY", error);
-                    setTimeout(ForOwner, 1000);
-                });
-            }
+            // function ForOwner() {
+            //     navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function (stream) {
+            //         stream.streamid = stream.streamid || stream.id || getRandomString();
+            //         stream.idInstance = idInstance;
+            //         streaming(stream);
+            //     }).catch(function (error) {
+            //         console.error("FAILED TO FIND CAM... RETRY", error);
+            //         setTimeout(ForOwner, 1000);
+            //     });
+            // }
 
         }
     }
@@ -3674,11 +3674,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 //     });
 
 // }
-
-
-
-
-
 
 
 // }
