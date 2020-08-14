@@ -63,9 +63,9 @@ connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
 connection.autoCloseEntireSession = false;
-connection.maxParticipantsAllowed = 1000;
+connection.maxParticipantsAllowed = 40;
 connection.chunkSize = 16000;
-connection.enableFileSharing = true;
+connection.enableFileSharing = false;
 
 connection.session = {
   audio: false,
@@ -512,7 +512,8 @@ designer.appendTo(document.getElementById('widget-container'), function () {
             return;
           }
           if (error === connection.errors.ROOM_FULL) {
-            alert('Room is full.');
+            alert("방이 가득 찼습니다.");
+            GoToMain();
             return;
           }
           if (error === connection.errors.INVALID_PASSWORD) {

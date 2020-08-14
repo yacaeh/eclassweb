@@ -316,7 +316,7 @@ button[disabled] {
   border-bottom: 1px solid #121010;
   padding-bottom: 1px;
   left: 1px;
-  top: max(30px, 5%);
+  top: max(30px, 4%);
   height: 25%;
 }
 
