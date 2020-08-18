@@ -103,7 +103,7 @@ ToggleViewType();
 _AllCantrallFunc();
 
 // 채팅 초기화
-SettingForChatting();
+ChattingManager.init();
 
 //시험치기 초기화
 examObj.init();
@@ -173,6 +173,28 @@ AddEvent("student_list_button", "click" ,function(self){
   self.classList.toggle("on");
 })
 
+AddEvent("right-tab-collapse", "click" ,function(self){
+  self.classList.toggle("off");
+  
+  if(self.classList.contains("off")){
+    self.style.transform = "rotate(90deg)";
+    $(".right-tab").animate({width : "0%"})
+    $("#widget-container").animate({right : "0%"},
+    function(){
+      CanvasResize();
+    })
+  }
+  else{
+    self.style.transform = "rotate(-90deg)";
+    $(".right-tab").animate({width : "17.7%"})
+    $("#widget-container").animate({right : "17.7%"},
+    function(){
+      CanvasResize();
+    })
+  }
+})
+
+
 window.addEventListener('resize', function () {
   rtime = new Date();
   if (timeout === false) {
@@ -219,13 +241,15 @@ connection.onmessage = function (event) {
   if(MaincamManager.eventListener(event))
     return;
 
+  if(ChattingManager.eventListener(event))
+    return;
+
   if(event.data.sendcanvasdata){
     sendMyCanvas = event.data.state;
     SendCanvasDataToOwnerOneTime();
   }
 
   if (event.data.canvassend) {
-    // console.log("RECIVE CANVAS DATA", event.data.canvas.length/ 1000 + "Kb");
     canvas_array[event.userid].src = event.data.canvas;
     if(event.userid = showingCanvasId)
       document.getElementById("bigcanvas-img").src = canvas_array[event.userid].src;
@@ -244,10 +268,7 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data.chatMessage) {
-    appendChatMessage(event);
-    return;
-  }
+
 
   if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect ! with" ,event.userid);
@@ -582,6 +603,9 @@ function SetStudent() {
 function JoinStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   if (!connection.extra.roomOwner) return;
+
+  ChattingManager.enterStudent(event);
+
   var id = event.userid;
   var name = event.extra.userFullName;
 
@@ -624,16 +648,6 @@ function JoinStudent(event){
   $(div).append(img);
 }
 
-function testjoin(num){
-  for(var i= 0 ; i < num ; i++)
-    JoinStudent(tempe);
-}
-
-function testleft(){
-  document.getElementById("student_list").removeChild(document.getElementById("student_list").children[2]);
-  StudentListResize();
-}
-
 function StudentListResize(){
   let btn = document.getElementById("student_list_button")
   let list = document.getElementById("student_list");
@@ -670,15 +684,13 @@ function StudentListResize(){
 
     btn.style.display = "inline-block";
   }
-  
 }
 
 function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
-  if (!connection.extra.roomOwner) {
-    console.log(event);
-    return;
-  }
+  if (!connection.extra.roomOwner) return;
+
+
   var id = event.userid;
   var name = event.extra.userFullName;
 
@@ -699,6 +711,7 @@ function LeftStudent(event){
       document.getElementById("student_list").removeChild(child);
       delete canvas_array[id];
       console.log("EXIT ROOM", id, name);
+      ChattingManager.leftStudent(event);
       break;
     }
   }
@@ -848,26 +861,7 @@ function CanvasResize() {
     EpubPositionSetting()
 }
 
-document.getElementById("right-tab-collapse").addEventListener("click",function(){
-  this.classList.toggle("off");
-  
-  if(this.classList.contains("off")){
-    this.style.transform = "rotate(90deg)";
-    $(".right-tab").animate({width : "0%"})
-    $("#widget-container").animate({right : "0%"},
-    function(){
-      CanvasResize();
-    })
-  }
-  else{
-    this.style.transform = "rotate(-90deg)";
-    $(".right-tab").animate({width : "17.7%"})
-    $("#widget-container").animate({right : "17.7%"},
-    function(){
-      CanvasResize();
-    })
-  }
-})
+
 
 var showcam = false;
 function CamOnOff(){

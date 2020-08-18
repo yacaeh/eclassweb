@@ -338,14 +338,6 @@ hr {
   cursor: pointer;
 }
 
-.checkmark {
-  display: none;
-  width: 15px;
-  vertical-align: middle;
-}
-
-
-
 #screen-container {
   margin: 20px;
 }
@@ -1603,6 +1595,21 @@ body:fullscreen {
 .teachermsg{
   overflow-wrap: break-word;
 }
+
+.teachermsg2{
+  overflow-wrap: break-word;
+  text-align: center;
+}
+
+.teachermsg2.enter{
+  color: #007bff;
+}
+.teachermsg2.left{
+  color: #ff0000;
+}
+
+
+
 
 #lprev{
   content: url(/dashboard/img/lastpage.png);
