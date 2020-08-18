@@ -133,6 +133,9 @@ AddEvent("top_alert", "click", function () {
     var chilldren = document.getElementById('student_list').children;
     for (var i = 0; i < chilldren.length; i++) {
       var al = chilldren[i].getElementsByClassName('bor')[0];
+      if(!al)
+        continue;
+
       al.className = "bor";
       al.classList.add('alert_wait');
     }
@@ -429,6 +432,8 @@ connection.onmessage = function (event) {
 
 connection.onstream = function (event) {
   console.log('onstream!',event);
+  if(event.share)
+    return;
 
   if (params.open === 'true' || params.open === true) {
     permissionManager.mute();
@@ -452,7 +457,7 @@ connection.setUserPreferences = function (userPreferences) {
 };
 
 connection.onstreamended = function (event) {
-  console.log('onstreameneded!');
+  console.log('onstreameneded!',event);
   ScreenshareManager.onclose(event);
 };
 

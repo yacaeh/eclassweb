@@ -204,57 +204,17 @@ function addStreamStopListener(stream, callback) {
   });
 }
 
-function replaceTrack(videoTrack, screenTrackId) {
-  if (!videoTrack) return;
-  if (videoTrack.readyState === 'ended') {
-    alert(
-      'Can not replace an "ended" track. track.readyState: ' +
-      videoTrack.readyState
-    );
-    return;
-  }
-  connection.getAllParticipants().forEach(function (pid) {
-    replaceTrackToPeer(pid, videoTrack, screenTrackId);
-  });
-}
-
-function replaceTrackToPeer(pid, videoTrack, screenTrackId) {
-  if (!connection.peers[pid]) {
-    console.error('connection peer error');
-    return;
-  }
-
-  var peer = connection.peers[pid].peer;
-  if (!peer.getSenders) return;
-  var trackToReplace = videoTrack;
-  peer.getSenders().forEach(function (sender) {
-    if (!sender || !sender.track) return;
-    if (screenTrackId) {
-      if (trackToReplace && sender.track.id === screenTrackId) {
-        sender.replaceTrack(trackToReplace);
-        trackToReplace = null;
-      }
-      return;
-    }
-
-    if (sender.track.id !== tempStream.getTracks()[0].id) return;
-    if (sender.track.kind === 'video' && trackToReplace) {
-      sender.replaceTrack(trackToReplace);
-      trackToReplace = null;
-    }
-  });
-}
 
 function replaceScreenTrack(stream, btn) {
   ClearCanvas();
   ClearStudentCanvas();
   ClearTeacherCanvas();
-
-  console.log("Stream Start", tempStream.streamid);
+  
+  console.log("Stream Start", stream.id);
 
   classroomCommand.setShareScreenLocal({
     state: true,
-    id: tempStream.streamid,
+    id: stream.id,
   });
 
   classroomInfoLocal.shareScreen.fromme = true;
@@ -263,7 +223,7 @@ function replaceScreenTrack(stream, btn) {
   if (connection.extra.roomOwner) {
     classroomInfo.shareScreen = {}
     classroomInfo.shareScreen.state = true
-    classroomInfo.shareScreen.id = tempStream.streamid
+    classroomInfo.shareScreen.id = stream.id
   }
 
   classroomCommand.setShareScreenServer(true, result => {
@@ -273,13 +233,6 @@ function replaceScreenTrack(stream, btn) {
 
 ScreenshareManager = {
   init: function () {
-    var tempStreamCanvas = document.createElement('canvas');
-    var tempStream = tempStreamCanvas.captureStream();
-    tempStream.isScreen = true;
-    tempStream.streamid = tempStream.id;
-    tempStream.type = 'local';
-    connection.attachStreams.push(tempStream);
-    window.tempStream = tempStream;
   },
   get: function () {
     return GetWidgetFrame().document.getElementById("screen-viewer");
@@ -299,27 +252,11 @@ ScreenshareManager = {
   },
   start: function (stream, btn) {
     connection.send({
-      showScreenShare: tempStream.streamid,
+      showScreenShare: stream.id,
     });
 
     window.shareStream = stream;
-    var screenTrackId = stream.getTracks()[0].id;
-
-    addStreamStopListener(stream, function () {
-      this.stop();
-      classroomCommand.setShareScreenServer(false, () => {
-        connection.send({ hideScreenShare: true });
-        if (btn != undefined) {
-          btn.classList.remove("on");
-          btn.classList.remove("selected-shape")
-        }
-        window.sharedStream = null;
-        ScreenshareManager.hide();
-        replaceTrack(tempStream.getTracks()[0], screenTrackId);
-      });
-    });
-
-    ScreenshareManager.retrack(stream);
+    var screenTrackId = stream.getTracks()[0].id
     ScreenshareManager.show();
   },
   stop: function () {
@@ -350,8 +287,10 @@ ScreenshareManager = {
 
     if (on) {
       isSharingScreen = false;
+
       if (typeof (lastStream) !== "undefined")
         lastStream.getTracks().forEach((track) => track.stop());
+
       btn.classList.remove("on");
       return false;
     }
@@ -369,7 +308,7 @@ ScreenshareManager = {
     // };
 
     screen_constraints = {
-      audio: false, // or true
+      audio: true, // or true
       oneway : true,
       video: {
         mandatory: {
@@ -386,6 +325,34 @@ ScreenshareManager = {
         (stream) => {
           btn.classList.toggle("selected-shape");
           btn.classList.toggle("on");
+
+          stream.isScreenShare = true;
+          connection.addStream(stream)
+          ScreenshareManager.get().volume = 0;
+          // connection.attachStreams.push(stream);
+
+          addStreamStopListener(stream, function () {
+            this.stop();
+
+            connection.removeStream(stream.id)
+            connection.attachStreams.forEach(function (e) {
+              if(e.id == stream.id){
+                var idx = connection.attachStreams.indexOf(e);
+                connection.attachStreams.splice(idx,1);
+              }
+            })
+
+
+            classroomCommand.setShareScreenServer(false, () => {
+              connection.send({ hideScreenShare: true });
+              if (btn != undefined) {
+                btn.classList.remove("on");
+                btn.classList.remove("selected-shape")
+              }
+              ScreenshareManager.hide();
+
+            });
+          })
 
           isSharingScreen = true;
           lastStream = stream;
@@ -411,13 +378,6 @@ ScreenshareManager = {
       alert('getDisplayMedia API is not available in this browser.');
     }
   },
-  retrack: function (stream) {
-    stream.getTracks().forEach(function (track) {
-      if (track.kind === 'video' && track.readyState === 'live') {
-        replaceTrack(track);
-      }
-    });
-  },
   eventListener: function (event) {
     if (event.data.showScreenShare) {
       console.log("SCREEN SHARE START", event.data.showScreenShare)
@@ -433,14 +393,31 @@ ScreenshareManager = {
       classroomInfo.shareScreen.id = event.data.showScreenShare;
       classroomInfo.shareScreen.userid = event.userid;
 
-      var stream = connection.streamEvents[event.data.showScreenShare].stream;
-      ScreenshareManager.show();
-      ScreenshareManager.srcObject(stream);
+      let inter = setInterval(function(){
+        try{
+          var stream = connection.streamEvents[event.data.showScreenShare].stream;
+          var parent =  ScreenshareManager.get().parentElement;
+          console.log(parent);
+
+          parent.removeChild(ScreenshareManager.get());
+          let element = connection.streamEvents[event.data.showScreenShare].mediaElement;
+          element.id = "screen-viewer";
+          element.volume = 0.3;
+          parent.appendChild(element);
+          ScreenshareManager.show();
+          ScreenshareManager.srcObject(stream);
+          clearInterval(inter);
+        }
+        catch(error){
+        }
+      },500);
+
       return true;
     }
 
     if (event.data.hideScreenShare) {
       console.log("SCREEN SHARE STOPED", event.userid)
+      console.log(event)
       classroomInfoLocal.shareScreenByStudent = false;
       ScreenshareManager.hide();
       classroomCommand.setShareScreenLocal({ state: false, id: undefined });
@@ -452,28 +429,30 @@ ScreenshareManager = {
       ScreenshareManager.start(event.data.studentStreaming)
       return true;
     }
-
-    if (event.data.retrackrequest) {
-      ScreenshareManager.retrack(ScreenshareManager.srcObject())
-    }
-
   },
   rejoin: function () {
     var streamEvents;
     let interval = setInterval(function () {
       try {
-        streamEvents = connection.streamEvents[classroomInfo.shareScreen.id];
-        ScreenshareManager.srcObject(streamEvents.stream);
-        ScreenshareManager.show();
-        connection.send({
-          retrackrequest: true,
-        }, streamEvents.userid);
+        console.log(event);
 
+        var stream = connection.streamEvents[classroomInfo.shareScreen.id].stream;
+        
+        var parent = ScreenshareManager.get().parentElement;
+        let element = connection.streamEvents[classroomInfo.shareScreen.id].mediaElement;
+        element.id = "screen-viewer";
+        parent.removeChild(ScreenshareManager.get());
+        parent.appendChild(element);
+        element.volume = 0.3
+        ScreenshareManager.show();
+        // ScreenshareManager.srcObject(stream);
+        
         CanvasResize();
         clearInterval(interval);
 
       }
-      catch{
+      catch(error){
+        console.error(error)
       }
     }, 500);
   },
@@ -564,6 +543,7 @@ MaincamManager = {
       if (event.type === 'local') 
       video.volume = 0;
       this.srcObject(event.stream);
+      console.log("MAIN CHANGED",event);
     this.start();
     
   },
