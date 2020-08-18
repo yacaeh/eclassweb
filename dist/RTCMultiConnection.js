@@ -2158,7 +2158,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
     // todo: add API documentation for connection.autoCreateMediaElement
 
     function getRMCMediaElement(stream, callback, connection) {
-        console.error("MAKE!!")
+        
         if (!connection.autoCreateMediaElement) {
             callback({});
             return;
@@ -2170,7 +2170,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         }
 
         var mediaElement = document.createElement(isAudioOnly ? 'audio' : 'video');
-
         mediaElement.srcObject = stream;
 
         mediaElement.setAttribute('autoplay', true);
@@ -2186,7 +2185,9 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             setTimeout(function() {
                 if (!cbFired) {
                     cbFired = true;
-                    // callback(mediaElement);
+                    if(stream.isVideo){
+                        callback(mediaElement);
+                    }
                 }
             }, 1000);
             played.then(function() {
@@ -3580,7 +3581,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             // }
             // else{
                 navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
-                    console.error(stream);
                     stream.streamid = stream.streamid || stream.id || getRandomString();
                     stream.idInstance = idInstance;
                     streaming(stream);

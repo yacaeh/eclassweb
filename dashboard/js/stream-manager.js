@@ -402,6 +402,7 @@ ScreenshareManager = {
           parent.removeChild(ScreenshareManager.get());
           let element = connection.streamEvents[event.data.showScreenShare].mediaElement;
           element.id = "screen-viewer";
+          element.volume = 0.3;
           parent.appendChild(element);
           ScreenshareManager.show();
           ScreenshareManager.srcObject(stream);
