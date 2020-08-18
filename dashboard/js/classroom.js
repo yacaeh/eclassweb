@@ -429,6 +429,8 @@ connection.onmessage = function (event) {
 
 connection.onstream = function (event) {
   console.log('onstream!',event);
+  if(event.share)
+    return;
 
   if (params.open === 'true' || params.open === true) {
     permissionManager.mute();
@@ -452,7 +454,7 @@ connection.setUserPreferences = function (userPreferences) {
 };
 
 connection.onstreamended = function (event) {
-  console.log('onstreameneded!');
+  console.log('onstreameneded!',event);
   ScreenshareManager.onclose(event);
 };
 

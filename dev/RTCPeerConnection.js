@@ -323,6 +323,7 @@ function PeerInitiator(config) {
     if (typeof peer.removeStream !== 'function') {
         // removeStream backward compatibility
         peer.removeStream = function(stream) {
+            console.error("REMOVE STREAM............")
             stream.getTracks().forEach(function(track) {
                 peer.removeTrack(track, stream);
             });

@@ -2158,6 +2158,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
     // todo: add API documentation for connection.autoCreateMediaElement
 
     function getRMCMediaElement(stream, callback, connection) {
+        console.error("MAKE!!")
         if (!connection.autoCreateMediaElement) {
             callback({});
             return;
@@ -2166,12 +2167,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         var isAudioOnly = false;
         if (!getTracks(stream, 'video').length && !stream.isVideo && !stream.isScreen) {
             isAudioOnly = true;
-        }
-
-        if (DetectRTC.browser.name === 'Firefox') {
-            if (connection.session.video || connection.session.screen) {
-                isAudioOnly = false;
-            }
         }
 
         var mediaElement = document.createElement(isAudioOnly ? 'audio' : 'video');
@@ -2184,54 +2179,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         mediaElement.setAttribute('muted', false);
         mediaElement.setAttribute('volume', 1);
 
-        // http://goo.gl/WZ5nFl
-        // Firefox don't yet support onended for any stream (remote/local)
-        if (DetectRTC.browser.name === 'Firefox') {
-            var streamEndedEvent = 'ended';
-
-            if ('oninactive' in mediaElement) {
-                streamEndedEvent = 'inactive';
-            }
-
-            mediaElement.addEventListener(streamEndedEvent, function() {
-                // fireEvent(stream, streamEndedEvent, stream);
-                currentUserMediaRequest.remove(stream.idInstance);
-
-                if (stream.type === 'local') {
-                    streamEndedEvent = 'ended';
-
-                    if ('oninactive' in stream) {
-                        streamEndedEvent = 'inactive';
-                    }
-
-                    StreamsHandler.onSyncNeeded(stream.streamid, streamEndedEvent);
-
-                    connection.attachStreams.forEach(function(aStream, idx) {
-                        if (stream.streamid === aStream.streamid) {
-                            delete connection.attachStreams[idx];
-                        }
-                    });
-
-                    var newStreamsArray = [];
-                    connection.attachStreams.forEach(function(aStream) {
-                        if (aStream) {
-                            newStreamsArray.push(aStream);
-                        }
-                    });
-                    connection.attachStreams = newStreamsArray;
-
-                    var streamEvent = connection.streamEvents[stream.streamid];
-
-                    if (streamEvent) {
-                        connection.onstreamended(streamEvent);
-                        return;
-                    }
-                    if (this.parentNode) {
-                        this.parentNode.removeChild(this);
-                    }
-                }
-            }, false);
-        }
 
         var played = mediaElement.play();
         if (typeof played !== 'undefined') {
@@ -2239,7 +2186,7 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             setTimeout(function() {
                 if (!cbFired) {
                     cbFired = true;
-                    callback(mediaElement);
+                    // callback(mediaElement);
                 }
             }, 1000);
             played.then(function() {
@@ -5095,6 +5042,8 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
         connection.removeStream = function(streamid, remoteUserId) {
             var stream;
+
+            console.error(connection.attachStreams, streamid);
             connection.attachStreams.forEach(function(localStream) {
                 if (localStream.id === streamid) {
                     stream = localStream;

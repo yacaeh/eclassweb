@@ -1893,6 +1893,7 @@ function canvasresize(id){
             });
 
             peer.ontrack = function(event) {
+                console.error("ONTRACK..")
                 callback({
                     stream: event.streams[0]
                 });
