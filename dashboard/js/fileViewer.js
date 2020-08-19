@@ -289,7 +289,6 @@ class mediaViewer {
             this.onended();
     }
 }
-
 class fileViewer {
     constructor() {
         this.mViewerLoader = new fileViewerLoader();
@@ -444,7 +443,9 @@ class fileViewer {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-var mfileViewer = new fileViewer();
+let pdfString = 'pdf';
+var mfileViewer         = new fileViewer();
+
 
 mfileViewer.onopen = function (_type, _url) {
 
@@ -501,13 +502,6 @@ mfileViewer.onsync = function () {
             mfileViewer.mViewerLoader.LockViewer(false);
     }
 }
-
-
-/*
-    PDF fileViewer
-*/
-
-let pdfString = 'pdf';
 
 mfileViewer.onopeneachtype[pdfString] = function () {
     console.log('onopen pdf');
@@ -567,7 +561,6 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
         }
     }
 }
-
 /*
     Video Viewer
 */

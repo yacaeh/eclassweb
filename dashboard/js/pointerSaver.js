@@ -127,4 +127,3 @@ class PointerSaver {
         this.save(this.nowIdx);
     }
 }
-var pointer_saver = new PointerSaver();

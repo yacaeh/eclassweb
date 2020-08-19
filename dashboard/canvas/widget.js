@@ -560,7 +560,7 @@ function canvasresize(id){
 
                                 }
                                 
-                                console.log("SEND ERASER",_uid, data);
+                                // console.log("SEND ERASER",_uid, data);
                                 data.pageidx = window.parent.pointer_saver.nowIdx;
                                 window.parent.postMessage({
                                     canvasDesignerSyncData: data,

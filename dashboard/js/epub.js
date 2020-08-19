@@ -1,8 +1,12 @@
-epubManager = {
-    isEpubViewer : false,
-    path : undefined,
-    renditionBuffer : undefined,
-    loadEpub : function(btn){
+class epubManagerClass{
+    constructor(){
+        this.isEpubViewer = false;
+        this.path = undefined;
+        this.renditionBuffer = undefined;
+    }
+
+
+    loadEpub(btn){
         if (!isSharingEpub && checkSharing()) {
             removeOnSelect(btn);
             return;
@@ -18,14 +22,14 @@ epubManager = {
             epubManager.unloadEpubViewer();
             classroomCommand.sendCloseEpub();
         }
-    },
-    EpubPositionSetting : function(){
+    }
+    EpubPositionSetting(){
         let viewer = GetWidgetFrame().document.getElementById("epub-viewer");
         let can = GetWidgetFrame().document.getElementById("main-canvas");
         let wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0].getBoundingClientRect();
         viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
-    },
-    loadEpubViewer : function(){
+    }
+    loadEpubViewer(){
         CanvasManager.clearCanvas();
         PageNavigator.on();
     
@@ -131,8 +135,8 @@ epubManager = {
     
         rendition.on('keyup', keyListener);
         document.addEventListener('keyup', keyListener, false);
-    },
-    unloadEpubViewer : function(){
+    }
+    unloadEpubViewer(){
         CanvasManager.clear();
     
         pointer_saver.close();

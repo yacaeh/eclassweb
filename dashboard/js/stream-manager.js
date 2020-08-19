@@ -232,11 +232,6 @@ class ScreenShareManagerClass{
       return;
     }
 
-    // screen_constraints = {
-    //   screen: true,
-    //   oneway: true,
-    // };
-
     var screen_constraints = {
       audio: true, // or true
       oneway : true,
@@ -305,6 +300,72 @@ class ScreenShareManagerClass{
       );
     } else {
       alert('getDisplayMedia API is not available in this browser.');
+    }
+  
+    function addStreamStopListener(stream, callback) {
+      stream.addEventListener(
+        'ended',
+        function () {
+          callback();
+          callback = function () { };
+        },
+        false
+      );
+    
+      stream.addEventListener(
+        'inactive',
+        function () {
+          classroomInfo.shareScreen.state = false;
+          callback();
+          callback = function () { };
+        },
+        false
+      );
+    
+      stream.getTracks().forEach(function (track) {
+        track.addEventListener(
+          'ended',
+          function () {
+            console.log("3");
+            callback();
+            callback = function () { };
+          },
+          false
+        );
+    
+        track.addEventListener(
+          'inactive',
+          function () {
+            console.log("4");
+            callback();
+            callback = function () { };
+          },
+          false
+        );
+      });
+    }
+
+    function replaceScreenTrack(stream, btn) {
+      CanvasManager.clear();
+    
+      console.log("Stream Start", stream.id);
+    
+      classroomCommand.setShareScreenLocal({
+        state: true,
+        id: stream.id,
+      });
+    
+      ScreenshareManager.srcObject(stream);
+    
+      if (connection.extra.roomOwner) {
+        classroomInfo.shareScreen = {}
+        classroomInfo.shareScreen.state = true
+        classroomInfo.shareScreen.id = stream.id
+      }
+    
+      classroomCommand.setShareScreenServer(true, result => {
+        ScreenshareManager.start(stream, btn);
+      });
     }
   }
   eventListener(event) {
@@ -384,6 +445,7 @@ class ScreenShareManagerClass{
       classroomCommand.setShareScreenServer(false, () => { console.log("Streaming Finish") });
     }
   }
+ 
 }
 
 class MaincamManagerClass{
@@ -467,78 +529,4 @@ class MaincamManagerClass{
   }
   eventListener(event) {
   }
-}
-
-var ScreenRecorder      = new ScreenRecorderClass();
-var ScreenshareManager  = new ScreenShareManagerClass();
-var MaincamManager      = new MaincamManagerClass();
-
-function addStreamStopListener(stream, callback) {
-  stream.addEventListener(
-    'ended',
-    function () {
-      callback();
-      callback = function () { };
-    },
-    false
-  );
-
-  stream.addEventListener(
-    'inactive',
-    function () {
-      classroomInfo.shareScreen.state = false;
-      classroomInfoLocal.shareScreen.fromme = false;
-      callback();
-      callback = function () { };
-    },
-    false
-  );
-
-  stream.getTracks().forEach(function (track) {
-    track.addEventListener(
-      'ended',
-      function () {
-        console.log("3");
-        callback();
-        callback = function () { };
-      },
-      false
-    );
-
-    track.addEventListener(
-      'inactive',
-      function () {
-        console.log("4");
-        callback();
-        callback = function () { };
-      },
-      false
-    );
-  });
-}
-
-function replaceScreenTrack(stream, btn) {
-  CanvasManager.clearCanvas();
-  CanvasManager.clearStudentCanvas();
-  CanvasManager.clearTeacherCanvas();
-  
-  console.log("Stream Start", stream.id);
-
-  classroomCommand.setShareScreenLocal({
-    state: true,
-    id: stream.id,
-  });
-
-  classroomInfoLocal.shareScreen.fromme = true;
-  ScreenshareManager.srcObject(stream);
-
-  if (connection.extra.roomOwner) {
-    classroomInfo.shareScreen = {}
-    classroomInfo.shareScreen.state = true
-    classroomInfo.shareScreen.id = stream.id
-  }
-
-  classroomCommand.setShareScreenServer(true, result => {
-    ScreenshareManager.start(stream, btn);
-  });
 }

@@ -1,16 +1,18 @@
-var limitWidth = 700;
-var isMobile = false;
-
 class mobileHelperClass{
+    constructor(){
+        this.isMobile = false;
+        this.conversationPanel;
+    }
     init(){
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
         // || !connection.extra.roomOwner
         ) {
+            this.conversationPanel = document.getElementById('conversation-panel');
             this.setMobile();
         }
     }
     setMobile(){
-        isMobile = true;
+        this.isMobile = true;
         document.getElementById("widget-container").style.right = "0px";
         ChatSetting();
         FullScreenBtnInit();
@@ -230,14 +232,14 @@ class mobileHelperClass{
             return GetWidgetFrame().document;
         }
         function ChatSetting(){
-            var widget = document.getElementById("widget-container");
-            var chatinput = document.getElementsByClassName("emojionearea-inline")[0]
+            let widget = document.getElementById("widget-container");
+            let chatinput = document.getElementsByClassName("emojionearea-inline")[0]
             widget.insertBefore( chatinput ,widget.firstChild)
-            AppendInFrame(conversationPanel);
-            var div = document.createElement("div");
+            AppendInFrame(mobileHelper.conversationPanel);
+            let div = document.createElement("div");
             div.className = "chatonoff";
         
-            var img = document.createElement("img");
+            let img = document.createElement("img");
             img.src = "/dashboard/img/openchat.png";
             div.appendChild(img);
         
@@ -247,26 +249,16 @@ class mobileHelperClass{
                 this.classList.toggle("off");
         
                 if(this.classList.contains("off")){
-                    $(conversationPanel).hide("Blind");
+                    $(mobileHelper.conversationPanel).hide("Blind");
                     $(chatinput).hide("Fade");
                     div.style.transform = "rotate(90deg)";
                 }
                 else{
                     div.style.transform = "rotate(-90deg)";
-                    $(conversationPanel).show("Blind");
+                    $(mobileHelper.conversationPanel).show("Blind");
                     $(chatinput).show("Fade");
                 }
             })
         }
     }
 }
-
-var mobileHelper = new mobileHelperClass();
-
-
-
-
-
-
-
-

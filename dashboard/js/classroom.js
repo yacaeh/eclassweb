@@ -1,7 +1,3 @@
-/*
-  메인
-*/
-
 (function () {
   var params = {},
     r = /([^&=]+)=?([^&]*)/g;
@@ -16,8 +12,7 @@
   window.params = params;
 })();
 
-let uploadServerUrl = "https://files.primom.co.kr:1443";
-var conversationPanel = document.getElementById('conversation-panel');
+const uploadServerUrl = "https://files.primom.co.kr:1443";
 
 var debug = false;
 var canvas_array = {};
@@ -30,6 +25,17 @@ let extraPath = '';
 let currentPdfPage = 0;
 var sendMyCanvas = false;
 var showingCanvasId = undefined;
+
+var ScreenRecorder      = new ScreenRecorderClass();
+var ScreenshareManager  = new ScreenShareManagerClass();
+var MaincamManager      = new MaincamManagerClass();
+var CanvasManager       = new CanvasManagerClass();
+var connection          = new RTCMultiConnection();
+var epubManager         = new epubManagerClass();
+var mobileHelper        = new mobileHelperClass();
+var pointer_saver       = new PointerSaver();
+var classroomManager    = new classRoomManagerClass();
+var permissionManager   = new permissionManagerClass();
 
 
 // 상단 버튼 도움말
@@ -50,31 +56,30 @@ var canvasButtonContents = {
   'movie'       : Movie_Render_Button,
   'file'        : LoadFile,
   'epub'        : epubManager.loadEpub,
-  'callteacher' : CallTeacher,
+  'callteacher' : classroomManager.callTeacher,
   'homework'    : HomeworkSubmit,
 }
 
 // 단축키
 var shortCut = [
-  {"onoff-icon" : "a"},
-  {"pencilIcon" : "q"},
-  {"markerIcon" : "w"},
-  {"eraserIcon" : "e"},
-  {"textIcon" : "r"},
-  {"undo" : "z"},
-  {"clearCanvas" : "x"},
+  {"onoff-icon"   : "a"},
+  {"pencilIcon"   : "q"},
+  {"markerIcon"   : "w"},
+  {"eraserIcon"   : "e"},
+  {"textIcon"     : "r"},
+  {"undo"         : "z"},
+  {"clearCanvas"  : "x"},
   {"screen_share" : "1"},
-  {"3d_view" : "2"},
-  {"movie" : "3"},
-  {"file" : "4"},
-  {"epub" : "5"},
-  {"callteacher" : "2"},
-  {"homework" : "3"},
+  {"3d_view"      : "2"},
+  {"movie"        : "3"},
+  {"file"         : "4"},
+  {"epub"         : "5"},
+  {"callteacher"  : "2"},
+  {"homework"     : "3"},
 ]
 
 //=============================================================================================
 
-var connection = new RTCMultiConnection();
 console.log('Connection!');
 connection.socketURL = '/';
 connection.extra.userFullName = params.userFullName;
@@ -430,7 +435,7 @@ connection.onmessage = function (event) {
       $('#exam-board').hide(300);
       $(".right-tab").css("z-index", 3);
     }
-    if (isMobile)
+    if (mobileHelper.isMobile)
       document.getElementById("widget-container").style.right = "0px";
     else
       document.getElementById("widget-container").removeAttribute("style")
@@ -460,11 +465,9 @@ connection.setUserPreferences = function (userPreferences) {
   if (connection.dontAttachStream) {
     userPreferences.dontAttachLocalStream = true;
   }
-
   if (connection.dontGetRemoteStream) {
     userPreferences.dontGetRemoteStream = true;
   }
-
   return userPreferences;
 };
 
@@ -786,13 +789,6 @@ function ToggleViewType() {
   });
 }
 
-function CallTeacher() {
-  connection.send({
-    callTeacher: { 
-      userid: connection.userid 
-    }}, GetOwnerId());
-}
-
 // Save classinfo on user exit
 function saveClassInfo() {
   localStorage.setItem('sessionid', params.sessionid);
@@ -884,22 +880,6 @@ function CanvasResize() {
   if (frame.document.getElementById("epub-viewer"))
     epubManager.EpubPositionSetting()
 }
-
-
-
-var showcam = false;
-function CamOnOff(){
-  if(!showcam){
-    MaincamManager.show();
-    $('#student_list').hide();
-  }
-  else{
-    MaincamManager.hide();
-    $('#student_list').show();
-  }
-  showcam = !showcam
-}
-
 
 function GoToMain(){
   var href = location.protocol + "//" + location.host + "/dashboard/";

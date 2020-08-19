@@ -29,14 +29,11 @@ class CanvasManagerClass {
     }
 }
 
-var CanvasManager = new CanvasManagerClass();
-
-
 var canvas;
 var ctx;
 var tooltips = [];
 var altdown = false;
-var designer = new CanvasDesigner();
+var designer            = new CanvasDesigner();
 
 designer.widgetHtmlURL = './canvas/widget.html';
 designer.widgetJsURL = './widget.js';
@@ -58,7 +55,6 @@ designer.icons.callteacher = '/dashboard/img/handsup.png';
 designer.icons.homework = '/dashboard/img/homework.png';
 designer.icons.fulloff = '/dashboard/img/cam_min.png';
 designer.icons.fullon = '/dashboard/img/cam_max.png';
-
 
 designer.addSyncListener(function (data) {
     var isStudent = permissionManager.IsCanvasPermission(data.userid);
@@ -93,7 +89,6 @@ designer.setTools({
 });
 
 function SetCanvasBtn(data) {
-
     function checkf() {
         if (designer.iframe != null) {
             clearInterval(inter)
