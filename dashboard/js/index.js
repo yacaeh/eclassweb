@@ -241,34 +241,34 @@ $('#btn-create-room').click(function () {
 
     $('#btn-create-room').html('Please wait...').prop('disabled', true);
 
-    connection.checkPresence(roomid, function (isRoomExist,a,extra) {
-        console.log(isRoomExist,a,extra);
+    connection.checkPresence(roomid, function (isRoomExist, a, extra) {
+        console.log(isRoomExist, a, extra);
 
-        connection.DetectRTC.load(function() {
+        connection.DetectRTC.load(function () {
             if (!connection.DetectRTC.hasMicrophone) {
                 console.log("user has no mic!");
                 alertBox('마이크가 없습니다', '에러');
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }
-        
-            if (!connection.DetectRTC.hasWebcam) {
-                console.log("user has no cam!");
-                alertBox('웹캠이 없습니다', '에러');
-                $('#btn-create-room').html(initialHTML).prop('disabled', false);
-                return;
-            }
+
+            // if (!connection.DetectRTC.hasWebcam) {
+            //     console.log("user has no cam!");
+            //     alertBox('웹캠이 없습니다', '에러');
+            //     $('#btn-create-room').html(initialHTML).prop('disabled', false);
+            //     return;
+            // }
 
             if (isRoomExist === true && !extra._room.teacher_rejoin) {
                 alertBox('이미 존재하는 방입니다.', '에러');
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }
-    
-            if(extra._room.teacher_rejoin){
+
+            if (extra._room.teacher_rejoin) {
                 connection.teacher_rejoin = true;
             }
-    
+
             // connection.publicRoomIdentifier = '';
             connection.sessionid = roomid;
             connection.isInitiator = true;
@@ -277,7 +277,7 @@ $('#btn-create-room').click(function () {
             $('#btn-create-room').html(initialHTML).prop('disabled', false);
         });
 
-       
+
     });
 });
 
