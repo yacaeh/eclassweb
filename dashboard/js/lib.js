@@ -114,3 +114,27 @@ function alert_exit_Box(message, title, callback_yes, callback_no) {
     $('#alert-exit-content').html(message);
     $('#alert-exit').fadeIn(300);
   }
+
+
+function Post(url, data, callback){
+  let xml = new XMLHttpRequest();
+  xml.open("POST", url);
+  xml.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
+  xml.send(data);
+  xml.addEventListener("readystatechange", function(data){
+    if(xml.readyState == xml.DONE && xml.status == 200){
+      callback(xml.responseText);
+    }
+  })
+}
+
+function Get(url, callback){
+  let xml = new XMLHttpRequest();
+  xml.open("GET", url);
+  xml.send();
+  xml.addEventListener("readystatechange", function(data){
+    if(xml.readyState == xml.DONE && xml.status == 200){
+      callback(xml.responseText);
+    }
+  })
+}

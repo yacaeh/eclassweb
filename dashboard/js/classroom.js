@@ -16,6 +16,9 @@
   window.params = params;
 })();
 
+let uploadServerUrl = "https://files.primom.co.kr:1443";
+var conversationPanel = document.getElementById('conversation-panel');
+
 var debug = false;
 var canvas_array = {};
 var isSharing3D = false;
@@ -31,13 +34,13 @@ var showingCanvasId = undefined;
 
 // 상단 버튼 도움말
 var topButtonContents = {
-  top_all_controll: "전체 제어",
-  top_test: "시험",
-  top_alert: "알림",
-  top_student: "학생 판서",
-  top_camera: "학생 카메라",
-  top_save_alert: "알림 기록 저장",
-  top_record_video: "화면 녹화"
+  top_all_controll      : "전체 제어",
+  top_test              : "시험",
+  top_alert             : "알림",
+  top_student           : "학생 판서",
+  top_camera            : "학생 카메라",
+  top_save_alert        : "알림 기록 저장",
+  top_record_video      : "화면 녹화"
 }
 
 // 좌측 버튼 기능
@@ -51,8 +54,23 @@ var canvasButtonContents = {
   'homework'    : HomeworkSubmit,
 }
 
-let uploadServerUrl = "https://files.primom.co.kr:1443";
-var conversationPanel = document.getElementById('conversation-panel');
+// 단축키
+var shortCut = [
+  {"onoff-icon" : "a"},
+  {"pencilIcon" : "q"},
+  {"markerIcon" : "w"},
+  {"eraserIcon" : "e"},
+  {"textIcon" : "r"},
+  {"undo" : "z"},
+  {"clearCanvas" : "x"},
+  {"screen_share" : "1"},
+  {"3d_view" : "2"},
+  {"movie" : "3"},
+  {"file" : "4"},
+  {"epub" : "5"},
+  {"callteacher" : "2"},
+  {"homework" : "3"},
+]
 
 //=============================================================================================
 
@@ -211,7 +229,7 @@ window.onWidgetLoaded = function () {
   WindowFocusChecker();
   SetCanvasBtn(canvasButtonContents);
   SetShortcut(shortCut);
-  mobileHelper.Init();
+  mobileHelper.init();
   canvasinit();
   SendCanvasDataToOwner();
 }
@@ -250,6 +268,7 @@ connection.onmessage = function (event) {
   if(event.data.sendcanvasdata){
     sendMyCanvas = event.data.state;
     SendCanvasDataToOwnerOneTime();
+    return;
   }
 
   if (event.data.canvassend) {
@@ -270,8 +289,6 @@ connection.onmessage = function (event) {
     console.log(classroomInfo)
     return;
   }
-
-
 
   if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect ! with" ,event.userid);
@@ -339,12 +356,11 @@ connection.onmessage = function (event) {
   if (event.data.viewer) {
     if (event.data.viewer.cmd == "close") {
       PageNavigator.off();
+      CanvasManager.clear();
     }
 
     if(!(event.data.viewer.cmd == "pause" || event.data.viewer.cmd == "play")){
-      ClearCanvas();
-      ClearStudentCanvas();
-      ClearTeacherCanvas();
+      // CanvasManager.clear();
     }
 
     classroomCommand.updateViewer(event.data.viewer);
@@ -356,12 +372,8 @@ connection.onmessage = function (event) {
     return;
   }
 
-
-
   if (event.data.modelEnable) {
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
+    CanvasManager.clear();
 
     var enable = event.data.modelEnable.enable;
     setShared3DStateLocal(enable);
@@ -385,7 +397,7 @@ connection.onmessage = function (event) {
   //동영상 공유
   if (event.data.MoiveURL) {
     console.log(event.data.MoiveURL);
-    // ClearCanvas();
+    // CanvasManager.clearCanvas();
     isSharingMovie = event.data.MoiveURL.enable;
 
     var moveURL = event.data.MoiveURL;

@@ -2,15 +2,45 @@ class PointerSaver {
     constructor(){
         this.container = {};
         this.nowIdx = 0;
+        this.path = undefined;
     }
 
     load_container(path){
-        var name = connection.extra.userFullName;
-        console.log("load container",path,name);
+        this.nowIdx = 0;
+        if(this.path){
+            this.save_container();
+        }
+        this.path = path;
+        let json =  path + "_" + connection.extra.userFullName + ".json";
+        Get(json,function(e){
+            let data = JSON.parse(e);
+            pointer_saver.container = data;
+            window.currentPoints = data[0].points;
+            window.currentHistory = data[0].history;
+            data[0].command = "my";
+            
+            designer.syncData(data[0]);
+            designer.sync();
+
+            console.log("loaded container",path,name,data);
+        })
     }
-    save_container(path){
-        var name = connection.extra.userFullName;
-        console.log("save container",path,name,this.container)
+    save_container(){
+        this.save();
+        let url = uploadServerUrl + '/point';
+        let name = connection.extra.userFullName;
+        let data = {
+            filepath : this.path,
+            userId   : name,
+            point    : this.container
+        }
+        Post(url,JSON.stringify(data),function(e){
+            console.log(e);
+        })
+
+        console.log("save container",this.path,name,this.container)
+        console.log(JSON.stringify(data).length);
+        this.path = undefined;
     }
     save(){
         var point, history;
@@ -35,13 +65,11 @@ class PointerSaver {
         this.show();
     }
     show(){
-        console.log(this.container);
+        console.debug(this.container);
     }
     load(idx){
         this.nowIdx = idx;
-        ClearCanvas();
-        ClearTeacherCanvas();
-        ClearStudentCanvas();
+        CanvasManager.clear();
 
         this.get();
 
@@ -51,7 +79,6 @@ class PointerSaver {
             window.currentPoints = this.container[idx].points;
             window.currentHistory = this.container[idx].history;
 
-            console.log(this.container[idx].history.length)
             if(this.container[idx].history.length == 0){
                 console.log("NO DATA")
                 return null;
@@ -100,38 +127,4 @@ class PointerSaver {
         this.save(this.nowIdx);
     }
 }
-
 var pointer_saver = new PointerSaver();
-
-function ClearTeacherCanvas(){
-  designer.syncData({
-    command : "clearteacher",
-    uid: connection.userid,
-  })
-}
-
-function ClearCanvas() {
-designer.syncData({
-    command : "clearcanvas",
-    uid: connection.userid,
-    })
-}
-  
-function ClearStudentCanvas(studentid){
-    designer.syncData({
-        command : "clearstudent",
-        isStudent : true,
-        userid: studentid,
-    })
-}
-
-function SendStudentPointData(){
-    designer.syncData({
-        command : "default",
-        isStudent : true,
-        points : currentPoints ,
-        history : currentHistory,
-        uid: connection.userid,
-      })
-}
-

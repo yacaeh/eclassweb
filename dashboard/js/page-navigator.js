@@ -1,3 +1,4 @@
+
 PageNavigator = {
     self : this,
     obj : undefined,
@@ -37,6 +38,8 @@ PageNavigator = {
     },
 
     pdfsetting : function(){
+      let self = this.self;
+
       this.leftbtn = function(){
         self.inputwindow.value = Math.max(1, --self.inputwindow.value);
         mfileViewer.updateViewer({
@@ -78,7 +81,10 @@ PageNavigator = {
     },
 
     init : function(){
-        self = this;
+        this.self = this;
+        let self = this.self;
+
+
         this.obj = document.getElementById("epub-navi");
         this.list = document.getElementById("thumbnail-list");
         this.maxidx = document.getElementById("epubmaxidx");

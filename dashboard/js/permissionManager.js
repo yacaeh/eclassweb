@@ -202,7 +202,7 @@ permissionManager = {
   DeleteCanvasPermission: function (id) {
     var idx = classroomInfo.canvasPermission.indexOf(id);
     classroomInfo.canvasPermission.splice(idx, 1);
-    ClearStudentCanvas(id);
+    CanvasManager.clearStudentCanvas(id);
     console.log("Canvas permission removed", id, classroomInfo.canvasPermission);
     FindInList(id).dataset.canvasPermission = false;
     DeleteIcon(id, "canvas");
@@ -257,7 +257,7 @@ permissionManager = {
 
   disableCanvasPermission: function (id) {
     console.log("LOST CANVAS PERMISSION");
-    ClearStudentCanvas(id);
+    CanvasManager.clearStudentCanvas(id);
   },
 
   disableMicPermission: function () {

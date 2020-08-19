@@ -393,7 +393,7 @@ classroomCommand.openEpub = function () {
         }
     }
     else {
-        loadEpubViewer ();
+        epubManager.loadEpubViewer ();
         $('#canvas-controller').show();
     }
     

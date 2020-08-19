@@ -220,9 +220,7 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
+    CanvasManager.clear();
     
     if (params.open == 'true') {
         const isViewer = classroomInfo.share3D.state;

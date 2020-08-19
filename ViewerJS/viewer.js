@@ -257,7 +257,7 @@ function Viewer( viewerPlugin, parameters ) {
             }
             else if(mimetype == "application/pdf"){
                 window.top.PageNavigator.on();
-                window.top.PageNavigator.pdfsetting();
+                // window.top.PageNavigator.pdfsetting();
                 window.top.PageNavigator.select(0);
             }else{
                 window.top.PageNavigator.off();

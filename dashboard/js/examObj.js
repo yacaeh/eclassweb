@@ -12,28 +12,6 @@ var examObj = {
     examAnswer: [],      // question 정답, 선생은 정답 저장, 학생은 자신이 선택한 정답 저장
     studentsAnswer: {},  // 학생들 정답 저장.
     submitStudents: {}    // 학생이 제출 했을 때, 최종 값
-
-
-    /*
-        학생별 저장값    
-        studentsAnswer : {                        
-            id, 유저 아디,
-            name : 유저 이름
-            userAnswers, : 유저가 고른 정답
-            answers : 실패 답과 비교 후, 정답인지 아닌지 값 저장,
-            examState : 현재 시험 상태 저장 ('on', 'off', 'submit')
-        }
-
-        // 최종 제출값 저장
-        subitStudents : {
-            id,
-            name,        
-            userAnswers : 선택한 번호
-            answers :  정답 (true, false)
-            time : 제출시간
-            score : 점수
-        }
-      */
 };
 
 examObj.init = function(){

@@ -130,9 +130,9 @@ class fileViewerLoader {
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
-
         let fileViewer = frame.document.getElementById('file-viewer');
         fileViewer.remove();
+        document.getElementById("btn-confirm-file-close").style.display = "none";
     }
 
     LockViewer(_lock) {
@@ -312,9 +312,6 @@ class fileViewer {
 
     }
 
-
-
-
     getCurrentViewer() {
         return this.mCurrentViewer;
     }
@@ -335,13 +332,14 @@ class fileViewer {
         }
     }
 
-
     openFile(_url) {
+        
         if (_url == undefined || _url == null) {
             console.error('open file url error ' + _url);
             return;
         }
 
+        pointer_saver.load_container(_url);
         this.mLoaded = false;
         this.mViewerLoader.openViewer(_url);
         this.initViewer();
@@ -366,7 +364,6 @@ class fileViewer {
     hasLoadViewer() {
         return (null != this.mCurrentViewer);
     }
-
 
     syncViewer() {
         const state = classroomInfo.viewer.state;
@@ -394,7 +391,6 @@ class fileViewer {
         }
     }
 
-
     updateViewer(_data) {
         const cmd = _data.cmd;
         console.log(_data);
@@ -402,6 +398,7 @@ class fileViewer {
             case 'open':
                 const url = _data.url;
                 this.openFile(url);
+
                 break;
 
             case 'close':
@@ -478,6 +475,8 @@ mfileViewer.onclose = function () {
     isFileViewer = false;
 
     console.log('close');
+
+    pointer_saver.save_container();
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;
 
@@ -758,13 +757,13 @@ function updateFileList(list, extraPath) {
 
     var re = /(?:\.([^.]+))?$/;
     var listElement = '<ul class="list-group-flush">';
+
     if (list.length == 0){
         listElement += '아직 파일이 없습니다!';
     }
     else {
         list.files.forEach(file => {
-        
-            if (file.name == "homework")
+            if (file.name == "homework" || re.exec(file.name)[1] == "json")
                 return;
     
             var buttons = "";
@@ -789,7 +788,7 @@ function updateFileList(list, extraPath) {
 }
 
 function getFileType(ext) {
-    console.log("ext:", ext);
+    // console.log("ext:", ext);
     let element = '';
     if (ext === undefined) {
         element += '<i class="fas fa-folder text-primary"></i>';
@@ -833,7 +832,7 @@ function getFileType(ext) {
     else {
         element += '<i class="fas fa-file text-muted"></i>';
     }
-    console.log(element);
+    // console.log(element);
 
     return element;
 }
@@ -992,11 +991,7 @@ function HomeworkSubmit(btn) {
 
 function unloadFileViewer() {
     console.log("UNLOAD FILEVIEWER");
-
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
-
+    CanvasManager.clear();
     pointer_saver.save();
     PageNavigator.off();
 
@@ -1010,24 +1005,17 @@ function unloadFileViewer() {
 }
 
 function loadFileViewer(path) {
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
-    
+    // CanvasManager.clear();
+
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
     
     isSharingFile = true;
     isFileViewer = true;
-
-    console.log('loadFileViewer',path);
-    pointer_saver.load_container(path);
     classroomCommand.openFile(path);
 }
 
-// Pdf가 처음 로딩이 다 되었는지 확인.
-// 로딩이 다 된 후에 페이지 동기화
 function pdfOnLoaded() {
     console.log("PDF ON");
     classroomCommand.onViewerLoaded();

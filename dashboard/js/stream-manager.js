@@ -311,10 +311,7 @@ class ScreenShareManagerClass{
     if (event.data.showScreenShare) {
       console.log("SCREEN SHARE START", event.data.showScreenShare)
 
-      ClearCanvas();
-      ClearStudentCanvas();
-      ClearTeacherCanvas();
-
+      CanvasManager.clear();
       classroomInfoLocal.shareScreenByStudent = true;
       classroomInfoLocal.shareScreen.state = true;
       classroomInfo.shareScreen = {}
@@ -360,13 +357,9 @@ class ScreenShareManagerClass{
     }
   }
   rejoin() {
-    var streamEvents;
     let interval = setInterval(function () {
       try {
         console.log(event);
-
-        var stream = connection.streamEvents[classroomInfo.shareScreen.id].stream;
-        
         var parent = ScreenshareManager.get().parentElement;
         let element = connection.streamEvents[classroomInfo.shareScreen.id].mediaElement;
         element.id = "screen-viewer";
@@ -374,11 +367,8 @@ class ScreenShareManagerClass{
         parent.appendChild(element);
         element.volume = 0.3
         ScreenshareManager.show();
-        // ScreenshareManager.srcObject(stream);
-        
         CanvasResize();
         clearInterval(interval);
-
       }
       catch(error){
         console.error(error)
@@ -528,9 +518,9 @@ function addStreamStopListener(stream, callback) {
 }
 
 function replaceScreenTrack(stream, btn) {
-  ClearCanvas();
-  ClearStudentCanvas();
-  ClearTeacherCanvas();
+  CanvasManager.clearCanvas();
+  CanvasManager.clearStudentCanvas();
+  CanvasManager.clearTeacherCanvas();
   
   console.log("Stream Start", stream.id);
 

@@ -20,14 +20,13 @@ epubManager = {
         }
     },
     EpubPositionSetting : function(){
-        var viewer = GetWidgetFrame().document.getElementById("epub-viewer");
-        var can = GetWidgetFrame().document.getElementById("main-canvas");
-        var wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0].getBoundingClientRect();
+        let viewer = GetWidgetFrame().document.getElementById("epub-viewer");
+        let can = GetWidgetFrame().document.getElementById("main-canvas");
+        let wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0].getBoundingClientRect();
         viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
     },
     loadEpubViewer : function(){
-        ClearCanvas();
-        pointer_saver.load(0);
+        CanvasManager.clearCanvas();
         PageNavigator.on();
     
         isSharingEpub = true;
@@ -134,23 +133,19 @@ epubManager = {
         document.addEventListener('keyup', keyListener, false);
     },
     unloadEpubViewer : function(){
-        ClearCanvas();
-        ClearTeacherCanvas();
-        ClearStudentCanvas();
+        CanvasManager.clear();
     
         pointer_saver.close();
         PageNavigator.off();
     
         isSharingEpub = false;
         this.isEpubViewer = false;
-    
         this.renditionBuffer = null;
-    
         let frame = GetWidgetFrame();
+
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
-    
         frame.document.getElementById('epub-viewer').remove();
         frame.document.getElementById('loading-window').remove();
     }

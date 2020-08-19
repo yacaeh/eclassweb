@@ -79,10 +79,7 @@ gothicFont.load().then((font) => {
         strokeStyle = '#6c96c8',
         fillStyle = 'rgba(0,0,0,0)',
         globalAlpha = 1,
-        globalCompositeOperation = 'source-over',
-        lineCap = 'round',
-        font = '500px "나눔펜글씨"',
-        lineJoin = 'round';
+        font = '500px "나눔펜글씨"';
 
     function getContext(id) {
         var canv = find(id),
@@ -248,13 +245,10 @@ function canvasresize(id){
                         if (p[0] == p[2] && p[1] == p[3])
                             return false;
                         var opt = point[2];
-                        context.globalAlpha = opt[3];
-                        context.globalCompositeOperation = opt[4];
-                        context.lineCap = opt[5];
-                        context.lineJoin = opt[6];
                         context.lineWidth = opt[0];
                         context.strokeStyle = opt[1];
                         context.fillStyle = opt[2];
+                        context.globalAlpha = opt[3];
                         const resizeP = resizePoint(p);
 
                         context.moveTo(resizeP[0], resizeP[1]);
@@ -296,25 +290,16 @@ function canvasresize(id){
                 opt.strokeStyle || strokeStyle,
                 opt.fillStyle || fillStyle,
                 opt.globalAlpha || globalAlpha,
-                opt.globalCompositeOperation || globalCompositeOperation,
-                opt.lineCap || lineCap,
-                opt.lineJoin || lineJoin,
                 opt.font || font
             ];
         },
         handleOptions: function(context, opt, isNoFillStroke) {
             opt = opt || this.getOptions();
 
-            context.globalAlpha = opt[3];
-            context.globalCompositeOperation = opt[4];
-
-            context.lineCap = opt[5];
-            context.lineJoin = opt[6];
             context.lineWidth = opt[0];
-
             context.strokeStyle = opt[1];
             context.fillStyle = opt[2];
-
+            context.globalAlpha = opt[3];
 
             if (!isNoFillStroke) {
                 context.stroke();
@@ -342,11 +327,10 @@ function canvasresize(id){
         },
         text: function(context, point, options) {
             const normal = resizePoint( [point[1], point[2]]);
-            context.font = options[7];
             this.handleOptions(context, options);
+            context.font = options[4];
             context.fillStyle = textHandler.getFillColor(options[2]);
             context.fillText(point[0].substr(1, point[0].length - 2), normal[0], normal[1]);
-            context.font = options[7];
         },
     };
 
@@ -410,7 +394,7 @@ function canvasresize(id){
     var pencilDrawHelper = clone(drawHelper);
 
     pencilDrawHelper.getOptions = function() {
-        return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+        return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, font];
     }
 
     var markerpoint = [];
@@ -477,7 +461,7 @@ function canvasresize(id){
     var markerDrawHelper = clone(drawHelper);
 
     markerDrawHelper.getOptions = function() {
-        return [markerLineWidth, markerStrokeStyle, fillStyle, markerGlobalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+        return [markerLineWidth, markerStrokeStyle, fillStyle, markerGlobalAlpha, font];
     }
 
     function isNear(x,y, point){
@@ -573,11 +557,11 @@ function canvasresize(id){
                                     command : "eraser",
                                     idx : _idx,
                                     userid : _uid,
+
                                 }
                                 
-                                
                                 console.log("SEND ERASER",_uid, data);
-                                data.pageidx = window.parent.pointer_saver.nowIdx.nowIdx;
+                                data.pageidx = window.parent.pointer_saver.nowIdx;
                                 window.parent.postMessage({
                                     canvasDesignerSyncData: data,
                                     uid: uid
@@ -623,10 +607,7 @@ function canvasresize(id){
                 font: textHandler.selectedFontSize + 'px ' + textHandler.selectedFontFamily + '',
                 fillStyle: this.lastFillStyle,
                 strokeStyle: '#6c96c8',
-                globalCompositeOperation: 'source-over',
                 globalAlpha: 1,
-                lineJoin: 'round',
-                lineCap: 'round',
                 lineWidth: 2
             };
             font = options.font;
@@ -934,7 +915,6 @@ function canvasresize(id){
 
         function bindEvent(context, shape) {
             if (shape === 'Pencil' || shape === 'Marker') {
-                lineCap = lineJoin = 'round';
             }
 
             addEvent(context.canvas, 'click', function() {
@@ -952,10 +932,6 @@ function canvasresize(id){
                     textHandler.onShapeUnSelected();
                 }
 
-                if (shape === 'Pencil' || shape === 'Marker') {
-                    lineCap = lineJoin = 'round';
-                }
-
                 setSelection(this, shape);
 
                 if (this.id === 'drag-last-path') {
@@ -966,16 +942,6 @@ function canvasresize(id){
                     find('copy-last').checked = false;
                 }
          
-                if (this.id === 'pencilIcon' || this.id === 'eraserIcon' || this.id === 'markerIcon') {
-                    cache.lineCap = lineCap;
-                    cache.lineJoin = lineJoin;
-
-                    lineCap = lineJoin = 'round';
-                } else if (cache.lineCap && cache.lineJoin) {
-                    lineCap = cache.lineCap;
-                    lineJoin = cache.lineJoin;
-                }
-
                 if (this.id === 'eraserIcon') {
                     if(this.classList.contains('off'))
                     return false;
@@ -1287,7 +1253,7 @@ function canvasresize(id){
         }
 
 
-        function decorateClearCanvas() {
+        function decorateclearCanvas() {
             var context = getContext('clearCanvas');
 
             var image = new Image();
@@ -1316,7 +1282,7 @@ function canvasresize(id){
         }
 
         if (tools.clearCanvas === true) {
-            decorateClearCanvas();
+            decorateclearCanvas();
             document.getElementById('clearCanvas').style.display = 'block';
         }
 
@@ -1605,7 +1571,6 @@ function canvasresize(id){
 
     addEvent(document, 'keypress', onkeypress);
 
-
     var lastPointIndex = 0;
     var uid;
 
@@ -1722,8 +1687,9 @@ function canvasresize(id){
                 PushPoints(data, studentPoints[id]);
             }
         }
-        else 
+        else {
             PushPoints(data, teacherPoints);
+        }
 
 
         lastPointIndex = points.length;
@@ -1733,6 +1699,7 @@ function canvasresize(id){
     var _uid = window.parent.connection.userid;
 
     function PushPoints(data, array){
+        
         switch(data.command){
             case "eraser" :
                 array.splice(data.idx,1);
@@ -1942,7 +1909,7 @@ function canvasresize(id){
     SliderSetting("pencileslider", "pencil-stroke-style",1 , 22, 3, function(v){
         var pencilDrawHelper = clone(drawHelper);
         pencilDrawHelper.getOptions = function() {
-            return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+            return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, font];
         }
         pencilLineWidth = v;
     });
@@ -1950,7 +1917,7 @@ function canvasresize(id){
     SliderSetting("markerslider", "marker-stroke-style",14, 40, 21, function(v){
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = function() {
-            return [markerLineWidth, markerStrokeStyle, fillStyle, globalAlpha, globalCompositeOperation, lineCap, lineJoin, font];
+            return [markerLineWidth, markerStrokeStyle, fillStyle, globalAlpha, font];
         }
         markerLineWidth = v;
     });
@@ -1992,6 +1959,10 @@ function canvasresize(id){
     }
 
         
+window.parent.test = function(){
+    console.log(teacherPoints);
+}
+
 })();
 
 // -----------------------------------------------------------------------
