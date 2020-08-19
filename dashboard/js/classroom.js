@@ -46,7 +46,7 @@ var canvasButtonContents = {
   '3d_view'     : _3DCanvasOnOff,
   'movie'       : Movie_Render_Button,
   'file'        : LoadFile,
-  'epub'        : LoadEpub,
+  'epub'        : epubManager.loadEpub,
   'callteacher' : CallTeacher,
   'homework'    : HomeworkSubmit,
 }
@@ -144,10 +144,10 @@ AddEvent("top_alert", "click", function () {
 
 AddEvent("top_record_video", "click", function (self) {
   if (!self.classList.contains("on")) {
-    screen_recorder._startCapturing();
+    ScreenRecorder._startCapturing();
   }
   else {
-    screen_recorder._stopCapturing();
+    ScreenRecorder._stopCapturing();
     self.classList.remove("on");
   }
 })
@@ -308,7 +308,7 @@ connection.onmessage = function (event) {
   }
 
   if (event.data.getpointer) {
-    PointerSaver.send(event.data.idx);
+    pointer_saver.send(event.data.idx);
     return;
   }
 
@@ -318,13 +318,13 @@ connection.onmessage = function (event) {
     event.data.data.command = "load";
 
     if (event.extra.roomOwner && !connection.extra.roomOwner) {
-      if (PointerSaver.nowIdx == event.data.idx) {
+      if (pointer_saver.nowIdx == event.data.idx) {
         designer.syncData(event.data.data);
       }
     }
     else {
       event.data.data.isStudent = true;
-      if (PointerSaver.nowIdx == event.data.idx) {
+      if (pointer_saver.nowIdx == event.data.idx) {
         designer.syncData(event.data.data);
       }
     }
@@ -425,7 +425,7 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data.pageidx == PointerSaver.nowIdx) {
+  if (event.data.pageidx == pointer_saver.nowIdx) {
     designer.syncData(event.data);
   }
 };
@@ -870,7 +870,7 @@ function CanvasResize() {
     renderCanvas.height = y;
   }
   if (frame.document.getElementById("epub-viewer"))
-    EpubPositionSetting()
+    epubManager.EpubPositionSetting()
 }
 
 

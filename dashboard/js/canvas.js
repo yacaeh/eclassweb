@@ -24,28 +24,27 @@ var shortCut = [
     {"homework" : "3"},
 ]
 
-
 var designer = new CanvasDesigner();
-designer.widgetHtmlURL = './canvas/widget.html';
-designer.widgetJsURL = './widget.js';
-designer.icons.pencil = '/dashboard/img/pen.png';
-designer.icons.marker = '/dashboard/img/pen2.png';
-designer.icons.eraser = '/dashboard/img/eraser.png';
-designer.icons.clearCanvas = '/dashboard/img/trash.png';
-designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
-designer.icons.on = '/dashboard/img/view_on.png';
-designer.icons.off = '/dashboard/img/view_off.png';
-designer.icons.screenShare = '/dashboard/img/screenshare.png';
-designer.icons.view3d = '/dashboard/img/3D.png';
-designer.icons.view3don = '/dashboard/img/3D.png';
-designer.icons.movie = '/dashboard/img/videolink.png';
-designer.icons.file = '/dashboard/img/openfile.png';
-designer.icons.text = '/dashboard/img/text.png';
-designer.icons.epub = '/dashboard/img/epub.png';
-designer.icons.callteacher = '/dashboard/img/handsup.png';
-designer.icons.homework = '/dashboard/img/homework.png';
-designer.icons.fulloff = '/dashboard/img/cam_min.png';
-designer.icons.fullon = '/dashboard/img/cam_max.png';
+designer.widgetHtmlURL      = './canvas/widget.html';
+designer.widgetJsURL        = './widget.js';
+designer.icons.pencil       = '/dashboard/img/pen.png';
+designer.icons.marker       = '/dashboard/img/pen2.png';
+designer.icons.eraser       = '/dashboard/img/eraser.png';
+designer.icons.clearCanvas  = '/dashboard/img/trash.png';
+designer.icons.pdf          = '/dashboard/img/iconfinder_File.png';
+designer.icons.on           = '/dashboard/img/view_on.png';
+designer.icons.off          = '/dashboard/img/view_off.png';
+designer.icons.screenShare  = '/dashboard/img/screenshare.png';
+designer.icons.view3d       = '/dashboard/img/3D.png';
+designer.icons.view3don     = '/dashboard/img/3D.png';
+designer.icons.movie        = '/dashboard/img/videolink.png';
+designer.icons.file         = '/dashboard/img/openfile.png';
+designer.icons.text         = '/dashboard/img/text.png';
+designer.icons.epub         = '/dashboard/img/epub.png';
+designer.icons.callteacher  = '/dashboard/img/handsup.png';
+designer.icons.homework     = '/dashboard/img/homework.png';
+designer.icons.fulloff      = '/dashboard/img/cam_min.png';
+designer.icons.fullon       = '/dashboard/img/cam_max.png';
 
 
 designer.addSyncListener(function (data) {

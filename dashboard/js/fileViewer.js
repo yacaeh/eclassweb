@@ -289,6 +289,7 @@ class mediaViewer {
             this.onended();
     }
 }
+
 class fileViewer {
     constructor() {
         this.mViewerLoader = new fileViewerLoader();
@@ -501,6 +502,7 @@ mfileViewer.onsync = function () {
             mfileViewer.mViewerLoader.LockViewer(false);
     }
 }
+
 
 /*
     PDF fileViewer
@@ -995,7 +997,7 @@ function unloadFileViewer() {
     ClearStudentCanvas();
     ClearTeacherCanvas();
 
-    PointerSaver.save();
+    pointer_saver.save();
     PageNavigator.off();
 
     var btn = GetWidgetFrame().document.getElementById("file");
@@ -1007,18 +1009,21 @@ function unloadFileViewer() {
     classroomCommand.closeFile();
 }
 
-function loadFileViewer(url) {
+function loadFileViewer(path) {
     ClearCanvas();
     ClearStudentCanvas();
     ClearTeacherCanvas();
-
-    console.log('loadFileViewer');
+    
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
+    
     isSharingFile = true;
     isFileViewer = true;
-    classroomCommand.openFile(url);
+
+    console.log('loadFileViewer',path);
+    pointer_saver.load_container(path);
+    classroomCommand.openFile(path);
 }
 
 // Pdf가 처음 로딩이 다 되었는지 확인.
@@ -1029,8 +1034,8 @@ function pdfOnLoaded() {
 }
 
 function showPage(n) {
-    PointerSaver.save()
-    PointerSaver.load(n - 1);
+    pointer_saver.save()
+    pointer_saver.load(n - 1);
     PageNavigator.select(n - 1);
     currentPdfPage = n;
     if (connection.extra.roomOwner || !classroomInfo.allControl)

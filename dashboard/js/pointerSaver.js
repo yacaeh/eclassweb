@@ -1,8 +1,18 @@
-PointerSaver = {
-    container : {},
-    nowIdx : 0,
+class PointerSaver {
+    constructor(){
+        this.container = {};
+        this.nowIdx = 0;
+    }
 
-    save : function(){
+    load_container(path){
+        var name = connection.extra.userFullName;
+        console.log("load container",path,name);
+    }
+    save_container(path){
+        var name = connection.extra.userFullName;
+        console.log("save container",path,name,this.container)
+    }
+    save(){
         var point, history;
 
         if(typeof window.currentPoints == "undefined")
@@ -23,11 +33,11 @@ PointerSaver = {
         window.currentHistory = undefined;
 
         this.show();
-    },
-    show : function(){
+    }
+    show(){
         console.log(this.container);
-    },
-    load : function(idx){
+    }
+    load(idx){
         this.nowIdx = idx;
         ClearCanvas();
         ClearTeacherCanvas();
@@ -53,18 +63,18 @@ PointerSaver = {
             console.log("There is no data");
         }
 
-    },
-    empty : function(){
+    }
+    empty(){
         this.container = {};
         this.nowIdx = 0;
-    },
-    get : function(){
+    }
+    get(){
         connection.send({
             getpointer: true ,
             idx : this.nowIdx
         });
-    },
-    send : function(idx){
+    }
+    send(idx){
     if(!(connection.extra.roomOwner || 
         permissionManager.IsCanvasPermission(connection.userid))){
         return;
@@ -85,11 +95,13 @@ PointerSaver = {
                 idx : "empty"
             })
         }
-    },
-    close : function(){
+    }
+    close(){
         this.save(this.nowIdx);
     }
 }
+
+var pointer_saver = new PointerSaver();
 
 function ClearTeacherCanvas(){
   designer.syncData({

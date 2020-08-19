@@ -575,8 +575,9 @@ function canvasresize(id){
                                     userid : _uid,
                                 }
                                 
+                                
                                 console.log("SEND ERASER",_uid, data);
-                                data.pageidx = window.parent.PointerSaver.nowIdx;
+                                data.pageidx = window.parent.pointer_saver.nowIdx.nowIdx;
                                 window.parent.postMessage({
                                     canvasDesignerSyncData: data,
                                     uid: uid
@@ -1800,7 +1801,7 @@ function canvasresize(id){
 
     function syncData(data) {
         // teacher....
-        data.pageidx = window.parent.PointerSaver.nowIdx;
+        data.pageidx = window.parent.pointer_saver.nowIdx;
         data.userid = _uid;
         data.history = pointHistory;
         data.startIndex = points.length;

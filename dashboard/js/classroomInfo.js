@@ -387,9 +387,9 @@ classroomCommand.sendCloseEpub = function () {
 
 classroomCommand.openEpub = function () {
     if(isSharingEpub) {
-        if(renditionBuffer) { 
+        if(epubManager.renditionBuffer) { 
             if(classroomInfo.allControl)                                                        
-                renditionBuffer.display(classroomInfo.epub.page);
+                epubManager.renditionBuffer.display(classroomInfo.epub.page);
         }
     }
     else {
@@ -424,7 +424,7 @@ classroomCommand.openEpub = function () {
 };
 
 classroomCommand.closeEpub = function () {
-    unloadEpubViewer();
+    epubManager.unloadEpubViewer();
     $('#canvas-controller').hide();
 }
 
@@ -462,8 +462,8 @@ classroomCommand.updateEpubCmd = function (_data) {
             let page = _data.data.page;           
             if(classroomInfo.epub.page != page) {
                 classroomInfo.epub.page = page;
-                if(renditionBuffer) {                                                
-                    renditionBuffer.display(page);
+                if(epubManager.renditionBuffer) {                                                
+                    epubManager.renditionBuffer.display(page);
                 }
             }
             break;
