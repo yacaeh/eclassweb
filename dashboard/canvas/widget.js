@@ -205,8 +205,6 @@ function canvasresize(id){
             context.lineJoin = "round";
 
             var _this = this;
-            console.log("REDRAW")
-
             Object.keys(studentPoints).forEach(function(e){
                 studentPoints[e].forEach(function(data){
                     drawpoint(data.points);
