@@ -526,7 +526,7 @@ function setQuestionAnswer(answerList) {
 
 // 학생들 OMR 세팅
 function setStudentOMR(quesCount, examTime) {
-    if (isMobile) {
+    if (mobileHelper.isMobile) {
         document.getElementById("widget-container").style.right = "max(0px, 290px)";
     }
     else {

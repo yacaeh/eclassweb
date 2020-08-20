@@ -8,8 +8,6 @@ class ChattingManagerClass{
     init(){
         this.noticeElement = document.getElementById('noticewindow');
         this.normalElement = document.getElementById('conversation-panel');
-        this.self = this;
-        self = this.self;
         var notice = document.getElementById("notice");
         var normal = document.getElementsByClassName('conversation-panel')[0];
 

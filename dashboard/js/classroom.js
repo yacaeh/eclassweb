@@ -365,7 +365,7 @@ connection.onmessage = function (event) {
     }
 
     if(!(event.data.viewer.cmd == "pause" || event.data.viewer.cmd == "play")){
-      // CanvasManager.clear();
+      CanvasManager.clear();
     }
 
     classroomCommand.updateViewer(event.data.viewer);
@@ -710,8 +710,8 @@ function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   
   if(event.userid == GetOwnerId()){
-    alert("선생님이 나갔습니다. 이전 화면으로 돌아갑니다.")
-    GoToMain();
+    // alert("선생님이 나갔습니다. 이전 화면으로 돌아갑니다");
+    // GoToMain();
   }
 
   if (!connection.extra.roomOwner) return;

@@ -6,10 +6,10 @@ class PointerSaver {
     }
 
     load_container(path){
-        this.nowIdx = 0;
         if(this.path){
             this.save_container();
         }
+        this.nowIdx = 0;
         this.path = path;
         let json =  path + "_" + connection.extra.userFullName + ".json";
         Get(json,function(e){

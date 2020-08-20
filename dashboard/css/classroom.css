@@ -1350,7 +1350,8 @@ input[type='number']:focus {
 }
 
 #alert-btns {
-  margin-left: 39px;
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
 #top_record_video.on {

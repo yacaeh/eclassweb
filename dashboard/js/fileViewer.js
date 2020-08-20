@@ -103,7 +103,7 @@ class fileViewerLoader {
         let src = 'https://' + window.location.host + '/ViewerJS/#' + url;
         fileViewer.setAttribute('src', src);
 
-        if (isMobile)
+        if (mobileHelper.isMobile)
             fileViewer.style.width = "calc(100% - 52px)";
 
         fileViewer.setAttribute('allowFullScreen', '');
@@ -143,6 +143,9 @@ class fileViewerLoader {
             .getElementsByTagName('iframe')[0].contentWindow;
         let fileViewer = frame.document.getElementById('file-viewer');
         let viewer = fileViewer.contentWindow.document.getElementById("viewer")
+        if(!viewer)
+            return;
+            
         if (_lock) {
             viewer.style.pointerEvents = 'none';
         }

@@ -31,7 +31,7 @@ PageNavigator = {
       }
 
       this.inputevent = function(){
-        var idx = Math.max(1, Math.min(self.maxidx.value, this.inputwindow.value));
+        var idx = Math.max(1, Math.min(this.maxidx.value, this.inputwindow.value));
         this.inputwindow.value = idx;
         rendition.display(idx-1);
       }
