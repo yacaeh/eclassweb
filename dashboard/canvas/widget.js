@@ -231,7 +231,6 @@ function canvasresize(id){
                         }
                     
                         if(point[1][0] == -1){
-                            console.log("END");
                             context.stroke();
                             _this.marking = false;
                             _this.prepoint = [];
