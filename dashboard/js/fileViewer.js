@@ -1005,6 +1005,14 @@ function unloadFileViewer() {
 
 function loadFileViewer(path) {
     // CanvasManager.clear();
+    if(mfileViewer.nowPath == path){
+        alert("같은 파일이 열려있습니다.")
+        // alertBox("t","t",function(){},"zz");
+        return;
+    }
+
+    mfileViewer.nowPath = path;
+
 
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
