@@ -2,15 +2,20 @@
     3D viewer 관련
 */
 
-var newPosition;
-var newRotation;
-var engine;
-var scene;
-var interval;
-var mesh;
-var light;
-var camera;
-
+let newPosition;
+let newRotation;
+let engine;
+let scene;
+let interval;
+let mesh;
+let light;
+let camera;
+let frame;
+let _3dcanvas;
+let rtime;
+let timeout = false;
+let delta = 400;
+let top_3d_button = $('#top_3d');
 
 /******* Add the create scene function ******/
 var createScene = function (_canvas) {
@@ -46,16 +51,6 @@ var createScene = function (_canvas) {
     });
 };
 /******* End of the create scene function ******/
-
-let frame;
-let _3dcanvas;
-let rtime;
-let timeout = false;
-let delta = 400;
-
-let top_3d_button = $('#top_3d');
-// let is3dViewer = false;
-
 
 
 
@@ -131,9 +126,6 @@ function engineInit(canvas) {
 function remove3DCanvas() {
     scene.removeMesh(mesh);
     scene.meshes.forEach(element => element.dispose());
-    // console.log(scene.meshes);
-    // console.log(scene.onPointerObservable);
-    // console.log(scene.rootNodes);
     scene.cleanCachedTextureBuffer();
     scene.clearCachedVertexData();
     clearInterval(interval);
@@ -141,13 +133,10 @@ function remove3DCanvas() {
 }
 
 function CanvasResize() {
-    //console.log(_3dcanvas);
     _3dcanvas = frame.document.getElementById("renderCanvas")
-
     var canvas = frame.document.getElementById("main-canvas");
     var r = document.getElementsByClassName("right-tab")[0];
     var rwidth = $(r).width();
-
     _3dcanvas.width = canvas.width - rwidth - 50;
     _3dcanvas.height = canvas.height - 60;
 }
@@ -183,26 +172,19 @@ function sync3DModel() {
 }
 
 function setShared3DStateServer(_state) {
-    // classroomInfo.share3D.state
     if (!connection.extra.roomOwner) return;
-
     connection.socket.emit('toggle-share-3D', (result) => {
-        // console.log(result);
         if (result.result) {
-            // success            
             setShared3DStateLocal(result.data);
             connection.send({
                 modelEnable: { enable: classroomInfo.share3D.state }
             });
         } else {
-            // error
-
         }
     })
 }
 
 function setShared3DStateLocal(_state) {
-
     classroomInfo.share3D.state = _state;
     top_3d_button.toggle('top_3d_on');
     top_3d_button.toggle('top_3d_off')
@@ -220,9 +202,7 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
+    CanvasManager.clear();
     
     if (params.open == 'true') {
         const isViewer = classroomInfo.share3D.state;

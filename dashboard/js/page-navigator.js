@@ -1,3 +1,4 @@
+
 PageNavigator = {
     self : this,
     obj : undefined,
@@ -30,13 +31,15 @@ PageNavigator = {
       }
 
       this.inputevent = function(){
-        var idx = Math.max(1, Math.min(self.maxidx.value, this.inputwindow.value));
+        var idx = Math.max(1, Math.min(this.maxidx.value, this.inputwindow.value));
         this.inputwindow.value = idx;
         rendition.display(idx-1);
       }
     },
 
     pdfsetting : function(){
+      let self = this.self;
+
       this.leftbtn = function(){
         self.inputwindow.value = Math.max(1, --self.inputwindow.value);
         mfileViewer.updateViewer({
@@ -78,7 +81,10 @@ PageNavigator = {
     },
 
     init : function(){
-        self = this;
+        this.self = this;
+        let self = this.self;
+
+
         this.obj = document.getElementById("epub-navi");
         this.list = document.getElementById("thumbnail-list");
         this.maxidx = document.getElementById("epubmaxidx");
@@ -141,8 +147,6 @@ PageNavigator = {
         this.idx ++;
     },
     select : function(idx){
-      console.log(idx);
-      console.log(this.list);
       var pre = this.list.getElementsByClassName("selected")[0];
       if(pre)
         pre.classList.remove("selected");

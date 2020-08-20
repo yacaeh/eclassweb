@@ -85,7 +85,7 @@ function embedYoutubeContent(bshow, url, send)
         var viwerEdunet = document.getElementById("edunetContent");
         eraseEdunetContent(document.getElementById("webview_edunet"));
 
-        ClearCanvas();
+        CanvasManager.clearCanvas();
 
         //console.log("div create");
         var div = document.createElement("div");

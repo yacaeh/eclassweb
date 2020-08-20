@@ -1,16 +1,13 @@
-/*
-    채팅
-*/
+class ChattingManagerClass{
+    constructor(){
+        this.noticeElement = undefined;
+        this.normalElement = undefined;
+        this.self = undefined;
+    }
 
-ChattingManager = {
-    noticeElement : undefined,
-    normalElement : undefined,
-    self : undefined,
-    init : function(){
+    init(){
         this.noticeElement = document.getElementById('noticewindow');
         this.normalElement = document.getElementById('conversation-panel');
-        this.self = this;
-        self = this.self;
         var notice = document.getElementById("notice");
         var normal = document.getElementsByClassName('conversation-panel')[0];
 
@@ -74,8 +71,8 @@ ChattingManager = {
             }
         };
 
-    },
-    append : function(event){
+    }
+    append(event){
         var div = document.createElement('div');
         var color = "#000000"
 
@@ -94,8 +91,8 @@ ChattingManager = {
         } 
 
         this.normal(id, event.data.msg, color);
-    },
-    enterStudent : function(event){
+    }
+    enterStudent(event){
         var name = event.extra.userFullName;
         var div = document.createElement('div');
         div.className = 'teachermsg2 enter';
@@ -103,8 +100,8 @@ ChattingManager = {
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
-    },
-    leftStudent : function(event){
+    }
+    leftStudent(event){
         var name = event.extra.userFullName;
         if(name == undefined)
             return;
@@ -115,27 +112,29 @@ ChattingManager = {
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
-    },
-    notice : function(msg){
+    }
+    notice(msg){
         var div = document.createElement('div');
         div.className = 'teachermsg';
         div.innerHTML = '<b> <font color="#C63EE8"> 선생님 </font>: </b>' + msg;
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
-    },
-    normal : function(name, msg, color = "#3E93E8"){
+    }
+    normal(name, msg, color = "#3E93E8"){
         var div = document.createElement('div');
         div.className = 'message';
         div.innerHTML = '<b> <font color="' + color + '"> ' + name + ' </font>: </b>' + msg;
         this.normalElement.appendChild(div);
         this.normalElement.scrollTop = this.normalElement.clientHeight;
         this.normalElement.scrollTop = this.normalElement.scrollHeight - this.normalElement.scrollTop;
-    },
-    eventListener : function(event){
+    }
+    eventListener(event){
         if (event.data.chatMessage) {
             this.append(event);
             return true;
         }
     }
 }
+
+var ChattingManager = new ChattingManagerClass();

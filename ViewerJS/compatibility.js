@@ -1619,4 +1619,3 @@ __webpack_require__(0);
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=compatibility.js.map

@@ -1,8 +1,55 @@
-PointerSaver = {
-    container : {},
-    nowIdx : 0,
+class PointerSaver {
+    constructor(){
+        this.container = {};
+        this.nowIdx = 0;
+        this.path = undefined;
+    }
 
-    save : function(){
+    load_container(path){
+        if(this.path){
+            this.save_container();
+        }
+        this.nowIdx = 0;
+        this.path = path;
+        let json =  path + "_" + connection.extra.userFullName + ".json";
+        Get(json,function(e){
+            let data = JSON.parse(e);
+            console.log("loaded container",path,name,data);
+            
+            if(data == 404 || Object.keys(data).length == 0){
+                pointer_saver.container = {};
+                CanvasManager.clear();
+                designer.sync();
+                return;
+            }
+
+            pointer_saver.container = data;
+            window.currentPoints = data[0].points;
+            window.currentHistory = data[0].history;
+            data[0].command = "my";
+            
+            designer.syncData(data[0]);
+            designer.sync();
+        })
+    }
+    save_container(){
+        this.save();
+        let url = uploadServerUrl + '/point';
+        let name = connection.extra.userFullName;
+        let data = {
+            filepath : this.path,
+            userId   : name,
+            point    : this.container
+        }
+        Post(url,JSON.stringify(data),function(e){
+            console.log(e);
+        })
+
+        console.log("save container",this.path,name,this.container)
+        console.log(JSON.stringify(data).length);
+        this.path = undefined;
+    }
+    save(){
         var point, history;
 
         if(typeof window.currentPoints == "undefined")
@@ -23,15 +70,13 @@ PointerSaver = {
         window.currentHistory = undefined;
 
         this.show();
-    },
-    show : function(){
-        console.log(this.container);
-    },
-    load : function(idx){
+    }
+    show(){
+        console.debug(this.container);
+    }
+    load(idx){
         this.nowIdx = idx;
-        ClearCanvas();
-        ClearTeacherCanvas();
-        ClearStudentCanvas();
+        CanvasManager.clear();
 
         this.get();
 
@@ -41,7 +86,6 @@ PointerSaver = {
             window.currentPoints = this.container[idx].points;
             window.currentHistory = this.container[idx].history;
 
-            console.log(this.container[idx].history.length)
             if(this.container[idx].history.length == 0){
                 console.log("NO DATA")
                 return null;
@@ -53,18 +97,18 @@ PointerSaver = {
             console.log("There is no data");
         }
 
-    },
-    empty : function(){
+    }
+    empty(){
         this.container = {};
         this.nowIdx = 0;
-    },
-    get : function(){
+    }
+    get(){
         connection.send({
             getpointer: true ,
             idx : this.nowIdx
         });
-    },
-    send : function(idx){
+    }
+    send(idx){
     if(!(connection.extra.roomOwner || 
         permissionManager.IsCanvasPermission(connection.userid))){
         return;
@@ -85,41 +129,8 @@ PointerSaver = {
                 idx : "empty"
             })
         }
-    },
-    close : function(){
+    }
+    close(){
         this.save(this.nowIdx);
     }
 }
-
-function ClearTeacherCanvas(){
-  designer.syncData({
-    command : "clearteacher",
-    uid: connection.userid,
-  })
-}
-
-function ClearCanvas() {
-designer.syncData({
-    command : "clearcanvas",
-    uid: connection.userid,
-    })
-}
-  
-function ClearStudentCanvas(studentid){
-    designer.syncData({
-        command : "clearstudent",
-        isStudent : true,
-        userid: studentid,
-    })
-}
-
-function SendStudentPointData(){
-    designer.syncData({
-        command : "default",
-        isStudent : true,
-        points : currentPoints ,
-        history : currentHistory,
-        uid: connection.userid,
-      })
-}
-

@@ -147,12 +147,6 @@ classroomCommand = {
     }
 };
 
-classroomCommand.exitAlert = function (callback) {    
-    alert_exit_Box("나가시겠습니까?", "경고", () => {
-        callback()
-    });
-};
-
 classroomCommand.sendAlert = function (callback) {    
     if(connection.extra.roomOwner)
     {
@@ -387,13 +381,13 @@ classroomCommand.sendCloseEpub = function () {
 
 classroomCommand.openEpub = function () {
     if(isSharingEpub) {
-        if(renditionBuffer) { 
+        if(epubManager.renditionBuffer) { 
             if(classroomInfo.allControl)                                                        
-                renditionBuffer.display(classroomInfo.epub.page);
+                epubManager.renditionBuffer.display(classroomInfo.epub.page);
         }
     }
     else {
-        loadEpubViewer ();
+        epubManager.loadEpubViewer ();
         $('#canvas-controller').show();
     }
     
@@ -424,7 +418,7 @@ classroomCommand.openEpub = function () {
 };
 
 classroomCommand.closeEpub = function () {
-    unloadEpubViewer();
+    epubManager.unloadEpubViewer();
     $('#canvas-controller').hide();
 }
 
@@ -462,8 +456,8 @@ classroomCommand.updateEpubCmd = function (_data) {
             let page = _data.data.page;           
             if(classroomInfo.epub.page != page) {
                 classroomInfo.epub.page = page;
-                if(renditionBuffer) {                                                
-                    renditionBuffer.display(page);
+                if(epubManager.renditionBuffer) {                                                
+                    epubManager.renditionBuffer.display(page);
                 }
             }
             break;

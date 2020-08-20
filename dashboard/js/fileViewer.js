@@ -103,7 +103,7 @@ class fileViewerLoader {
         let src = 'https://' + window.location.host + '/ViewerJS/#' + url;
         fileViewer.setAttribute('src', src);
 
-        if (isMobile)
+        if (mobileHelper.isMobile)
             fileViewer.style.width = "calc(100% - 52px)";
 
         fileViewer.setAttribute('allowFullScreen', '');
@@ -130,9 +130,9 @@ class fileViewerLoader {
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
-
         let fileViewer = frame.document.getElementById('file-viewer');
         fileViewer.remove();
+        document.getElementById("btn-confirm-file-close").style.display = "none";
     }
 
     LockViewer(_lock) {
@@ -143,9 +143,12 @@ class fileViewerLoader {
             .getElementsByTagName('iframe')[0].contentWindow;
         let fileViewer = frame.document.getElementById('file-viewer');
         let viewer = fileViewer.contentWindow.document.getElementById("viewer")
+        if(!viewer)
+            return;
+            
         if (_lock) {
             viewer.style.pointerEvents = 'none';
-        }
+        } 
         else {
             viewer.style.pointerEvents = '';
         }
@@ -308,11 +311,8 @@ class fileViewer {
         this.onsynceachtype = function () { }          // 난입시, 동기화 처리
         this.onshowpageeachtype = function (_page) { }
 
-
+        this.nowPath = undefined;
     }
-
-
-
 
     getCurrentViewer() {
         return this.mCurrentViewer;
@@ -334,13 +334,14 @@ class fileViewer {
         }
     }
 
-
     openFile(_url) {
+        
         if (_url == undefined || _url == null) {
             console.error('open file url error ' + _url);
             return;
         }
 
+        pointer_saver.load_container(_url);
         this.mLoaded = false;
         this.mViewerLoader.openViewer(_url);
         this.initViewer();
@@ -365,7 +366,6 @@ class fileViewer {
     hasLoadViewer() {
         return (null != this.mCurrentViewer);
     }
-
 
     syncViewer() {
         const state = classroomInfo.viewer.state;
@@ -393,27 +393,24 @@ class fileViewer {
         }
     }
 
-
     updateViewer(_data) {
         const cmd = _data.cmd;
-        console.log(_data);
+        this.nowPath = _data.url;
+
         switch (cmd) {
             case 'open':
                 const url = _data.url;
                 this.openFile(url);
                 break;
-
             case 'close':
                 this.closeFile();
                 break;
             default:
                 if (!this.mLoaded)
                     return;
-
                 const viewerType = this.getCurrentViewerType();
                 if (this.onupdateeachtype[viewerType])
                     this.onupdateeachtype[viewerType](_data);
-
                 break;
         }
     }
@@ -446,7 +443,9 @@ class fileViewer {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-var mfileViewer = new fileViewer();
+let pdfString = 'pdf';
+var mfileViewer         = new fileViewer();
+
 
 mfileViewer.onopen = function (_type, _url) {
 
@@ -472,11 +471,13 @@ mfileViewer.onopen = function (_type, _url) {
 }
 
 mfileViewer.onclose = function () {
-
+    this.nowPath = undefined;
     isSharingFile = false;
     isFileViewer = false;
 
     console.log('close');
+
+    pointer_saver.save_container();
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;
 
@@ -501,12 +502,6 @@ mfileViewer.onsync = function () {
             mfileViewer.mViewerLoader.LockViewer(false);
     }
 }
-
-/*
-    PDF fileViewer
-*/
-
-let pdfString = 'pdf';
 
 mfileViewer.onopeneachtype[pdfString] = function () {
     console.log('onopen pdf');
@@ -566,7 +561,6 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
         }
     }
 }
-
 /*
     Video Viewer
 */
@@ -722,6 +716,9 @@ function ViewHomeworkList(btn) {
 }
 
 function ViewUploadList(btn) {
+    if(!connection.extra.roomOwner)
+        return;
+
     btn.classList.add("selected");
     document.getElementById("confirm-title2").classList.remove("selected");
     $("form[name=upload]").show();
@@ -735,15 +732,18 @@ function getUploadFileList(extraPath) {
     var xhr = new XMLHttpRequest();
     var url = uploadServerUrl + '/list';
     var data = { "userId": params.sessionid, "extraPath": extraPath };
+
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            updateFileList(JSON.parse(xhr.responseText), extraPath);
-        }
-        else {
-            console.log("directory doesn't exist!");
-            updateFileList([], extraPath);
+        if (xhr.readyState == xhr.DONE) {
+            if(xhr.status == 200){
+                updateFileList(JSON.parse(xhr.responseText), extraPath);
+            }
+            else{
+                console.error("directory doesn't exist!", xhr.status);
+                updateFileList([], extraPath);
+            }
         }
     };
 
@@ -756,13 +756,13 @@ function updateFileList(list, extraPath) {
 
     var re = /(?:\.([^.]+))?$/;
     var listElement = '<ul class="list-group-flush">';
+
     if (list.length == 0){
         listElement += '아직 파일이 없습니다!';
     }
     else {
         list.files.forEach(file => {
-        
-            if (file.name == "homework")
+            if (file.name == "homework" || re.exec(file.name)[1] == "json")
                 return;
     
             var buttons = "";
@@ -787,7 +787,7 @@ function updateFileList(list, extraPath) {
 }
 
 function getFileType(ext) {
-    console.log("ext:", ext);
+    // console.log("ext:", ext);
     let element = '';
     if (ext === undefined) {
         element += '<i class="fas fa-folder text-primary"></i>';
@@ -831,7 +831,7 @@ function getFileType(ext) {
     else {
         element += '<i class="fas fa-file text-muted"></i>';
     }
-    console.log(element);
+    // console.log(element);
 
     return element;
 }
@@ -990,12 +990,8 @@ function HomeworkSubmit(btn) {
 
 function unloadFileViewer() {
     console.log("UNLOAD FILEVIEWER");
-
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
-
-    PointerSaver.save();
+    CanvasManager.clear();
+    pointer_saver.save();
     PageNavigator.off();
 
     var btn = GetWidgetFrame().document.getElementById("file");
@@ -1007,30 +1003,32 @@ function unloadFileViewer() {
     classroomCommand.closeFile();
 }
 
-function loadFileViewer(url) {
-    ClearCanvas();
-    ClearStudentCanvas();
-    ClearTeacherCanvas();
+function loadFileViewer(path) {
+    if(mfileViewer.nowPath == path){
+        alert("같은 파일이 열려있습니다.")
+        return;
+    }
 
-    console.log('loadFileViewer');
+    mfileViewer.nowPath = path;
+
+
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
+    
     isSharingFile = true;
     isFileViewer = true;
-    classroomCommand.openFile(url);
+    classroomCommand.openFile(path);
 }
 
-// Pdf가 처음 로딩이 다 되었는지 확인.
-// 로딩이 다 된 후에 페이지 동기화
 function pdfOnLoaded() {
     console.log("PDF ON");
     classroomCommand.onViewerLoaded();
 }
 
 function showPage(n) {
-    PointerSaver.save()
-    PointerSaver.load(n - 1);
+    pointer_saver.save()
+    pointer_saver.load(n - 1);
     PageNavigator.select(n - 1);
     currentPdfPage = n;
     if (connection.extra.roomOwner || !classroomInfo.allControl)

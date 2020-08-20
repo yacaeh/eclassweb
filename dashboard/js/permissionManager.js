@@ -1,11 +1,9 @@
-/////////////////////////////////////
-// 학생 권한 ////////////////////////
-/////////////////////////////////////
+class permissionManagerClass{
+  constructor(){
+    this.nowSelectStudent = undefined;
+  }
 
-var nowSelectStudent = undefined;
-
-permissionManager = {
-  init: function () {
+  init() {
     $(window).click(function (e) {
       if (document.getElementById('student-menu').contains(e.target)) return false;
       if ($(e.target).hasClass('student')) return false;
@@ -14,7 +12,7 @@ permissionManager = {
 
     $(".perbtn").click(function () {
       var circle = this.getElementsByClassName("circle")[0];
-      var pid = nowSelectStudent.dataset.id;
+      var pid = permissionManager.nowSelectStudent.dataset.id;
 
       switch (this.id) {
         case "classP":
@@ -54,9 +52,8 @@ permissionManager = {
       button(this, circle, this.classList.contains("off"))
       connection.send({ permissionChanged: classroomInfo });
     });
-  },
-
-  eventListener: function (event) {
+  }
+  eventListener(event){
     if (event.data.permissionChanged) {
       classroomInfo = event.data.permissionChanged;
       return true;
@@ -98,10 +95,8 @@ permissionManager = {
       }
       return true;
     }
-
-  },
-
-  mute: function () {
+  }
+  mute(){
     connection.streamEvents.selectAll().forEach(function (e) {
       if (e.stream.isVideo && !e.extra.roomOwner && e.userid != classroomInfo.micPermission) {
         e.mediaElement.volume = 0;
@@ -111,9 +106,8 @@ permissionManager = {
     if (connection.extra.roomOwner) {
       connection.send({ mute: true });
     }
-  },
-
-  unmute: function (id) {
+  }
+  unmute(id){
     connection.streamEvents.selectAll().forEach(function (e) {
       if (e.stream.isVideo && e.userid == id && !e.extra.roomOwner) {
         e.mediaElement.volume = 1;
@@ -123,17 +117,13 @@ permissionManager = {
     if (connection.extra.roomOwner) {
       connection.send({ unmute: id });
     }
-  },
-
-  IsCanvasPermission: function (id) {
+  }
+  IsCanvasPermission(id) {
     if (classroomInfo.canvasPermission.indexOf(id) == -1)
       return false;
     return true
-  },
-
-  // for teacher ======================================================================
-
-  AddClassPermission: function (id) {
+  }
+  AddClassPermission(id) {
     classroomInfo.classPermission = id;
     FindInList(id).dataset.classPermission = true;
     console.log("Class permission added", id);
@@ -144,9 +134,8 @@ permissionManager = {
       id: id,
       on: true
     }, id)
-  },
-
-  DeleteClassPermission: function (id) {
+  }
+  DeleteClassPermission(id) {
     classroomInfo.classPermission = undefined;
     console.log("Class permission removed", id);
     FindInList(id).dataset.classPermission = false;
@@ -157,9 +146,8 @@ permissionManager = {
       id: id,
       on: false
     }, id)
-  },
-
-  AddMicPermission: function (id) {
+  }
+  AddMicPermission(id) {
     console.log("Mic permission added", id);
     classroomInfo.micPermission = id;
     permissionManager.unmute(id);
@@ -171,9 +159,8 @@ permissionManager = {
       id: id,
       on: true
     })
-  },
-
-  DeleteMicPermission: function (id) {
+  }
+  DeleteMicPermission(id) {
     console.log("Mic permission removed", id);
     classroomInfo.micPermission = undefined;
     permissionManager.mute();
@@ -185,9 +172,8 @@ permissionManager = {
       id: id,
       on: false
     })
-  },
-
-  AddCanvasPermission: function (id) {
+  }
+  AddCanvasPermission(id) {
     classroomInfo.canvasPermission.push(id);
     console.log("Canvas permission added", id, classroomInfo.canvasPermission);
     FindInList(id).dataset.canvasPermission = true;
@@ -197,12 +183,11 @@ permissionManager = {
       id: id,
       on: true
     }, id)
-  },
-
-  DeleteCanvasPermission: function (id) {
+  }
+  DeleteCanvasPermission(id) {
     var idx = classroomInfo.canvasPermission.indexOf(id);
     classroomInfo.canvasPermission.splice(idx, 1);
-    ClearStudentCanvas(id);
+    CanvasManager.clearStudentCanvas(id);
     console.log("Canvas permission removed", id, classroomInfo.canvasPermission);
     FindInList(id).dataset.canvasPermission = false;
     DeleteIcon(id, "canvas");
@@ -211,18 +196,15 @@ permissionManager = {
       id: id,
       on: false
     })
-  },
-
+  }
 
   // for student ==================================================================
-
-  setClassPermission: function () {
+  setClassPermission() {
     console.log("GET CLASS PERMISSION");
     document.getElementById("class_permission").innerHTML = "화면 공유 권한";
     window.permission = true;
-  },
-
-  disableClassPermission: function () {
+  }
+  disableClassPermission() {
     console.log("LOST CLASS PERMISSION");
     document.getElementById("class_permission").innerHTML = "";
     if (classroomInfoLocal.shareScreen.state) {
@@ -232,9 +214,8 @@ permissionManager = {
       return false;
     }
     window.permission = false;
-  },
-
-  setMicPermission: function (id) {
+  }
+  setMicPermission(id) {
     if (connection.userid == id) {
       console.log("GET MIC PERMISSION");
       document.getElementById("mic_permission").innerHTML = "마이크 권한";
@@ -242,9 +223,8 @@ permissionManager = {
     else {
       this.unmute();
     }
-  },
-
-  setCanvasPermission: function (id) {
+  }
+  setCanvasPermission(id) {
     console.log("GET CANVAS PERMISSION");
     connection.send({
       sendStudentPoint: true,
@@ -253,27 +233,24 @@ permissionManager = {
       history: currentHistory,
       userid: id,
     })
-  },
-
-  disableCanvasPermission: function (id) {
+  }
+  disableCanvasPermission(id) {
     console.log("LOST CANVAS PERMISSION");
-    ClearStudentCanvas(id);
-  },
-
-  disableMicPermission: function () {
+    CanvasManager.clearStudentCanvas(id);
+  }
+  disableMicPermission() {
     console.log("LOST MIC PERMISSION");
     document.getElementById("mic_permission").innerHTML = "";
     this.mute();
-  },
-  // =============================================================================
-
-
+  }
 }
+
+
 
 function OnClickStudent(div) {
   div.click(function (e) {
     var menu = document.getElementById('student-menu');
-    nowSelectStudent = e.target;
+    permissionManager.nowSelectStudent = e.target;
     var name = e.target.dataset.name;
     var pid = e.target.dataset.id;
 
