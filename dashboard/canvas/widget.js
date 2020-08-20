@@ -77,7 +77,7 @@ gothicFont.load().then((font) => {
     var points = [],
         lineWidth = 2,
         strokeStyle = '#6c96c8',
-        fillStyle = 'rgba(0,0,0,0)',
+        fillStyle = '#484848',
         globalAlpha = 1,
         font = '500px "나눔펜글씨"';
 
@@ -102,9 +102,7 @@ function normalizePoint (x, y) {
 function resizePoint (point) {
     const p0 = canvas.width * point[0];
     const p1 = canvas.height * point[1];
-    const p2 = canvas.width * point[2];
-    const p3 = canvas.height * point[3];
-    return [p0, p1, p2, p3];
+    return [p0, p1];
 }
 
 window.resize = function(){
@@ -196,13 +194,17 @@ function canvasresize(id){
 
     var drawHelper = {
         firstTime : false,
+        prepoint : [],
+        marking : false,
 
         redraw: function() {
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
 
-            var _this = this;
+            context.lineCap = "round";
+            context.lineJoin = "round";
 
+            var _this = this;
             Object.keys(studentPoints).forEach(function(e){
                 studentPoints[e].forEach(function(data){
                     drawpoint(data.points);
@@ -216,69 +218,67 @@ function canvasresize(id){
             drawpoint(points);
 
             function drawpoint(points) {
-                var marking = false;
-                var lastmarkpos = undefined;
-                var isText = false;
-                var isBegin = false;
-                
                 points.forEach(function (point) {
                     if (point == null) {
                         return false;
                     }
 
-
                     if (point[0] == "marker") {
-                        if (!marking) {
+
+                        if (!_this.marking) {
                             context.beginPath();
-                            isBegin = true;
-                            marking = true;
+                            _this.marking = true;
                         }
                     
-                        var p = point[1];
-                        var now = [p[0], p[1]];
-
-                        if (lastmarkpos != undefined && lastmarkpos[0] != now[0] && lastmarkpos[1] != now[1]) {
+                        if(point[1][0] == -1){
                             context.stroke();
-                            context.beginPath();
-                            isBegin = true;
+                            _this.marking = false;
+                            _this.prepoint = [];
+                            return;
                         }
-                        if (p[0] == p[2] && p[1] == p[3])
-                            return false;
+
+                        const resizeP = resizePoint(point[1]);
+
+                        if(!_this.prepoint){
+                            _this.prepoint = [resizeP[0], resizeP[1]];
+                        }
+
+                        if (_this.prepoint[0] == resizeP[0] && _this.prepoint[1] == resizeP[1]) {
+                            context.beginPath();
+                        }
+
                         var opt = point[2];
                         context.lineWidth = opt[0];
                         context.strokeStyle = opt[1];
-                        context.fillStyle = opt[2];
-                        context.globalAlpha = opt[3];
-                        const resizeP = resizePoint(p);
+                        context.moveTo(_this.prepoint[0], _this.prepoint[1]);
+                        context.lineTo(resizeP[0], resizeP[1]);
 
-                        context.moveTo(resizeP[0], resizeP[1]);
-                        context.lineTo(resizeP[2], resizeP[3]);
-                        lastmarkpos = [p[2], p[3]];
+                        _this.prepoint = [resizeP[0], resizeP[1]];
                     }
                     else {
-                        if (marking) {
-                            marking = !marking;
+                        if (_this.marking) {
+                            _this.marking = !_this.marking;
                             context.stroke();
-                            isBegin = true;
                         }
-
+    
                         if (point && point.length && _this[point[0]]) {
-                                context.beginPath();
+                            context.beginPath();
                             _this[point[0]](context, point[1], point[2]);
                         }
                     }
+
                 });
 
-                if (marking) {
-                    marking = !marking;
+                if (_this.marking) {
+                    _this.marking = !_this.marking;
                     context.stroke();
                 }
 
-                if(isText && !_this.firstTime){
+                if(!_this.firstTime){
                     _this.firstTime = true;
                     drawpoint(points);
-
                 }
+                _this.prepoint = [];
 
             }
         },
@@ -307,21 +307,42 @@ function canvasresize(id){
             }
         },
         line: function(context, point, options) {
+            if(point[0] == -1){
+                context.beginPath();
+                this.prepoint = [];
+                return;
+            }
+
             const p = resizePoint(point);
             context.beginPath();
-            context.moveTo(p[0], p[1]);
-            context.lineTo(p[2], p[3]);
+
+            var x, y;
+
+            x = this.prepoint[0] || p[0];
+            y = this.prepoint[1] || p[1];
+
+            context.moveTo(x, y);
+            context.lineTo(p[0], p[1]);
+            
+            this.prepoint[0] = p[0];
+            this.prepoint[1] = p[1];
+
             this.handleOptions(context, options);
         },
         marker: function(context, point, options) {
-
             context.beginPath();
             context.clearRect(0,0,innerWidth, innerHeight)
+
+            var pre = [];
             for(var i = 0 ; i < point.length; i++){
                 var p = point[i];
-                const resizeP = resizePoint(p);
-                context.moveTo(resizeP[0], resizeP[1]);
-                context.lineTo(resizeP[2], resizeP[3]);
+                var x, y;
+                x = pre[0] || p[0];
+                y = pre[1] || p[1];
+                context.moveTo(x, y);
+                context.lineTo(p[0], p[1]);
+                pre[0] = p[0];
+                pre[1] = p[1];
             }
             this.handleOptions(context, options);
         },
@@ -346,22 +367,22 @@ function canvasresize(id){
 
             // normlaize : 0 ~ 1
             const normalized = normalizePoint (x, y);
-            x = normalized[0];
-            y = normalized[1];
+            let nx = normalized[0];
+            let ny = normalized[1];
 
-            t.prevX = x;
-            t.prevY = y;
+            t.prevX = nx;
+            t.prevY = ny;
 
             t.ismousedown = true;
 
-            // make sure that pencil is drawing shapes even 
-            // if mouse is down but mouse isn't moving
             tempContext.lineCap = 'round';
-            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-            points[points.length] = ['line', [t.prevX, t.prevY, x, y], pencilDrawHelper.getOptions()];   
+            let opt = pencilDrawHelper.getOptions();
+            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, [x,y]);
+            points[points.length] = ['line', [t.prevX, t.prevY], opt];   
             document.getElementById("pencil-container").style.display = 'none';
         },
         mouseup: function(e) {        
+            points[points.length] = ['line', [-1, -1]];
             pointHistory.push(points.length);
             this.ismousedown = false;
         },
@@ -371,30 +392,29 @@ function canvasresize(id){
 
             // normalize~
             const normalized = normalizePoint(x, y);
-            x = normalized[0];
-            y = normalized[1];
+            let nx = normalized[0];
+            let ny = normalized[1];
 
             var t = this;            
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY, x, y]);
-
-                points[points.length] = ['line', [t.prevX, t.prevY, x, y], pencilDrawHelper.getOptions()];
-
-                t.prevX = x;
-                t.prevY = y;
+                let opt = pencilDrawHelper.getOptions()
+                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt , [x,y]);
+                points[points.length] = ['line', [t.prevX, t.prevY], opt];
+                t.prevX = nx;
+                t.prevY = ny;
             }
         }
     }
 
     var pencilLineWidth = document.getElementById('pencil-stroke-style').value,
-        pencilStrokeStyle = '#000000';
+        pencilStrokeStyle = '#484848';
 
     var pencilDrawHelper = clone(drawHelper);
 
     pencilDrawHelper.getOptions = function() {
-        return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, font];
+        return [pencilLineWidth, pencilStrokeStyle];
     }
 
     var markerpoint = [];
@@ -408,25 +428,29 @@ function canvasresize(id){
                 y = e.pageY - canvas.offsetTop;
 
             const normalized = normalizePoint(x, y);
-            x = normalized[0];
-            y = normalized[1];
+            let nx = normalized[0];
+            let ny = normalized[1];
 
             var t = this;
-            t.prevX = x;
-            t.prevY = y;
+            t.prevX = nx;
+            t.prevY = ny;
 
             t.ismousedown = true;
 
             // make sure that pencil is drawing shapes even 
             // if mouse is down but mouse isn't moving
             tempContext.lineCap = 'round';
-            markerpoint = [];
-            markerpoint.push([t.prevX, t.prevY, x, y]);
 
-            points[points.length] = ['marker', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
+            markerpoint = [];
+            markerpoint.push([x, y]);
+            let opt = markerDrawHelper.getOptions();
+            // markerDrawHelper.marker(tempContext, markerpoint, opt, []);
+            points[points.length] = ['marker', [t.prevX, t.prevY], opt];
+
             document.getElementById("marker-container").style.display = 'none';
         },
         mouseup: function(e) {
+            points[points.length] = ['marker', [-1, -1]];
             pointHistory.push(points.length);
             this.ismousedown = false;
         },
@@ -437,31 +461,29 @@ function canvasresize(id){
             var t = this;
 
             const normalized = normalizePoint(x, y);
-            x = normalized[0];
-            y = normalized[1];
+            let nx = normalized[0];
+            let ny = normalized[1];
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-                markerpoint.push([t.prevX, t.prevY, x, y]);
-
-                markerDrawHelper.marker(tempContext, markerpoint);
-
-                points[points.length] = ['marker', [t.prevX, t.prevY, x, y], markerDrawHelper.getOptions()];
-
-                t.prevX = x;
-                t.prevY = y;
+             
+                markerpoint.push([x, y]);
+                let opt = markerDrawHelper.getOptions();
+                markerDrawHelper.marker(tempContext, markerpoint, opt, []);
+                points[points.length] = ['marker', [t.prevX, t.prevY], opt];
+                t.prevX = nx;
+                t.prevY = ny;
             }
         }
     }
 
     var markerLineWidth = document.getElementById('marker-stroke-style').value,
-        markerStrokeStyle = '#F12A2A',
-        markerGlobalAlpha = 0.7;
+        markerStrokeStyle = '#F12A2A';
 
     var markerDrawHelper = clone(drawHelper);
 
     markerDrawHelper.getOptions = function() {
-        return [markerLineWidth, markerStrokeStyle, fillStyle, markerGlobalAlpha, font];
+        return [markerLineWidth, markerStrokeStyle];
     }
 
     function isNear(x,y, point){
@@ -1118,7 +1140,7 @@ function canvasresize(id){
                 alpha = 0.2;
 
             // START INIT PENCIL
-            pencilStrokeStyle = hexToRGBA("#000000", alpha)
+            pencilStrokeStyle = hexToRGBA("#484848", alpha)
 
 
 
@@ -1452,14 +1474,15 @@ function canvasresize(id){
 
         var cache = is;
         window.parent.document.getElementById("student-menu").style.display = 'none';
-        if (cache.isLine) lineHandler.mousedown(e);
-        else if (cache.isPencil) pencilHandler.mousedown(e);
+        if (cache.isPencil) pencilHandler.mousedown(e);
         else if (cache.isEraser) eraserHandler.mousedown(e);
         else if (cache.isText) textHandler.mousedown(e);
         else if (cache.isMarker) markerHandler.mousedown(e);
 
-        drawHelper.redraw();
-        preventStopEvent(e);
+        if(!cache.isMarker)
+            drawHelper.redraw();
+        
+            preventStopEvent(e);
     });
 
     function preventStopEvent(e) {
@@ -1481,8 +1504,7 @@ function canvasresize(id){
 
         var command = "default";
 
-        if (cache.isLine) lineHandler.mouseup(e);
-        else if (cache.isPencil) {
+        if (cache.isPencil) {
             command = "pen";
             pencilHandler.mouseup(e);
         }
@@ -1512,8 +1534,7 @@ function canvasresize(id){
 
         var cache = is;
 
-        if (cache.isLine)           lineHandler.mousemove(e);
-        else if (cache.isPencil)    pencilHandler.mousemove(e);
+        if (cache.isPencil)    pencilHandler.mousemove(e);
         else if (cache.isEraser)    eraserHandler.mousemove(e);
         else if (cache.isText)      textHandler.mousemove(e);
         else if (cache.isMarker)    markerHandler.mousemove(e);
@@ -1952,7 +1973,7 @@ function canvasresize(id){
                     pencilStrokeStyle = nowColor;
                 }
                 else if(_container == "marker-container"){
-                    markerStrokeStyle = hexToRGBA(nowColor, 0.4);
+                    markerStrokeStyle = hexToRGBA(nowColor, 0.2);
                 }
             })
         }
