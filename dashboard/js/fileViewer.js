@@ -739,7 +739,7 @@ function getUploadFileList(extraPath) {
             updateFileList(JSON.parse(xhr.responseText), extraPath);
         }
         else {
-            console.log("directory doesn't exist!");
+            console.error("directory doesn't exist!");
             updateFileList([], extraPath);
         }
     };

@@ -523,7 +523,6 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         classroomCommand.joinRoom();
 
         connection.socket.on('disconnect', function () {
-          console.log(isRoomOpened, roomid, error);
           location.reload();
         });
       }
@@ -708,8 +707,9 @@ function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   
   if(event.userid == GetOwnerId()){
+    connection.socket._callbacks.$disconnect.length = 0
+    connection.socket.disconnect();
     alertBox("선생님이 나갔습니다. 이전 화면으로 돌아갑니다","알림", GoToMain, "확인")
-
   }
 
   if (!connection.extra.roomOwner) return;
