@@ -311,7 +311,7 @@ class fileViewer {
         this.onsynceachtype = function () { }          // 난입시, 동기화 처리
         this.onshowpageeachtype = function (_page) { }
 
-
+        this.nowPath = undefined;
     }
 
     getCurrentViewer() {
@@ -395,25 +395,22 @@ class fileViewer {
 
     updateViewer(_data) {
         const cmd = _data.cmd;
-        console.log(_data);
+        this.nowPath = _data.url;
+
         switch (cmd) {
             case 'open':
                 const url = _data.url;
                 this.openFile(url);
-
                 break;
-
             case 'close':
                 this.closeFile();
                 break;
             default:
                 if (!this.mLoaded)
                     return;
-
                 const viewerType = this.getCurrentViewerType();
                 if (this.onupdateeachtype[viewerType])
                     this.onupdateeachtype[viewerType](_data);
-
                 break;
         }
     }
@@ -719,6 +716,9 @@ function ViewHomeworkList(btn) {
 }
 
 function ViewUploadList(btn) {
+    if(!connection.extra.roomOwner)
+        return;
+
     btn.classList.add("selected");
     document.getElementById("confirm-title2").classList.remove("selected");
     $("form[name=upload]").show();
@@ -732,15 +732,18 @@ function getUploadFileList(extraPath) {
     var xhr = new XMLHttpRequest();
     var url = uploadServerUrl + '/list';
     var data = { "userId": params.sessionid, "extraPath": extraPath };
+
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            updateFileList(JSON.parse(xhr.responseText), extraPath);
-        }
-        else {
-            console.error("directory doesn't exist!");
-            updateFileList([], extraPath);
+        if (xhr.readyState == xhr.DONE) {
+            if(xhr.status == 200){
+                updateFileList(JSON.parse(xhr.responseText), extraPath);
+            }
+            else{
+                console.error("directory doesn't exist!", xhr.status);
+                updateFileList([], extraPath);
+            }
         }
     };
 
