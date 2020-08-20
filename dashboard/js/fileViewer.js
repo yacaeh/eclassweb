@@ -148,7 +148,7 @@ class fileViewerLoader {
             
         if (_lock) {
             viewer.style.pointerEvents = 'none';
-        }
+        } 
         else {
             viewer.style.pointerEvents = '';
         }

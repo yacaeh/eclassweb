@@ -1313,42 +1313,6 @@ input[type='number']:focus {
   background: #d84b4b;
 }
 
-
-#alert-exit-content {
-  text-align: center;
-  height: 57px;
-  line-height: 48px;
-  color: #707070;
-  font-style: normal;
-  font-weight: normal;
-}
-
-.btn-alert-exit-yes {
-  width: 82px;
-  height: 28px;
-  background: #ff5959;
-  
-  border-radius: 3px;
-  color: white;
-}
-
-.btn-alert-exit-yes:hover {
-  background: #d84b4b;
-  
-}
-
-.btn-alert-exit-no {
-  width: 280px;
-  height: 28px;
-  background: #18dbbe;
-  border-radius: 3px;
-  color: white;
-}
-
-.btn-alert-exit-no:hover {
-  background: #13b59c;
-}
-
 #alert-btns {
   margin-left: 40px;
   margin-right: 40px;

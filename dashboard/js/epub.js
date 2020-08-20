@@ -65,6 +65,8 @@ class epubManagerClass{
         window.book = book;
 
         this.path = book.url.href;
+        pointer_saver.load_container(this.path);
+        
         var rendition = book.renderTo(epubViewer, {
             flow: 'paginated',
             height: "100%",
@@ -137,9 +139,9 @@ class epubManagerClass{
         document.addEventListener('keyup', keyListener, false);
     }
     unloadEpubViewer(){
+        pointer_saver.save_container();
+
         CanvasManager.clear();
-    
-        pointer_saver.close();
         PageNavigator.off();
     
         isSharingEpub = false;

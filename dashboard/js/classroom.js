@@ -146,9 +146,7 @@ AddEvent("top_save_alert", "click", function () {
 })
 
 AddEvent("icon_exit", "click", function () {
-  classroomCommand.exitAlert(function () {
-    GoToMain();
-  });
+  alertBox("정말로 나가시겠습니까?","경고", GoToMain, function(){})
 })
 
 AddEvent("top_alert", "click", function () {
@@ -710,8 +708,8 @@ function LeftStudent(event){
   document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   
   if(event.userid == GetOwnerId()){
-    // alert("선생님이 나갔습니다. 이전 화면으로 돌아갑니다");
-    // GoToMain();
+    alertBox("선생님이 나갔습니다. 이전 화면으로 돌아갑니다","알림", GoToMain, "확인")
+
   }
 
   if (!connection.extra.roomOwner) return;
