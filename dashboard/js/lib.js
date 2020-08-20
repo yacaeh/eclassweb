@@ -111,9 +111,14 @@ function Get(url, callback) {
   let xml = new XMLHttpRequest();
   xml.open("GET", url);
   xml.send();
+
   xml.addEventListener("readystatechange", function (data) {
     if (xml.readyState == xml.DONE && xml.status == 200) {
       callback(xml.responseText);
     }
+    else if(xml.readyState == xml.DONE && xml.status == 404){
+      callback(xml.status);
+    }
+
   })
 }

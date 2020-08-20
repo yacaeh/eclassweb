@@ -14,6 +14,15 @@ class PointerSaver {
         let json =  path + "_" + connection.extra.userFullName + ".json";
         Get(json,function(e){
             let data = JSON.parse(e);
+            console.log("loaded container",path,name,data);
+            
+            if(data == 404 || Object.keys(data).length == 0){
+                pointer_saver.container = {};
+                CanvasManager.clear();
+                designer.sync();
+                return;
+            }
+
             pointer_saver.container = data;
             window.currentPoints = data[0].points;
             window.currentHistory = data[0].history;
@@ -21,8 +30,6 @@ class PointerSaver {
             
             designer.syncData(data[0]);
             designer.sync();
-
-            console.log("loaded container",path,name,data);
         })
     }
     save_container(){
