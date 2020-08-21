@@ -5011,7 +5011,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         connection.removeStream = function(streamid, remoteUserId) {
             var stream;
 
-            console.error(connection.attachStreams, streamid);
             connection.attachStreams.forEach(function(localStream) {
                 if (localStream.id === streamid) {
                     stream = localStream;

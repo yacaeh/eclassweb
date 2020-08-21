@@ -550,14 +550,6 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
             });
         }
         else {
-            //  학생            
-            connection.send({
-                studentCmd: {
-                    from: connection.userid,
-                    cmd: 'pdf-page',
-                    data: page
-                }
-            },GetOwnerId());
         }
     }
 }

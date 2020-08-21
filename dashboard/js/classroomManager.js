@@ -1,6 +1,77 @@
 class classroomManagerClass {
     constructor(){
         this.tooltips = [];
+        this.altdown = false;
+    }
+    init(shortCut, topButtonContents){
+        this.toggleViewType();
+        this.windowFocusChecker();
+        this.setShortCut(shortCut);
+        this.setTopToolTip(topButtonContents);
+        
+        window.addEventListener('resize', function () {
+            rtime = new Date();
+            if (timeout === false) {
+              timeout = true;
+              setTimeout(classroomManager.resizeend, delta);
+            }
+        });
+
+        _AllCantrallFunc();
+        AddEvent("confirm-title", "click", ViewUploadList);
+        AddEvent("confirm-title2", "click", ViewHomeworkList);
+        AddEvent("icon_exit", "click", () => alertBox("정말로 나가시겠습니까?", "경고", classroomManager.gotoMain, function () { }))
+        AddEvent("top_save_alert", "click", attentionManager.exportAttention);
+        AddEvent("top_alert", "click", attentionManager.callAttend);
+        AddEvent("top_record_video", "click", (self) => {
+            if (!self.classList.contains("on")) {
+                screenRecorder._startCapturing();
+            }
+            else {
+                screenRecorder._stopCapturing();
+                self.classList.remove("on");
+            }
+        })
+
+        AddEvent("student_list_button", "click", (self) => {
+            let on = self.classList.contains("on");
+            let list = document.getElementById("student_list");
+            let len = list.children.length;
+            let line = Math.ceil(len / 4);
+
+            if (!on) {
+                list.appendChild(self);
+                line = Math.max(4, line);
+                self.innerHTML = "…";
+            }
+            else {
+                self.innerHTML = "+" + (len - 16);
+                list.insertBefore(self, list.children[15]);
+                line = 4;
+            }
+
+            $(list).css({
+                gridAutoRows: 100 / line + "%",
+                height: 6 * line + "%"
+            })
+            self.classList.toggle("on");
+        })
+        AddEvent("right-tab-collapse", "click", (self) => {
+            self.classList.toggle("off");
+
+            if (self.classList.contains("off")) {
+                self.style.transform = "rotate(90deg)";
+                $(".right-tab").animate({ width: "0%" })
+                $("#widget-container").animate({ right: "0%" },
+                    classroomManager.canvasResize)
+            }
+            else {
+                self.style.transform = "rotate(-90deg)";
+                $(".right-tab").animate({ width: "17.7%" })
+                $("#widget-container").animate({ right: "17.7%" },
+                    classroomManager.canvasResize)
+            }
+        })
     }
 
     callTeacher() {
@@ -72,20 +143,20 @@ class classroomManagerClass {
         let frame = GetWidgetFrame();
         document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
         $("#my-name").remove();
-        $(".for_teacher").show();
-        $(".controll").show();
         $(".feature").show();
+        $(".controll").show();
+        $(".for_teacher").show();
         $(frame.document.getElementById("callteacher")).remove();
         $(frame.document.getElementById("homework")).remove();
     };
 
     setStudent() {
         document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
-        $(".for_teacher").remove();
-        $(".controll").remove();
         $(".feature").remove();
         $("#showcam").remove();
+        $(".controll").remove();
         $("#showcanvas").remove();
+        $(".for_teacher").remove();
         $("#student_list").remove();
 
         let frame = GetWidgetFrame();
@@ -103,6 +174,7 @@ class classroomManagerClass {
     setTopToolTip(data) {
         Object.keys(data).forEach(function (id) {
             let element = document.getElementById(id);
+            if(element)
             element.addEventListener("mouseover", function (e) {
                 document.getElementById("toptooltip").style.display = 'block';
                 let tooltip = document.getElementById("toptooltip")
@@ -117,7 +189,7 @@ class classroomManagerClass {
     };
 
     removeToolTip(){
-        altdown = false;
+        classroomManager.altdown = false;
         this.tooltips.forEach(element => GetWidgetFrame().document.getElementById("tool-box").removeChild(element));
         this.tooltips = [];
     };
@@ -131,9 +203,9 @@ class classroomManagerClass {
     
         function down(key) {
             if (key.altKey) {
-                if (!altdown) {
+                if (!classroomManager.altdown) {
                     MakeTooltip(shortCut);
-                    altdown = true;
+                    classroomManager.altdown = true;
                 }
                 key.preventDefault();
     
@@ -141,7 +213,7 @@ class classroomManagerClass {
                     if (key.key == Object.values(cut)) {
                         if (Object.keys(cut) == "screen_share") {
                             classroomManager.removeToolTip();
-                            altdown = false;
+                            classroomManager.altdown = false;
                         }
                         try {
                             GetWidgetFrame().document.getElementById(Object.keys(cut)).click();
@@ -156,9 +228,9 @@ class classroomManagerClass {
     
         function up(key) {
             if (key.key == "Alt") {
-                if (altdown) {
+                if (classroomManager.altdown) {
                     classroomManager.removeToolTip();
-                    altdown = false;
+                    classroomManager.altdown = false;
                 }
             }
         }
@@ -181,6 +253,8 @@ class classroomManagerClass {
     }
 
     joinStudent(event) {
+        classroomCommand.onConnectionSession(event);
+        connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
         if (!connection.extra.roomOwner) return;
 
@@ -344,5 +418,21 @@ class classroomManagerClass {
                 break;
             }
           });
-    }
+    };
+
+    eventListener(event){
+        if (event.data.onFocus) {
+            classroomCommand.receivedOnFocusResponse({ 
+              userId: event.data.onFocus.userid, 
+              onFocus: event.data.onFocus.focus 
+            });
+          return true;
+        }
+
+        if (event.data.callTeacher) {
+            classroomCommand.receivedCallTeacherResponse(event.data.callTeacher.userid);
+          return true;
+        }
+    };
+
 }

@@ -8,7 +8,6 @@ class attentionManagerClass{
         this.teacherRequest = {};
     }
 
-
     callAttend(){
         var callback = function () {
             var chilldren = document.getElementById('student_list').children;
@@ -16,19 +15,16 @@ class attentionManagerClass{
                 var al = chilldren[i].getElementsByClassName('bor')[0];
                 if (!al)
                     continue;
-
                 al.className = "bor";
                 al.classList.add('alert_wait');
             }
         }
 
- 
-
         if(connection.extra.roomOwner)
         {
             alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => {
-                this.totalCount++;
-                this.teacherRequest[this.totalCount] = {
+                attentionManager.totalCount++;
+                attentionManager.teacherRequest[attentionManager.totalCount] = {
                     name : '집중하세요',
                 }
                 callback();
@@ -62,7 +58,7 @@ class attentionManagerClass{
     };
 
     exportAttention(){
-        if( this.totalCount <= 0 ){
+        if( attentionManager.totalCount <= 0 ){
             alert("저장할 데이터가 없습니다");
             return false;
         } 
@@ -71,7 +67,7 @@ class attentionManagerClass{
             let excelFileName = `${now}_attention.xlsx`;
             let sheetName = connection.sessionid;
     
-            let workData = this.getSubmitData();
+            let workData = attentionManager.getSubmitData();
     
             // step 1. workbook 생성
             let wb = XLSX.utils.book_new();
@@ -137,6 +133,18 @@ class attentionManagerClass{
         return XLSX.utils.aoa_to_sheet(contents);
     }; 
 
+    resetBorder(){
+        var chilldren = document.getElementById('student_list').children;
+        for (var i = 0; i < chilldren.length; i++) {
+            var al = chilldren[i].getElementsByClassName('bor')[0];
+            if (!al)
+                continue;
+            al.className = "bor";
+            al.classList.remove('alert_wait');
+            al.classList.remove('alert_yes');
+            al.classList.remove('alert_no');
+        }
+    }
 }
 
 

@@ -203,16 +203,20 @@ class permissionManagerClass{
     console.log("GET CLASS PERMISSION");
     document.getElementById("class_permission").innerHTML = "화면 공유 권한";
     window.permission = true;
-  }
+  };
+
   disableClassPermission() {
     console.log("LOST CLASS PERMISSION");
     document.getElementById("class_permission").innerHTML = "";
+    console.log(classroomInfoLocal.shareScreen.state);
+
     if (classroomInfoLocal.shareScreen.state) {
-      isSharingScreen = false;
-      if (typeof (lastStream) !== "undefined")
-        lastStream.getTracks().forEach((track) => track.stop());
+      screenshareManager.isSharingScreen = false;
+      if (typeof (screenshareManager.lastStream) !== "undefined")
+      screenshareManager.lastStream.getTracks().forEach((track) => track.stop());
       return false;
     }
+
     window.permission = false;
   }
   setMicPermission(id) {

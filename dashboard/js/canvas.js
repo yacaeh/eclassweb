@@ -7,7 +7,14 @@ class canvasManagerClass {
         this.sendMyCanvas = false;
         this.showingCanvasId = undefined;
         this.canvas_array = {};
+        this.canvas = undefined;
+
     }
+
+    init(){
+        this.canvas = GetWidgetFrame().document.getElementById("main-canvas");
+        this.sendCanvasDataToOwner();
+    };
 
     clear(){
         this.clearCanvas();
@@ -46,7 +53,7 @@ class canvasManagerClass {
     eventListener(event) {
         if (event.data.sendcanvasdata) {
             this.sendMyCanvas = event.data.state;
-            SendCanvasDataToOwnerOneTime();
+            canvasManager.sendCanvasDataToOwnerOneTime();
             return true;
         };
 
@@ -69,9 +76,41 @@ class canvasManagerClass {
         };
 
     };
+    sendCanvasDataToOwner(){
+        if (connection.extra.roomOwner)
+            return;
+        setInterval(function () {
+            if (canvasManager.sendMyCanvas) {
+                canvasManager.sendCanvasDataToOwnerOneTime();
+            }
+        }, 1000)
+    };
+    sendCanvasDataToOwnerOneTime(){
+        let canvas = this.canvas;
+        let newcanvas = document.createElement("canvas");
+        let width = Math.max(canvas.width / 4, 480);
+        let height = Math.max(canvas.width / 4, 380)
+        let newctx = newcanvas.getContext("2d");
+        
+        newcanvas.width = width;
+        newcanvas.height = height;
+    
+        newctx.fillStyle = "#FFFFFF";
+        newctx.fillRect(0,0,newcanvas.width, newcanvas.height);
+        newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
+    
+        let data = newcanvas.toDataURL('image/jpeg', 0.000001);
+        
+        connection.send({
+            canvassend: true,
+            isStudent: true,
+            points: currentPoints,
+            history: currentHistory,
+            userid: connection.userid,
+            image : data
+          }, GetOwnerId())
+    };
 }
-
-var altdown = false;
 
 var designer                = new CanvasDesigner();
 
@@ -187,37 +226,3 @@ function removeOnSelect(btn) {
         })
 }
 
-function SendCanvasDataToOwner() {
-    if (connection.extra.roomOwner)
-        return;
-    setInterval(function () {
-        if (canvasManager.sendMyCanvas) {
-            SendCanvasDataToOwnerOneTime();
-        }
-    }, 1000)
-}
-
-function SendCanvasDataToOwnerOneTime() {
-    let newcanvas = document.createElement("canvas");
-    let canvas = GetWidgetFrame().document.getElementById("main-canvas");
-    let width = Math.max(canvas.width / 4, 480);
-    let height = Math.max(canvas.width / 4, 380)
-    newcanvas.width = width;
-    newcanvas.height = height;
-
-    let newctx = newcanvas.getContext("2d");
-    newctx.fillStyle = "#FFFFFF";
-    newctx.fillRect(0,0,newcanvas.width, newcanvas.height);
-    newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
-
-    let data = newcanvas.toDataURL('image/jpeg', 0.000001);
-    
-    connection.send({
-        canvassend: true,
-        isStudent: true,
-        points: currentPoints,
-        history: currentHistory,
-        userid: connection.userid,
-        image : data
-      }, GetOwnerId())
-}

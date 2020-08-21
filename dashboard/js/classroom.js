@@ -23,11 +23,11 @@ var isSharingFile       = false;
 var isSharingEpub       = false;
 let isFileViewer        = false;
 
+var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
-var connection          = new RTCMultiConnection();
 var epubManager         = new epubManagerClass();
 var mobileHelper        = new mobileHelperClass();
 var pointer_saver       = new PointerSaver();
@@ -89,6 +89,9 @@ connection.publicRoomIdentifier   = params.publicRoomIdentifier;
 connection.autoCloseEntireSession = false;
 connection.maxParticipantsAllowed = 40;
 connection.password               = params.password;
+connection.enableLogs             = false;
+
+screenshareManager.setFrameRate(5,10);
 
 connection.session = {
   audio: false,
@@ -102,109 +105,19 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: false,
 };
 
-classroomManager.setTopToolTip(topButtonContents);
-classroomManager.toggleViewType();
-permissionManager.init();
-pageNavigator.init();
-screenshareManager.init();
-_AllCantrallFunc();
-ChattingManager.init();
-examObj.init();
-
-
-AddEvent("confirm-title", "click", function (self) {
-  ViewUploadList(self);
-})
-
-AddEvent("confirm-title2", "click", function (self) {
-  ViewHomeworkList(self);
-})
-
-AddEvent("top_save_alert", "click", function () {
-  attentionManager.exportAttention()
-})
-
-AddEvent("icon_exit", "click", function () {
-  alertBox("정말로 나가시겠습니까?","경고", classroomManager.gotoMain, function(){})
-})
-
-AddEvent("top_alert", "click", function () {
-  attentionManager.callAttend();
-})
-
-AddEvent("top_record_video", "click", function (self) {
-  if (!self.classList.contains("on")) {
-    screenRecorder._startCapturing();
-  }
-  else {
-    screenRecorder._stopCapturing();
-    self.classList.remove("on");
-  }
-})
-
-AddEvent("student_list_button", "click" ,function(self){
-  let on = self.classList.contains("on");
-  let list = document.getElementById("student_list");
-  let len = list.children.length;
-  let line = Math.ceil(len / 4);
-  
-  if(!on){
-    list.appendChild(self);
-    line = Math.max(4,line);
-    self.innerHTML = "…";
-  }
-  else{
-    self.innerHTML = "+" + (len - 16);
-    list.insertBefore(self, list.children[15]);
-    line = 4;
-  }
-  
-  $(list).css({
-    gridAutoRows : 100 / line + "%",
-    height : 6 * line + "%"
-  })
-  self.classList.toggle("on");
-})
-
-AddEvent("right-tab-collapse", "click" ,function(self){
-  self.classList.toggle("off");
-  
-  if(self.classList.contains("off")){
-    self.style.transform = "rotate(90deg)";
-    $(".right-tab").animate({width : "0%"})
-    $("#widget-container").animate({right : "0%"},
-    classroomManager.canvasResize)
-  }
-  else{
-    self.style.transform = "rotate(-90deg)";
-    $(".right-tab").animate({width : "17.7%"})
-    $("#widget-container").animate({right : "17.7%"},
-    classroomManager.canvasResize)
-  }
-})
-
-
-window.addEventListener('resize', function () {
-  rtime = new Date();
-  if (timeout === false) {
-    timeout = true;
-    setTimeout(classroomManager.resizeend, delta);
-  }
-});
-
-// 캔버스가 불러와졌을 때
 window.onWidgetLoaded = function () {
-  classroomManager.windowFocusChecker();
-  classroomManager.setShortCut(shortCut);
-  canvasManager.setCanvasButtons(canvasButtonContents);
+  examObj.init();
   mobileHelper.init();
-  SendCanvasDataToOwner();
+  pageNavigator.init();
+  canvasManager.init();
+  ChattingManager.init();
+  permissionManager.init();
+  canvasManager.setCanvasButtons(canvasButtonContents);
+  classroomManager.init(shortCut, topButtonContents);
 }
 
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
-  connection.send('plz-sync-points', event.userid);
-  classroomCommand.onConnectionSession(event);
   classroomManager.joinStudent(event);
 };
 
@@ -212,6 +125,110 @@ connection.onclose = connection.onerror = connection.onleave = function (event) 
   console.log('onclose!');
   classroomManager.leftStudent(event);
 };
+
+connection.onstream = function (event) {
+  console.log('onstream!',event);
+  if(event.share)
+    return;
+
+  if (params.open === 'true' || params.open === true) {
+    permissionManager.mute();
+    maincamManager.addStudentCam(event);
+  }
+  else{
+    maincamManager.addTeacherCam(event);
+  }
+};
+
+connection.onstreamended = function (event) {
+  console.log('onstreameneded!',event);
+  screenshareManager.onclose(event);
+};
+
+designer.appendTo(document.getElementById('widget-container'), function () {
+  console.log('designer append');
+
+  if (params.open === true || params.open === 'true') {
+    console.log('Opening Class!');
+    classroomManager.setTeacher();
+    connection.extra.roomOwner = true;
+    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+      if (!isRoomOpened) {
+        alert("이미 존재하는 방입니다.");
+        var href = location.protocol + "//" + location.host + "/dashboard/";
+        window.open(href, "_self");
+      }
+      else {
+        if (error) {
+          connection.rejoin(params.sessionid);
+        }
+        classroomCommand.joinRoom();
+        connection.socket.on('disconnect', function () {
+          location.reload();
+        });
+      }
+    });
+  }
+  //----------------------------------------------------------------
+  else {
+    classroomManager.setStudent();
+
+    console.log('try joining!');
+    connection.DetectRTC.load(function () {
+    });
+
+    connection.join({
+        sessionid: params.sessionid,
+        userid: connection.channel,
+        session: connection.session
+      }, function (isRoomJoined, roomid, error) {
+        console.log('Joing Class!');
+
+        if (error) {
+          console.log('Joing Error!');
+          if (error === connection.errors.ROOM_NOT_AVAILABLE) {
+            // alert("방이 존재하지 않습니다.");
+            location.reload();
+            return;
+          }
+          if (error === connection.errors.ROOM_FULL) {
+            alert("방이 가득 찼습니다.");
+            classroomManager.gotoMain();
+            return;
+          }
+          if (error === connection.errors.INVALID_PASSWORD) {
+            connection.password = prompt('Please enter room password.') || '';
+            if (!connection.password.length) {
+              alert('Invalid password.');
+              return;
+            }
+            connection.join(params.sessionid, function (
+              isRoomJoined,
+              roomid,
+              error
+            ) {
+              if (error) {
+                alert(error);
+              }
+            });
+            return;
+          }
+          alert(error);
+        }
+
+        classroomCommand.joinRoom();
+        connection.socket.on('disconnect', function () {
+          console.log('disconnect Class!');
+          location.reload();
+        });
+        console.log('isRoomJoined', isRoomJoined);
+
+
+      }
+    );
+  }
+  onWidgetLoaded();
+});
 
 connection.onmessage = function (event) {
   if (debug)
@@ -232,6 +249,10 @@ connection.onmessage = function (event) {
   if(canvasManager.eventListener(event))
     return;
 
+  if(classroomManager.eventListener(event))
+    return;
+
+
   if (event.data.roomSync) {
     classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
     console.log(classroomInfo)
@@ -241,11 +262,6 @@ connection.onmessage = function (event) {
   if (event.data === 'plz-sync-points') {
     console.log("Sync! when connect ! with" ,event.userid);
     designer.sync();
-    return;
-  }
-
-  if (event.data.studentCmd) {
-    classroomCommand.onStudentCommand(event.data.studentCmd);
     return;
   }
 
@@ -280,6 +296,7 @@ connection.onmessage = function (event) {
   if (event.data.setpointer) {
     if (event.data.idx == "empty")
       return;
+
     event.data.data.command = "load";
 
     if (event.extra.roomOwner && !connection.extra.roomOwner) {
@@ -344,8 +361,6 @@ connection.onmessage = function (event) {
 
   //동영상 공유
   if (event.data.MoiveURL) {
-    console.log(event.data.MoiveURL);
-    // canvasManager.clearCanvas();
     isSharingMovie = event.data.MoiveURL.enable;
 
     var moveURL = event.data.MoiveURL;
@@ -361,23 +376,14 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data.onFocus) {
-      classroomCommand.receivedOnFocusResponse({ 
-        userId: event.data.onFocus.userid, 
-        onFocus: event.data.onFocus.focus });
-    return;
-  }
-
-  if (event.data.callTeacher) {
-      classroomCommand.receivedCallTeacherResponse(event.data.callTeacher.userid);
-    return;
-  }
 
   if (event.data.closeTesting) {
+
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);
       $(".right-tab").css("z-index", 3);
     }
+
     if (mobileHelper.isMobile)
       document.getElementById("widget-container").style.right = "0px";
     else
@@ -389,119 +395,3 @@ connection.onmessage = function (event) {
     designer.syncData(event.data);
   }
 };
-
-connection.onstream = function (event) {
-  console.log('onstream!',event);
-  if(event.share)
-    return;
-
-  if (params.open === 'true' || params.open === true) {
-    permissionManager.mute();
-    maincamManager.addStudentCam(event);
-  }
-  else{
-    maincamManager.addTeacherCam(event);
-  }
-};
-
-connection.setUserPreferences = function (userPreferences) {
-  if (connection.dontAttachStream) {
-    userPreferences.dontAttachLocalStream = true;
-  }
-  if (connection.dontGetRemoteStream) {
-    userPreferences.dontGetRemoteStream = true;
-  }
-  return userPreferences;
-};
-
-connection.onstreamended = function (event) {
-  console.log('onstreameneded!',event);
-  screenshareManager.onclose(event);
-};
-
-designer.appendTo(document.getElementById('widget-container'), function () {
-  console.log('designer append');
-
-  if (params.open === true || params.open === 'true') {
-    console.log('Opening Class!');
-    classroomManager.setTeacher();
-    connection.extra.roomOwner = true;
-    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-      if (!isRoomOpened) {
-        alert("이미 존재하는 방입니다.");
-        var href = location.protocol + "//" + location.host + "/dashboard/";
-        window.open(href, "_self");
-      }
-      else {
-        if (error) {
-          connection.rejoin(params.sessionid);
-        }
-
-        classroomCommand.joinRoom();
-
-        connection.socket.on('disconnect', function () {
-          location.reload();
-        });
-      }
-    });
-  }
-  //----------------------------------------------------------------
-  else {
-    classroomManager.setStudent();
-
-    console.log('try joining!');
-    connection.DetectRTC.load(function () {
-    });
-
-    connection.join({
-        sessionid: params.sessionid,
-        userid: connection.channel,
-        session: connection.session
-      }, function (isRoomJoined, roomid, error) {
-        console.log('Joing Class!');
-
-        if (error) {
-          console.log('Joing Error!');
-          if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            alert("방이 존재하지 않습니다.");
-            location.reload();
-            return;
-          }
-          if (error === connection.errors.ROOM_FULL) {
-            alert("방이 가득 찼습니다.");
-            classroomManager.gotoMain();
-            return;
-          }
-          if (error === connection.errors.INVALID_PASSWORD) {
-            connection.password = prompt('Please enter room password.') || '';
-            if (!connection.password.length) {
-              alert('Invalid password.');
-              return;
-            }
-            connection.join(params.sessionid, function (
-              isRoomJoined,
-              roomid,
-              error
-            ) {
-              if (error) {
-                alert(error);
-              }
-            });
-            return;
-          }
-          alert(error);
-        }
-
-        classroomCommand.joinRoom();
-        connection.socket.on('disconnect', function () {
-          console.log('disconnect Class!');
-          location.reload();
-        });
-        console.log('isRoomJoined', isRoomJoined);
-
-
-      }
-    );
-  }
-  onWidgetLoaded();
-});

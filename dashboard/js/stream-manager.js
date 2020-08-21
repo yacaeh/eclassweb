@@ -71,8 +71,6 @@ class screenRecorderClass {
     };
   }
 
-
-
   async _startCapturing() {
     this.start = true;
 
@@ -165,8 +163,11 @@ class ScreenShareManagerClass{
     this.maxFrameRate = 10;
   }
 
-  init() {
-  }
+  setFrameRate(min,max) {
+    this.minFrameRate = min;
+    this.maxFrameRate = max;
+  };
+  
   get() {
     return GetWidgetFrame().document.getElementById("screen-viewer");
   }
@@ -217,10 +218,10 @@ class ScreenShareManagerClass{
     }
 
     if (on) {
-      this.isSharingScreen = false;
+      screenshareManager.isSharingScreen = false;
 
-      if (typeof (this.lastStream) !== "undefined")
-        this.lastStream.getTracks().forEach((track) => track.stop());
+      if (typeof (screenshareManager.lastStream) !== "undefined")
+        screenshareManager.lastStream.getTracks().forEach((track) => track.stop());
 
       btn.classList.remove("on");
       return false;
@@ -242,9 +243,6 @@ class ScreenShareManagerClass{
           max : screenshareManager.maxFrameRate}
       }
     }
-
-    console.log(screen_constraints);
-
 
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
@@ -277,8 +275,8 @@ class ScreenShareManagerClass{
             });
           })
 
-          this.isSharingScreen = true;
-          this.lastStream = stream;
+          screenshareManager.isSharingScreen = true;
+          screenshareManager.lastStream = stream;
           replaceScreenTrack(stream, btn);
         },
         (error) => {
@@ -443,7 +441,6 @@ class ScreenShareManagerClass{
   }
  
 }
-
 class maincamManagerClass{
   get() {
     var video = document.getElementById("main-video");

@@ -5,12 +5,12 @@ class epubManagerClass{
         this.renditionBuffer = undefined;
     }
 
-
     loadEpub(btn){
         if (!isSharingEpub && checkSharing()) {
             removeOnSelect(btn);
             return;
         }
+
         if (epubManager.isEpubViewer === false) {
             isSharingEpub = true;
             epubManager.isEpubViewer = true;
@@ -20,6 +20,7 @@ class epubManagerClass{
             isSharingEpub = false;
             epubManager.isEpubViewer = false;
             epubManager.unloadEpubViewer();
+            $('#canvas-controller').hide();
             classroomCommand.sendCloseEpub();
         }
     }
@@ -59,9 +60,7 @@ class epubManagerClass{
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
     
-        var book = ePub(
-            'https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf'
-        );
+        var book = ePub('https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf');
         window.book = book;
 
         this.path = book.url.href;
@@ -125,14 +124,11 @@ class epubManagerClass{
     
         var keyListener = function (e) {
             // Left Key
-            if ((e.keyCode || e.which) == 37) {
+            if ((e.keyCode || e.which) == 37) 
                 rendition.prev();
-            }
-    
             // Right Key
-            if ((e.keyCode || e.which) == 39) {
+            if ((e.keyCode || e.which) == 39) 
                 rendition.next();
-            }
         };
     
         rendition.on('keyup', keyListener);
