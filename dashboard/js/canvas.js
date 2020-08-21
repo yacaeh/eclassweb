@@ -73,10 +73,10 @@ class canvasManagerClass {
 
 var altdown = false;
 
-var designer            = new CanvasDesigner();
+var designer                = new CanvasDesigner();
 
-designer.widgetHtmlURL      = './canvas/widget.html';
-designer.widgetJsURL        = './widget.js';
+designer.widgetHtmlURL      = './widget.html';
+designer.widgetJsURL        = './js/widget.js';
 designer.icons.pencil       = '/dashboard/img/pen.png';
 designer.icons.marker       = '/dashboard/img/pen2.png';
 designer.icons.eraser       = '/dashboard/img/eraser.png';
