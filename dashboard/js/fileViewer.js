@@ -645,7 +645,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
 
 function HomeworkUploadModal(message, callback) {
     console.log(message);
-    extraPath = '';
     $('#btn-confirm-close').hide();
     $('#btn-confirm-file-close').hide();
     $("#confirm-title2").hide();
@@ -667,7 +666,6 @@ function HomeworkUploadModal(message, callback) {
 
 function fileUploadModal(message, btn, callback) {
     console.log(message);
-    extraPath = '';
     getUploadFileList();
     $("#confirm-title2").show();
     $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
@@ -853,8 +851,14 @@ function downloadUploadedFile(url, name) {
 }
 
 function deleteUploadedFile(filename, extraPath) {
-    var xhr = new XMLHttpRequest();
+    var nowName = mfileViewer.nowPath.split('/');
+    nowName = nowName[nowName.length - 1];
+    if(filename == nowName) {
+        alert("현재 열려있는 파일은 지울 수 없습니다")
+        return;
+    }
 
+    var xhr = new XMLHttpRequest();
     var url = uploadServerUrl + '/delete';
     var data = {
         "userId": params.sessionid,
@@ -877,7 +881,7 @@ function deleteUploadedFile(filename, extraPath) {
 function loadFileInput() {
 
     $(document).ready(function () {
-        var extraPath = "";
+        let extraPath = "";
 
         if (!connection.extra.roomOwner)
             extraPath = "/homework";
@@ -1011,7 +1015,6 @@ function loadFileViewer(path) {
 
     mfileViewer.nowPath = path;
 
-
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
@@ -1030,7 +1033,6 @@ function showPage(n) {
     pointer_saver.save()
     pointer_saver.load(n - 1);
     PageNavigator.select(n - 1);
-    currentPdfPage = n;
     if (connection.extra.roomOwner || !classroomInfo.allControl)
         classroomCommand.onShowPage(n);
 }
