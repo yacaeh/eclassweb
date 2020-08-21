@@ -1700,7 +1700,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
                     if (device.kind === 'audioinput') {
                         hasMicrophone = true;
-
                         if (audioInputDevices.indexOf(device) === -1) {
                             audioInputDevices.push(device);
                         }
@@ -1708,7 +1707,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
                     if (device.kind === 'audiooutput') {
                         hasSpeakers = true;
-
                         if (audioOutputDevices.indexOf(device) === -1) {
                             audioOutputDevices.push(device);
                         }
@@ -1716,7 +1714,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
                     if (device.kind === 'videoinput') {
                         hasWebcam = true;
-
                         if (videoInputDevices.indexOf(device) === -1) {
                             videoInputDevices.push(device);
                         }
@@ -3494,7 +3491,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
             if (typeof navigator.mediaDevices === 'undefined') {
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-                var getUserMediaSuccess = function() {};
                 var getUserMediaFailure = function() {};
 
                 var getUserMediaStream, getUserMediaError;
@@ -3556,7 +3552,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
            
-            console.log(options.localMediaConstraints);
             if (params.open == "true") {
                 options.localMediaConstraints.video.mandatory = {
                     "minWidth": 320,
@@ -3575,57 +3570,30 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     "maxFrameRate": 5
                 };
             }   
-            
-            // if (params.open == "true") {
-            //     ForOwner();
-            // }
-            // else{
-                navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
+
+            getMedia(options.localMediaConstraints);
+  
+            function getMedia(option){
+                navigator.mediaDevices.getUserMedia(option).then(function(stream) {
                     stream.streamid = stream.streamid || stream.id || getRandomString();
                     stream.idInstance = idInstance;
                     streaming(stream);
                 }).catch(function(error) {
+                    console.error(error);
+                    if(error.name == "NotReadableError" && error.message == "Could not start video source"){
+                        option.video = false;
+                        getMedia(option);
+                        return;
+                    };
                     var st = document.createElement("canvas").captureStream();
                     st.stid = getRandomString();
                     st.idInstance = idInstance;
                     streaming(st);
                 })
-            //         // options.onLocalMediaError (error, options.localMediaConstraints);
-            //     });
-            // }?
-
-
-            // function ForOwner() {
-            //     navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function (stream) {
-            //         stream.streamid = stream.streamid || stream.id || getRandomString();
-            //         stream.idInstance = idInstance;
-            //         streaming(stream);
-            //     }).catch(function (error) {
-            //         console.error("FAILED TO FIND CAM... RETRY", error);
-            //         setTimeout(ForOwner, 1000);
-            //     });
-            // }
-
+            }
         }
     }
 
-
-//     navigator.mediaDevices.getUserMedia(options.localMediaConstraints).then(function(stream) {
-//         stream.streamid = stream.streamid || stream.id || getRandomString();
-//         stream.idInstance = idInstance;
-//         streaming(stream);
-//     }).catch(function(error) {
-//         var st = document.createElement("canvas").captureStream();
-//         st.stid = getRandomString();
-//         st.idInstance = idInstance;
-//         streaming(st);
-//         // options.onLocalMediaError(error, options.localMediaConstraints);
-//     });
-
-// }
-
-
-// }
     // StreamsHandler.js
 
     var StreamsHandler = (function() {
