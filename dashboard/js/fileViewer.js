@@ -644,6 +644,8 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
 }
 
 function HomeworkUploadModal(message, callback) {
+    callback = callback || function(){}
+
     console.log(message);
     $('#btn-confirm-close').hide();
     $('#btn-confirm-file-close').hide();
@@ -665,6 +667,8 @@ function HomeworkUploadModal(message, callback) {
 }
 
 function fileUploadModal(message, btn, callback) {
+    callback = callback || function(){}
+    
     console.log(message);
     getUploadFileList();
     $("#confirm-title2").show();
@@ -988,15 +992,15 @@ function LoadFile(btn) {
     fileUploadModal("파일 관리자", btn, function (e) { });
 }
 
-function HomeworkSubmit(btn) {
-    HomeworkUploadModal("숙제 제출", function () { });
+function HomeworkSubmit() {
+    HomeworkUploadModal("숙제 제출");
 }
 
 function unloadFileViewer() {
     console.log("UNLOAD FILEVIEWER");
-    CanvasManager.clear();
+    canvasManager.clear();
     pointer_saver.save();
-    PageNavigator.off();
+    pageNavigator.off();
 
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.remove("selected-shape");
@@ -1032,7 +1036,7 @@ function pdfOnLoaded() {
 function showPage(n) {
     pointer_saver.save()
     pointer_saver.load(n - 1);
-    PageNavigator.select(n - 1);
+    pageNavigator.select(n - 1);
     if (connection.extra.roomOwner || !classroomInfo.allControl)
         classroomCommand.onShowPage(n);
 }

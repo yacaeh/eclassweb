@@ -1694,7 +1694,6 @@ function canvasresize(id){
         if (!event.data.canvasDesignerSyncData) return;
 
         var data = event.data.canvasDesignerSyncData;
-       
         if(data.isStudent){
             var id = data.userid;
             if(id == undefined){

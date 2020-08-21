@@ -1,5 +1,5 @@
 
-PageNavigator = {
+pageNavigator = {
     self : this,
     obj : undefined,
     list : undefined,

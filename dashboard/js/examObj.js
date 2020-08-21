@@ -32,7 +32,7 @@ examObj.init = function(){
           // 선생님
           if (params.open === 'true') {
             document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
-            CanvasResize();
+            classroomManager.canvasResize();
             $('#exam-omr').hide();
             $('#exam-teacher-menu').show();
             $(".right-tab").css("z-index", -1);
@@ -532,7 +532,7 @@ function setStudentOMR(quesCount, examTime) {
     else {
         document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
     }
-    CanvasResize();
+    classroomManager.canvasResize();
     $(".right-tab").css("z-index", -1);
 
     $('#exam-omr').show();

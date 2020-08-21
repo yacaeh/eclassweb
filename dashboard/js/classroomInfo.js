@@ -125,11 +125,11 @@ classroomCommand = {
         }
 
         if(classroomInfo.showcanvas){
-            sendMyCanvas = true;
+            canvasManager.sendMyCanvas = true;
         }
 
         if(classroomInfo.shareScreen.state){
-            ScreenshareManager.rejoin();
+            screenshareManager.rejoin();
         }
     },
 
@@ -144,21 +144,6 @@ classroomCommand = {
     onSynchronizationClassRoom : function (_roomInfo) {
         classroomInfo = _roomInfo;        
         this.updateSyncRoom ();
-    }
-};
-
-classroomCommand.sendAlert = function (callback) {    
-    if(connection.extra.roomOwner)
-    {
-        alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => { //callback yes
-            callback();
-            attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
-            connection.send ({
-                alert : true
-            });
-        },()=>{ //callback no 파일 저장한다.
-            // attentionObj.exportAttention();
-        });    
     }
 };
 
@@ -298,7 +283,6 @@ classroomCommand.setShareScreenServer = function (_data, success, error) {
 classroomCommand.setShareScreenLocal = function (_data) {
     classroomInfo.shareScreen.state = _data.state;
     classroomInfo.shareScreen.id = _data.id;
-    // classroomInfo.shareScreen.streamer = _data.streamer;
     classroomInfoLocal.shareScreen.state = _data.state;
     classroomInfoLocal.shareScreen.id = _data.id;
 };

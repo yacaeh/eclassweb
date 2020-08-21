@@ -30,8 +30,8 @@ class epubManagerClass{
         viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
     }
     loadEpubViewer(){
-        CanvasManager.clearCanvas();
-        PageNavigator.on();
+        canvasManager.clearCanvas();
+        pageNavigator.on();
     
         isSharingEpub = true;
         this.isEpubViewer = true;
@@ -93,20 +93,20 @@ class epubManagerClass{
         // Navigation loaded
         book.loaded.navigation.then(function (toc) {
             var len = book.spine.length;
-            PageNavigator.set(len);
+            pageNavigator.set(len);
     
             let origin = book.url.origin;
             let path = book.path.directory;
             let location = origin + path;
     
-            PageNavigator.epubsetting();
+            pageNavigator.epubsetting();
     
             Object.keys(book.package.manifest).forEach(function (e) {
                 var href = book.package.manifest[e].href;
                 if (href.includes("thumbnail")) {
                     var img = document.createElement("img");
                     img.src = location + href;
-                    PageNavigator.push(img, function () {
+                    pageNavigator.push(img, function () {
                         rendition.display(this.getAttribute("idx"));
                     })
                 }
@@ -116,7 +116,7 @@ class epubManagerClass{
         rendition.on('relocated', function (locations) {
             pointer_saver.save()
             pointer_saver.load(locations.start.index);
-            PageNavigator.select(locations.start.index);
+            pageNavigator.select(locations.start.index);
             classroomCommand.sendEpubCmd('page', {
                 page: locations.start.index
             });
@@ -141,8 +141,8 @@ class epubManagerClass{
     unloadEpubViewer(){
         pointer_saver.save_container();
 
-        CanvasManager.clear();
-        PageNavigator.off();
+        canvasManager.clear();
+        pageNavigator.off();
     
         isSharingEpub = false;
         this.isEpubViewer = false;

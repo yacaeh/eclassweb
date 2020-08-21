@@ -253,14 +253,14 @@ function Viewer( viewerPlugin, parameters ) {
             loading.parentNode.removeChild(loading);
             
             if(typeof mimetype == "undefined"){
-                window.top.PageNavigator.off();
+                window.top.pageNavigator.off();
             }
             else if(mimetype == "application/pdf"){
-                window.top.PageNavigator.on();
-                // window.top.PageNavigator.pdfsetting();
-                window.top.PageNavigator.select(0);
+                window.top.pageNavigator.on();
+                // window.top.pageNavigator.pdfsetting();
+                window.top.pageNavigator.select(0);
             }else{
-                window.top.PageNavigator.off();
+                window.top.pageNavigator.off();
             }
             window.top.pdfOnLoaded ();
             initialized = true;
