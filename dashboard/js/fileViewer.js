@@ -847,11 +847,13 @@ function downloadUploadedFile(url, name) {
 }
 
 function deleteUploadedFile(filename, extraPath) {
-    var nowName = mfileViewer.nowPath.split('/');
-    nowName = nowName[nowName.length - 1];
-    if(filename == nowName) {
-        alert("현재 열려있는 파일은 지울 수 없습니다")
-        return;
+    if(mfileViewer.nowPath){
+        var nowName = mfileViewer.nowPath.split('/');
+        nowName = nowName[nowName.length - 1];
+        if(filename == nowName) {
+            alert("현재 열려있는 파일은 지울 수 없습니다")
+            return;
+        }
     }
 
     var xhr = new XMLHttpRequest();
