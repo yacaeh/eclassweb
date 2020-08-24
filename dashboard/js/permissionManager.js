@@ -187,7 +187,7 @@ class permissionManagerClass{
   DeleteCanvasPermission(id) {
     var idx = classroomInfo.canvasPermission.indexOf(id);
     classroomInfo.canvasPermission.splice(idx, 1);
-    CanvasManager.clearStudentCanvas(id);
+    canvasManager.clearStudentCanvas(id);
     console.log("Canvas permission removed", id, classroomInfo.canvasPermission);
     FindInList(id).dataset.canvasPermission = false;
     DeleteIcon(id, "canvas");
@@ -203,16 +203,20 @@ class permissionManagerClass{
     console.log("GET CLASS PERMISSION");
     document.getElementById("class_permission").innerHTML = "화면 공유 권한";
     window.permission = true;
-  }
+  };
+
   disableClassPermission() {
     console.log("LOST CLASS PERMISSION");
     document.getElementById("class_permission").innerHTML = "";
+    console.log(classroomInfoLocal.shareScreen.state);
+
     if (classroomInfoLocal.shareScreen.state) {
-      isSharingScreen = false;
-      if (typeof (lastStream) !== "undefined")
-        lastStream.getTracks().forEach((track) => track.stop());
+      screenshareManager.isSharingScreen = false;
+      if (typeof (screenshareManager.lastStream) !== "undefined")
+      screenshareManager.lastStream.getTracks().forEach((track) => track.stop());
       return false;
     }
+
     window.permission = false;
   }
   setMicPermission(id) {
@@ -236,7 +240,7 @@ class permissionManagerClass{
   }
   disableCanvasPermission(id) {
     console.log("LOST CANVAS PERMISSION");
-    CanvasManager.clearStudentCanvas(id);
+    canvasManager.clearStudentCanvas(id);
   }
   disableMicPermission() {
     console.log("LOST MIC PERMISSION");
@@ -319,7 +323,6 @@ function MakeIcon(id, type){
 
 function DeleteIcon(id, type){
   var node = FindInList(id)
-  console.log(node.getElementsByClassName(type)[0]);
   node.getElementsByClassName(type)[0].parentElement.removeChild(node.getElementsByClassName(type)[0])
 
   if(FindInList(id).getElementsByClassName("permissions")[0].children.length == 0){

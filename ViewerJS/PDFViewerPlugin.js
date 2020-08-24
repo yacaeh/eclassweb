@@ -249,7 +249,7 @@ function PDFViewerPlugin() {
                 ensurePageRendered(page);
             }
         });
-        window.parent.parent.PageNavigator.push(thumbnail, function(){
+        window.parent.parent.pageNavigator.push(thumbnail, function(){
             var idx = (this.getAttribute("idx") * 1) + 1;
             self.showPage(idx)
             window.parent.parent.showPage(idx);
@@ -294,14 +294,14 @@ function PDFViewerPlugin() {
             PDFJS.getDocument(location, null, passwordCallback).then(function loadPDF( doc ) {
                 pdfDocument = doc;
                 container   = viewContainer;
-                window.parent.parent.PageNavigator.removethumbnail();
+                window.parent.parent.pageNavigator.removethumbnail();
 
                 for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
                     pdfDocument.getPage(i + 1).then(createPage);
                 }
 
-                window.parent.parent.PageNavigator.set(pdfDocument.numPages);
-                window.parent.parent.PageNavigator.pdfsetting();
+                window.parent.parent.pageNavigator.set(pdfDocument.numPages);
+                window.parent.parent.pageNavigator.pdfsetting();
             });
         });
     };

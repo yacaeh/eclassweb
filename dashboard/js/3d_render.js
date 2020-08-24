@@ -74,7 +74,7 @@ function modelEnable() {
         createScene(_3d_canvas); //Call the createScene function
     }
 
-    CanvasResize();
+    classroomManager.canvasResize();
 }
 
 function engineInit(canvas) {
@@ -132,14 +132,6 @@ function remove3DCanvas() {
     GetWidgetFrame().document.getElementById("renderCanvas").style.display = "none";
 }
 
-function CanvasResize() {
-    _3dcanvas = frame.document.getElementById("renderCanvas")
-    var canvas = frame.document.getElementById("main-canvas");
-    var r = document.getElementsByClassName("right-tab")[0];
-    var rwidth = $(r).width();
-    _3dcanvas.width = canvas.width - rwidth - 50;
-    _3dcanvas.height = canvas.height - 60;
-}
 
 function set3DModelStateData(_newPosition, _newRotation) {
     newPosition = _newPosition;
@@ -202,7 +194,7 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
-    CanvasManager.clear();
+    canvasManager.clear();
     
     if (params.open == 'true') {
         const isViewer = classroomInfo.share3D.state;

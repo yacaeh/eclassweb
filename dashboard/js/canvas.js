@@ -2,59 +2,138 @@
     캔버스, 판서 관련
 */
 
-class CanvasManagerClass {
+class canvasManagerClass {
+    constructor(){
+        this.sendMyCanvas = false;
+        this.showingCanvasId = undefined;
+        this.canvas_array = {};
+        this.canvas = undefined;
+
+    }
+
+    init(){
+        this.canvas = GetWidgetFrame().document.getElementById("main-canvas");
+        this.sendCanvasDataToOwner();
+    };
+
     clear(){
         this.clearCanvas();
         this.clearStudentCanvas();
         this.clearTeacherCanvas();
-    }
+    };
     clearCanvas() {
         designer.syncData({
             command: "clearcanvas",
             uid: connection.userid,
         })
-    }
+    };
     clearStudentCanvas(studentid) {
         designer.syncData({
             command: "clearstudent",
             isStudent: true,
             userid: studentid,
         })
-    }
+    };
     clearTeacherCanvas() {
         designer.syncData({
             command: "clearteacher",
             uid: connection.userid,
         })
-    }
+    };
+    setCanvasButtons(data) {
+        let frame = GetWidgetFrame();
+        Object.keys(data).forEach(function (e) {
+            let btn = frame.document.getElementById(e);
+            if (btn)
+                btn.addEventListener("click", function () {
+                    data[e](btn);
+                })
+        })
+    };
+    eventListener(event) {
+        if (event.data.sendcanvasdata) {
+            this.sendMyCanvas = event.data.state;
+            canvasManager.sendCanvasDataToOwnerOneTime();
+            return true;
+        };
+
+        if (event.data.canvassend) {
+            let img = event.data.image;
+            event.data.image = undefined;
+            // console.log(img.length / 1024 + "kb");
+            // console.log(event.data.points.length / 1024 + "kb");
+            this.canvas_array[event.userid].src = img;
+            if (event.userid == this.showingCanvasId){
+                designer.syncData(event.data);
+            }
+            return true;
+        };
+
+        if (event.data.sendStudentPoint) {
+            event.data.command = "default";
+            designer.syncData(event.data);
+            return true;
+        };
+
+    };
+    sendCanvasDataToOwner(){
+        if (connection.extra.roomOwner)
+            return;
+        setInterval(function () {
+            if (canvasManager.sendMyCanvas) {
+                canvasManager.sendCanvasDataToOwnerOneTime();
+            }
+        }, 1000)
+    };
+    sendCanvasDataToOwnerOneTime(){
+        let canvas = this.canvas;
+        let newcanvas = document.createElement("canvas");
+        let width = Math.max(canvas.width / 4, 480);
+        let height = Math.max(canvas.width / 4, 380)
+        let newctx = newcanvas.getContext("2d");
+        
+        newcanvas.width = width;
+        newcanvas.height = height;
+    
+        newctx.fillStyle = "#FFFFFF";
+        newctx.fillRect(0,0,newcanvas.width, newcanvas.height);
+        newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
+    
+        let data = newcanvas.toDataURL('image/jpeg', 0.000001);
+        
+        connection.send({
+            canvassend: true,
+            isStudent: true,
+            points: currentPoints,
+            history: currentHistory,
+            userid: connection.userid,
+            image : data
+          }, GetOwnerId())
+    };
 }
 
-var canvas;
-var ctx;
-var tooltips = [];
-var altdown = false;
-var designer            = new CanvasDesigner();
+var designer                = new CanvasDesigner();
 
-designer.widgetHtmlURL = './canvas/widget.html';
-designer.widgetJsURL = './widget.js';
-designer.icons.pencil = '/dashboard/img/pen.png';
-designer.icons.marker = '/dashboard/img/pen2.png';
-designer.icons.eraser = '/dashboard/img/eraser.png';
-designer.icons.clearCanvas = '/dashboard/img/trash.png';
-designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
-designer.icons.on = '/dashboard/img/view_on.png';
-designer.icons.off = '/dashboard/img/view_off.png';
-designer.icons.screenShare = '/dashboard/img/screenshare.png';
-designer.icons.view3d = '/dashboard/img/3D.png';
-designer.icons.view3don = '/dashboard/img/3D.png';
-designer.icons.movie = '/dashboard/img/videolink.png';
-designer.icons.file = '/dashboard/img/openfile.png';
-designer.icons.text = '/dashboard/img/text.png';
-designer.icons.epub = '/dashboard/img/epub.png';
-designer.icons.callteacher = '/dashboard/img/handsup.png';
-designer.icons.homework = '/dashboard/img/homework.png';
-designer.icons.fulloff = '/dashboard/img/cam_min.png';
-designer.icons.fullon = '/dashboard/img/cam_max.png';
+designer.widgetHtmlURL      = './widget.html';
+designer.widgetJsURL        = './js/widget.js';
+designer.icons.pencil       = '/dashboard/img/pen.png';
+designer.icons.marker       = '/dashboard/img/pen2.png';
+designer.icons.eraser       = '/dashboard/img/eraser.png';
+designer.icons.clearCanvas  = '/dashboard/img/trash.png';
+designer.icons.pdf          = '/dashboard/img/iconfinder_File.png';
+designer.icons.on           = '/dashboard/img/view_on.png';
+designer.icons.off          = '/dashboard/img/view_off.png';
+designer.icons.screenShare  = '/dashboard/img/screenshare.png';
+designer.icons.view3d       = '/dashboard/img/3D.png';
+designer.icons.view3don     = '/dashboard/img/3D.png';
+designer.icons.movie        = '/dashboard/img/videolink.png';
+designer.icons.file         = '/dashboard/img/openfile.png';
+designer.icons.text         = '/dashboard/img/text.png';
+designer.icons.epub         = '/dashboard/img/epub.png';
+designer.icons.callteacher  = '/dashboard/img/handsup.png';
+designer.icons.homework     = '/dashboard/img/homework.png';
+designer.icons.fulloff      = '/dashboard/img/cam_min.png';
+designer.icons.fullon       = '/dashboard/img/cam_max.png';
 
 designer.addSyncListener(function (data) {
     var isStudent = permissionManager.IsCanvasPermission(data.userid);
@@ -87,24 +166,6 @@ designer.setTools({
     callteacher: true,
     homework: true,
 });
-
-function SetCanvasBtn(data) {
-    function checkf() {
-        if (designer.iframe != null) {
-            clearInterval(inter)
-            var frame = GetWidgetFrame();
-
-            Object.keys(data).forEach(function (e) {
-                var btn = frame.document.getElementById(e);
-                if (btn)
-                    btn.addEventListener("click", function () {
-                        data[e](btn);
-                    })
-            })
-        }
-    }
-    var inter = setInterval(checkf, 1000);
-}
 
 function checkSharing() {
     return classroomInfo.shareScreen.state ||
@@ -165,123 +226,3 @@ function removeOnSelect(btn) {
         })
 }
 
-function SendCanvasDataToOwner() {
-    if (connection.extra.roomOwner)
-        return;
-    setInterval(function () {
-        if (sendMyCanvas) {
-            SendCanvasDataToOwnerOneTime();
-        }
-    }, 1000)
-}
-
-function SendCanvasDataToOwnerOneTime() {
-    var newcanvas = document.createElement("canvas");
-    var width = Math.max(canvas.width / 4, 480);
-    var height = Math.max(canvas.width / 4, 380)
-    newcanvas.width = width;
-    newcanvas.height = height;
-
-    var newctx = newcanvas.getContext("2d");
-    newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
-
-    var data = newcanvas.toDataURL();
-
-    connection.send({
-        canvassend: true,
-        canvas: data
-    }, GetOwnerId());
-
-    if (debug) {
-        console.log(data)
-        console.log("SENDING", connection.userid);
-    }
-}
-
-function CreateTopTooltip(data) {
-    Object.keys(data).forEach(function (id) {
-        var element = document.getElementById(id);
-        element.addEventListener("mouseover", function (e) {
-            document.getElementById("toptooltip").style.display = 'block';
-            var tooltip = document.getElementById("toptooltip")
-            tooltip.children[0].innerHTML = data[id];
-            var x = e.target.x;
-            var width = tooltip.getBoundingClientRect().width / 2;
-            tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width / 2) - width + "px";
-            element.addEventListener("mouseleave", function () {
-                document.getElementById("toptooltip").style.display = 'none';
-            })
-        })
-    });
-}
-
-function SetShortcut(shortCut) {
-
-    $(GetWidgetFrame()).on("keydown", down);
-    $(window).on("keydown", down);
-
-    $(GetWidgetFrame()).on("keyup", up);
-    $(window).on("keyup", up);
-
-
-    function down(key) {
-        if (key.altKey) {
-            if (!altdown) {
-                MakeTooltip(shortCut);
-                altdown = true;
-            }
-            key.preventDefault();
-
-            shortCut.forEach(function (cut) {
-                if (key.key == Object.values(cut)) {
-                    if (Object.keys(cut) == "screen_share") {
-                        RemoveTooltip();
-                        altdown = false;
-                    }
-                    try {
-                        GetWidgetFrame().document.getElementById(Object.keys(cut)).click();
-                    }
-                    catch{
-                    }
-                }
-            });
-
-        }
-    }
-
-    function up(key) {
-        if (key.key == "Alt") {
-            if (altdown) {
-                RemoveTooltip();
-                altdown = false;
-            }
-        }
-    }
-
-    function MakeTooltip(shortcut) {
-        shortcut.forEach(function (cut) {
-            var btn = GetWidgetFrame().document.getElementById(Object.keys(cut));
-            if (!btn)
-                return false;
-
-            var top = btn.getBoundingClientRect().top;
-            var div = GetWidgetFrame().document.createElement("div");
-            div.className = "tooltip";
-            div.innerHTML = Object.values(cut)[0];
-            div.style.top = top + 15 + 'px';
-            tooltips.push(div);
-            GetWidgetFrame().document.getElementById("tool-box").appendChild(div);
-        });
-    }
-}
-
-function RemoveTooltip() {
-    altdown = false;
-    tooltips.forEach(element => GetWidgetFrame().document.getElementById("tool-box").removeChild(element));
-    tooltips = [];
-}
-
-function canvasinit() {
-    canvas = GetWidgetFrame().document.getElementById('main-canvas');
-    ctx = canvas.getContext('2d');
-}

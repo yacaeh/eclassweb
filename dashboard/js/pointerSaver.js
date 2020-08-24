@@ -18,7 +18,7 @@ class PointerSaver {
             
             if(data == 404 || Object.keys(data).length == 0){
                 pointer_saver.container = {};
-                CanvasManager.clear();
+                canvasManager.clear();
                 designer.sync();
                 return;
             }
@@ -76,7 +76,7 @@ class PointerSaver {
     }
     load(idx){
         this.nowIdx = idx;
-        CanvasManager.clear();
+        canvasManager.clear();
 
         this.get();
 

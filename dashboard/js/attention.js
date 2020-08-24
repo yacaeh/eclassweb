@@ -1,92 +1,116 @@
 /*
     학생 알림 관련
 */
-
-var attentionObj = {
-    isStart : false,    
-    totalCount : 0,
-
-    teacherRequest : {},
-    studentsAnswer : {}    
-};
-
-attentionObj.callAttend = (message) => {    
-    //console.log( "Attention Call Attend : " + JSON.stringify(message));
-    attentionObj.totalCount++;
-    attentionObj.teacherRequest[attentionObj.totalCount] = {
-        name : message.msg,
+class attentionManagerClass{
+    constructor(){
+        this.studentsAnswer = {};
+        this.totalCount = 0;
+        this.teacherRequest = {};
     }
-}
 
-attentionObj.submit = (submitStudent) => {
-    //console.log( "Attention submit : " + JSON.stringify(submitStudent) );
+    callAttend(){
+        var callback = function () {
+            var chilldren = document.getElementById('student_list').children;
+            for (var i = 0; i < chilldren.length; i++) {
+                var al = chilldren[i].getElementsByClassName('bor')[0];
+                if (!al)
+                    continue;
+                al.className = "bor";
+                al.classList.add('alert_wait');
+            }
+        }
+
+        if(connection.extra.roomOwner)
+        {
+            alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => {
+                attentionManager.totalCount++;
+                attentionManager.teacherRequest[attentionManager.totalCount] = {
+                    name : '집중하세요',
+                }
+                callback();
+                connection.send ({
+                    alert : true
+                });
+            },() => {});    
+        }
+    };
+
+    submit(submitStudent){
+        let userid = submitStudent.userid;
+        let name = submitStudent.name;
     
-    let userid = submitStudent.userid;
-    let name = submitStudent.name;
-
-    let studentAnswerInfo = attentionObj.studentsAnswer[userid];
-    if(!studentAnswerInfo)
-    {
-        // studentAnswer가 없다면 새로 만들어 준다.
-        attentionObj.studentsAnswer[userid] = {
-            userid : userid,   // 학생 아디
-            name : name,
-            count : 0,
-            userAnswers : []    // 학생이 선택한 항목을 저장 
-        };
-
-        studentAnswerInfo = attentionObj.studentsAnswer[userid];
-    }
+        let studentAnswerInfo = this.studentsAnswer[userid];
+        if(!studentAnswerInfo)
+        {
+            // studentAnswer가 없다면 새로 만들어 준다.
+            this.studentsAnswer[userid] = {
+                userid : userid,   // 학생 아디
+                name : name,
+                count : 0,
+                userAnswers : []    // 학생이 선택한 항목을 저장 
+            };
     
-    studentAnswerInfo.userAnswers[attentionObj.totalCount] = submitStudent.response;
-    studentAnswerInfo.count++;
+            studentAnswerInfo = this.studentsAnswer[userid];
+        }
+        
+        studentAnswerInfo.userAnswers[this.totalCount] = submitStudent.response;
+        studentAnswerInfo.count++;
+    };
 
-    //console.log( "Attention submit : " + JSON.stringify(attentionObj.studentsAnswer) );
-};
+    exportAttention(){
+        if( attentionManager.totalCount <= 0 ){
+            alert("저장할 데이터가 없습니다");
+            return false;
+        } 
+        if(connection.extra.roomOwner) {
+            let now = new Date();
+            let excelFileName = `${now}_attention.xlsx`;
+            let sheetName = connection.sessionid;
+    
+            let workData = attentionManager.getSubmitData();
+    
+            // step 1. workbook 생성
+            let wb = XLSX.utils.book_new();
+    
+            // step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
+            XLSX.utils.book_append_sheet(wb, workData, sheetName);
+    
+            // step 4. 엑셀 파일 만들기 
+            let wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+    
+            // step 5. 엑셀 파일 내보내기 
+            saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelFileName);
+    
+            //console.log("집중모드 저장하였습니다.");
+            return true
+        }  
+    
+         // export excel data
+   
+    
+        function s2ab(s) { 
+            var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+            var view = new Uint8Array(buf);  //create uint8array as viewer
+            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+            return buf;    
+        }
 
-attentionObj.exportAttention = () => {
-    if( attentionObj.totalCount <= 0 ){
-        console.log("집중모드 저장할 데이타가 없습니다.");
-        return false;
-    } 
+    };
 
-    if(connection.extra.roomOwner) {
-        let now = new Date();
-        let excelFileName = `${now}_attention.xlsx`;
-        let sheetName = connection.sessionid;
-
-        let workData = getSubmitData();
-
-        // step 1. workbook 생성
-        let wb = XLSX.utils.book_new();
-
-        // step 3. workbook에 새로만든 워크시트에 이름을 주고 붙인다.  
-        XLSX.utils.book_append_sheet(wb, workData, sheetName);
-
-        // step 4. 엑셀 파일 만들기 
-        let wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
-
-        // step 5. 엑셀 파일 내보내기 
-        saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), excelFileName);
-
-        //console.log("집중모드 저장하였습니다.");
-        return true
-    }  
-
-     // export excel data
-    function getSubmitData () {
+    getSubmitData () {
         let contents = [];        
         contents[0] = ['이름', '응답'];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
-        for(let i = 0; i < attentionObj.totalCount; ++i) {
+        for(let i = 0; i < this.totalCount; ++i) {
             contents[0][i+prefix] = `${i+1}번`;
         }        
         
         let row = 1;
-        for(id in attentionObj.studentsAnswer)
-        {
-            const submit = attentionObj.studentsAnswer[id];
+
+        var answer = this.studentsAnswer;
+        Object.keys(this.studentsAnswer).forEach(function(id){
+            const submit = answer[id];
             let content = contents[row];
             content = [submit.name];        
             content[1] = submit.count;
@@ -104,24 +128,24 @@ attentionObj.exportAttention = () => {
 
             contents[row] = content;
             row +=1;      
-        }
+        })
+
         return XLSX.utils.aoa_to_sheet(contents);
     }; 
 
-    function s2ab(s) { 
-        var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-        var view = new Uint8Array(buf);  //create uint8array as viewer
-        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-        return buf;    
+    resetBorder(){
+        var chilldren = document.getElementById('student_list').children;
+        for (var i = 0; i < chilldren.length; i++) {
+            var al = chilldren[i].getElementsByClassName('bor')[0];
+            if (!al)
+                continue;
+            al.className = "bor";
+            al.classList.remove('alert_wait');
+            al.classList.remove('alert_yes');
+            al.classList.remove('alert_no');
+        }
     }
+}
 
-};
 
-// 종료시 저장하시겠습니까 메시지 발생 시킨다.
-// window.addEventListener("beforeunload", function (e) {
-//     var confirmationMessage = "저장하지 않은 데이터가 있습니다.";
 
-//     (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-
-//     return confirmationMessage;                            //Webkit, Safari, Chrome
-// });

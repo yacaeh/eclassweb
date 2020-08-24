@@ -5,12 +5,12 @@ class epubManagerClass{
         this.renditionBuffer = undefined;
     }
 
-
     loadEpub(btn){
         if (!isSharingEpub && checkSharing()) {
             removeOnSelect(btn);
             return;
         }
+
         if (epubManager.isEpubViewer === false) {
             isSharingEpub = true;
             epubManager.isEpubViewer = true;
@@ -20,6 +20,7 @@ class epubManagerClass{
             isSharingEpub = false;
             epubManager.isEpubViewer = false;
             epubManager.unloadEpubViewer();
+            $('#canvas-controller').hide();
             classroomCommand.sendCloseEpub();
         }
     }
@@ -30,8 +31,8 @@ class epubManagerClass{
         viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
     }
     loadEpubViewer(){
-        CanvasManager.clearCanvas();
-        PageNavigator.on();
+        canvasManager.clearCanvas();
+        pageNavigator.on();
     
         isSharingEpub = true;
         this.isEpubViewer = true;
@@ -59,9 +60,7 @@ class epubManagerClass{
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
     
-        var book = ePub(
-            'https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf'
-        );
+        var book = ePub('https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf');
         window.book = book;
 
         this.path = book.url.href;
@@ -93,20 +92,20 @@ class epubManagerClass{
         // Navigation loaded
         book.loaded.navigation.then(function (toc) {
             var len = book.spine.length;
-            PageNavigator.set(len);
+            pageNavigator.set(len);
     
             let origin = book.url.origin;
             let path = book.path.directory;
             let location = origin + path;
     
-            PageNavigator.epubsetting();
+            pageNavigator.epubsetting();
     
             Object.keys(book.package.manifest).forEach(function (e) {
                 var href = book.package.manifest[e].href;
                 if (href.includes("thumbnail")) {
                     var img = document.createElement("img");
                     img.src = location + href;
-                    PageNavigator.push(img, function () {
+                    pageNavigator.push(img, function () {
                         rendition.display(this.getAttribute("idx"));
                     })
                 }
@@ -116,7 +115,7 @@ class epubManagerClass{
         rendition.on('relocated', function (locations) {
             pointer_saver.save()
             pointer_saver.load(locations.start.index);
-            PageNavigator.select(locations.start.index);
+            pageNavigator.select(locations.start.index);
             classroomCommand.sendEpubCmd('page', {
                 page: locations.start.index
             });
@@ -125,14 +124,11 @@ class epubManagerClass{
     
         var keyListener = function (e) {
             // Left Key
-            if ((e.keyCode || e.which) == 37) {
+            if ((e.keyCode || e.which) == 37) 
                 rendition.prev();
-            }
-    
             // Right Key
-            if ((e.keyCode || e.which) == 39) {
+            if ((e.keyCode || e.which) == 39) 
                 rendition.next();
-            }
         };
     
         rendition.on('keyup', keyListener);
@@ -141,8 +137,8 @@ class epubManagerClass{
     unloadEpubViewer(){
         pointer_saver.save_container();
 
-        CanvasManager.clear();
-        PageNavigator.off();
+        canvasManager.clear();
+        pageNavigator.off();
     
         isSharingEpub = false;
         this.isEpubViewer = false;

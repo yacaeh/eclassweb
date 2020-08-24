@@ -4,74 +4,59 @@
 
 var top_all_controll_jthis;
 
-
-function updateControlView(send)
-{
-    if(classroomInfo.allControl)
-    {
+function updateControlView(send) {
+    if (classroomInfo.allControl) {
         top_all_controll_jthis.addClass('top_all_controll_on');
         top_all_controll_jthis.removeClass('top_all_controll_off')
     }
-    else{
+    else {
         top_all_controll_jthis.addClass('top_all_controll_off');
         top_all_controll_jthis.removeClass('top_all_controll_on')
     }
 
-    if(send == true)
-    {
+    if (send == true) {
         SendAllControll(classroomInfo.allControl);
     }
 }
 
-function onAllControlValue (_allControl) {    
-    classroomInfo.allControl = _allControl.state;  
-    if(classroomInfo.allControl) {        
-        //  전체제어하기가 걸리게 되면, 현재 상태와 동기화 시킨다.
+function onAllControlValue(_allControl) {
+    classroomInfo.allControl = _allControl.state;
+    if (classroomInfo.allControl) {
         console.log("All Controll On");
         document.getElementById("student-isallcontrol").style.display = "block";
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
-    else
-    {
-        document.getElementById("student-isallcontrol").style.display = "none";
+    else {
         console.log("All Controll Off");
-        classroomCommand.updateSyncRoom ();
-        // updateControlView (false);   
+        document.getElementById("student-isallcontrol").style.display = "none";
+        classroomCommand.updateSyncRoom();
     }
 }
 
 function _AllCantrallFunc() {
     top_all_controll_jthis = $("#top_all_controll");
-    if(params.open == "true")
-    {
-        top_all_controll_jthis.click(function(){
-            connection.socket.emit('toggle-all-control', (changeControl) => {
-                classroomInfo.allControl = changeControl;
-                updateControlView (true);        
-                //setAllControlValueWithSend (changeControl);
-            });
-        })
-    }
+    top_all_controll_jthis.click(function () {
+        connection.socket.emit('toggle-all-control', (changeControl) => {
+            classroomInfo.allControl = changeControl;
+            updateControlView(true);
+        });
+    })
 }
 
-function SendAllControll(b)
-{
-    if(b) {
-        // true면 방의 정보를 다시 보낸다.
+function SendAllControll(b) {
+    if (b) {
         console.log("")
         connection.send({
             allControl: {
-                state : b,
-                roomInfo : classroomInfo
+                state: b,
+                roomInfo: classroomInfo
             }
         });
     }
-    else
-    {
-        // false 면 일반 값만 보낸다.
+    else {
         connection.send({
-            allControl:  {
-                state : b
+            allControl: {
+                state: b
             }
         });
     }

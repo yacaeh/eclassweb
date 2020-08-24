@@ -18,7 +18,7 @@ class mobileHelperClass{
         FullScreenBtnInit();
         ToolSetting();
         $(".right-tab").css({display:"none", width : "0px"})
-        CanvasResize();
+        classroomManager.canvasResize();
         MainCamSetting();
 
         function ToolSetting(){
@@ -31,7 +31,7 @@ class mobileHelperClass{
         }
 
         function MainCamSetting(){
-            var video = MaincamManager.get();
+            var video = maincamManager.get();
             var x = 0;
             var y = 0;
             var lastleft = 0;
@@ -142,7 +142,7 @@ class mobileHelperClass{
         
             })
         
-            MaincamManager.start(function(){
+            maincamManager.start(function(){
                 AppendInFrame(video);
             });
         }
@@ -174,7 +174,7 @@ class mobileHelperClass{
                 }
         
                 promise.then(function(){
-                    CanvasResize();
+                    classroomManager.canvasResize();
                 })
                 btn.classList.toggle("off");
                 btn.classList.toggle("on");

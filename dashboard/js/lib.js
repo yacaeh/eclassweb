@@ -1,7 +1,9 @@
 
 // 이벤트 추가
 function AddEvent(id, event, callback) {
-  document.getElementById(id).addEventListener(event, function () {
+  var element = document.getElementById(id);
+  if(element)
+  element.addEventListener(event, function () {
     callback(this);
   })
 }

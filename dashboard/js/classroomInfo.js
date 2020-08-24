@@ -52,13 +52,13 @@ classroomCommand = {
     joinRoom : function () {  
         connection.socket.emit ('update-room-info', (_info) => {
             console.log(_info);                    
-            classroomInfo.roomOpenTime = _info.roomOpenTime;
-            classroomInfo.allControl = _info.allControl;
+            classroomInfo.roomOpenTime      = _info.roomOpenTime;
+            classroomInfo.allControl        = _info.allControl;
             classroomInfo.shareScreen.state = _info.shareScreen;
-            classroomInfo.share3D.state = _info.share3D.state;                 
-            classroomInfo.exam = _info.exam;
-            classroomInfo.classPermission = _info.classPermission;
-            classroomInfo.micPermission = _info.micPermission;
+            classroomInfo.share3D.state     = _info.share3D.state;                 
+            classroomInfo.exam              = _info.exam;
+            classroomInfo.classPermission   = _info.classPermission;
+            classroomInfo.micPermission     = _info.micPermission;
 
             updateClassTime ();
             if(connection.extra.roomOwner)
@@ -96,12 +96,12 @@ classroomCommand = {
     
     //  Global Data를 Local에 Copy.
     copyGlobalToLocal : function() {
-        classroomInfoLocal.allControl = classroomInfo.allControl;
-        classroomInfoLocal.shareScreen = classroomInfo.shareScreen;
-        classroomInfoLocal.share3D = classroomInfo.share3D;   
-        classroomInfoLocal.epub = classroomInfo.epub;
-        classroomInfoLocal.exam = classroomInfo.exam;
-        classroomInfoLocal.viewer = classroomInfo.viewer;
+        classroomInfoLocal.allControl   = classroomInfo.allControl;
+        classroomInfoLocal.shareScreen  = classroomInfo.shareScreen;
+        classroomInfoLocal.share3D      = classroomInfo.share3D;   
+        classroomInfoLocal.epub         = classroomInfo.epub;
+        classroomInfoLocal.exam         = classroomInfo.exam;
+        classroomInfoLocal.viewer       = classroomInfo.viewer;
     },
 
     /*
@@ -125,11 +125,11 @@ classroomCommand = {
         }
 
         if(classroomInfo.showcanvas){
-            sendMyCanvas = true;
+            canvasManager.sendMyCanvas = true;
         }
 
         if(classroomInfo.shareScreen.state){
-            ScreenshareManager.rejoin();
+            screenshareManager.rejoin();
         }
     },
 
@@ -144,21 +144,6 @@ classroomCommand = {
     onSynchronizationClassRoom : function (_roomInfo) {
         classroomInfo = _roomInfo;        
         this.updateSyncRoom ();
-    }
-};
-
-classroomCommand.sendAlert = function (callback) {    
-    if(connection.extra.roomOwner)
-    {
-        alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => { //callback yes
-            callback();
-            attentionObj.callAttend({msg:"집중하세요"});  //집중하세요관한 저장처리
-            connection.send ({
-                alert : true
-            });
-        },()=>{ //callback no 파일 저장한다.
-            // attentionObj.exportAttention();
-        });    
     }
 };
 
@@ -232,23 +217,23 @@ classroomCommand.receivedCallTeacherResponse = (userId) => {
 
                 var student_overlay;
                 var isMeCount = 5;
-                var flickerInterval = setInterval(function(){
+                var flickerInterval = setInterval(function () {
                     student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
                     var initBackColor = student_overlay.css('background');
                     var orangeColor = setOverlayColor('orange');
-                    setTimeout(function(){
+                    setTimeout(function () {
                         student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
                         var initBackColor2 = student_overlay.css('background');
-                        if(orangeColor !== initBackColor2)
+                        if (orangeColor !== initBackColor2)
                             initBackColor = initBackColor2
                         setOverlayColor(initBackColor);
-                    } ,500);
-                    if(isMeCount-- <= 0)
+                    }, 500);
+                    if (isMeCount-- <= 0)
                         clearInterval(flickerInterval);
-                },1000);
-                
-                function setOverlayColor(overlayColor){
-                    student_overlay.css('background',overlayColor);
+                }, 1000);
+
+                function setOverlayColor(overlayColor) {
+                    student_overlay.css('background', overlayColor);
                     return student_overlay.css('background');
                 }
             }
@@ -298,7 +283,6 @@ classroomCommand.setShareScreenServer = function (_data, success, error) {
 classroomCommand.setShareScreenLocal = function (_data) {
     classroomInfo.shareScreen.state = _data.state;
     classroomInfo.shareScreen.id = _data.id;
-    // classroomInfo.shareScreen.streamer = _data.streamer;
     classroomInfoLocal.shareScreen.state = _data.state;
     classroomInfoLocal.shareScreen.id = _data.id;
 };
@@ -313,13 +297,6 @@ classroomCommand.setShareScreenLocal = function (_data) {
 /*
     학생들한테 오는 메시지 처리.
 */
-classroomCommand.onStudentCommand = function (_cmd) {    
-    switch(_cmd.cmd) {
-        case 'pdf-page' :
-            classroomStudentsWatchInfo.setPdfPage (_cmd.from, _cmd.data);
-            break;
-    }
-}
 
 classroomCommand.openFile = function (_url) {   
     mfileViewer.openFile (_url);
@@ -423,7 +400,6 @@ classroomCommand.closeEpub = function () {
 }
 
 classroomCommand.sendEpubCmd = function (_cmd, _data) {
-    
     if(!connection.extra.roomOwner) return;    
     if(classroomInfo.epub.page == _data.page)   return;
 
@@ -440,16 +416,10 @@ classroomCommand.sendEpubCmd = function (_cmd, _data) {
 }
 
 classroomCommand.updateEpubCmd = function (_data) {
-
-    console.log(_data);
-
-    let frame = document
-    .getElementById('widget-container')
-    .getElementsByTagName('iframe')[0].contentWindow;
+    let frame = document.getElementById('widget-container').getElementsByTagName('iframe')[0].contentWindow;
     let epubViewer = frame.document.getElementById('epub-viewer');
-    if(!epubViewer)  return;
 
-    console.log('page');
+    if(!epubViewer)  return;
     switch(_data.cmd)
     {
         case 'page' :            
@@ -461,7 +431,6 @@ classroomCommand.updateEpubCmd = function (_data) {
                 }
             }
             break;
-
         case 'next' :
             document.getElementById('next').click();
             break;
@@ -473,45 +442,12 @@ classroomCommand.updateEpubCmd = function (_data) {
 
 classroomCommand.syncEpub = function () {    
     if(classroomInfo.epub.state) {
-        // open
         classroomCommand.openEpub ();
     }
     else {
-        // close        
         classroomCommand.closeEpub ();     
     }
 };
-
-
-/*
-    방 오픈 경과 시간 동기화
-*/
-
-//--------------------------------------------------------------------------------//
-
-teacherCommand =  {
-
-
-}
-
-
-studentCommand = {
-
-    sendStudentToTeachCmd : function (_cmd, _data) {
-        if(connection.extra.roomOwner)  return;    
-        connection.send ({
-            studentCmd : {
-                from : connection.userid,
-                cmd : _cmd,
-                data : _data
-            }        
-        }, GetOwnerId())
-    },
-
-    sendPdfPage : function (_page) {        
-        this.sendStudentToTeachCmd ('pdf-page', _page);
-    },
-}
 
 let classTimeIntervalHandle;
 
