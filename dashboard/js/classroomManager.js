@@ -256,10 +256,11 @@ class classroomManagerClass {
         classroomCommand.onConnectionSession(event);
         connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
+
         if (!connection.extra.roomOwner) return;
+        logManager.joinStudent(event.userid);
 
         ChattingManager.enterStudent(event);
-
         var id = event.userid;
         var name = event.extra.userFullName;
 

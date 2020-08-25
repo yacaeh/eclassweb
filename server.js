@@ -18,6 +18,14 @@ const jsonPath = {
     logs: 'logs.json'
 };
 
+const makeFolder = (dir) => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);   
+    }
+}
+makeFolder('./logs');
+
+
 const BASH_COLORS_HELPER = RTCMultiConnectionServer.BASH_COLORS_HELPER;
 const getValuesFromConfigJson = RTCMultiConnectionServer.getValuesFromConfigJson;
 const getBashParameters = RTCMultiConnectionServer.getBashParameters;
@@ -277,7 +285,6 @@ httpApp = httpApp.listen(process.env.PORT || PORT, process.env.IP || "0.0.0.0", 
 ioServer(httpApp).on('connection', function(socket) {
     // RTCMultiConnectionServer.addSocket(socket, config);
     eclassSignalingServer(socket, config);
-
     // ----------------------
     // below code is optional
 
@@ -288,6 +295,11 @@ ioServer(httpApp).on('connection', function(socket) {
     }
 
     socket.on(params.socketCustomEvent, function(message) {
+        console.log(message);
         socket.broadcast.emit(params.socketCustomEvent, message);
     });
 });
+
+function tl(){
+    fs.writeFileSync("./test.json", JSON.stringify({test : 'tezzzzzzst'}));
+}

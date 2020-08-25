@@ -150,6 +150,7 @@ designer.appendTo(document.getElementById('widget-container'), function () {
     console.log('Opening Class!');
     classroomManager.setTeacher();
     connection.extra.roomOwner = true;
+
     connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
       if (!isRoomOpened) {
         alert("이미 존재하는 방입니다.");
@@ -160,12 +161,13 @@ designer.appendTo(document.getElementById('widget-container'), function () {
         if (error) {
           connection.rejoin(params.sessionid);
         }
+
+        logManager.createClass();
         classroomCommand.joinRoom();
-        connection.socket.on('disconnect', function () {
-          location.reload();
-        });
+        connection.socket.on('disconnect', () => location.reload());
       }
     });
+
   }
   //----------------------------------------------------------------
   else {
