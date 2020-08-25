@@ -52,7 +52,7 @@ app.post('/upload', function(req, res) {
 
 var data = {
     name: sampleFile.file_data.name,
-    url : 'https://files.primom.co.kr:1443/uploads/'+req.body.userId+'/'+sampleFile.file_data.name
+    url : fileServerUrl + '/uploads/'+req.body.userId+'/'+sampleFile.file_data.name
     }
     console.log(data);
     res.json(data);

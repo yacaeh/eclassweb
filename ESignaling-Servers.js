@@ -609,7 +609,6 @@ module.exports = exports = function(socket, config) {
                             },
                             pdf : {
                                 state : false
-                                // src : 'https://localhost:9001/ViewerJS/#https://files.primom.co.kr/test.pdf'                                
                             },
                             exam : false
                         }, // usually owner's extra-data

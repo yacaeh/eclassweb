@@ -89,14 +89,6 @@ function checkCamAndMicExist(){
     });
 }
 
-// connection.join({
-//     sessionid: connection.channel,
-//     userid: connection.channel,
-//     extra: {},
-//     session: connection.session
-// });
-
-
 function looper() {
     if(ver_time_table)
     connection.socket.emit('get-public-rooms', publicRoomIdentifier, function (listOfRooms) {

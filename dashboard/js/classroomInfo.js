@@ -14,7 +14,7 @@ classroomInfo = {
         state : false,
         page : 0,        
         data : {
-            src : 'https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf'
+            src : undefined
         }   // 어떤 pdf, 몇 페이지 등
     },
     viewer : {

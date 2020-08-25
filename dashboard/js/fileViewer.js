@@ -724,7 +724,7 @@ function getUploadFileList(extraPath) {
         extraPath = "";
 
     var xhr = new XMLHttpRequest();
-    var url = uploadServerUrl + '/list';
+    var url = fileServerUrl + '/list';
     var data = { "userId": params.sessionid, "extraPath": extraPath };
 
     xhr.open("POST", url, true);
@@ -857,7 +857,7 @@ function deleteUploadedFile(filename, extraPath) {
     }
 
     var xhr = new XMLHttpRequest();
-    var url = uploadServerUrl + '/delete';
+    var url = fileServerUrl + '/delete';
     var data = {
         "userId": params.sessionid,
         "name": filename,
@@ -895,7 +895,7 @@ function loadFileInput() {
         $("#file-explorer").fileinput({
             'theme': 'explorer-fas',
             'language': 'kr',
-            'uploadUrl': 'https://files.primom.co.kr:1443/upload',
+            'uploadUrl': fileServerUrl + '/upload',
             fileActionSettings: {
                 showZoom: false,
             },
@@ -904,9 +904,9 @@ function loadFileInput() {
             overwriteInitial: false,
             initialPreviewAsData: true,
             initialPreview: [
-                // "https://files.primom.co.kr/test.pdf",
-                // "https://files.primom.co.kr/epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
-                // "https://files.primom.co.kr/small.mp4"
+                // fileServerUrl + "test.pdf",
+                // fileServerUrl + "epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
+                // fileServerUrl + "small.mp4"
             ],
             initialPreviewConfig: [
                 // {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
