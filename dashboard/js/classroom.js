@@ -12,8 +12,6 @@
   window.params = params;
 })();
 
-const uploadServerUrl = "https://files.primom.co.kr:1443";
-
 //=============================================================================================
 
 var debug               = false;

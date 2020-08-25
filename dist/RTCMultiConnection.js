@@ -1482,11 +1482,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
             var servers = {
                 iceServers: [{
-                    urls: 'stun:stun.l.google.com:19302'
+                    urls: turnData.stunURI
                 },{ 
-                    urls : 'turn:turn.primom.co.kr:3478', 
-                    credential : 'webrtc',
-                    username: 'primomceo'
+                    urls : turnData.turnURI, 
+                    credential : turnData.turnCredential,
+                    username: turnData.turnUsername
                 }]
             };
 
@@ -3373,14 +3373,14 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     'stun:stun.l.google.com:19302?transport=udp',
                 ]
             },{ 
-                'urls' : ['turn:turn.primom.co.kr:3478'], 
-                'credential' : 'webrtc',
-                'username': 'primomceo'
+                'urls' : [turnData.turnURI], 
+                'credential' : turnData.turnCredential,
+                'username': turnData.turnUsername
             },
             { 
-                'urls' : ['turn:turn.primom.co.kr:3478?transport=udp'], 
-                'credential' : 'webrtc',
-                'username': 'primomceo'
+                'urls' : [turnData.turnURI + '?transport=udp'], 
+                'credential' : turnData.turnCredential,
+                'username': turnData.turnUsername
             }];
 
             return iceServers;
@@ -3389,8 +3389,9 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         return {
             getIceServers: getIceServers
         };
-    })();
 
+    })();
+    IceServersHandler.getIceServers
     // getUserMediaHandler.js
 
     function setStreamType(constraints, stream) {

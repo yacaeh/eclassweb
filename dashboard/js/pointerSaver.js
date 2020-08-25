@@ -34,7 +34,7 @@ class PointerSaver {
     }
     save_container(){
         this.save();
-        let url = uploadServerUrl + '/point';
+        let url = fileServerUrl + '/point';
         let name = connection.extra.userFullName;
         let data = {
             filepath : this.path,

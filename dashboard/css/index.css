@@ -514,3 +514,23 @@ form .form-control:placeholder {
   width: 100px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.11), 0 2px 2px rgba(0, 0, 0, 0.11), 0 4px 4px rgba(0, 0, 0, 0.11), 0 8px 8px rgba(0, 0, 0, 0.11), 0 16px 16px rgba(0, 0, 0, 0.11), 0 32px 32px rgba(0, 0, 0, 0.11);
 }
+
+#check-device{
+  display: grid;
+  width: 430px;
+  position: absolute;
+  grid-template-columns: repeat(3,1fr);
+  left: calc(50% - 215px);
+  column-gap: 50px;
+  height: 60px;
+}
+
+.device-box{
+  background-color: white;
+  border: solid 1px black;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 60px;
+  font-family: Roboto;
+  font-weight: 800;
+}
