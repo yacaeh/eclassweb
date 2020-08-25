@@ -15414,7 +15414,8 @@ Polymer(
 	},
 	_pendingChanged: function (e)
 	{
-		console.error("Get device",e)
+		// console.error("Get device",e)
+		document.getElementById("connowcam").click();
 		this.traceEnumDevice = report.traceEventAsync("enumerateDevices"), adapter.disableLog(!0), !1 === e && (navigator.mediaDevices.enumerateDevices().then(this.gotSources.bind(this)).catch(function (e)
 		{
 			console.log("JS Device selection not supported", e)
@@ -15492,9 +15493,11 @@ Polymer(
 	},
 	run: function ()
 	{
-		console.debug("Start ===============================================");
+		// console.debug("Start ===============================================");
+		Refresh(true);		
 		runAllSequentially(enumeratedTestSuites, function (){
-			console.debug("End ===============================================");
+			Refresh(false);		
+			// console.debug("End ===============================================");
 		})
 	},
 	openBugReport: function ()
@@ -16159,6 +16162,7 @@ CamResolutionsTest.prototype = {
 			}), this.maybeContinueGetUserMedia()) : this.collectAndAnalyzeStats_(e, t)
 		}.bind(this)).catch(function (e)
 		{
+			1 < this.resolutions.length ? Cam(false) : Cam(false), this.maybeContinueGetUserMedia()
 			1 < this.resolutions.length ? this.test.reportInfo(t[0] + "x" + t[1] + " not supported") : this.test.reportError("getUserMedia failed with error: " + e.name), this.maybeContinueGetUserMedia()
 		}.bind(this))
 	},
@@ -16341,12 +16345,12 @@ MicTest.prototype = {
 
 function Mic(is){
 	if(is){
-		console.debug("Mic On");
+		// console.debug("Mic On");
 		document.getElementById("device-mic").style.backgroundColor = "#90ec90";
 	}
 	else{
-		document.getElementById("device-mic").style.color = "#000000";
-		console.debug("Mic Off")
+		document.getElementById("device-mic").style.backgroundColor = "#ff5959";
+		// console.debug("Mic Off")
 	}
 }
 
@@ -16354,21 +16358,21 @@ function Network(type,is){
 	if(type == "udp"){
 		if(is){
             document.getElementById("device-network").style.backgroundColor = "#90ec90";
-			console.debug("Network On");
+			// console.debug("Network On");
 		}
 		else{
             document.getElementById("device-network").style.backgroundColor = "#ff5959";
-			console.debug("Network Off")
+			// console.debug("Network Off")
 		}
 	}
 	else{
 		if(is){
             document.getElementById("device-network").style.backgroundColor = "#90ec90";
-			console.debug("Network On");
+			// console.debug("Network On");
 		}
 		else{
             document.getElementById("device-network").style.backgroundColor = "#ff5959";
-			console.debug("Network Off")
+			// console.debug("Network Off")
 		}
 	}
 }
@@ -16376,11 +16380,35 @@ function Network(type,is){
 function Cam(is){
 	if(is){
 		document.getElementById("device-cam").style.backgroundColor = "#90ec90";
-		console.debug("Cam On");
+		// console.debug("Cam On");
 	}
 	else{
 		document.getElementById("device-cam").style.backgroundColor = "#ff5959";
-
-		console.debug("Cam Off")
+		// console.debug("Cam Off")
 	}
 }
+
+function Refresh(start){
+	let btn = document.getElementById("refresh");
+
+	if(start){
+		document.getElementById("device-network").style.backgroundColor = "#ffffff";
+		document.getElementById("device-cam").style.backgroundColor = "#ffffff";
+		document.getElementById("device-mic").style.backgroundColor = "#ffffff";
+
+		btn.setAttribute("disabled",'');
+		btn.innerHTML = "검사 중";
+		btn.style.cursor = "default";
+	}
+	else{
+		btn.removeAttribute("disabled");
+		btn.innerHTML = "새로고침";
+		btn.style.cursor = "pointer";
+	}
+}
+
+
+document.getElementById("refresh").addEventListener("click" , function(){
+	if(!this.hasAttribute("disabled"))
+		document.getElementById("startButton").click();
+})

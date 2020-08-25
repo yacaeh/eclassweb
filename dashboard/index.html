@@ -15,6 +15,7 @@
   <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
   <link href="/dashboard/css/index.css" rel="stylesheet">
 
+  <script src="/dashboard/js/config.js"></script>
   <script src="/dashboard/js/lib/jquery-3.3.1.min.js"></script>
   <script src="/dashboard/js/lib/popper.min.js"></script>
   <script src="/dashboard/js/lib/bootstrap.min.js"></script>
@@ -206,6 +207,7 @@
       <div id="device-mic" class="device-box">마이크</div>
       <div id="device-network" class="device-box">네트워크</div>
     </div>
+    <div id="refresh" >새로고침</div>
 
     <input placeholder="이름" id="user-name">
 
@@ -244,15 +246,14 @@
       <template>
         <gum-handler style="border: 1px solid black;" pending="{{pending}}" error="{{error}}"></gum-handler>
         <paper-dialog style= "background-color: white; border: 1px solid black;" id="dialog" opened="{{pending}}" modal="">
-          <h2>{{heading}}</h2>
           <div hidden$="[[!error]]" class="buttons" horizontal="" justified="" layout="">
-            <paper-button dialog-dismiss="">Continue without audio/or video</paper-button>
+            <paper-button id="connowcam" dialog-dismiss="">Continue without audio/or video</paper-button>
           </div>
         </paper-dialog>
       </template>
     </dom-module>
   
-    <dom-module style="display: none;" id="testrtc-main" assetpath="ui/">
+    <dom-module id="testrtc-main" assetpath="ui/">
       <template>
         <gum-dialog heading="Welcome to WebRTC Troubleshooter" pending="{{pending}}"></gum-dialog>
         <paper-toolbar class="titlebar">
@@ -274,15 +275,14 @@
   
   </div>
   
-    <testrtc-main style="display: none;"></testrtc-main>
+    <testrtc-main style="display: none;" ></testrtc-main>
     <div style="display: none;" id="content" class="main"></div>
 
   </div>
 
   <script src="/dashboard/js/index.js"></script>
   <script src="/dashboard/js/time_table.js"></script>
-  <script src="/dashboard/js/config.js"></script>
-  <script src="devicetester.js"></script>
+  <script src="/dashboard/js/devicetester.js"></script>
 
 </body>
 

@@ -534,3 +534,18 @@ form .form-control:placeholder {
   font-family: Roboto;
   font-weight: 800;
 }
+
+#refresh{
+  background-color: white;
+  position: relative;
+  border: solid 1px black;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 60px;
+  font-family: Roboto;
+  font-weight: 800;
+  width: 110px;
+  left: calc(50% - 55px);
+  top: 100px;
+  cursor: pointer;
+}
