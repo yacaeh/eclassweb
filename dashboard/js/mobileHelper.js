@@ -234,6 +234,9 @@ class mobileHelperClass{
         function ChatSetting(){
             let widget = document.getElementById("widget-container");
             let chatinput = document.getElementsByClassName("emojionearea-inline")[0]
+            console.log(chatinput);
+            console.log(widget.firstChild);
+            console.log(widget);
             widget.insertBefore( chatinput ,widget.firstChild)
             AppendInFrame(mobileHelper.conversationPanel);
             let div = document.createElement("div");

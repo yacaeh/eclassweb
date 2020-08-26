@@ -103,15 +103,16 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: false,
 };
 
+ChattingManager.init();
+
 window.onWidgetLoaded = function () {
   examObj.init();
-  mobileHelper.init();
   pageNavigator.init();
   canvasManager.init();
-  ChattingManager.init();
   permissionManager.init();
   canvasManager.setCanvasButtons(canvasButtonContents);
   classroomManager.init(shortCut, topButtonContents);
+  mobileHelper.init();
 }
 
 connection.onopen = function (event) {
@@ -131,10 +132,13 @@ connection.onstream = function (event) {
     return;
 
   if (params.open === 'true' || params.open === true) {
-    permissionManager.mute();
     maincamManager.addStudentCam(event);
   }
   else{
+    if(event.type == "local" && event.stream.isVideo){
+      permissionManager.muteAudio(event);
+    }
+
     maincamManager.addTeacherCam(event);
   }
 };
