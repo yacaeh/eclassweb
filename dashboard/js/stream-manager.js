@@ -380,8 +380,6 @@ class ScreenShareManagerClass{
         try{
           var stream = connection.streamEvents[event.data.showScreenShare].stream;
           var parent =  screenshareManager.get().parentElement;
-          console.log(parent);
-
           parent.removeChild(screenshareManager.get());
           let element = connection.streamEvents[event.data.showScreenShare].mediaElement;
           element.id = "screen-viewer";
@@ -389,9 +387,14 @@ class ScreenShareManagerClass{
           parent.appendChild(element);
           screenshareManager.show();
           screenshareManager.srcObject(stream);
-          clearInterval(inter);
+          element.play();
+          console.log(element.paused)
+
+          if(!element.paused)
+            clearInterval(inter);
         }
         catch(error){
+          console.warn(error)
         }
       },500);
 
