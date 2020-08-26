@@ -3581,15 +3581,18 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     streaming(stream);
                 }).catch(function(error) {
                     console.error(error);
+
                     if(error.name == "NotReadableError" && error.message == "Could not start video source"){
                         option.video = false;
                         getMedia(option);
                         return;
                     };
-                    var st = document.createElement("canvas").captureStream();
-                    st.stid = getRandomString();
-                    st.idInstance = idInstance;
-                    streaming(st);
+                    options.onLocalMediaError(error, options.localMediaConstraints);
+
+                    // var st = document.createElement("canvas").captureStream();
+                    // st.stid = getRandomString();
+                    // st.idInstance = idInstance;
+                    // streaming(st);
                 })
             }
         }
@@ -4425,6 +4428,8 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     joinRoom(connectionDescription, cb);
                 });
             });
+
+            console.log(connectionDescription);
             return connectionDescription;
         };
 
@@ -5370,9 +5375,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             connection.session.audio = false;
             connection.session.video = false;
             console.log("mediaError but join");
-            connection.join({sessionid:connection.sessionid,
-                userid: connection.channel,
-                session: connection.session});
+            connection.join({
+                sessionid   :connection.sessionid,
+                userid      : connection.channel,
+                session     : connection.session
+            });
         };
 
         connection.autoCloseEntireSession = false;

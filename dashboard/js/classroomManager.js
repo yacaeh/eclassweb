@@ -140,6 +140,8 @@ class classroomManagerClass {
     };
 
     setTeacher() {
+        connection.extra.roomOwner = true;
+
         let frame = GetWidgetFrame();
         document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
         $("#my-name").remove();
@@ -419,6 +421,79 @@ class classroomManagerClass {
             }
           });
     };
+
+    createRoom(){
+        console.log('Opening Class!');
+        classroomManager.setTeacher();
+        connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
+            console.log("TQ")
+            if (!isRoomOpened) {
+                alert("이미 존재하는 방입니다.");
+                classroomManager.gotoMain();
+            }
+            else if (error) {
+                connection.rejoin(params.sessionid);
+            }
+            else {
+                classroomCommand.joinRoom();
+                connection.socket.on('disconnect', () => location.reload())
+            }
+        });
+    };
+
+    joinRoom(){
+        classroomManager.setStudent();
+
+        console.log('try joining!');
+    
+        connection.join({
+            sessionid: params.sessionid,
+            userid: connection.channel,
+            session: connection.session
+        }, function (isRoomJoined, roomid, error) {
+            console.log('Joing Class!');
+    
+            if (error) {
+              console.log('Joing Error!');
+              if (error === connection.errors.ROOM_NOT_AVAILABLE) {
+                // alert("방이 존재하지 않습니다.");
+                location.reload();
+                return;
+              }
+              if (error === connection.errors.ROOM_FULL) {
+                alert("방이 가득 찼습니다.");
+                classroomManager.gotoMain();
+                return;
+              }
+              if (error === connection.errors.INVALID_PASSWORD) {
+                connection.password = prompt('Please enter room password.') || '';
+                if (!connection.password.length) {
+                  alert('Invalid password.');
+                  return;
+                }
+                connection.join(params.sessionid, function (
+                  isRoomJoined,
+                  roomid,
+                  error
+                ) {
+                  if (error) {
+                    alert(error);
+                  }
+                });
+                return;
+              }
+              alert(error);
+            }
+            
+            connection.socket.on('disconnect', function () {
+              console.log('disconnect Class!');
+              location.reload();
+            });
+
+            console.log('isRoomJoined', isRoomJoined);
+          }
+        );
+    }
 
     eventListener(event){
         if (event.data.onFocus) {

@@ -318,6 +318,7 @@ button[disabled] {
   left: 1px;
   top: max(30px, 4%);
   height: 25%;
+  border: solid 1px black;
 }
 
 hr {

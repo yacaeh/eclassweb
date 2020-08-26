@@ -116,6 +116,7 @@ window.onWidgetLoaded = function () {
 
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
+  classroomCommand.joinRoom();
   classroomManager.joinStudent(event);
 };
 
@@ -147,83 +148,10 @@ designer.appendTo(document.getElementById('widget-container'), function () {
   console.log('designer append');
 
   if (params.open === true || params.open === 'true') {
-    console.log('Opening Class!');
-    classroomManager.setTeacher();
-    connection.extra.roomOwner = true;
-    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-      if (!isRoomOpened) {
-        alert("이미 존재하는 방입니다.");
-        var href = location.protocol + "//" + location.host + "/dashboard/";
-        window.open(href, "_self");
-      }
-      else {
-        if (error) {
-          connection.rejoin(params.sessionid);
-        }
-        classroomCommand.joinRoom();
-        connection.socket.on('disconnect', function () {
-          location.reload();
-        });
-      }
-    });
+    classroomManager.createRoom();
   }
-  //----------------------------------------------------------------
   else {
-    classroomManager.setStudent();
-
-    console.log('try joining!');
-    connection.DetectRTC.load(function () {
-    });
-
-    connection.join({
-        sessionid: params.sessionid,
-        userid: connection.channel,
-        session: connection.session
-      }, function (isRoomJoined, roomid, error) {
-        console.log('Joing Class!');
-
-        if (error) {
-          console.log('Joing Error!');
-          if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            // alert("방이 존재하지 않습니다.");
-            location.reload();
-            return;
-          }
-          if (error === connection.errors.ROOM_FULL) {
-            alert("방이 가득 찼습니다.");
-            classroomManager.gotoMain();
-            return;
-          }
-          if (error === connection.errors.INVALID_PASSWORD) {
-            connection.password = prompt('Please enter room password.') || '';
-            if (!connection.password.length) {
-              alert('Invalid password.');
-              return;
-            }
-            connection.join(params.sessionid, function (
-              isRoomJoined,
-              roomid,
-              error
-            ) {
-              if (error) {
-                alert(error);
-              }
-            });
-            return;
-          }
-          alert(error);
-        }
-
-        classroomCommand.joinRoom();
-        connection.socket.on('disconnect', function () {
-          console.log('disconnect Class!');
-          location.reload();
-        });
-        console.log('isRoomJoined', isRoomJoined);
-
-
-      }
-    );
+    classroomManager.joinRoom();
   }
   onWidgetLoaded();
 });
