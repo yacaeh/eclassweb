@@ -426,7 +426,6 @@ class classroomManagerClass {
         console.log('Opening Class!');
         classroomManager.setTeacher();
         connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-            console.log("TQ")
             if (!isRoomOpened) {
                 alert("이미 존재하는 방입니다.");
                 classroomManager.gotoMain();

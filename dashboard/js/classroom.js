@@ -136,7 +136,8 @@ connection.onstream = function (event) {
   }
   else{
     if(event.type == "local" && event.stream.isVideo){
-      permissionManager.muteAudio(event);
+      event.mediaElement.pause();
+      event.stream.mute("audio");
     }
 
     maincamManager.addTeacherCam(event);

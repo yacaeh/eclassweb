@@ -98,13 +98,6 @@ class permissionManagerClass{
         e.unmute("audio");
     })
   }
-  muteAudio(event){
-
-    console.log(event)
-    event.mediaElement.pause();
-
-    event.stream.mute("audio");
-  };
 
   IsCanvasPermission(id) {
     if (classroomInfo.canvasPermission.indexOf(id) == -1)
