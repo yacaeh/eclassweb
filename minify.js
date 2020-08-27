@@ -3,6 +3,12 @@ const fs = require('fs')
 const readline = require('readline')
 const path = "./dashboard/js";
 
+let terserOptions = {
+    compress: {
+        drop_console : true
+    },
+}
+
 if (!fs.existsSync(path + '/original'))
     fs.mkdirSync(path + '/original')
 
@@ -42,7 +48,7 @@ function Minify() {
         console.log(file)
         var z = fs.readFileSync(path + "/" + file, 'utf8')
         var code = z;
-        minify.minify(code).then((min) => {
+        minify.minify(code, terserOptions).then((min) => {
             let filepath = path + '/' + file;
             fs.copyFileSync(path + '/' + file, path + '/original/' + file)
             fs.writeFileSync(filepath, min.code);
