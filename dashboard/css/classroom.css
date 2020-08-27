@@ -316,9 +316,8 @@ button[disabled] {
   border-bottom: 1px solid #121010;
   padding-bottom: 1px;
   left: 1px;
-  top: max(30px, 4%);
-  height: 25%;
-  border: solid 1px black;
+  top: max(30px, 5%);
+  height: 24%;
 }
 
 hr {
@@ -394,7 +393,7 @@ hr {
 }
 
 
-.right-tab {
+right-tab {
   position: absolute;
   width: 17.7%;
   bottom: 0px;
@@ -1524,29 +1523,6 @@ video::-webkit-media-controls-volume-slider {
 #toptooltip > .text{
 margin: 10px;
 }
-
-/* 
-
-@media(max-width:700px){
-  .right-tab,
-  .nos_student_text,
-  .nos_student_icon {
-    display: none;
-    width: 0px;
-  }
-
-  #screen-viewer {
-    position: fixed;
-    top: 0px !important;
-    left: 0px !important;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 9999999999999;
-    display: none;
-  }
-  
-}
- */
 
 body:fullscreen {
   background-color: rgb(255, 255, 255);
