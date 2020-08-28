@@ -1239,7 +1239,7 @@ function canvasresize(id){
             };
             image.src = data_uris.clearCanvas;
 
-            document.querySelector('#clearCanvas').onclick = () => {
+            document.querySelector('#clearCanvas').onclick = function(){
                 if(this.classList.contains('off'))
                 return false;
 
@@ -1304,7 +1304,7 @@ function canvasresize(id){
             };
             image.src = data_uris.on;
             
-            document.querySelector('#onoff-icon').onclick = () => {
+            document.querySelector('#onoff-icon').onclick = function(){
                 this.classList.toggle("on");
                 // this.classList.toggle("off");
 
