@@ -9,10 +9,10 @@ class attentionManagerClass{
     }
 
     callAttend(){
-        var callback = function () {
-            var chilldren = document.getElementById('student_list').children;
-            for (var i = 0; i < chilldren.length; i++) {
-                var al = chilldren[i].getElementsByClassName('bor')[0];
+        let callback = function () {
+            let chilldren = document.getElementById('student_list').children;
+            for (let i = 0; i < chilldren.length; i++) {
+                let al = chilldren[i].getElementsByClassName('bor')[0];
                 if (!al)
                     continue;
                 al.className = "bor";
@@ -89,9 +89,9 @@ class attentionManagerClass{
    
     
         function s2ab(s) { 
-            var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
-            var view = new Uint8Array(buf);  //create uint8array as viewer
-            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+            let buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+            let view = new Uint8Array(buf);  //create uint8array as viewer
+            for (let i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
             return buf;    
         }
 
@@ -108,7 +108,7 @@ class attentionManagerClass{
         
         let row = 1;
 
-        var answer = this.studentsAnswer;
+        let answer = this.studentsAnswer;
         Object.keys(this.studentsAnswer).forEach(function(id){
             const submit = answer[id];
             let content = contents[row];
@@ -134,9 +134,9 @@ class attentionManagerClass{
     }; 
 
     resetBorder(){
-        var chilldren = document.getElementById('student_list').children;
-        for (var i = 0; i < chilldren.length; i++) {
-            var al = chilldren[i].getElementsByClassName('bor')[0];
+        let chilldren = document.getElementById('student_list').children;
+        for (let i = 0; i < chilldren.length; i++) {
+            let al = chilldren[i].getElementsByClassName('bor')[0];
             if (!al)
                 continue;
             al.className = "bor";

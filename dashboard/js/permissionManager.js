@@ -4,7 +4,7 @@ class permissionManagerClass{
   }
 
   init() {
-    $(window).click(function (e) {
+    window.addEventListener("click", (e) => {
       if (document.getElementById('student-menu').contains(e.target)) return false;
       if ($(e.target).hasClass('student')) return false;
       if ($('#student-menu').show()) $('#student-menu').hide();
@@ -59,65 +59,34 @@ class permissionManagerClass{
       return true;
     }
 
-    if (event.data.unmute) {
-      permissionManager.unmute(event.data.unmute);
-      return true;
-    }
-
-    if (event.data.mute) {
-      permissionManager.mute();
-      return true;
-    }
-
     if (event.data.classPermissionChanged) {
-      if (event.data.on)
-        permissionManager.setClassPermission();
-      else
-        permissionManager.disableClassPermission();
-
+      event.data.on ? permissionManager.setClassPermission() : permissionManager.disableClassPermission();
       return true;
     }
 
     if (event.data.micPermissionChanged) {
-      if (event.data.on)
-        permissionManager.setMicPermission(event.data.id);
-      else
-        permissionManager.disableMicPermission();
+      event.data.on ? permissionManager.setMicPermission() : permissionManager.disableMicPermission()
       return true;
     }
 
     if (event.data.canvasPermissionChanged) {
-      if (event.data.on) {
-        permissionManager.setCanvasPermission(event.data.id);
-      }
-      else {
-        permissionManager.disableCanvasPermission(event.data.id);
-      }
+      event.data.on ? permissionManager.setCanvasPermission(event.data.id) : permissionManager.disableCanvasPermission(event.data.id)
       return true;
     }
   }
   mute(){
-    connection.streamEvents.selectAll().forEach(function (e) {
-      if (e.stream.isVideo && !e.extra.roomOwner && e.userid != classroomInfo.micPermission) {
-        e.mediaElement.volume = 0;
-      }
+    connection.attachStreams.forEach(function(e){
+      if(e.isVideo)
+        e.mute("audio");
     })
-
-    if (connection.extra.roomOwner) {
-      connection.send({ mute: true });
-    }
   }
-  unmute(id){
-    connection.streamEvents.selectAll().forEach(function (e) {
-      if (e.stream.isVideo && e.userid == id && !e.extra.roomOwner) {
-        e.mediaElement.volume = 1;
-      }
+  unmute(){
+    connection.attachStreams.forEach(function(e){
+      if(e.isVideo)
+        e.unmute("audio");
     })
-
-    if (connection.extra.roomOwner) {
-      connection.send({ unmute: id });
-    }
   }
+
   IsCanvasPermission(id) {
     if (classroomInfo.canvasPermission.indexOf(id) == -1)
       return false;
@@ -150,7 +119,6 @@ class permissionManagerClass{
   AddMicPermission(id) {
     console.log("Mic permission added", id);
     classroomInfo.micPermission = id;
-    permissionManager.unmute(id);
     FindInList(id).dataset.micPermission = true;
     MakeIcon(id, "mic");
 
@@ -158,12 +126,11 @@ class permissionManagerClass{
       micPermissionChanged: true,
       id: id,
       on: true
-    })
+    }, id)
   }
   DeleteMicPermission(id) {
     console.log("Mic permission removed", id);
     classroomInfo.micPermission = undefined;
-    permissionManager.mute();
     FindInList(id).dataset.micPermission = false;
     DeleteIcon(id, "mic");
 
@@ -171,7 +138,7 @@ class permissionManagerClass{
       micPermissionChanged: true,
       id: id,
       on: false
-    })
+    }, id)
   }
   AddCanvasPermission(id) {
     classroomInfo.canvasPermission.push(id);
@@ -219,14 +186,10 @@ class permissionManagerClass{
 
     window.permission = false;
   }
-  setMicPermission(id) {
-    if (connection.userid == id) {
-      console.log("GET MIC PERMISSION");
-      document.getElementById("mic_permission").innerHTML = "마이크 권한";
-    }
-    else {
-      this.unmute();
-    }
+  setMicPermission() {
+    console.log("GET MIC PERMISSION");
+    document.getElementById("mic_permission").innerHTML = "마이크 권한";
+    this.unmute();
   }
   setCanvasPermission(id) {
     console.log("GET CANVAS PERMISSION");
@@ -254,28 +217,31 @@ class permissionManagerClass{
 function OnClickStudent(div) {
   div.click(function (e) {
     var menu = document.getElementById('student-menu');
-    permissionManager.nowSelectStudent = e.target;
     var name = e.target.dataset.name;
-    var pid = e.target.dataset.id;
+
+    permissionManager.nowSelectStudent = e.target;
 
     SetBtn("classP", e.target.dataset.classPermission);
     SetBtn("micP", e.target.dataset.micPermission);
     SetBtn("canP", e.target.dataset.canvasPermission);
 
     function SetBtn(id, ispermission) {
-      $('#' + id).clearQueue();
-      $('#' + id + '> .circle').clearQueue();
+      let btn =  $('#' + id);
+      let circle = $('#' + id + '> .circle');
+
+      btn.clearQueue();
+      circle.clearQueue();
 
       if (ispermission == 'true') {
-        $('#' + id).css({ 'background-color': '#18dbbe' });
-        $('#' + id + '> .circle').css({ left: '22px' });
-        $('#' + id).addClass('on');
-        $('#' + id).removeClass('off');
+        btn.css({ 'background-color': '#18dbbe' });
+        circle.css({ left: '22px' });
+        btn.addClass('on');
+        btn.removeClass('off');
       } else {
-        $('#' + id).css({ 'background-color': 'gray', });
-        $('#' + id + '> .circle').css({ left: '2px', });
-        $('#' + id).addClass('off');
-        $('#' + id).removeClass('on');
+        btn.css({ 'background-color': 'gray', });
+        circle.css({ left: '2px', });
+        btn.addClass('off');
+        btn.removeClass('on');
       }
     }
 

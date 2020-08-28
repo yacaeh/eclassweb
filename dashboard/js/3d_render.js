@@ -164,14 +164,12 @@ function sync3DModel() {
 }
 
 function setShared3DStateServer(_state) {
-    if (!connection.extra.roomOwner) return;
     connection.socket.emit('toggle-share-3D', (result) => {
         if (result.result) {
             setShared3DStateLocal(result.data);
             connection.send({
                 modelEnable: { enable: classroomInfo.share3D.state }
             });
-        } else {
         }
     })
 }
@@ -180,12 +178,7 @@ function setShared3DStateLocal(_state) {
     classroomInfo.share3D.state = _state;
     top_3d_button.toggle('top_3d_on');
     top_3d_button.toggle('top_3d_off')
-    if (_state) {
-        modelEnable();
-    }
-    else {
-        remove3DCanvas();
-    }
+    _state ? modelEnable() : remove3DCanvas();
 }
 
 
@@ -194,17 +187,9 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
-    canvasManager.clear();
     
-    if (params.open == 'true') {
-        const isViewer = classroomInfo.share3D.state;
-        if (false == isViewer) {
-            isSharing3D = true;
-            setShared3DStateServer(true);
-        }
-        else {
-            isSharing3D = false;
-            setShared3DStateServer(false);
-        }
-    }
+    canvasManager.clear();
+    const isViewer = classroomInfo.share3D.state;
+    isSharing3D = !isViewer;
+    setShared3DStateServer(!isViewer);
 }

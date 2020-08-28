@@ -38,7 +38,7 @@ class epubManagerClass{
         this.isEpubViewer = true;
         console.log("Load Epub viewer");
     
-        document.getElementById("widget-container").style.width - 50;
+        widgetContainer.style.width - 50;
     
         let epubViewer = document.createElement('div');
         epubViewer.setAttribute('id', 'epub-viewer');
@@ -80,10 +80,7 @@ class epubManagerClass{
         if (connection.extra.roomOwner)
             displayed = rendition.display();
         else {
-            if (classroomInfo.epub.page)
-                displayed = rendition.display(classroomInfo.epub.page);
-            else
-                displayed = rendition.display();
+            classroomInfo.epub.page ? displayed = rendition.display(classroomInfo.epub.page) : displayed = rendition.display();
         }
     
         displayed.then(function (renderer) {
@@ -101,9 +98,9 @@ class epubManagerClass{
             pageNavigator.epubsetting();
     
             Object.keys(book.package.manifest).forEach(function (e) {
-                var href = book.package.manifest[e].href;
+                let href = book.package.manifest[e].href;
                 if (href.includes("thumbnail")) {
-                    var img = document.createElement("img");
+                    let img = document.createElement("img");
                     img.src = location + href;
                     pageNavigator.push(img, function () {
                         rendition.display(this.getAttribute("idx"));

@@ -13,39 +13,41 @@ class mobileHelperClass{
     }
     setMobile(){
         this.isMobile = true;
-        document.getElementById("widget-container").style.right = "0px";
+        widgetContainer.style.right = "0px";
         ChatSetting();
         FullScreenBtnInit();
         ToolSetting();
-        $(".right-tab").css({display:"none", width : "0px"})
+        rightTab.style.display = "none";
+        rightTab.style.width = "0px";
         classroomManager.canvasResize();
         MainCamSetting();
 
         function ToolSetting(){
-            var doc = GetDoc();
-            doc.getElementById("tool-box").removeChild(doc.getElementsByClassName("tooldivide")[0])
-            doc.getElementById("tool-box").removeChild(doc.getElementById("screen_share"))
-            doc.getElementById("tool-box").removeChild(doc.getElementById("textIcon"))
-            doc.getElementById("tool-box").removeChild(doc.getElementById("clearCanvas"))
-            doc.getElementById("tool-box").removeChild(doc.getElementById("undo"))
+            let doc = GetDoc();
+            let toolbox = doc.getElementById("tool-box");
+            toolbox.removeChild(doc.getElementsByClassName("tooldivide")[0])
+            toolbox.removeChild(doc.getElementById("screen_share"))
+            toolbox.removeChild(doc.getElementById("textIcon"))
+            toolbox.removeChild(doc.getElementById("clearCanvas"))
+            toolbox.removeChild(doc.getElementById("undo"))
         }
 
         function MainCamSetting(){
-            var video = maincamManager.get();
-            var x = 0;
-            var y = 0;
-            var lastleft = 0;
-            var lastTop =0 ;
+            let video = maincamManager.get();
+            let x = 0;
+            let y = 0;
+            let lastleft = 0;
+            let lastTop =0 ;
             video.controls = false;
-            var timeout = null;
-            var isTouch = false;
+            let timeout = null;
+            let isTouch = false;
         
             addEvent(video, "touchstart mousedown", function(e){
                 if(timeout != null){
                     clearTimeout(timeout);
                     timeout = null;
                     if(!video.classList.contains("full")){
-                        var rect = GetDoc().body.getBoundingClientRect();
+                        let rect = GetDoc().body.getBoundingClientRect();
                         console.log(rect);
         
                         lastleft = video.style.left;
@@ -94,9 +96,9 @@ class mobileHelperClass{
                 x -= e.pageX;
                 y -= e.pageY;
         
-                var rect = video.getBoundingClientRect();
-                var left = rect.left - x;
-                var top = rect.top - y;
+                let rect = video.getBoundingClientRect();
+                let left = rect.left - x;
+                let top = rect.top - y;
         
                 x = e.pageX;
                 y = e.pageY;
@@ -104,8 +106,8 @@ class mobileHelperClass{
                 if(left < 0 || top < 0)
                     return false;
         
-                var canvaswidth = GetDoc().body.getBoundingClientRect().width;
-                var canvasheight = GetDoc().body.getBoundingClientRect().height;
+                let canvaswidth = GetDoc().body.getBoundingClientRect().width;
+                let canvasheight = GetDoc().body.getBoundingClientRect().height;
         
                 if(left + rect.width > canvaswidth ||
                     top + rect.height > canvasheight
@@ -126,12 +128,12 @@ class mobileHelperClass{
         
             window.addEventListener("orientationchange", function(e){
                 setTimeout(function(){
-                    var canvaswidth = GetDoc().body.getBoundingClientRect().width;
-                    var canvasheight = GetDoc().body.getBoundingClientRect().height;
-                    var rect = video.getBoundingClientRect();
+                    let canvaswidth = GetDoc().body.getBoundingClientRect().width;
+                    let canvasheight = GetDoc().body.getBoundingClientRect().height;
+                    let rect = video.getBoundingClientRect();
         
-                    var x = rect.x + rect.width;
-                    var y = rect.y + rect.height; 
+                    let x = rect.x + rect.width;
+                    let y = rect.y + rect.height; 
                     if(x > canvaswidth){
                         video.style.left = canvaswidth - rect.width + "px";
                     }
@@ -148,13 +150,13 @@ class mobileHelperClass{
         }
 
         function FullScreenBtnInit() {
-            var doc = GetDoc();
-            var btn = doc.getElementById("full");
+            let doc = GetDoc();
+            let btn = doc.getElementById("full");
             btn.classList.add("fullscreen");
             btn.classList.add("off");            
             btn.style.display = 'block';
-            var context = btn.getContext('2d');
-            var image = new Image();
+            let context = btn.getContext('2d');
+            let image = new Image();
         
             image.onload = function() {
                 context.clearRect(0, 0, 28, 28);
@@ -164,7 +166,7 @@ class mobileHelperClass{
             btn.addEventListener('click' ,function(){
                 
                 if(btn.classList.contains("off")){
-                    var promise = document.getElementById("widget-container").requestFullscreen();
+                    var promise = widgetContainer.requestFullscreen();
                     image.src = "/dashboard/img/cam_min.png";
                 }
                 else{
@@ -184,7 +186,7 @@ class mobileHelperClass{
         }
 
         function TouchConverter(e){
-            var r = {
+            let r = {
                 pageX : e.touches[0].pageX,
                 pageY : e.touches[0].pageY,
             }   
@@ -210,8 +212,8 @@ class mobileHelperClass{
         
         function addEvent(element, eventType, callback) {
             if (eventType.split(' ').length > 1) {
-                var events = eventType.split(' ');
-                for (var i = 0; i < events.length; i++) {
+                let events = eventType.split(' ');
+                for (let i = 0; i < events.length; i++) {
                     addEvent(element, events[i], callback);
                 }
                 return;
@@ -232,8 +234,11 @@ class mobileHelperClass{
             return GetWidgetFrame().document;
         }
         function ChatSetting(){
-            let widget = document.getElementById("widget-container");
+            let widget = widgetContainer;
             let chatinput = document.getElementsByClassName("emojionearea-inline")[0]
+            console.log(chatinput);
+            console.log(widget.firstChild);
+            console.log(widget);
             widget.insertBefore( chatinput ,widget.firstChild)
             AppendInFrame(mobileHelper.conversationPanel);
             let div = document.createElement("div");

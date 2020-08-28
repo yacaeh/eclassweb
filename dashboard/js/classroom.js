@@ -21,6 +21,9 @@ var isSharingFile       = false;
 var isSharingEpub       = false;
 let isFileViewer        = false;
 
+const widgetContainer   = document.getElementById("widget-container");
+const rightTab          = document.getElementById("right-tab")
+
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
@@ -103,25 +106,28 @@ connection.sdpConstraints.mandatory = {
   OfferToReceiveVideo: false,
 };
 
+ChattingManager.init();
+
 window.onWidgetLoaded = function () {
   examObj.init();
-  mobileHelper.init();
   pageNavigator.init();
   canvasManager.init();
-  ChattingManager.init();
   permissionManager.init();
   canvasManager.setCanvasButtons(canvasButtonContents);
   classroomManager.init(shortCut, topButtonContents);
+  mobileHelper.init();
 }
 
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
+  if(!connection.extra.roomOwner)
+    classroomCommand.joinRoom();
   classroomManager.joinStudent(event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
   console.log('onclose!');
-  classroomManager.leftStudent(event);
+  classroomManager.leftStudent(event);  
 };
 
 connection.onstream = function (event) {
@@ -130,11 +136,16 @@ connection.onstream = function (event) {
     return;
 
   if (params.open === 'true' || params.open === true) {
-    permissionManager.mute();
     maincamManager.addStudentCam(event);
   }
   else{
-    maincamManager.addTeacherCam(event);
+    if(event.type == "local" && event.stream.isVideo){
+      event.mediaElement.pause();
+      event.stream.mute("audio");
+    }
+    else{
+      maincamManager.addTeacherCam(event);
+    }
   }
 };
 
@@ -143,90 +154,13 @@ connection.onstreamended = function (event) {
   screenshareManager.onclose(event);
 };
 
-designer.appendTo(document.getElementById('widget-container'), function () {
+designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  if (params.open === true || params.open === 'true') {
-    console.log('Opening Class!');
-    classroomManager.setTeacher();
-    connection.extra.roomOwner = true;
-
-    connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-      if (!isRoomOpened) {
-        alert("이미 존재하는 방입니다.");
-        var href = location.protocol + "//" + location.host + "/dashboard/";
-        window.open(href, "_self");
-      }
-      else {
-        if (error) {
-          connection.rejoin(params.sessionid);
-        }
-
-        logManager.createClass();
-        classroomCommand.joinRoom();
-        connection.socket.on('disconnect', () => location.reload());
-      }
-    });
-
-  }
-  //----------------------------------------------------------------
-  else {
-    classroomManager.setStudent();
-
-    console.log('try joining!');
-    connection.DetectRTC.load(function () {
-    });
-
-    connection.join({
-        sessionid: params.sessionid,
-        userid: connection.channel,
-        session: connection.session
-      }, function (isRoomJoined, roomid, error) {
-        console.log('Joing Class!');
-
-        if (error) {
-          console.log('Joing Error!');
-          if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-            // alert("방이 존재하지 않습니다.");
-            location.reload();
-            return;
-          }
-          if (error === connection.errors.ROOM_FULL) {
-            alert("방이 가득 찼습니다.");
-            classroomManager.gotoMain();
-            return;
-          }
-          if (error === connection.errors.INVALID_PASSWORD) {
-            connection.password = prompt('Please enter room password.') || '';
-            if (!connection.password.length) {
-              alert('Invalid password.');
-              return;
-            }
-            connection.join(params.sessionid, function (
-              isRoomJoined,
-              roomid,
-              error
-            ) {
-              if (error) {
-                alert(error);
-              }
-            });
-            return;
-          }
-          alert(error);
-        }
-
-        classroomCommand.joinRoom();
-        connection.socket.on('disconnect', function () {
-          console.log('disconnect Class!');
-          location.reload();
-        });
-        console.log('isRoomJoined', isRoomJoined);
-
-
-      }
-    );
-  }
+  if (params.open === true || params.open === 'true') 
+    classroomManager.createRoom();
+  else 
+    classroomManager.joinRoom();
   onWidgetLoaded();
 });
 
@@ -300,15 +234,13 @@ connection.onmessage = function (event) {
     event.data.data.command = "load";
 
     if (event.extra.roomOwner && !connection.extra.roomOwner) {
-      if (pointer_saver.nowIdx == event.data.idx) {
+      if (pointer_saver.nowIdx == event.data.idx) 
         designer.syncData(event.data.data);
-      }
     }
     else {
       event.data.data.isStudent = true;
-      if (pointer_saver.nowIdx == event.data.idx) {
+      if (pointer_saver.nowIdx == event.data.idx) 
         designer.syncData(event.data.data);
-      }
     }
     return;
   }
@@ -378,16 +310,12 @@ connection.onmessage = function (event) {
 
 
   if (event.data.closeTesting) {
-
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);
-      $(".right-tab").css("z-index", 3);
+      rightTab.style.zIndex = 3;
     }
 
-    if (mobileHelper.isMobile)
-      document.getElementById("widget-container").style.right = "0px";
-    else
-      document.getElementById("widget-container").removeAttribute("style")
+    mobileHelper.isMobile ? widgetContainer.style.right = "0px" : widgetContainer.removeAttribute("style");
     return;
   }
 

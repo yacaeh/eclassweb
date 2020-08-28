@@ -22,7 +22,7 @@ function GetOwnerId() {
 
 // canvas element 를 받아옴
 function GetWidgetFrame() {
-  let frame = document.getElementById('widget-container').getElementsByTagName('iframe')[0].contentWindow;
+  let frame = widgetContainer.getElementsByTagName('iframe')[0].contentWindow;
   return frame;
 }
 
@@ -52,7 +52,8 @@ function Hide(element) {
 
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {
-  $(".right-tab").css("z-index", 1);
+  rightTab.style.zIndex = 1;
+
 
   callback_yes  = callback_yes  || function () { };
 
@@ -74,8 +75,8 @@ function alertBox(message, title, callback_yes, callback_no) {
   $('.btn-alert-yes').unbind('click').bind('click', function (e) {
     if (clickCount++ == 0) {
       e.preventDefault();
-      $.when($('#alert-box').fadeOut(300)).done(function () {
-        $(".right-tab").css("z-index", 2);
+      $.when($('#alert-box').fadeOut(300)).done(() => {
+        rightTab.style.zIndex = 2;
       });
       callback_yes();
     }
@@ -84,9 +85,8 @@ function alertBox(message, title, callback_yes, callback_no) {
   $('.btn-alert-no').unbind('click').bind('click', function (e) {
     if (clickCount++ == 0) {
       e.preventDefault();
-
-      $.when($('#alert-box').fadeOut(300)).done(function () {
-        $(".right-tab").css("z-index", 2);
+      $.when($('#alert-box').fadeOut(300)).done(() => {
+        rightTab.style.zIndex = 2;
       });
       callback_no();
     }

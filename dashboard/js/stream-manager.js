@@ -380,8 +380,6 @@ class ScreenShareManagerClass{
         try{
           var stream = connection.streamEvents[event.data.showScreenShare].stream;
           var parent =  screenshareManager.get().parentElement;
-          console.log(parent);
-
           parent.removeChild(screenshareManager.get());
           let element = connection.streamEvents[event.data.showScreenShare].mediaElement;
           element.id = "screen-viewer";
@@ -389,9 +387,14 @@ class ScreenShareManagerClass{
           parent.appendChild(element);
           screenshareManager.show();
           screenshareManager.srcObject(stream);
-          clearInterval(inter);
+          element.play();
+          console.log(element.paused)
+
+          if(!element.paused)
+            clearInterval(inter);
         }
         catch(error){
+          console.warn(error)
         }
       },500);
 
@@ -413,9 +416,9 @@ class ScreenShareManagerClass{
     }
   }
   rejoin() {
+    console.error("REJOIN")
     let interval = setInterval(function () {
       try {
-        console.log(event);
         var parent = screenshareManager.get().parentElement;
         let element = connection.streamEvents[classroomInfo.shareScreen.id].mediaElement;
         element.id = "screen-viewer";
@@ -444,12 +447,10 @@ class ScreenShareManagerClass{
 class maincamManagerClass{
   get() {
     var video = document.getElementById("main-video");
-    if (video) {
+    if (video) 
       return video;
-    }
-    else {
+    else 
       return GetWidgetFrame().document.getElementById("main-video");
-    }
   }
   show() {
     Show(this.get());
@@ -479,8 +480,8 @@ class maincamManagerClass{
     }
   }
   addStudentCam(event) {
-    if(!event.stream.isVideo) 
-      return;
+    if(!event.stream.isVideo) return;
+
     try {
       event.mediaElement.controls = false;
       event.mediaElement.style.width = "100%";
@@ -489,7 +490,7 @@ class maincamManagerClass{
       event.mediaElement.style.position = "absolute";
 
       if (classroomInfo.showcanvas) {
-        event.mediaElement.style.display = 'none';
+        Hide(event.mediaElement)
       }
 
       var childern = document.getElementById("student_list").children;
@@ -501,7 +502,6 @@ class maincamManagerClass{
           break;
         }
       }
-
     }
 
     catch{
@@ -510,13 +510,10 @@ class maincamManagerClass{
 
   }
   addTeacherCam (event){
-    if (!event.extra.roomOwner || !event.stream.isVideo)
-      return;
-      var video = this.get();
-      if (event.type === 'local') 
-      video.volume = 0;
-      this.srcObject(event.stream);
-      console.log("MAIN CHANGED",event);
+    if (!event.extra.roomOwner || !event.stream.isVideo) return;      
+    
+    this.srcObject(event.stream);
+    console.log("MAIN CHANGED",event);
     this.start();
     
   }
