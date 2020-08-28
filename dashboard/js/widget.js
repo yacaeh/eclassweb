@@ -211,17 +211,19 @@ function canvasresize(id){
 
             function drawpoint(points) {
                 points.forEach(function (point) {
-                    if (point == null || point[1][0] == -1 ) return false;
+                    if (point == null ) return false;
 
                     if (point[0] == "marker") {
 
                         if (!_this.marking) {
                             context.beginPath();
-
-                            let opt = point[2];
-                            context.lineWidth = opt[0];
-                            context.strokeStyle = opt[1];
                             _this.marking = true;
+
+                            if(point[1][0] != -1){
+                                let opt = point[2];
+                                context.lineWidth = opt[0];
+                                context.strokeStyle = opt[1];
+                            } 
                         }
                     
                         if(point[1][0] == -1){

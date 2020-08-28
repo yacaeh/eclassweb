@@ -15,8 +15,8 @@ function updateControlView(send) {
     }
 
     if (send == true) {
-        classroomInfo.allControl ? connection.send({allControl: {state: b,roomInfo: classroomInfo}})
-                                 : connection.send({allControl: {state: b}});
+        classroomInfo.allControl ? connection.send({allControl: {state: true,roomInfo: classroomInfo}})
+                                 : connection.send({allControl: {state: false}});
     }
 }
 
@@ -24,12 +24,12 @@ function onAllControlValue(_allControl) {
     classroomInfo.allControl = _allControl.state;
     if (classroomInfo.allControl) {
         console.log("All Controll On");
-        document.getElementById("student-isallcontrol").style.display = "block";
+        Show("student-isallcontrol")
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
     else {
         console.log("All Controll Off");
-        document.getElementById("student-isallcontrol").style.display = "none";
+        Hide("student-isallcontrol")
         classroomCommand.updateSyncRoom();
     }
 }
