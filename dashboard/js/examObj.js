@@ -20,9 +20,9 @@ examObj.init = function(){
     AddEvent("top_test", "click" ,function(){
         if ($('#exam-board').is(':visible')) {
           if (examObj.closeTesting()) {
-            document.getElementById("widget-container").removeAttribute("style")
+            widgetContainer.removeAttribute("style")
             $('#exam-board').hide(300,function(){
-                $(".right-tab").css("z-index", 3);
+                rightTab.style.zIndex = 3;
             });
           } else {
             alert("시험 종료 후 닫을 수 있습니다");
@@ -31,11 +31,11 @@ examObj.init = function(){
         else {
           // 선생님
           if (params.open === 'true') {
-            document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
+            widgetContainer.style.right = "max(17.7%, 290px)";
             classroomManager.canvasResize();
             $('#exam-omr').hide();
             $('#exam-teacher-menu').show();
-            $(".right-tab").css("z-index", -1);
+            rightTab.style.zIndex = -1;
           }
           $('#exam-board').show(300);
         }
@@ -527,13 +527,13 @@ function setQuestionAnswer(answerList) {
 // 학생들 OMR 세팅
 function setStudentOMR(quesCount, examTime) {
     if (mobileHelper.isMobile) {
-        document.getElementById("widget-container").style.right = "max(0px, 290px)";
+        widgetContainer.style.right = "max(0px, 290px)";
     }
     else {
-        document.getElementById("widget-container").style.right = "max(17.7%, 290px)";
+        widgetContainer.style.right = "max(17.7%, 290px)";
     }
     classroomManager.canvasResize();
-    $(".right-tab").css("z-index", -1);
+    rightTab.style.zIndex = -1;
 
     $('#exam-omr').show();
     $('#exam-board').show();

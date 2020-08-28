@@ -15,7 +15,8 @@ function updateControlView(send) {
     }
 
     if (send == true) {
-        SendAllControll(classroomInfo.allControl);
+        classroomInfo.allControl ? connection.send({allControl: {state: b,roomInfo: classroomInfo}})
+                                 : connection.send({allControl: {state: b}});
     }
 }
 
@@ -35,29 +36,10 @@ function onAllControlValue(_allControl) {
 
 function _AllCantrallFunc() {
     top_all_controll_jthis = $("#top_all_controll");
-    top_all_controll_jthis.click(function () {
+    top_all_controll_jthis.click(() => {
         connection.socket.emit('toggle-all-control', (changeControl) => {
             classroomInfo.allControl = changeControl;
             updateControlView(true);
         });
     })
-}
-
-function SendAllControll(b) {
-    if (b) {
-        console.log("")
-        connection.send({
-            allControl: {
-                state: b,
-                roomInfo: classroomInfo
-            }
-        });
-    }
-    else {
-        connection.send({
-            allControl: {
-                state: b
-            }
-        });
-    }
 }

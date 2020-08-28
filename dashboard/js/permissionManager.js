@@ -4,7 +4,7 @@ class permissionManagerClass{
   }
 
   init() {
-    $(window).click(function (e) {
+    window.addEventListener("click", (e) => {
       if (document.getElementById('student-menu').contains(e.target)) return false;
       if ($(e.target).hasClass('student')) return false;
       if ($('#student-menu').show()) $('#student-menu').hide();
@@ -60,29 +60,17 @@ class permissionManagerClass{
     }
 
     if (event.data.classPermissionChanged) {
-      if (event.data.on)
-        permissionManager.setClassPermission();
-      else
-        permissionManager.disableClassPermission();
-
+      event.data.on ? permissionManager.setClassPermission() : permissionManager.disableClassPermission();
       return true;
     }
 
     if (event.data.micPermissionChanged) {
-      if (event.data.on)
-        permissionManager.setMicPermission();
-      else
-        permissionManager.disableMicPermission();
+      event.data.on ? permissionManager.setMicPermission() : permissionManager.disableMicPermission()
       return true;
     }
 
     if (event.data.canvasPermissionChanged) {
-      if (event.data.on) {
-        permissionManager.setCanvasPermission(event.data.id);
-      }
-      else {
-        permissionManager.disableCanvasPermission(event.data.id);
-      }
+      event.data.on ? permissionManager.setCanvasPermission(event.data.id) : permissionManager.disableCanvasPermission(event.data.id)
       return true;
     }
   }
@@ -229,28 +217,31 @@ class permissionManagerClass{
 function OnClickStudent(div) {
   div.click(function (e) {
     var menu = document.getElementById('student-menu');
-    permissionManager.nowSelectStudent = e.target;
     var name = e.target.dataset.name;
-    var pid = e.target.dataset.id;
+
+    permissionManager.nowSelectStudent = e.target;
 
     SetBtn("classP", e.target.dataset.classPermission);
     SetBtn("micP", e.target.dataset.micPermission);
     SetBtn("canP", e.target.dataset.canvasPermission);
 
     function SetBtn(id, ispermission) {
-      $('#' + id).clearQueue();
-      $('#' + id + '> .circle').clearQueue();
+      let btn =  $('#' + id);
+      let circle = $('#' + id + '> .circle');
+
+      btn.clearQueue();
+      circle.clearQueue();
 
       if (ispermission == 'true') {
-        $('#' + id).css({ 'background-color': '#18dbbe' });
-        $('#' + id + '> .circle').css({ left: '22px' });
-        $('#' + id).addClass('on');
-        $('#' + id).removeClass('off');
+        btn.css({ 'background-color': '#18dbbe' });
+        circle.css({ left: '22px' });
+        btn.addClass('on');
+        btn.removeClass('off');
       } else {
-        $('#' + id).css({ 'background-color': 'gray', });
-        $('#' + id + '> .circle').css({ left: '2px', });
-        $('#' + id).addClass('off');
-        $('#' + id).removeClass('on');
+        btn.css({ 'background-color': 'gray', });
+        circle.css({ left: '2px', });
+        btn.addClass('off');
+        btn.removeClass('on');
       }
     }
 

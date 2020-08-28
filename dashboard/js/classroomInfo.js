@@ -214,15 +214,15 @@ classroomCommand.receivedCallTeacherResponse = (userId) => {
             if( children[i].dataset.id == userId ){
                 console.log( "Received Call Teacher Respose : " +  userId );    
 
-                var student_overlay;
-                var isMeCount = 5;
-                var flickerInterval = setInterval(function () {
+                let student_overlay;
+                let isMeCount = 5;
+                let flickerInterval = setInterval(function () {
                     student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
-                    var initBackColor = student_overlay.css('background');
-                    var orangeColor = setOverlayColor('orange');
+                    let initBackColor = student_overlay.css('background');
+                    let orangeColor = setOverlayColor('orange');
                     setTimeout(function () {
                         student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
-                        var initBackColor2 = student_overlay.css('background');
+                        let initBackColor2 = student_overlay.css('background');
                         if (orangeColor !== initBackColor2)
                             initBackColor = initBackColor2
                         setOverlayColor(initBackColor);
@@ -301,7 +301,6 @@ classroomCommand.openFile = function (_url) {
     mfileViewer.openFile (_url);
 }
 
-
 classroomCommand.updateViewer = function (_cmd) {
     mfileViewer.updateViewer(_cmd);
 }
@@ -348,11 +347,7 @@ classroomCommand.sendOpenEpub = function () {
 
 classroomCommand.sendCloseEpub = function () {
     classroomInfo.epub.state = false;
-    connection.send({
-        epub : {
-            state : false
-        }
-    });
+    connection.send({epub : {state : false}});
 };
 
 classroomCommand.openEpub = function () {
