@@ -3553,12 +3553,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 return;
             }
            
+        
             if (params.open == "true") {
                 options.localMediaConstraints.video.mandatory = {
-                    "minWidth": 320,
                     "maxWidth": 640,
-                    "minHeight": 180,
-                    "maxHeight": 480,
+                    "maxHeight": 320,
                     "maxFrameRate": 24
                 };
             }

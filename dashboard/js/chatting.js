@@ -73,8 +73,8 @@ class ChattingManagerClass{
 
     }
     append(event){
-        var div = document.createElement('div');
-        var color = "#000000"
+        let div = document.createElement('div');
+        let color = "#000000"
 
         div.className = 'message';
 
@@ -83,7 +83,7 @@ class ChattingManagerClass{
         }
 
         if (event.data) {
-            var id = event.extra.userFullName || event.userid;
+            let id = event.extra.userFullName || event.userid;
             if (event.extra.roomOwner == true) {
                 id += '(선생님)';
                 color = "#C63EE8"
@@ -93,8 +93,8 @@ class ChattingManagerClass{
         this.normal(id, event.data.msg, color);
     }
     enterStudent(event){
-        var name = event.extra.userFullName;
-        var div = document.createElement('div');
+        let name = event.extra.userFullName;
+        let div = document.createElement('div');
         div.className = 'teachermsg2 enter';
         div.innerHTML = '<b> <font color="#000000">' + name + ' </font>학생이 접속했습니다</b>';
         this.noticeElement.appendChild(div);
@@ -102,11 +102,11 @@ class ChattingManagerClass{
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
     leftStudent(event){
-        var name = event.extra.userFullName;
+        let name = event.extra.userFullName;
         if(name == undefined)
             return;
 
-        var div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'teachermsg2 left';
         div.innerHTML = '<b> <font color="#000000">' + name + ' </font>학생이 나갔습니다</b>';
         this.noticeElement.appendChild(div);
@@ -114,7 +114,7 @@ class ChattingManagerClass{
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
     notice(msg){
-        var div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'teachermsg';
         div.innerHTML = '<b> <font color="#C63EE8"> 선생님 </font>: </b>' + msg;
         this.noticeElement.appendChild(div);
@@ -122,7 +122,7 @@ class ChattingManagerClass{
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
     normal(name, msg, color = "#3E93E8"){
-        var div = document.createElement('div');
+        let div = document.createElement('div');
         div.className = 'message';
         div.innerHTML = '<b> <font color="' + color + '"> ' + name + ' </font>: </b>' + msg;
         this.normalElement.appendChild(div);
