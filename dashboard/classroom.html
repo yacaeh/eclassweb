@@ -4,7 +4,7 @@
 <html lang="en" dir="ltr">
 
 <head>
-  <title id="class-title">Home Class : 비대면 학습 시스템</title>
+  <title id="class-title" data-i18n="TITLE">Home Class : 비대면 학습 시스템</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
@@ -72,8 +72,20 @@
   <script src="/dashboard/js/chatting.js" ></script>
   <script src="/dashboard/js/permissionManager.js"></script>
   <script src=/dashboard/js/3d_render.js></script>
-
   <script src="/dashboard/js/lib/emojionearea.min.js"></script>
+
+  <script src="/dashboard/js/lib/CLDRPluralRuleParser.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.messagestore.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.fallbacks.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.language.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
+	<script src="/dashboard/js/languages/he.js"></script>
+	<script src="/dashboard/js/languages/fi.js"></script>
+	<script src="/dashboard/js/languages/ml.js"></script>
+	<script src="/dashboard/js/lib/demo.js"></script>
 </head>
 
 <body ondragstart="return false" style="height: 1080px;">
@@ -140,6 +152,13 @@
             <img class="top_icon" id="top_save_alert">
             <img class="top_icon" id="top_record_video">
           </span>
+          <span>
+            <select class="language span3">
+              <option value="en">English</option>
+              <option value="ko">한국어</option>
+              <option value="ml">Malayalam</option>
+            </select>
+          </span>
 
           <span class="time">
               <span id="current-time"></span>
@@ -153,6 +172,12 @@
 
     <article id="article">
         <div id="widget-container">
+            <select class="input-small person">
+              <option data-i18n='Meera' value="female">Meera</option>
+              <option data-i18n='Harry' value="male">Harry</option>
+            </select>
+            <li data-i18n="WELCOME"></li>...
+            <div class="result"><!-- The message will be filled here automatically. --></div>
 
           <div id="epub-navi" style="display: none;" class="shadow-5">
             <span id="navi-top">
@@ -257,7 +282,8 @@
     <div class="chatting">
     
     <div id="notice" class="on">
-      <span class="text">선생님 채팅</span>
+      <h1 data-i18n="welcome"></h1>
+      <span class="text"><h1 data-i18n="TEACHER_CHAT"></h1></span>
       <div class="scroll" id="noticewindow"></div>
       <div id="collapse">
         <img class="btn" src="/dashboard/img/openchat.png">
