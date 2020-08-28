@@ -1009,7 +1009,7 @@ function canvasresize(id){
             };
             image.src = data_uris.view3d;
 
-            document.getElementById('3d_view').onclick = () => {
+            document.getElementById('3d_view').onclick = function() {
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
             }
@@ -1039,7 +1039,7 @@ function canvasresize(id){
             };
             image.src = data_uris.movie;
 
-            document.getElementById('movie').onclick = () => {
+            document.getElementById('movie').onclick = function(){
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
             }
@@ -1285,7 +1285,7 @@ function canvasresize(id){
             };
             image.src = data_uris.epub;
 
-            document.getElementById('epub').onclick = () => {
+            document.getElementById('epub').onclick = function(){
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
             }
