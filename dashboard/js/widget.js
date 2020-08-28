@@ -211,9 +211,7 @@ function canvasresize(id){
 
             function drawpoint(points) {
                 points.forEach(function (point) {
-                    if (point == null) {
-                        return false;
-                    }
+                    if (point == null || point[1][0] == -1 ) return false;
 
                     if (point[0] == "marker") {
 
