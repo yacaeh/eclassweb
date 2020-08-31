@@ -187,12 +187,11 @@ classroomCommand.receivedOnFocusResponse = (_response) => {
     {     
         let userId = _response.userId;
         let boolOnFocus = _response.onFocus; 
-
         let children = document.getElementById("student_list").children;
 
         for(let i = 0; i < children.length; i++){
             if( children[i].dataset.id == userId ){
-                var student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
+                let student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
                 if(boolOnFocus == false){
                     student_overlay.css('background','black');
                 }
@@ -215,15 +214,15 @@ classroomCommand.receivedCallTeacherResponse = (userId) => {
             if( children[i].dataset.id == userId ){
                 console.log( "Received Call Teacher Respose : " +  userId );    
 
-                var student_overlay;
-                var isMeCount = 5;
-                var flickerInterval = setInterval(function () {
+                let student_overlay;
+                let isMeCount = 5;
+                let flickerInterval = setInterval(function () {
                     student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
-                    var initBackColor = student_overlay.css('background');
-                    var orangeColor = setOverlayColor('orange');
+                    let initBackColor = student_overlay.css('background');
+                    let orangeColor = setOverlayColor('orange');
                     setTimeout(function () {
                         student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
-                        var initBackColor2 = student_overlay.css('background');
+                        let initBackColor2 = student_overlay.css('background');
                         if (orangeColor !== initBackColor2)
                             initBackColor = initBackColor2
                         setOverlayColor(initBackColor);
@@ -302,7 +301,6 @@ classroomCommand.openFile = function (_url) {
     mfileViewer.openFile (_url);
 }
 
-
 classroomCommand.updateViewer = function (_cmd) {
     mfileViewer.updateViewer(_cmd);
 }
@@ -349,11 +347,7 @@ classroomCommand.sendOpenEpub = function () {
 
 classroomCommand.sendCloseEpub = function () {
     classroomInfo.epub.state = false;
-    connection.send({
-        epub : {
-            state : false
-        }
-    });
+    connection.send({epub : {state : false}});
 };
 
 classroomCommand.openEpub = function () {
@@ -372,21 +366,20 @@ classroomCommand.openEpub = function () {
         if(classroomInfo.allControl) 
         {        
             if(isSharingEpub) {       
-                document.getElementById('next').style.display = "none";     
-                document.getElementById('prev').style.display = "none";     
-                document.getElementById('lnext').style.display = "none";     
-                document.getElementById('lprev').style.display = "none";  
-                document.getElementsByClassName("thumbnail")
+                Hide('next')
+                Hide('prev')
+                Hide('lnext')
+                Hide('lprev')
                 $(".thumbnail").css("pointer-events", "none")
             }
         }
         else 
         {
             if(isSharingEpub) {      
-                document.getElementById('next').style.display = "block";     
-                document.getElementById('prev').style.display = "block";     
-                document.getElementById('lnext').style.display = "block";     
-                document.getElementById('lprev').style.display = "block";   
+                Show('next')
+                Show('prev')
+                Show('lnext')
+                Show('lprev')
                 $(".thumbnail").css("pointer-events", "");
             }
         }
@@ -406,6 +399,7 @@ classroomCommand.sendEpubCmd = function (_cmd, _data) {
     classroomInfo.epub.page = _data.page;
 
     if(!classroomInfo.allControl) return;
+
     console.log(_data);
     connection.send ({
         epub : {
@@ -416,7 +410,7 @@ classroomCommand.sendEpubCmd = function (_cmd, _data) {
 }
 
 classroomCommand.updateEpubCmd = function (_data) {
-    let frame = document.getElementById('widget-container').getElementsByTagName('iframe')[0].contentWindow;
+    let frame = GetWidgetFrame();
     let epubViewer = frame.document.getElementById('epub-viewer');
 
     if(!epubViewer)  return;
@@ -440,41 +434,28 @@ classroomCommand.updateEpubCmd = function (_data) {
     }
 }
 
-classroomCommand.syncEpub = function () {    
-    if(classroomInfo.epub.state) {
-        classroomCommand.openEpub ();
-    }
-    else {
-        classroomCommand.closeEpub ();     
-    }
+classroomCommand.syncEpub = function () {
+    classroomInfo.epub.state ? classroomCommand.openEpub() : classroomCommand.closeEpub();
 };
 
-let classTimeIntervalHandle;
 
 function updateClassTime() {
-  var now = new Date().getTime() - classroomInfo.roomOpenTime;
-  now = parseInt(now / 1000);
-
-  if (!classTimeIntervalHandle){
-      setTimeout(function () {
-          document.getElementById("loading-screen").style.display = "none";
-      },1000
-    )
+    let currentTime = document.getElementById("current-time");
+    setTimeout(() => { Hide("loading-screen") }, 1000)
     classTimeIntervalHandle = setInterval(Sec, 1000);
-  }
 
-  function Sec() {
-    now++;
-    var time = now;
-    var hour = Math.floor(time / 3600);
-    time %= 3600;
+    function Sec() {
+        let now = new Date().getTime() - classroomInfo.roomOpenTime;
+        now = parseInt(now * 0.001);
+        let time = now;
+        let hour = Math.floor(time / 3600);
+        time %= 3600;
 
-    var min = Math.floor(time / 60);
-    time %= 60;
+        let min = Math.floor(time / 60);
+        time %= 60;
 
-    if (min < 10) min = '0' + min;
-    if (time < 10) time = '0' + time;
-
-    $('#current-time').text(hour + ':' + min + ':' + time);
-  }
+        if (min < 10) min = '0' + min;
+        if (time < 10) time = '0' + time;
+        currentTime.innerHTML = hour + ':' + min + ':' + time;
+    }
 }

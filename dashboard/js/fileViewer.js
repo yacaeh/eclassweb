@@ -107,9 +107,7 @@ class fileViewerLoader {
             fileViewer.style.width = "calc(100% - 52px)";
 
         fileViewer.setAttribute('allowFullScreen', '');
-        let frame = document
-            .getElementById('widget-container')
-            .getElementsByTagName('iframe')[0].contentWindow;
+        let frame = GetWidgetFrame();
 
         frame.document
             .getElementsByClassName('design-surface')[0]
@@ -124,9 +122,7 @@ class fileViewerLoader {
     }
 
     removeElementViewer() {
-        let frame = document
-            .getElementById('widget-container')
-            .getElementsByTagName('iframe')[0].contentWindow;
+        let frame = GetWidgetFrame();
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
@@ -138,9 +134,7 @@ class fileViewerLoader {
     LockViewer(_lock) {
         this.bLock = _lock;
 
-        let frame = document
-            .getElementById('widget-container')
-            .getElementsByTagName('iframe')[0].contentWindow;
+        let frame = GetWidgetFrame();
         let fileViewer = frame.document.getElementById('file-viewer');
         let viewer = fileViewer.contentWindow.document.getElementById("viewer")
         if(!viewer)
@@ -165,9 +159,7 @@ class pdfViewer {
         interface method 다른 viewer도 같이 구현을 해야 함.
     */
     getElementFileViewer() {
-        let frame = document
-            .getElementById('widget-container')
-            .getElementsByTagName('iframe')[0].contentWindow;
+        let frame = GetWidgetFrame();
         let fileViewer = frame.document.getElementById('file-viewer');
         return fileViewer;
     }
@@ -635,6 +627,10 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
+function HomeworkSubmit(){
+    HomeworkUploadModal("숙제 제출")
+}
+
 function HomeworkUploadModal(message, callback) {
     callback = callback || function(){}
 
@@ -986,9 +982,6 @@ function LoadFile(btn) {
     fileUploadModal("파일 관리자", btn, function (e) { });
 }
 
-function HomeworkSubmit() {
-    HomeworkUploadModal("숙제 제출");
-}
 
 function unloadFileViewer() {
     console.log("UNLOAD FILEVIEWER");

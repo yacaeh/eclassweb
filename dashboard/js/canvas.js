@@ -100,6 +100,7 @@ class canvasManagerClass {
         newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
     
         let data = newcanvas.toDataURL('image/jpeg', 0.000001);
+        console.log(data);
         
         connection.send({
             canvassend: true,

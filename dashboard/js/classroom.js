@@ -21,6 +21,9 @@ var isSharingFile       = false;
 var isSharingEpub       = false;
 let isFileViewer        = false;
 
+const widgetContainer   = document.getElementById("widget-container");
+const rightTab          = document.getElementById("right-tab")
+
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
@@ -117,13 +120,14 @@ window.onWidgetLoaded = function () {
 
 connection.onopen = function (event) {
   console.log('onopen!', event.extra.userFullName, event.userid);
-  classroomCommand.joinRoom();
+  if(!connection.extra.roomOwner)
+    classroomCommand.joinRoom();
   classroomManager.joinStudent(event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
   console.log('onclose!');
-  classroomManager.leftStudent(event);
+  classroomManager.leftStudent(event);  
 };
 
 connection.onstream = function (event) {
@@ -139,8 +143,9 @@ connection.onstream = function (event) {
       event.mediaElement.pause();
       event.stream.mute("audio");
     }
-
-    maincamManager.addTeacherCam(event);
+    else{
+      maincamManager.addTeacherCam(event);
+    }
   }
 };
 
@@ -149,15 +154,13 @@ connection.onstreamended = function (event) {
   screenshareManager.onclose(event);
 };
 
-designer.appendTo(document.getElementById('widget-container'), function () {
+designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  if (params.open === true || params.open === 'true') {
+  if (params.open === true || params.open === 'true') 
     classroomManager.createRoom();
-  }
-  else {
+  else 
     classroomManager.joinRoom();
-  }
   onWidgetLoaded();
 });
 
@@ -231,15 +234,13 @@ connection.onmessage = function (event) {
     event.data.data.command = "load";
 
     if (event.extra.roomOwner && !connection.extra.roomOwner) {
-      if (pointer_saver.nowIdx == event.data.idx) {
+      if (pointer_saver.nowIdx == event.data.idx) 
         designer.syncData(event.data.data);
-      }
     }
     else {
       event.data.data.isStudent = true;
-      if (pointer_saver.nowIdx == event.data.idx) {
+      if (pointer_saver.nowIdx == event.data.idx) 
         designer.syncData(event.data.data);
-      }
     }
     return;
   }
@@ -309,16 +310,12 @@ connection.onmessage = function (event) {
 
 
   if (event.data.closeTesting) {
-
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);
-      $(".right-tab").css("z-index", 3);
+      rightTab.style.zIndex = 3;
     }
 
-    if (mobileHelper.isMobile)
-      document.getElementById("widget-container").style.right = "0px";
-    else
-      document.getElementById("widget-container").removeAttribute("style")
+    mobileHelper.isMobile ? widgetContainer.style.right = "0px" : widgetContainer.removeAttribute("style");
     return;
   }
 

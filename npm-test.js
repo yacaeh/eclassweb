@@ -6,7 +6,7 @@ try {
     RTCMultiConnection = require('rtcmulticonnection');
 }
 catch(e) {
-    RTCMultiConnection = require('./dist/RTCMultiConnection.js');
+    RTCMultiConnection = require('./dashboard/js/RTCMultiConnection.js');
 }
 
 var connection = new RTCMultiConnection();

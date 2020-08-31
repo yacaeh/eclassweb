@@ -61,25 +61,21 @@ class classroomManagerClass {
 
             if (self.classList.contains("off")) {
                 self.style.transform = "rotate(90deg)";
-                $(".right-tab").animate({ width: "0%" })
-                $("#widget-container").animate({ right: "0%" },
+                $(rightTab).animate({ width: "0%" })
+                $(widgetContainer).animate({ right: "0%" },
                     classroomManager.canvasResize)
             }
             else {
                 self.style.transform = "rotate(-90deg)";
-                $(".right-tab").animate({ width: "17.7%" })
-                $("#widget-container").animate({ right: "17.7%" },
+                $(rightTab).animate({ width: "17.7%" })
+                $(widgetContainer).animate({ right: "17.7%" },
                     classroomManager.canvasResize)
             }
         })
     }
 
     callTeacher() {
-        connection.send({
-            callTeacher: {
-                userid: connection.userid
-            }
-        }, GetOwnerId());
+        connection.send({callTeacher: {userid: connection.userid}}, GetOwnerId());
     };
 
     windowFocusChecker() {
@@ -258,18 +254,20 @@ class classroomManagerClass {
         classroomCommand.onConnectionSession(event);
         connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
+
         if (!connection.extra.roomOwner) return;
 
         ChattingManager.enterStudent(event);
 
-        var id = event.userid;
-        var name = event.extra.userFullName;
+        let id = event.userid;
+        let name = event.extra.userFullName;
+        let img = document.createElement("img");
 
-        var img = document.createElement("img");
         if (!classroomInfo.showcanvas)
             img.style.display = 'none';
+
         canvasManager.canvas_array[id] = img;
-        var div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
+        let div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
               <span style="display:none;" class="permissions"></span> \
               <span class="student-overlay"></span> \
               <span class="bor"></span> \

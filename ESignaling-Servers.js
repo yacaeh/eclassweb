@@ -11,6 +11,7 @@ var adminSocket;
 var ScalableBroadcast;
 
 // pushLogs is used to write error logs into logs.json
+const fs = require("fs")
 var pushLogs = require('rtcmulticonnection-server/node_scripts/pushLogs.js');
 // const strings
 var CONST_STRINGS = require('rtcmulticonnection-server/node_scripts/CONST_STRINGS.js');
@@ -141,6 +142,18 @@ module.exports = exports = function(socket, config) {
         });
 
         adminSocket = socket;
+       
+        socket.on('get-log-list', function(e){
+            let filelist = fs.readdirSync('./logs')
+            filelist = filelist.reverse();
+            e(filelist);
+        })
+
+        socket.on('delete-log-file', function(name, callback){
+            fs.unlinkSync('./logs/' + name);
+            callback(200);
+        })
+
         socket.on('admin', function(message, callback) {
             if (!isAdminAuthorized(params, config)) {
                 socket.emit('admin', {
@@ -919,13 +932,14 @@ module.exports = exports = function(socket, config) {
             } catch (e) {
                 pushLogs(config, 'open-room', e);
             }
+
+            OpenRoom();
         });
 
         socket.on('join-room', function(arg, callback) {
             callback = callback || function() {};
 
             try {
-                // if already joined a room, either leave or close it
                 closeOrShiftRoom();
 
                 if (enableScalableBroadcast === true) {
@@ -993,6 +1007,7 @@ module.exports = exports = function(socket, config) {
                 pushLogs(config, 'join-room', e);
             }
 
+            JoinStudent();
             sendToAdmin();
 
             try {
@@ -1028,12 +1043,15 @@ module.exports = exports = function(socket, config) {
                 pushLogs(config, 'disconnect', e);
             }
 
-            closeOrShiftRoom();
-
+            // console.log("LEFT")
+            if(listOfRooms[getRoomId()])
+               LeftClass();
+    
+               closeOrShiftRoom();
             delete listOfUsers[socket.userid];
 
             if (socket.ondisconnect) {
-                console.error("if on disconnect")
+                console.error("if on disconnect",socket.userid);
                 try {
                     // scalable-broadcast.js
                     socket.ondisconnect();
@@ -1075,9 +1093,6 @@ module.exports = exports = function(socket, config) {
             });
         });
 
-
-      
-
         socket.on ('set-share-screen', function(_state, _callback) {
             call_getRoom(room => {
                 //  현재 상태가 같으면... 리턴
@@ -1113,14 +1128,10 @@ module.exports = exports = function(socket, config) {
             });
         });
 
-        socket.on('exam', function(args, callback) {
-
-            
-        });
-
-
-
-
+        socket.on("show-class-status", function(callback){
+            console.log("SHOW?")
+            callback(listOfRooms)
+        })
         //--------------------------------------------------------------------------------//
         function callBackPackingData (_result, _data, _callBack) {
             try {
@@ -1147,11 +1158,6 @@ module.exports = exports = function(socket, config) {
             }
         }
 
-        function call_getRoom_only_roomOwner (success, error) {
-
-            
-        };
-
         function call_getRoom (success, error) {
             let room = getRoom();
             if(room.error) {
@@ -1174,46 +1180,82 @@ module.exports = exports = function(socket, config) {
         function getRoomId () {
             if(socket.admininfo)
                 return socket.admininfo.sessionid;
-            return null;
         };
 
-        function getUser () {                     
-            var user = listOfUsers[socket.userid];
-            if(!user) return { error : CONST_STRINGS.USERID_NOT_AVAILABLE };
-            if(!user.roomid) return { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };
-            if(!socket.admininfo) return { error : CONST_STRINGS.INVALID_SOCKET };
-            return user;
-        } ;    
-
-
-
-    /*
-        socket.join을 사용하지 않기 때문에, room 브로드캐스트를 사용할 수 없음.            
-
-        socket.on ('teacherToStudents', (arg, callback) => {            
-            broadcastInRoom('teacherToStudents', arg);
-            callback('success call');
-        });
-
-
-        function getRoomNumber () {
-            return socket.admininfo.sessionid;
+        function OpenRoom() {
+            let openTime = GetTime();
+            let user = GetUserData();
+            console.log("Create Room",user.userid);
+            getRoom().openTime = openTime.full;
+            
+            let data = {
+                roomOpenDate : openTime.date,
+                roomOpenTime : openTime.time,
+                roomOwner : user.userid,
+                userList : {}
+            }   
+            data.userList[user.userid] = user;
+            fs.writeFileSync("./logs/" + openTime.full + "_" + user.userid + ".json", JSON.stringify(data));
         }
 
-        function isOwner () {                                    
-            return socket.userid == getRoomNumber ();
-        };
+        function JoinStudent() {
+            let json = fs.readFileSync(GetLogFilePath());
+            json = JSON.parse(json);
+            let user = GetUserData();
+            json.userList[user.userid] = user;
+            fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
+            console.log("Join Student",socket.userid);  
+        }
 
-        function broadcastInRoom (socketEvent, message) {                        
+        function LeftClass() {
+            let room = listOfRooms[getRoomId()];
+            let json = JSON.parse(fs.readFileSync(GetLogFilePath()));
+            let user = GetUserData();
 
-            var room = getRoom ();
-            if(room.error)
-            {
-                console.log(room.error);
-                return;
-            }            
-            socket.broadcast.to(room).emit(socketEvent, message);
-        };
-        */
+            if(room.owner != socket.userid){
+                json.userList[user.userid].leftTime = GetTime().time;
+                console.log("Left student",socket.userid);
+            }
+            else if(room.owner == socket.userid){
+                json.userList[user.userid].leftTime = GetTime().time;
+                json.roomCloseTime = GetTime().time;
+                console.log("Delete Room",socket.userid);
+            }
+            fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
+        }
+
+        function GetLogFilePath(){
+            return "./logs/" + getRoom().openTime + "_" + getRoom().owner + ".json";
+        }
+
+        function GetUserData(){
+            return {
+                userid : socket.userid,
+                username : socket.admininfo.extra.userFullName,
+                enterTime : GetTime().time
+            }
+        }
+
+        function GetTime(){
+            let time = new Date();
+            
+            let year = time.getFullYear();
+            let month = time.getMonth() + 1;
+            let day = time.getDate();
+
+            let hours = time.getHours();
+            hours = ("00" + hours).slice(-2);
+            let min = time.getMinutes();
+            min = ("00" + min).slice(-2);
+            let sec = time.getSeconds();
+            sec = ("00" + sec).slice(-2);
+
+            return {
+                date : year + "-" + month + "-" + day,
+                time : hours + ":" + min + ":" + sec,
+                full : year + "-" + month + "-" + day + "_" + hours + "-" + min + "-" + sec
+            }
+        }
+
     }
 };
