@@ -256,7 +256,6 @@ class classroomManagerClass {
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
 
         if (!connection.extra.roomOwner) return;
-        logManager.joinStudent(event.userid);
 
         ChattingManager.enterStudent(event);
 

@@ -299,7 +299,3 @@ ioServer(httpApp).on('connection', function(socket) {
         socket.broadcast.emit(params.socketCustomEvent, message);
     });
 });
-
-function tl(){
-    fs.writeFileSync("./test.json", JSON.stringify({test : 'tezzzzzzst'}));
-}
