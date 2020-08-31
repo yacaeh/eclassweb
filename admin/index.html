@@ -254,7 +254,7 @@ header div .top-span, header div button {
 }
 
 #logs-viewer {
-  height: 400px;
+  height: 800px;
   overflow: auto;
   padding: 0;
   border: 0;
@@ -335,7 +335,7 @@ input[disabled], button[disabled] {
     </div>
   </header>
 
-  <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div id="log-viewer" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -451,7 +451,7 @@ input[disabled], button[disabled] {
     </div>
   </div>
 
-  <section style="min-height: 400px;">
+  <section id="room-list" style="min-height: 400px;">
     <table class="table">
       <thead>
         <tr>
@@ -469,6 +469,20 @@ input[disabled], button[disabled] {
       <tbody id="rooms-list"><tr><td colspan=8>No active room found on this server.</td></tr></tbody>
     </table>
   </section>
+
+  <section style="min-height: 400px;">
+    <table style="display: none;" id="log-list" class="table">
+        <tr>
+          <th>Date</th>
+          <th>Open Time</th>
+          <th>Owner ID</th>
+          <th>Show</th>
+          <th>Delete</th>
+        </tr>
+    </table>
+  </section>
+
+
 
   <section style="min-height: 400px; display: none;">
     <table class="table">

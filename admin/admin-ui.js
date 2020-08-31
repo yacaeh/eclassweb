@@ -84,6 +84,98 @@ function connectSocket(username, password) {
             location.reload();
         }
     });
+
+    socket.emit("get-log-list", (files) => {
+        let loglist = document.getElementById("log-list");
+
+        files.forEach((e) => {
+            let split = e.split("_");
+            let openDate = split[0];
+            let openTime = split[1].replace(/-/g,":");
+            let ownerid = split[2].slice(0,-5);
+            let row = loglist.insertRow()
+            row.insertCell().innerHTML = openDate;
+            row.insertCell().innerHTML = openTime;
+            row.insertCell().innerHTML = ownerid;
+
+            let showbtn = document.createElement("button");
+            showbtn.innerHTML = "Show";
+            showbtn.dataset.toggle = "modal";
+            showbtn.dataset.target = ".bd-example-modal-lg";
+
+            showbtn.addEventListener("click", function(){
+                $.get("/logs/" + e, (json) =>{
+                    json = JSON.parse(json);
+                    let opendate = json.roomOpenDate;
+                    let opentime = json.roomOpenTime;
+                    let closetime = json.roomCloseTime;
+                    let participants = json.userList;
+
+                    let logviewer = document.getElementById("logs-viewer");
+                    if(logviewer.firstChild)
+                    logviewer.removeChild(logviewer.firstChild);
+
+                    let table = document.createElement("table");
+                    table.className ="table";
+                    let row = table.insertRow();
+                    row.style.fontWeight = "bold";
+                    row.insertCell().innerHTML = "<th>Open Date</th";
+                    row.insertCell().innerHTML = "<th>Open Time</th";
+                    row.insertCell().innerHTML = "<th>Close Time</th";
+                    row.insertCell().innerHTML = "<th>Participants</th";
+                    
+                    row = table.insertRow();
+
+                    row.insertCell().innerHTML = opendate;
+                    row.insertCell().innerHTML = opentime;
+                    row.insertCell().innerHTML = closetime || "~";
+                    row.insertCell().innerHTML = Object.keys(participants).length;
+                    
+                    row = table.insertRow();
+                    let cell = row.insertCell()
+                    row.style.fontWeight = "bold";
+                    cell.setAttribute("colspan", 4);
+                    cell.innerHTML = "Users"
+
+                    row = table.insertRow();
+                    row.insertCell().innerHTML = "Name";
+                    row.insertCell().innerHTML = "Enter";
+                    row.insertCell().innerHTML = "Left";
+
+                    Object.keys(participants).forEach((id) => {
+                        let user = participants[id];
+
+                        row = table.insertRow();
+                        row.insertCell().innerHTML = user.username + "(" + user.userid + ")";
+                        row.insertCell().innerHTML = user.enterTime;
+                        row.insertCell().innerHTML = user.leftTime || "~";
+                    })
+
+
+                    logviewer.appendChild(table);
+
+
+                })
+            })
+
+            let deletebtn = document.createElement("button");
+            deletebtn.innerHTML = "Delete";
+            deletebtn.addEventListener("click", function(){
+                socket.emit('delete-log-file', e, (back) => {
+                    if(back == 200){
+                        row.parentElement.removeChild(row)
+                    }
+                });
+            })
+
+            row.insertCell().appendChild(showbtn)
+            row.insertCell().appendChild(deletebtn);
+        })
+    })
+}
+
+function showlog(){
+
 }
 
 function updateListOfUsers(listOfUsers) {
@@ -459,3 +551,17 @@ $('#view-userinfo').click(function() {
     $('#exampleModal').modal('hide');
     $('.bd-example-modal-lg').modal('show');
 });
+
+
+document.getElementById("view-class-logs").addEventListener("click", function(){
+    this.classList.toggle("on");
+    if(this.classList.contains("on")){
+        document.getElementById("room-list").style.display = 'none';
+        document.getElementById("log-list").style.display = 'block';
+    }
+    else{
+        document.getElementById("room-list").style.display = 'block';
+        document.getElementById("log-list").style.display = 'none';
+    }
+})
+

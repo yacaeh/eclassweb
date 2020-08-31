@@ -94,7 +94,7 @@ function serverHandler(request, response) {
         }
 
         var matched = false;
-        ['/dashboard/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', '/ViewerJS/'].forEach(function(item) {
+        ['/dashboard/', '/logs/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', '/ViewerJS/'].forEach(function(item) {
             if (filename.indexOf(resolveURL(item)) !== -1) {
                 matched = true;
             }

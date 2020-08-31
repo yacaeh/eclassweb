@@ -142,6 +142,18 @@ module.exports = exports = function(socket, config) {
         });
 
         adminSocket = socket;
+       
+        socket.on('get-log-list', function(e){
+            let filelist = fs.readdirSync('./logs')
+            filelist = filelist.reverse();
+            e(filelist);
+        })
+
+        socket.on('delete-log-file', function(name, callback){
+            fs.unlinkSync('./logs/' + name);
+            callback(200);
+        })
+
         socket.on('admin', function(message, callback) {
             if (!isAdminAuthorized(params, config)) {
                 socket.emit('admin', {
@@ -1032,8 +1044,10 @@ module.exports = exports = function(socket, config) {
             }
 
             // console.log("LEFT")
-            LeftClass();
-            closeOrShiftRoom();
+            if(listOfRooms[getRoomId()])
+               LeftClass();
+    
+               closeOrShiftRoom();
             delete listOfUsers[socket.userid];
 
             if (socket.ondisconnect) {
@@ -1114,7 +1128,8 @@ module.exports = exports = function(socket, config) {
             });
         });
 
-           socket.on("show-class-status", function(callback){
+        socket.on("show-class-status", function(callback){
+            console.log("SHOW?")
             callback(listOfRooms)
         })
         //--------------------------------------------------------------------------------//
