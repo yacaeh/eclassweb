@@ -44,7 +44,7 @@ const topButtonContents = {
   top_test              : "시험",
   top_alert             : "알림",
   top_student           : "학생 판서",
-  top_camera            : "학생 카메라",
+  top_camera            : $.i18n( 'TOP_CAMERA' ),
   top_save_alert        : "알림 기록 저장",
   top_record_video      : "화면 녹화"
 }

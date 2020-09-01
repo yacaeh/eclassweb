@@ -10,17 +10,19 @@ function updateLanguage(){
 			});
 	
 			$( '#txt-roomid' ).prop( {
-				placeholder: $.i18n( 'ROOM_NUMBER' ),
+				placeholder: $.i18n( 'ROOM_NUMBER' )
 			});
 	
 			$( '#txt-user-name' ).prop( {
-				placeholder: $.i18n( 'NAME' ),
+				placeholder: $.i18n( 'NAME' )
 			});
 	
 			$( '#txt-room-password' ).prop( {
-				placeholder: $.i18n( 'PASSWORD' ),
+				placeholder: $.i18n( 'PASSWORD' )
 			});
-			
+			$('.conversation-panel .emojionearea-editor').prop( {
+				placeholder: $.i18n( 'CHAT_PLACEHOLDER' )
+			});
 			$('html').i18n();
 		});
 	});

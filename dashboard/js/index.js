@@ -39,13 +39,13 @@ connection.sdpConstraints.mandatory = {
 $('#btn-join-hidden-room').click(function () {
     var roomid = $('#txt-roomid').val().toString();
     if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox('방 번호를 입력해주세요.', '에러');
+        alertBox($.i18n( 'ROOM_NUMBER_ERROR' ), $.i18n( 'ERROR' ));
         return;
     }
 
     var fullName = $('#txt-user-name').val().toString();
     if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox('이름을 입력해주세요.', '에러');
+        alertBox($.i18n('NO_NAME_ERROR'),  $.i18n( 'ERROR' ));
         return;
     }
 
@@ -53,7 +53,7 @@ $('#btn-join-hidden-room').click(function () {
 
     var roomPassword = $('#txt-room-password').val().toString();
     if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox('방 비밀번호를 입력해주세요.', '에러');
+        alertBox($.i18n('ROOM_PASSWORD_ERROR'),  $.i18n( 'ERROR' ));
         return;
     }
     connection.password = roomPassword;
@@ -63,7 +63,7 @@ $('#btn-join-hidden-room').click(function () {
             joinAHiddenRoom(roomid);
         }
         else {
-            alertBox('방 정보를 확인해주세요.', '에러');
+            alertBox($.i18n('ROOM_INFO_ERROR'),  $.i18n( 'ERROR' ));
         }
     });
     return;
@@ -76,14 +76,14 @@ function checkCamAndMicExist(){
             connection.mediaConstraints.audio = false;
             connection.session.audio = false;
             console.log("user has no mic!");
-            alert("마이크가 없습니다!");
+            alert($.i18n('NO_MIC_ERROR'));
         }
     
         if (!connection.DetectRTC.hasWebcam) {
             connection.mediaConstraints.video = false;
             connection.session.video = false;
             console.log("user has no cam!");
-            alert("캠이 없습니다!");
+            alert($.i18n('NO_CAM_ERROR'));
         }
 
     });
@@ -209,13 +209,13 @@ function confirmBox(message, callback) {
 $('#btn-create-room').click(function () {
     var roomid = $('#txt-roomid').val().toString();
     if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox('방 번호를 입력해주세요.', '에러');
+        alertBox($.i18n( 'ROOM_NUMBER_ERROR' ), $.i18n( 'ERROR' ));
         return;
     }
 
     var fullName = $('#txt-user-name').val().toString();
     if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox('이름을 입력해주세요.', '에러');
+        alertBox($.i18n( 'NO_NAME_ERROR' ), $.i18n( 'ERROR' ));
         return;
     }
 
@@ -223,7 +223,7 @@ $('#btn-create-room').click(function () {
 
     var roomPassword = $('#txt-room-password').val().toString();
     if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox('방 비밀번호를 입력해주세요.', '에러');
+        alertBox($.i18n( 'ROOM_PASSWORD_ERROR' ), $.i18n( 'ERROR' ));
         return;
     }
 
@@ -239,20 +239,20 @@ $('#btn-create-room').click(function () {
         connection.DetectRTC.load(function () {
             if (!connection.DetectRTC.hasMicrophone) {
                 console.log("user has no mic!");
-                alertBox('마이크가 없습니다', '에러');
+                alertBox($.i18n( 'NO_MIC_ERROR' ), $.i18n( 'ERROR' ));
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }
 
             // if (!connection.DetectRTC.hasWebcam) {
             //     console.log("user has no cam!");
-            //     alertBox('웹캠이 없습니다', '에러');
+            //     alertBox('웹캠이 없습니다', $.i18n( 'ERROR' ));
             //     $('#btn-create-room').html(initialHTML).prop('disabled', false);
             //     return;
             // }
 
             if (isRoomExist === true && !extra._room.teacher_rejoin) {
-                alertBox('이미 존재하는 방입니다.', '에러');
+                alertBox( $.i18n( 'EXISTING_ROOM_ERROR' ), $.i18n( 'ERROR' ));
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }

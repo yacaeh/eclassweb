@@ -86,7 +86,7 @@
 	<script src="/dashboard/js/languages/he.js"></script>
 	<script src="/dashboard/js/languages/fi.js"></script>
 	<script src="/dashboard/js/languages/ml.js"></script>
-	<script src="/dashboard/js/lib/demo.js"></script>
+	<script src="/dashboard/js/lib/updateLanguage.js"></script>
 </head>
 
 <body ondragstart="return false" style="height: 1080px;">
@@ -154,10 +154,10 @@
             <img class="top_icon" id="top_record_video">
           </span>
           <span>
-            <select class="language span3">
+            <select class="language span3" onchange="updateLanguage()">
               <option value="en">English</option>
               <option value="ko">한국어</option>
-              <option value="ml">Malayalam</option>
+              <option value="id">Bahasa Indonesia</option>
             </select>
           </span>
 
@@ -173,13 +173,6 @@
 
     <article id="article">
         <div id="widget-container">
-            <select class="input-small person">
-              <option data-i18n='Meera' value="female">Meera</option>
-              <option data-i18n='Harry' value="male">Harry</option>
-            </select>
-            <li data-i18n="WELCOME"></li>...
-            <div class="result"><!-- The message will be filled here automatically. --></div>
-
           <div id="epub-navi" style="display: none;" class="shadow-5">
             <span id="navi-top">
               <input id="epubidx" autocomplete="off">
@@ -283,8 +276,7 @@
     <div class="chatting">
     
     <div id="notice" class="on">
-      <h1 data-i18n="welcome"></h1>
-      <span class="text"><h1 data-i18n="TEACHER_CHAT"></h1></span>
+      <span class="text" data-i18n="TEACHER_CHAT">선생님 채팅</h1></span>
       <div class="scroll" id="noticewindow"></div>
       <div id="collapse">
         <img class="btn" src="/dashboard/img/openchat.png">

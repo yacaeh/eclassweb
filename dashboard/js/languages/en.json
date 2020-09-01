@@ -1,14 +1,29 @@
 {
     "TITLE": "Home Class : Untact Education System",
-    "TEACHER_CHAT":"TEACHER_CHAT",
     "LOGIN":"Login",
     "STUDENT":"Student",
     "TEACHER":"Teacher",
+    "TEACHER_CHAT":"Teacher's Chat",
     "ROOM_NUMBER":"Room Number",
     "NAME":"Name",
     "PASSWORD":"Password",
     "CAMERA":"Camera",
     "MIC":"Microphone",
     "NETWORK":"Network",
-    "REFRESH":"Refresh"
+    "REFRESH":"Refresh",
+    "TESTING":"Testing",
+    "ERROR":"Error",
+    "ROOM_NUMBER_ERROR":"Please enter room number",
+    "NO_NAME_ERROR":"Please enter name",
+    "ROOM_PASSWORD_ERROR":"Please enter room password",
+    "ROOM_INFO_ERROR":"Please check room info",
+    "NO_MIC_ERROR":"No microphone found!",
+    "NO_CAM_ERROR":"No cam found!",
+    "EXISTING_ROOM_ERROR":"Room already exists!",
+    "NO_ROOM_ERROR":"Please check room info",
+
+    "_CLASS_":"클래스",
+
+    "CHAT_PLACEHOLDER":"Write your message here."
+
 }

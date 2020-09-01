@@ -40,7 +40,7 @@ class ChattingManagerClass{
             autocomplete: true,
             inline: true,
             hidePickerOnBlur: true,
-            placeholder: '메세지를 입력하세요',
+            placeholder: $.i18n( 'CHAT_PLACEHOLDER' ),
         
             events: {
                 focus: function () {

@@ -1,9 +1,9 @@
 {
     "TITLE": "Kelas Utama: Sistem Pendidikan Untact",
-    "TEACHER_CHAT":"Chat guru",
     "LOGIN":"Gabung",
     "STUDENT":"Student",
     "TEACHER":"Siswa",
+    "TEACHER_CHAT":"Chat guru",
     "ROOM_NUMBER":"Nomor kamar",
     "NAME":"Nama",
     "PASSWORD":"Kata sandi",
