@@ -2155,12 +2155,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
     // todo: add API documentation for connection.autoCreateMediaElement
 
     function getRMCMediaElement(stream, callback, connection) {
-        
         if (!connection.autoCreateMediaElement) {
             callback({});
             return;
         }
-
+        
         var isAudioOnly = false;
         if (!getTracks(stream, 'video').length && !stream.isVideo && !stream.isScreen) {
             isAudioOnly = true;
@@ -2175,11 +2174,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         mediaElement.setAttribute('muted', false);
         mediaElement.setAttribute('volume', 1);
 
-
         var played = mediaElement.play();
         if (typeof played !== 'undefined') {
             var cbFired = false;
-            setTimeout(function() {
+            
+            setTimeout(() => {
                 if (!cbFired) {
                     cbFired = true;
                     if(stream.isVideo){
@@ -2187,8 +2186,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                     }
                 }
             }, 1000);
+
             played.then(function() {
-                if (cbFired) return;
+                if (cbFired && stream.isVideo){
+                    return;
+                } 
                 cbFired = true;
                 callback(mediaElement);
             }).catch(function(error) {
@@ -3554,23 +3556,42 @@ var RTCMultiConnection = function(roomid, forceOptions) {
             }
            
         
+            // if (params.open == "true") {
+            //     options.localMediaConstraints.video.mandatory = {
+            //         "maxWidth": 640,
+            //         "maxHeight": 320,
+            //         "maxFrameRate": 24
+            //     };
+            // }
+            // else {
+            //     options.localMediaConstraints.video.mandatory = {
+            //         "minWidth": 82,
+            //         "maxWidth": 82,
+            //         "minHeight": 64,
+            //         "maxHeight": 64,
+            //         "maxFrameRate": 5
+            //     };
+            // }   
+
             if (params.open == "true") {
                 options.localMediaConstraints.video.mandatory = {
-                    "maxWidth": 640,
-                    "maxHeight": 320,
-                    "maxFrameRate": 24
+                    "minWidth": 32,
+                    "maxWidth": 160,
+                    "minHeight": 12,
+                    "maxHeight": 120,
+                    "maxFrameRate": 12
                 };
             }
             else {
                 options.localMediaConstraints.video.mandatory = {
-                    "minWidth": 82,
+                    "minWidth": 41,
                     "maxWidth": 82,
-                    "minHeight": 64,
+                    "minHeight": 32,
                     "maxHeight": 64,
-                    "maxFrameRate": 5
+                    "maxFrameRate": 4
                 };
             }   
-
+            
             getMedia(options.localMediaConstraints);
   
             function getMedia(option){
@@ -4428,7 +4449,6 @@ var RTCMultiConnection = function(roomid, forceOptions) {
                 });
             });
 
-            console.log(connectionDescription);
             return connectionDescription;
         };
 
@@ -4698,9 +4718,9 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
         // reverted
         connection.bandwidth = {
-            screen: 300,
-            audio: 6,
-            video: 100
+            screen: 64,
+            audio: 8,
+            video: 64
         };
 
         connection.codecs = {
