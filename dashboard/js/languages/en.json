@@ -6,5 +6,9 @@
     "TEACHER":"Teacher",
     "ROOM_NUMBER":"Room Number",
     "NAME":"Name",
-    "PASSWORD":"Password"
+    "PASSWORD":"Password",
+    "CAMERA":"Camera",
+    "MIC":"Microphone",
+    "NETWORK":"Network",
+    "REFRESH":"Refresh"
 }

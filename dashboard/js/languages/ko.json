@@ -6,5 +6,9 @@
     "TEACHER":"선생님",
     "ROOM_NUMBER":"방번호",
     "NAME":"이름",
-    "PASSWORD":"비밀번호"
+    "PASSWORD":"비밀번호",
+    "CAMERA":"카메라",
+    "MIC":"마이크",
+    "NETWORK":"네트워크",
+    "REFRESH":"새로고침"
 }
