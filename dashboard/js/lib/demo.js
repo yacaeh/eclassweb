@@ -1,28 +1,31 @@
-function updateText() {
-	'use strict';
-	var i18n = $.i18n(), language, person, kittens, message, gender;
-
-	message = '$1 has $2 {{plural:$2|kitten|kittens}}. ' +
-		'{{gender:$3|He|She}} loves to play with {{plural:$2|it|them}}.';
-	language = $( '.language option:selected' ).val();
-	person = $( '.person option:selected' ).text();
-	gender = $( '.person option:selected' ).val();
-	kittens = $( '.kittens' ).val();
-
-	i18n.locale = language;
-	i18n.load( 'js/languages/' + i18n.locale + '.json', i18n.locale )
-	// .done(
-	// 	function () {
-	// 		var personName = $.i18n( person ), localizedMessage = $.i18n( message, personName,
-	// 			kittens, gender );
-	// 		$( '.result' ).text( localizedMessage ).prop( 'title', i18n.localize( message ) );
-	// 	} );
+function updateLanguage(){
+	jQuery(function($) {
+		var i18n = $.i18n()
+		language = $( '.language option:selected' ).val();
+		i18n.locale = language;
+		$.i18n().load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
+		.done(function() {
+			$( "title" ).prop( {
+				text: $.i18n( 'TITLE' )
+			});
+	
+			$( '#txt-roomid' ).prop( {
+				placeholder: $.i18n( 'ROOM_NUMBER' ),
+			});
+	
+			$( '#txt-user-name' ).prop( {
+				placeholder: $.i18n( 'NAME' ),
+			});
+	
+			$( '#txt-room-password' ).prop( {
+				placeholder: $.i18n( 'PASSWORD' ),
+			});
+			
+			$('html').i18n();
+		});
+	});
+	
 }
-// Enable debug
-$.i18n.debug = true;
 
-$( document ).ready( function ( $ ) {
-	'use strict';
-	updateText();
-	$( '.kittens, .person, .language' ).on( 'change keyup', updateText );
-} );
+updateLanguage();
+

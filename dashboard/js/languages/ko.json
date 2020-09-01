@@ -1,4 +1,10 @@
 {
     "TITLE": "Home Class : 비대면 학습 시스템",
-    "TEACHER_CHAT":"선생님 채팅"
+    "TEACHER_CHAT":"선생님 채팅",
+    "LOGIN":"로그인",
+    "STUDENT":"학생",
+    "TEACHER":"선생님",
+    "ROOM_NUMBER":"방번호",
+    "NAME":"이름",
+    "PASSWORD":"비밀번호"
 }

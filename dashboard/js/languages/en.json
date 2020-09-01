@@ -1,5 +1,10 @@
 {
-    "WELCOME": "Welcome!",
-    "TITLE": "Home Class : Untacked Education System",
-    "TEACHER_CHAT":"TEACHER_CHAT"
+    "TITLE": "Home Class : Untact Education System",
+    "TEACHER_CHAT":"TEACHER_CHAT",
+    "LOGIN":"Login",
+    "STUDENT":"Student",
+    "TEACHER":"Teacher",
+    "ROOM_NUMBER":"Room Number",
+    "NAME":"Name",
+    "PASSWORD":"Password"
 }
