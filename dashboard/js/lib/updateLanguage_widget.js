@@ -1,7 +1,7 @@
 function updateLanguage(){
 	jQuery(function($) {
 		var i18n = $.i18n()
-		language = $( '.language option:selected' ).val();
+		language = 'ko';
 		i18n.locale = language;
 		$.i18n().load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
 		.done(function() {

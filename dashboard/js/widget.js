@@ -1850,7 +1850,7 @@ function canvasresize(id){
     }
 
     MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
-    MakeTitlePop("pencilIcon", "연필");
+    MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
     MakeTitlePop("markerIcon", "마커");
     MakeTitlePop("eraserIcon", "지우개");
     MakeTitlePop("textIcon", "글자를 적습니다");
@@ -1922,6 +1922,8 @@ function canvasresize(id){
 
 
 function MakeTitlePop(element, contents){
+    console.log("MakeTitlePop");
+    console.log(contents);
     let ele = document.getElementById(element);
     let pop = document.getElementById("titlebox");
 

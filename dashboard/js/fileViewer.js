@@ -678,7 +678,7 @@ function fileUploadModal(message, btn, callback) {
 
     $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
     $('#confirm-title').html(message).addClass("selected");
-    $('#confirm-title2').html("과제").removeClass("selected");
+    $('#confirm-title2').html($.i18n('ASSIGNMENT')).removeClass("selected");
     $('#confirm-box-topper').show();
 
     $('#confirm-box').modal({
@@ -979,7 +979,7 @@ function LoadFile(btn) {
     }
     if (!connection.extra.roomOwner)
         return;
-    fileUploadModal("파일 관리자", btn, function (e) { });
+    fileUploadModal($.i18n('FILE_MANAGER'), btn, function (e) { });
 }
 
 
