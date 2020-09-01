@@ -25,7 +25,7 @@ class attentionManagerClass{
             alertBox("<span>"+$.i18n( 'NOTIFICATION_WARNING' )+"</span>  ", $.i18n( 'NOTIFICATION' ), () => {
                 attentionManager.totalCount++;
                 attentionManager.teacherRequest[attentionManager.totalCount] = {
-                    name : '집중하세요',
+                    name : $.i18n( 'ATTENTION_PLEASE' ),
                 }
                 callback();
                 connection.send ({
@@ -59,7 +59,7 @@ class attentionManagerClass{
 
     exportAttention(){
         if( attentionManager.totalCount <= 0 ){
-            alert("저장할 데이터가 없습니다");
+            alert($.i18n( 'NO_DATA_STORE' ));
             return false;
         } 
         if(connection.extra.roomOwner) {

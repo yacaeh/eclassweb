@@ -175,7 +175,7 @@ function checkSharing() {
 
 function removeOnSelect(btn) {
     if (!connection.extra.roomOwner) {
-        alert("선생님이 다른 기능을 사용 중 입니다")
+        alert($.i18n( 'TEACHER_USING_FEATURE' ))
         return;
     }
 
@@ -186,7 +186,7 @@ function removeOnSelect(btn) {
         return;
     }
 
-    alertBox("현재 기능을 종료합니까?", "알림", function () {
+    alertBox("현재 기능을 종료합니까?", $.i18n( 'NOTIFICATION' ), function () {
         if (classroomInfo.share3D.state) {
             GetWidgetFrame().document.getElementById("3d_view").click();
             classroomInfo.share3D.state = false;

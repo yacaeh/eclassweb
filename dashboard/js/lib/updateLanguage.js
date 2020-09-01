@@ -29,6 +29,10 @@ function updateLanguage(){
 				placeholder: $.i18n( 'QUIZ_MINUTES' )
 			});
 
+			$( '#urlform #urlinput' ).prop( {
+				placeholder: $.i18n( 'ENTER_URL' )
+			});
+
 			$('html').i18n();
 		});
 	});
