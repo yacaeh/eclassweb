@@ -254,6 +254,7 @@ class classroomManagerClass {
         classroomCommand.onConnectionSession(event);
         connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
+        console.debug('Connected with ',"[",event.extra.userFullName,"]", "[",event.userid,"]");
 
         if (!connection.extra.roomOwner) return;
 
@@ -331,12 +332,12 @@ class classroomManagerClass {
         
         let childern = document.getElementById("student_list").children;
         for (let i = 0; i < childern.length; i++) {
-          let child = childern[i];
-          if (child.dataset.id == id) {
-            document.getElementById("student_list").removeChild(child);
-            delete canvasManager.canvas_array[id];
-            console.log("EXIT ROOM", id, name);
-            ChattingManager.leftStudent(event);
+            let child = childern[i];
+            if (child.dataset.id == id) {
+                document.getElementById("student_list").removeChild(child);
+                delete canvasManager.canvas_array[id];
+                console.debug("Left student", "[", id, "]", "[", name, "]");
+                ChattingManager.leftStudent(event);
             break;
           }
         }
@@ -433,6 +434,7 @@ class classroomManagerClass {
             }
             else {
                 classroomCommand.joinRoom();
+                isSync = true;
                 connection.socket.on('disconnect', () => location.reload())
             }
         });

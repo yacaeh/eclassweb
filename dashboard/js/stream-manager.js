@@ -238,6 +238,7 @@ class ScreenShareManagerClass{
       audio: true, // or true
       oneway : true,
       video: {
+        width : 1280,
         frameRate : { 
           ideal : screenshareManager.minFrameRate , 
           max : screenshareManager.maxFrameRate}
@@ -318,27 +319,6 @@ class ScreenShareManagerClass{
         false
       );
     
-      stream.getTracks().forEach(function (track) {
-        track.addEventListener(
-          'ended',
-          function () {
-            console.log("3");
-            callback();
-            callback = function () { };
-          },
-          false
-        );
-    
-        track.addEventListener(
-          'inactive',
-          function () {
-            console.log("4");
-            callback();
-            callback = function () { };
-          },
-          false
-        );
-      });
     }
 
     function replaceScreenTrack(stream, btn) {
@@ -364,9 +344,23 @@ class ScreenShareManagerClass{
       });
     }
   }
+  streamstart(stream){
+    console.log(stream);
+    console.debug("Find Screenshare stream",stream.streamid);
+    let parent = this.get().parentElement;
+    parent.removeChild(this.get());
+    let element = stream.mediaElement;
+    element.setAttribute('id', "screen-viewer"); 
+    element.volume = 0.3;
+    parent.appendChild(element);
+    this.show();
+    element.muted = true;
+    element.play();
+  }
+
   eventListener(event) {
     if (event.data.showScreenShare) {
-      console.log("SCREEN SHARE START", event.data.showScreenShare)
+      console.debug("Start Screensharing", event.data.showScreenShare)
 
       canvasManager.clear();
       classroomInfoLocal.shareScreenByStudent = true;
@@ -376,27 +370,12 @@ class ScreenShareManagerClass{
       classroomInfo.shareScreen.id = event.data.showScreenShare;
       classroomInfo.shareScreen.userid = event.userid;
 
-      let inter = setInterval(function(){
-        try{
-          var stream = connection.streamEvents[event.data.showScreenShare].stream;
-          var parent =  screenshareManager.get().parentElement;
-          parent.removeChild(screenshareManager.get());
-          let element = connection.streamEvents[event.data.showScreenShare].mediaElement;
-          element.id = "screen-viewer";
-          element.volume = 0.3;
-          parent.appendChild(element);
-          screenshareManager.show();
-          screenshareManager.srcObject(stream);
-          element.play();
-          console.log(element.paused)
-
-          if(!element.paused)
-            clearInterval(inter);
-        }
-        catch(error){
-          console.warn(error)
-        }
-      },500);
+      try {
+        let stream = connection.streamEvents[event.data.showScreenShare].stream;
+        this.streamstart(stream);
+      }
+      catch (error) {
+      }
 
       return true;
     }
@@ -416,16 +395,11 @@ class ScreenShareManagerClass{
     }
   }
   rejoin() {
-    console.error("REJOIN")
+    console.debug("Rejoin Screensharing", event.data.showScreenShare)
     let interval = setInterval(function () {
       try {
-        var parent = screenshareManager.get().parentElement;
-        let element = connection.streamEvents[classroomInfo.shareScreen.id].mediaElement;
-        element.id = "screen-viewer";
-        parent.removeChild(screenshareManager.get());
-        parent.appendChild(element);
-        element.volume = 0.3
-        screenshareManager.show();
+        let stream = connection.streamEvents[classroomInfo.shareScreen.id];
+        screenshareManager.streamstart(stream);
         clearInterval(interval);
       }
       catch(error){
@@ -511,11 +485,9 @@ class maincamManagerClass{
   }
   addTeacherCam (event){
     if (!event.extra.roomOwner || !event.stream.isVideo) return;      
-    
     this.srcObject(event.stream);
-    console.log("MAIN CHANGED",event);
+    console.debug("Teacher's cam selected",event.userid, event.streamid);
     this.start();
-    
   }
   eventListener(event) {
   }

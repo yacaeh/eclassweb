@@ -92,7 +92,7 @@ connection.maxParticipantsAllowed = 40;
 connection.password               = params.password;
 connection.enableLogs             = false;
 
-screenshareManager.setFrameRate(5,10);
+screenshareManager.setFrameRate(1,2);
 
 connection.session = {
   audio: false,
@@ -118,20 +118,28 @@ window.onWidgetLoaded = function () {
   mobileHelper.init();
 }
 
+let isSync = false;
+
 connection.onopen = function (event) {
-  console.log('onopen!', event.extra.userFullName, event.userid);
-  if(!connection.extra.roomOwner)
+  if(!isSync){
     classroomCommand.joinRoom();
+    isSync = true;
+  }
   classroomManager.joinStudent(event);
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
-  console.log('onclose!');
   classroomManager.leftStudent(event);  
 };
 
 connection.onstream = function (event) {
   console.log('onstream!',event);
+
+  if(classroomInfoLocal.shareScreen.state && (classroomInfo.shareScreen.id == event.streamid)){
+    screenshareManager.streamstart(event);
+  };
+
+
   if(event.share)
     return;
 
@@ -150,7 +158,7 @@ connection.onstream = function (event) {
 };
 
 connection.onstreamended = function (event) {
-  console.log('onstreameneded!',event);
+  console.warn('onstreameneded!',event);
   screenshareManager.onclose(event);
 };
 
@@ -186,22 +194,14 @@ connection.onmessage = function (event) {
   if(classroomManager.eventListener(event))
     return;
 
-
-  if (event.data.roomSync) {
-    classroomCommand.receiveSyncRoomInfo(event.data.roomSync);
-    console.log(classroomInfo)
-    return;
-  }
-
   if (event.data === 'plz-sync-points') {
-    console.log("Sync! when connect ! with" ,event.userid);
     designer.sync();
     return;
   }
 
   if (event.data.roomInfo) {
     classroomCommand.onReceiveRoomInfo(event.data);
-    console.log("SYNC", classroomInfo);
+    console.debug("Synced class room info");
     return;
   }
 

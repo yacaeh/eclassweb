@@ -82,8 +82,9 @@ class ChattingManagerClass{
             this.notice(event.data.msg);
         }
 
+        let id;
         if (event.data) {
-            let id = event.extra.userFullName || event.userid;
+            id = event.extra.userFullName || event.userid;
             if (event.extra.roomOwner == true) {
                 id += '('+$.i18n('TEACHER')+')';
                 color = "#C63EE8"
