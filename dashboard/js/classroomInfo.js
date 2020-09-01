@@ -50,8 +50,8 @@ classroomCommand = {
         방 동기화를 해준다.
     */
     joinRoom : function () {  
+        console.debug("join room...");
         connection.socket.emit ('update-room-info', (_info) => {
-            console.log(_info);                    
             classroomInfo.roomOpenTime      = _info.roomOpenTime;
             classroomInfo.allControl        = _info.allControl;
             classroomInfo.shareScreen.state = _info.shareScreen;
@@ -72,10 +72,6 @@ classroomCommand = {
     */
     onConnectionSession : function (_data) {
         if(!connection.extra.roomOwner) return;
-
-        // 로컬에서만 사용하는 데이터를 동기화 시켜 준다.
-        // 학생들은 선생님한테 룸 정보를 받아서, 선생님 정보를 동기화 시켜준다.
-        // 선생님이 로컬에서만 저장하는 데이터만 있을 수 있기 때문..
 
         let sendObj = {
             userid : _data.userid,

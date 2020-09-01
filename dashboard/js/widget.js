@@ -1904,7 +1904,7 @@ function canvasresize(id){
         });
 
         for(let i= 0 ; i < divs.length; i++){
-            divs[i].addEventListener("click", () => {
+            divs[i].addEventListener("click", function(){
                 let nowColor = this.dataset.color;
                 divs.forEach(element => element.classList.remove("on"));
                 this.classList.add("on");
