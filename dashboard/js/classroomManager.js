@@ -20,7 +20,7 @@ class classroomManagerClass {
         _AllCantrallFunc();
         AddEvent("confirm-title", "click", ViewUploadList);
         AddEvent("confirm-title2", "click", ViewHomeworkList);
-        AddEvent("icon_exit", "click", () => alertBox("정말로 나가시겠습니까?", "경고", classroomManager.gotoMain, function () { }))
+        AddEvent("icon_exit", "click", () => alertBox($.i18n( 'EXIT_CONFIRM' ), $.i18n( 'WARNING' ), classroomManager.gotoMain, function () { }))
         AddEvent("top_save_alert", "click", attentionManager.exportAttention);
         AddEvent("top_alert", "click", attentionManager.callAttend);
         AddEvent("top_record_video", "click", (self) => {
@@ -313,7 +313,7 @@ class classroomManagerClass {
         if(event.userid == GetOwnerId()){
           connection.socket._callbacks.$disconnect.length = 0
           connection.socket.disconnect();
-          alertBox("선생님이 나갔습니다. 이전 화면으로 돌아갑니다","알림", classroomManager.gotoMain, "확인")
+          alertBox($.i18n( 'TEACHER_LEFT' ),$.i18n( 'NOTIFICATION' ), classroomManager.gotoMain, $.i18n( 'CONFIRM' ))
         }
       
         if (!connection.extra.roomOwner) return;
@@ -426,7 +426,7 @@ class classroomManagerClass {
         classroomManager.setTeacher();
         connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
             if (!isRoomOpened) {
-                alert("이미 존재하는 방입니다.");
+                alert($.i18n( 'EXISTING_ROOM_ERROR' ));
                 classroomManager.gotoMain();
             }
             else if (error) {
@@ -460,7 +460,7 @@ class classroomManagerClass {
                 return;
               }
               if (error === connection.errors.ROOM_FULL) {
-                alert("방이 가득 찼습니다.");
+                alert($.i18n('FULL_ROOM_ERROR'));
                 classroomManager.gotoMain();
                 return;
               }

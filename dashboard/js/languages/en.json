@@ -21,6 +21,7 @@
     "NO_CAM_ERROR":"No cam found!",
     "EXISTING_ROOM_ERROR":"Room already exists!",
     "NO_ROOM_ERROR":"Please check room info",
+    "FULL_ROOM_ERROR":"Room full already!",
 
     "_CLASS_":"클래스",
 
@@ -32,12 +33,15 @@
     "NOTIFICATION_WARNING":"Send notification to student?",
     "YES":"YES",
     "NO":"NO",
+    "ME":"Me",
+    "CONFIRM":"Confirm",
     "":"동영상",
     "":"URL을 입력하세요",
     "":"저장할 데이터가 없습니다",
     "STUDENT_JOIN":" Student joined!",
     "STUDENT_LEFT":" Student left!",
     "":"선생님이 다른 기능을 사용 중 입니다",
+    "TEACHER_LEFT":"Teacher left. Return to previous page",
     "":"화면 공유 권한이 없습니다",
     "":"다른 사람이 화면 공유를 사용 중 입니다",
 

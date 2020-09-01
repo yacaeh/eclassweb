@@ -59,7 +59,7 @@ class ChattingManagerClass{
                 var chatMessage = $('.emojionearea-editor').html();
                 $('.emojionearea-editor').html('');
                 if (!chatMessage || !chatMessage.replace(/ /g, '').length) return;
-                ChattingManager.normal("나", chatMessage);
+                ChattingManager.normal($.i18n('ME'), chatMessage);
                 if(connection.extra.roomOwner)
                     ChattingManager.notice(chatMessage);
                 connection.send({
