@@ -92,7 +92,7 @@ connection.maxParticipantsAllowed = 40;
 connection.password               = params.password;
 connection.enableLogs             = false;
 
-screenshareManager.setFrameRate(5,10);
+screenshareManager.setFrameRate(1,2);
 
 connection.session = {
   audio: false,
@@ -150,7 +150,7 @@ connection.onstream = function (event) {
 };
 
 connection.onstreamended = function (event) {
-  console.log('onstreameneded!',event);
+  console.warn('onstreameneded!',event);
   screenshareManager.onclose(event);
 };
 
