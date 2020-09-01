@@ -22,7 +22,7 @@ class attentionManagerClass{
 
         if(connection.extra.roomOwner)
         {
-            alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => {
+            alertBox("<span>"+$.i18n( 'NOTIFICATION_WARNING' )+"</span>  ", $.i18n( 'NOTIFICATION' ), () => {
                 attentionManager.totalCount++;
                 attentionManager.teacherRequest[attentionManager.totalCount] = {
                     name : '집중하세요',

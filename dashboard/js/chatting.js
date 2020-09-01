@@ -85,7 +85,7 @@ class ChattingManagerClass{
         if (event.data) {
             let id = event.extra.userFullName || event.userid;
             if (event.extra.roomOwner == true) {
-                id += '(선생님)';
+                id += '('+$.i18n('TEACHER')+')';
                 color = "#C63EE8"
             }
         } 
@@ -96,7 +96,7 @@ class ChattingManagerClass{
         let name = event.extra.userFullName;
         let div = document.createElement('div');
         div.className = 'teachermsg2 enter';
-        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>학생이 접속했습니다</b>';
+        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>'+$.i18n('STUDENT_JOIN')+'</b>';
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
@@ -108,7 +108,7 @@ class ChattingManagerClass{
 
         let div = document.createElement('div');
         div.className = 'teachermsg2 left';
-        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>학생이 나갔습니다</b>';
+        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>'+$.i18n('STUDENT_LEFT')+'</b>';
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
@@ -116,7 +116,7 @@ class ChattingManagerClass{
     notice(msg){
         let div = document.createElement('div');
         div.className = 'teachermsg';
-        div.innerHTML = '<b> <font color="#C63EE8"> 선생님 </font>: </b>' + msg;
+        div.innerHTML = '<b> <font color="#C63EE8"> '+$.i18n('TEACHER')+' </font>: </b>' + msg;
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;

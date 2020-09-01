@@ -20,9 +20,15 @@ function updateLanguage(){
 			$( '#txt-room-password' ).prop( {
 				placeholder: $.i18n( 'PASSWORD' )
 			});
+
 			$('.conversation-panel .emojionearea-editor').prop( {
 				placeholder: $.i18n( 'CHAT_PLACEHOLDER' )
 			});
+
+			$( '#exam-time' ).prop( {
+				placeholder: $.i18n( 'QUIZ_MINUTES' )
+			});
+
 			$('html').i18n();
 		});
 	});

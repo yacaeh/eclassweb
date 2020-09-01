@@ -24,6 +24,90 @@
 
     "_CLASS_":"클래스",
 
-    "CHAT_PLACEHOLDER":"Write your message here."
+    "CHAT_PLACEHOLDER":"Write your message here.",
+    "NOTIFICATION":"Notification",
+    "WARNING":"Warning",
+    "ASK_CLOSE_CURRENT":"Do you want to close current window?",
+    "EXIT_CONFIRM":"Are you sure you want to leave?",
+    "NOTIFICATION_WARNING":"Send notification to student?",
+    "YES":"YES",
+    "NO":"NO",
+    "":"동영상",
+    "":"URL을 입력하세요",
+    "":"저장할 데이터가 없습니다",
+    "STUDENT_JOIN":" Student joined!",
+    "STUDENT_LEFT":" Student left!",
+    "":"선생님이 다른 기능을 사용 중 입니다",
+    "":"화면 공유 권한이 없습니다",
+    "":"다른 사람이 화면 공유를 사용 중 입니다",
+
+    "_STUDNET_AUTH_":"학생 기능 부여",
+
+    "":"이미 다른 학생에게 권한이 있습니다",
+    "":"화면 공유",
+    "":"마이크",
+    "":"판서 공유",
+    "":"화면 공유 권한",
+    "":"마이크 권한",
+    "":"판서 공유 중",
+
+
+    "_QUIZ_":"시험",
+
+    "QUIZ_CREATE":"Create Quiz",
+    "QUIZ_NUM":"# Q",
+    "QUIZ_TIME":"Time",
+    "QUIZ_MINUTES":"(Min)",
+    "QUIZ_SETTING":"Setting",
+    "QUIZ_START":"Quiz Start",
+    "QUIZ_ANSWER_ERROR":"문제에 대한 모든 답을 선택해야합니다.",
+    "QUIZ_ON":"시험 중",
+    "QUIZ_END":"시험 종료",
+    "QUIZ_END_WARNING":"시험 종료 후 닫을 수 있습니다",
+    "QUIZ_SUBMIT":"제출 하기",
+    "QUIZ_SUBMIT_WARNING":"아직 답안지 작성이 완료 안됐습니다",
+    "RECORD":"0000년 0월 00일 0시 0분 0초 - 수업녹화",
+
+    "_FILE_MANAGER_":"파일 관리자",
+
+    "":"파일 관리자",
+    "":"과제",
+    "":"찾아보기",
+    "":"제출",
+    "":"마우스로 파일을 끌어오세요",
+    "":"파일 선택",
+    
+
+
+    "_TOOLS_":"툴 도움말",
+
+    "MARKER_ON_OFF":"Marker on & off",
+    "":"연필",
+    "":"마커",
+    "":"지우개",
+    "":"글자를 적습니다",
+    "":"작업 하나를 취소합니다",
+    "":"판서를 비웁니다",
+    "":"내 화면을 공유합니다",
+    "":"3D 모델을 공유합니다",
+    "":"Youtube URL 로 동영상을 불러옵니다",
+    "":"파일을 불러옵니다",
+    "":"E-Pub을 불러옵니다",
+    
+    "_TOP_TOOLS_":"상단 도움말",
+    
+    "":"전체 제어",
+    "":"시험",
+    "":"알림",
+    "TOP_CAMERA":"학생 카메라",
+    "":"학생 판서",
+    "":"알림 기록 저장",
+    "":"화면 녹화",
+
+    "_EXTRA_":"기타",
+
+    "":"답안지를 먼저 작성해야 합니다",
+    "":"최대 문항수는 200개입니다",
+    "":"시간 설정이 잘못 되었습니다"
 
 }
