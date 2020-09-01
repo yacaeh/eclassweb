@@ -238,6 +238,7 @@ class ScreenShareManagerClass{
       audio: true, // or true
       oneway : true,
       video: {
+        width : 1280,
         frameRate : { 
           ideal : screenshareManager.minFrameRate , 
           max : screenshareManager.maxFrameRate}
@@ -318,27 +319,6 @@ class ScreenShareManagerClass{
         false
       );
     
-      stream.getTracks().forEach(function (track) {
-        track.addEventListener(
-          'ended',
-          function () {
-            console.log("3");
-            callback();
-            callback = function () { };
-          },
-          false
-        );
-    
-        track.addEventListener(
-          'inactive',
-          function () {
-            console.log("4");
-            callback();
-            callback = function () { };
-          },
-          false
-        );
-      });
     }
 
     function replaceScreenTrack(stream, btn) {
@@ -387,6 +367,7 @@ class ScreenShareManagerClass{
           parent.appendChild(element);
           screenshareManager.show();
           screenshareManager.srcObject(stream);
+          element.muted = true;
           element.play();
           console.log(element.paused)
 
@@ -424,7 +405,10 @@ class ScreenShareManagerClass{
         element.id = "screen-viewer";
         parent.removeChild(screenshareManager.get());
         parent.appendChild(element);
-        element.volume = 0.3
+        element.volume = 0.3;
+        element.muted = true;
+        element.play();
+        // element.muted = false;
         screenshareManager.show();
         clearInterval(interval);
       }
