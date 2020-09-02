@@ -7,12 +7,12 @@
 
 'use strict';
 
-const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/css/NanumPen.ttf)');
+const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/fonts/NanumPen.ttf)');
 penFont.load().then((font) => {
   document.fonts.add(font);
 });
 
-const gothicFont = new FontFace('나눔고딕', 'url(/dashboard/css/NanumBarunGothic.ttf)');
+const gothicFont = new FontFace('나눔고딕', 'url(/dashboard/fonts/NanumBarunGothic.ttf)');
 gothicFont.load().then((font) => {
   document.fonts.add(font);
 });
