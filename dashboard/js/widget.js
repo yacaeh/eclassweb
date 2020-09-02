@@ -6,6 +6,9 @@
 // https://github.com/muaz-khan/Canvas-Designer
 
 'use strict';
+$(window).bind("load", function() {
+    updateLanguage();
+});
 
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/fonts/NanumPen.ttf)');
 penFont.load().then((font) => {
@@ -1848,21 +1851,6 @@ function canvasresize(id){
             document.getElementById("pencil-container").style.display = 'none';
         })
     }
-
-    MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
-    MakeTitlePop("pencilIcon", "연필");
-    MakeTitlePop("markerIcon", "마커");
-    MakeTitlePop("eraserIcon", "지우개");
-    MakeTitlePop("textIcon", "글자를 적습니다");
-    MakeTitlePop("undo", "작업 하나를 취소합니다");
-    MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
-    MakeTitlePop("screen_share", "내 화면을 공유합니다");
-    MakeTitlePop("3d_view", "3D 모델을 공유합니다");
-    MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
-    MakeTitlePop("file", "파일을 불러옵니다");
-    MakeTitlePop("epub", "E-Pub을 불러옵니다");
-    MakeTitlePop("callteacher", "저요");
-    MakeTitlePop("homework", "숙제를 제출합니다");
 
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
 

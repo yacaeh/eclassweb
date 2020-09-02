@@ -16397,12 +16397,12 @@ function Refresh(start){
 		document.getElementById("device-mic").style.backgroundColor = "#ffffff";
 
 		btn.setAttribute("disabled",'');
-		btn.innerHTML = "검사 중";
+		btn.innerHTML = $.i18n( 'TESTING' );
 		btn.style.cursor = "default";
 	}
 	else{
 		btn.removeAttribute("disabled");
-		btn.innerHTML = "새로고침";
+		btn.innerHTML = $.i18n( 'REFRESH' );
 		btn.style.cursor = "pointer";
 	}
 }

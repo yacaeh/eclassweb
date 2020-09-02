@@ -628,7 +628,7 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
 }
 
 function HomeworkSubmit(){
-    HomeworkUploadModal("숙제 제출")
+    HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
 }
 
 function HomeworkUploadModal(message, callback) {
@@ -639,7 +639,7 @@ function HomeworkUploadModal(message, callback) {
     $('#btn-confirm-file-close').hide();
     $("#confirm-title2").hide();
     $('#confirm-title').html(message).removeClass("selected");
-    $('#btn-confirm-action').html('닫기').unbind('click').bind('click', function (e) {
+    $('#btn-confirm-action').html($.i18n('CLOSE')).unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
@@ -660,14 +660,14 @@ function fileUploadModal(message, btn, callback) {
     console.log(message);
     getUploadFileList();
     $("#confirm-title2").show();
-    $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
+    $('#btn-confirm-action').html($.i18n('OK')).unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
         callback(true);
     });
 
-    $('#btn-confirm-close').html('취소');
+    $('#btn-confirm-close').html($.i18n('CANCEL'));
 
     $('.btn-confirm-close').unbind('click').bind('click', function (e) {
         e.preventDefault();
@@ -678,7 +678,7 @@ function fileUploadModal(message, btn, callback) {
 
     $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
     $('#confirm-title').html(message).addClass("selected");
-    $('#confirm-title2').html("과제").removeClass("selected");
+    $('#confirm-title2').html($.i18n('ASSIGNMENT')).removeClass("selected");
     $('#confirm-box-topper').show();
 
     $('#confirm-box').modal({
@@ -688,7 +688,7 @@ function fileUploadModal(message, btn, callback) {
     if (!isFileViewer) $('#btn-confirm-file-close').hide();
     else {
         $('#btn-confirm-file-close').show();
-        $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
+        $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE')).unbind('click').bind('click', function (e) {
             e.preventDefault();
             unloadFileViewer();
         });
@@ -748,7 +748,7 @@ function updateFileList(list, extraPath) {
     var listElement = '<ul class="list-group-flush">';
 
     if (list.length == 0){
-        listElement += '아직 파일이 없습니다!';
+        listElement += $.i18n('NO_FILES');
     }
     else {
         list.files.forEach(file => {
@@ -847,7 +847,7 @@ function deleteUploadedFile(filename, extraPath) {
         var nowName = mfileViewer.nowPath.split('/');
         nowName = nowName[nowName.length - 1];
         if(filename == nowName) {
-            alert("현재 열려있는 파일은 지울 수 없습니다")
+            alert($.i18n('DELETE_OPEN_ERROR'));
             return;
         }
     }
@@ -873,7 +873,10 @@ function deleteUploadedFile(filename, extraPath) {
 }
 
 function loadFileInput() {
+    var lang = language;
+    if (lang == 'ko'){lang='kr';}
 
+    console.log("lang",lang);
     $(document).ready(function () {
         let extraPath = "";
 
@@ -883,14 +886,14 @@ function loadFileInput() {
         $("#test-upload").fileinput({
             'theme': 'fas',
             'showPreview': true,
-            'language': 'kr',
+            'language': lang,
             'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg", "odt"],
             'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
             'elErrorContainer': '#errorBlock'
         });
         $("#file-explorer").fileinput({
             'theme': 'explorer-fas',
-            'language': 'kr',
+            'language': lang,
             'uploadUrl': fileServerUrl + '/upload',
             fileActionSettings: {
                 showZoom: false,
@@ -979,7 +982,7 @@ function LoadFile(btn) {
     }
     if (!connection.extra.roomOwner)
         return;
-    fileUploadModal("파일 관리자", btn, function (e) { });
+    fileUploadModal($.i18n('FILE_MANAGER'), btn, function (e) { });
 }
 
 
@@ -1000,7 +1003,7 @@ function unloadFileViewer() {
 
 function loadFileViewer(path) {
     if(mfileViewer.nowPath == path){
-        alert("같은 파일이 열려있습니다.")
+        alert($.i18n('SAME_FILE_OPEN_ERROR'));
         return;
     }
 

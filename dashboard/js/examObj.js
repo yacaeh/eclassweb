@@ -25,7 +25,7 @@ examObj.init = function(){
                 rightTab.style.zIndex = 3;
             });
           } else {
-            alert("시험 종료 후 닫을 수 있습니다");
+            alert($.i18n('QUIZ_END_WARNING'));
           }
         }
         else {
@@ -424,11 +424,11 @@ examObj.exportExam = function () {
     // export excel data
     function getSubmitData() {
         var contents = [];
-        contents[0] = ['이름', '점수'];   // 타이틀        
+        contents[0] = [$.i18n('NAME'), $.i18n('SCORE')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for (var i = 0; i < examObj.questionCount; ++i) {
-            contents[0][i + prefix] = `${i + 1}번`;
+            contents[0][i + prefix] = `${i + 1}`;
         }
 
         var row = 1;
@@ -541,7 +541,7 @@ function setStudentOMR(quesCount, examTime) {
     var question = '';
 
     question += "<div class='exam-header'>";
-    question += "<div id='is-testing'>시험 중</div>";
+    question += "<div id='is-testing'>"+$.i18n('QUIZ_ON')+"</div>";
     question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
     question += '</div>';
     question += "<div class='exam-overflow exam-border-bottom'>";
@@ -560,7 +560,7 @@ function setStudentOMR(quesCount, examTime) {
     question += '</div>';
     question += `</div>`;
     question +=
-        "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
+        "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>"+$.i18n('QUIZ_SUBMIT')+"</button>";
     $('#exam-omr').html(question);
 
     examTime *= 60;
@@ -578,7 +578,7 @@ function setStudentOMR(quesCount, examTime) {
 function submitOMR() {
     if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
         // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
-        alert('아직 답안지 작성이 완료 안되었습니다');
+        alert($.i18n('QUIZ_SUBMIT_WARNING'));
         return;
     }
 
@@ -593,7 +593,7 @@ function stopQuestionOMR() {
     var studentOMR = getQuestionAnswerList();
     examObj.examAnswer = studentOMR;
     //  console.log(studentOMR);
-    $('#is-testing').html("시험 종료");
+    $('#is-testing').html($.i18n('QUIZ_END'));
     $('#exam-omr-question-list').css('pointer-events', 'none');
     $('#exam-answer-submit').hide();
 }
@@ -637,7 +637,7 @@ function showExamStateForm() {
     var stateHtmlStr = '';
 
     stateHtmlStr += "<div class='exam-header'>";
-    stateHtmlStr += '<div>시험 중</div>';
+    stateHtmlStr += '<div>'+$.i18n('QUIZ_ON')+'</div>';
     stateHtmlStr += "<div id='exam-teacher-timer' style='color:red;'>0:0</div>";
     stateHtmlStr += '</div>';
     stateHtmlStr += "<div class='exam-background exam-overflow'>";
@@ -650,7 +650,7 @@ function showExamStateForm() {
     }
     stateHtmlStr += '</div>';
     stateHtmlStr +=
-        "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>시험 종료</button>";
+        "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>"+$.i18n('QUIZ_END')+"</button>";
 
     $('#exam-state').html(stateHtmlStr);
 }
@@ -659,7 +659,7 @@ function SettingForExam() {
     AddEvent("exam-setting-apply", "click", function () {
         m_QuesCount = $('#exam-question-count').val();
         if (m_QuesCount > 200) {
-            alert("최대 문항수는 200개입니다");
+            alert($.i18n('QUIZ_MAX_ERROR'));
             m_QuesCount = 200;
             $('#exam-question-count').val(m_QuesCount);
         }
@@ -674,18 +674,18 @@ function SettingForExam() {
 
     AddEvent("exam-start", "click", function () {
         if (m_QuesCount <= 0) {
-            alert('답안지를 먼저 작성해야 합니다');
+            alert($.i18n('QUIZ_FILL_ERROR'));
             return;
         }
         //const questionCount = $('#exam-question-count').val();
         if (!examObj.checkAnswerChecked(m_QuesCount)) {
-            alert('문제애 대한 모든 답을 선택해야 합니다');
+            alert($.i18n('QUIZ_ANSWER_ERROR'));
             return;
         }
 
         const examTime = $('#exam-time').val();
         if (examTime <= 0 || isNaN(examTime)) {
-            alert('시간 설정이 잘못 되었습니다.');
+            alert($.i18n('QUIZ_TIME_ERROR'));
             return;
         }
 
