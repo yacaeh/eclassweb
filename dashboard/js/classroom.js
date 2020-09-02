@@ -60,28 +60,6 @@ const canvasButtonContents = {
   'homework'    : HomeworkSubmit,
 }
 
-function updateLanguage(){
-	jQuery(function($) {
-		i18n = $.i18n()
-		language = $( '.language option:selected' ).val();
-		i18n.locale = language;
-		i18n.load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
-		.done(function() {
-      topButtonContents.top_all_controll = $.i18n( 'MANAGE_ALL' );
-      topButtonContents.top_test = $.i18n( 'TOP_QUIZ' );
-      topButtonContents.top_alert = $.i18n( 'TOP_NOTIFY' );
-      topButtonContents.top_student = $.i18n( 'TOP_STUDNET_CANVAS' );
-      topButtonContents.top_camera = $.i18n( 'TOP_CAMERA' );
-      topButtonContents.top_save_alert = $.i18n( 'TOP_SAVE_ALERT' );
-      topButtonContents.top_record_video = $.i18n( 'TOP_RECORD_VIDEO' );
-			$('html').i18n();
-		});
-	});
-	
-}
-
-updateLanguage();
-
 // Alt + 단축키
 const shortCut = [
   {"onoff-icon"   : "a"},

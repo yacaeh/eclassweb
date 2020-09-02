@@ -7,21 +7,7 @@
 
 'use strict';
 $(window).bind("load", function() {
-
-    MakeTitlePop("onoff-icon",$.i18n('CANVAS_ON_OFF'));
-    MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
-    MakeTitlePop("markerIcon", $.i18n('MARKER'));
-    MakeTitlePop("eraserIcon", $.i18n('ERASER'));
-    MakeTitlePop("textIcon", $.i18n('TEXT'));
-    MakeTitlePop("undo", $.i18n('UNDO'));
-    MakeTitlePop("clearCanvas", $.i18n('CLEAR_CANVAS'));
-    MakeTitlePop("screen_share", $.i18n('SHARE_SCREEN'));
-    MakeTitlePop("3d_view", $.i18n('SHARE_3D'));
-    MakeTitlePop("movie", $.i18n('SHARE_YOUTUBE'));
-    MakeTitlePop("file", $.i18n('SHARE_FILE'));
-    MakeTitlePop("epub", $.i18n('SHARE_EPUB'));
-    MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
-    MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));
+    updateLanguage();
 });
 
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/css/NanumPen.ttf)');
