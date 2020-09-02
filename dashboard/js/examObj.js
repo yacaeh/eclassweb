@@ -578,7 +578,7 @@ function setStudentOMR(quesCount, examTime) {
 function submitOMR() {
     if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
         // TODO : 경고 표시, 답안지 작성이 완료가 안되었다는 내용.
-        alert('아직 답안지 작성이 완료 안되었습니다');
+        alert($.i18n('QUIZ_SUBMIT_WARNING'));
         return;
     }
 
@@ -593,7 +593,7 @@ function stopQuestionOMR() {
     var studentOMR = getQuestionAnswerList();
     examObj.examAnswer = studentOMR;
     //  console.log(studentOMR);
-    $('#is-testing').html("시험 종료");
+    $('#is-testing').html($.i18n('QUIZ_END'));
     $('#exam-omr-question-list').css('pointer-events', 'none');
     $('#exam-answer-submit').hide();
 }
@@ -637,7 +637,7 @@ function showExamStateForm() {
     var stateHtmlStr = '';
 
     stateHtmlStr += "<div class='exam-header'>";
-    stateHtmlStr += '<div>시험 중</div>';
+    stateHtmlStr += '<div>'+$.i18n('QUIZ_ON')+'</div>';
     stateHtmlStr += "<div id='exam-teacher-timer' style='color:red;'>0:0</div>";
     stateHtmlStr += '</div>';
     stateHtmlStr += "<div class='exam-background exam-overflow'>";
@@ -659,7 +659,7 @@ function SettingForExam() {
     AddEvent("exam-setting-apply", "click", function () {
         m_QuesCount = $('#exam-question-count').val();
         if (m_QuesCount > 200) {
-            alert("최대 문항수는 200개입니다");
+            alert($.i18n('QUIZ_MAX_ERROR'));
             m_QuesCount = 200;
             $('#exam-question-count').val(m_QuesCount);
         }
@@ -674,18 +674,18 @@ function SettingForExam() {
 
     AddEvent("exam-start", "click", function () {
         if (m_QuesCount <= 0) {
-            alert('답안지를 먼저 작성해야 합니다');
+            alert($.i18n('QUIZ_FILL_ERROR'));
             return;
         }
         //const questionCount = $('#exam-question-count').val();
         if (!examObj.checkAnswerChecked(m_QuesCount)) {
-            alert('문제애 대한 모든 답을 선택해야 합니다');
+            alert($.i18n('QUIZ_ANSWER_ERROR'));
             return;
         }
 
         const examTime = $('#exam-time').val();
         if (examTime <= 0 || isNaN(examTime)) {
-            alert('시간 설정이 잘못 되었습니다.');
+            alert($.i18n('QUIZ_TIME_ERROR'));
             return;
         }
 
