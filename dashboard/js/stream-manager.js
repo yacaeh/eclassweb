@@ -149,7 +149,7 @@ class screenRecorderClass {
     var hour = date.getHours();
     var min = date.getMinutes();
     var sec = date.getSeconds();
-    var name = year + "년" + month + "월" + day + "일 " + hour + "시" + min + "분" + sec + "초" + '-수업녹화.webm';
+    var name = year + "/" + month + "/" + day + "/ " + hour + "/" + min + "/" + sec + '-'+$.i18n('RECORD') +'.webm';
     return name;
   }
 }

@@ -76,6 +76,7 @@
     "QUIZ_SUBMIT":"제출 하기",
     "QUIZ_SUBMIT_WARNING":"아직 답안지 작성이 완료 안됐습니다",
     "SCORE":"점수",
+    "ANSWER":"응답",
     "RECORD":"수업녹화",
 
     "_FILE_MANAGER_":"파일 관리자",

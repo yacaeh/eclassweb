@@ -99,11 +99,11 @@ class attentionManagerClass{
 
     getSubmitData () {
         let contents = [];        
-        contents[0] = ['이름', '응답'];   // 타이틀        
+        contents[0] = [$.i18n('NAME'), $.i18n('ANSWER')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for(let i = 0; i < this.totalCount; ++i) {
-            contents[0][i+prefix] = `${i+1}번`;
+            contents[0][i+prefix] = `${i+1}`;
         }        
         
         let row = 1;
