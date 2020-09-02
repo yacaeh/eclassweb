@@ -33,8 +33,8 @@ rl.on("line", function (line) {
         MinifyCSS();
     }
     else if (line == "2"){
-        ReturnJS();
-        ReturnCSS();
+        Return(jspath);
+        Return(csspath);
     }
 
     console.log("Finished")
@@ -104,9 +104,9 @@ function MinifyCSS() {
     console.log("CSS Minify finished");
 }
 
-function ReturnJS() {
-    var dir = fs.readdirSync(jspath, { withFileTypes: true })
-    var original = fs.readdirSync(jspath +'/original');
+function Return(path) {
+    var dir = fs.readdirSync(path, { withFileTypes: true })
+    var original = fs.readdirSync(path +'/original');
 
     if(original.length == 0){
         console.log("Not minified yet");
@@ -118,27 +118,8 @@ function ReturnJS() {
         .map(dir => dir.name);
 
     filesNames.forEach((file) => {
-        fs.unlinkSync(jspath + "/" + file);
-        fs.renameSync(jspath + '/original/' + file, jspath + '/' + file);
+        fs.unlinkSync(path + "/" + file);
+        fs.renameSync(path + '/original/' + file, path + '/' + file);
     })
 
-}
-
-function ReturnCSS(){
-    var dir = fs.readdirSync(csspath, { withFileTypes: true })
-    var original = fs.readdirSync(csspath +'/original');
-
-    if(original.length == 0){
-        console.log("Not minified yet");
-        return;
-    }
-
-    const filesNames = dir
-        .filter(dir => dir.isFile())
-        .map(dir => dir.name);
-
-    filesNames.forEach((file) => {
-        fs.unlinkSync(csspath + "/" + file);
-        fs.renameSync(csspath + '/original/' + file, csspath + '/' + file);
-    })
 }
