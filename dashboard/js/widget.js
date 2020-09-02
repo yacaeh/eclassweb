@@ -6,20 +6,23 @@
 // https://github.com/muaz-khan/Canvas-Designer
 
 'use strict';
-function updateLanguage(){
-	jQuery(function($) {
-		i18n = $.i18n()
-		language = $( '.language option:selected' ).val();
-		i18n.locale = language;
-		i18n.load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
-		.done(function() {
-			$('html').i18n();
-		});
-	});
-	
-}
+$(window).bind("load", function() {
 
-updateLanguage();
+    MakeTitlePop("onoff-icon",$.i18n('CANVAS_ON_OFF'));
+    MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
+    MakeTitlePop("markerIcon", $.i18n('MARKER'));
+    MakeTitlePop("eraserIcon", $.i18n('ERASER'));
+    MakeTitlePop("textIcon", $.i18n('TEXT'));
+    MakeTitlePop("undo", $.i18n('UNDO'));
+    MakeTitlePop("clearCanvas", $.i18n('CLEAR_CANVAS'));
+    MakeTitlePop("screen_share", $.i18n('SHARE_SCREEN'));
+    MakeTitlePop("3d_view", $.i18n('SHARE_3D'));
+    MakeTitlePop("movie", $.i18n('SHARE_YOUTUBE'));
+    MakeTitlePop("file", $.i18n('SHARE_FILE'));
+    MakeTitlePop("epub", $.i18n('SHARE_EPUB'));
+    MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
+    MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));
+});
 
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/css/NanumPen.ttf)');
 penFont.load().then((font) => {
@@ -1863,21 +1866,6 @@ function canvasresize(id){
         })
     }
 
-    MakeTitlePop("onoff-icon", "판서 기능을 켜고 끕니다");
-    MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
-    MakeTitlePop("markerIcon", "마커");
-    MakeTitlePop("eraserIcon", "지우개");
-    MakeTitlePop("textIcon", "글자를 적습니다");
-    MakeTitlePop("undo", "작업 하나를 취소합니다");
-    MakeTitlePop("clearCanvas", "캔버스를 비웁니다");
-    MakeTitlePop("screen_share", "내 화면을 공유합니다");
-    MakeTitlePop("3d_view", "3D 모델을 공유합니다");
-    MakeTitlePop("movie", "Youtube URL 로 동영상을 불러옵니다");
-    MakeTitlePop("file", "파일을 불러옵니다");
-    MakeTitlePop("epub", "E-Pub을 불러옵니다");
-    MakeTitlePop("callteacher", "저요");
-    MakeTitlePop("homework", "숙제를 제출합니다");
-
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
 
     SliderSetting("pencileslider", "pencil-stroke-style",1 , 22, 3, function(v){
@@ -1936,8 +1924,6 @@ function canvasresize(id){
 
 
 function MakeTitlePop(element, contents){
-    console.log("MakeTitlePop");
-    console.log(contents);
     let ele = document.getElementById(element);
     let pop = document.getElementById("titlebox");
 

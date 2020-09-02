@@ -1,6 +1,7 @@
 let language;
 let i18n;
 function updateLanguage(){
+	console.log("Update language on change!");
 	jQuery(function($) {
 		i18n = $.i18n()
 		language = $( '.language option:selected' ).val();
@@ -40,9 +41,7 @@ function updateLanguage(){
 			console.log("Load Language!");
 		});
 	});
-	
+
 }
 
 updateLanguage();
-
-//right-tab > div.chatting > div.conversation-panel > div.emojionearea.emojionearea-inline > div.emojionearea-editor

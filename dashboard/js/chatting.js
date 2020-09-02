@@ -6,6 +6,23 @@ class ChattingManagerClass{
     }
 
     init(){
+
+        function updateLanguage(){
+            jQuery(function($) {
+                i18n = $.i18n()
+                language = $( '.language option:selected' ).val();
+                i18n.locale = language;
+                i18n.load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
+                .done(function() {
+                    $('html').i18n();
+                });
+            });
+            
+        }
+        
+        updateLanguage();
+        
+        
         this.noticeElement = document.getElementById('noticewindow');
         this.normalElement = document.getElementById('conversation-panel');
         var notice = document.getElementById("notice");
@@ -32,7 +49,8 @@ class ChattingManagerClass{
             notice.classList.toggle('off');
             notice.classList.toggle('on');
         });
-        
+        $(window).bind("load", function() {
+
         $('#txt-chat-message').emojioneArea({
             pickerPosition: 'top',
             filtersPosition: 'bottom',
@@ -40,7 +58,7 @@ class ChattingManagerClass{
             autocomplete: true,
             inline: true,
             hidePickerOnBlur: true,
-            placeholder: 'replace this',
+            placeholder: $.i18n( 'CHAT_PLACEHOLDER' ),
             events: {
                 focus: function () {
                     $('.emojionearea-category')
@@ -51,7 +69,7 @@ class ChattingManagerClass{
                 },
             },
         });
-    
+        });
         window.onkeyup = function (e) {
             var code = e.keyCode || e.which;
             if (code == 13) {
