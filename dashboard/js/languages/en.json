@@ -1,4 +1,6 @@
 {
+    "_MAIN_":"메인",
+
     "TITLE": "Home Class : Untact Education System",
     "LOGIN":"Login",
     "STUDENT":"Student",
@@ -37,6 +39,7 @@
     "CONFIRM":"Confirm",
     "OK":"Ok",
     "CANCEL":"Cancel",
+    "CLOSE":"Close",
     "ATTENTION_PLEASE":"attention please!",
     "FOOTAGE":"Footage",
     "ENTER_URL":"Enter URL",
@@ -57,7 +60,6 @@
     "STUDENT_SCREEN_PERMISSION":"Screen share permission",
     "STUDENT_MIC_PERMISSION":"Mic permission",
     "STUDENT_SHARING_CANVAS":"Sharing Canvas",
-
 
     "_QUIZ_":"시험",
 
@@ -83,8 +85,11 @@
     "SUBMIT_FILE":"Submit file",
     "DRAG_DES":"Drag files here",
     "FILE_SELECT":"Select File",
-    
-
+    "NO_FILES":"No files yet!",
+    "DELETE_OPEN_ERROR":"You can't delete open file",
+    "SAME_FILE_OPEN_ERROR":"Same file is open already",
+    "CLOSE_CURRENT_FILE":"Close current file",
+    "SUBMIT_ASSIGNMENT":"Submit Assignment",
 
     "_TOOLS_":"툴 도움말",
 

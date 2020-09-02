@@ -1,11 +1,11 @@
 let language;
-
+let i18n;
 function updateLanguage(){
 	jQuery(function($) {
-		var i18n = $.i18n()
+		i18n = $.i18n()
 		language = $( '.language option:selected' ).val();
 		i18n.locale = language;
-		$.i18n().load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
+		i18n.load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
 		.done(function() {
 			$( "title" ).prop( {
 				text: $.i18n( 'TITLE' )

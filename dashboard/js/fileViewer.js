@@ -628,7 +628,7 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
 }
 
 function HomeworkSubmit(){
-    HomeworkUploadModal("숙제 제출")
+    HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
 }
 
 function HomeworkUploadModal(message, callback) {
@@ -639,7 +639,7 @@ function HomeworkUploadModal(message, callback) {
     $('#btn-confirm-file-close').hide();
     $("#confirm-title2").hide();
     $('#confirm-title').html(message).removeClass("selected");
-    $('#btn-confirm-action').html('닫기').unbind('click').bind('click', function (e) {
+    $('#btn-confirm-action').html($.i18n('CLOSE')).unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
@@ -688,7 +688,7 @@ function fileUploadModal(message, btn, callback) {
     if (!isFileViewer) $('#btn-confirm-file-close').hide();
     else {
         $('#btn-confirm-file-close').show();
-        $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
+        $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE')).unbind('click').bind('click', function (e) {
             e.preventDefault();
             unloadFileViewer();
         });
@@ -748,7 +748,7 @@ function updateFileList(list, extraPath) {
     var listElement = '<ul class="list-group-flush">';
 
     if (list.length == 0){
-        listElement += '아직 파일이 없습니다!';
+        listElement += $.i18n('NO_FILES');
     }
     else {
         list.files.forEach(file => {
@@ -847,7 +847,7 @@ function deleteUploadedFile(filename, extraPath) {
         var nowName = mfileViewer.nowPath.split('/');
         nowName = nowName[nowName.length - 1];
         if(filename == nowName) {
-            alert("현재 열려있는 파일은 지울 수 없습니다")
+            alert($.i18n('DELETE_OPEN_ERROR'));
             return;
         }
     }
@@ -1003,7 +1003,7 @@ function unloadFileViewer() {
 
 function loadFileViewer(path) {
     if(mfileViewer.nowPath == path){
-        alert("같은 파일이 열려있습니다.")
+        alert($.i18n('SAME_FILE_OPEN_ERROR'));
         return;
     }
 

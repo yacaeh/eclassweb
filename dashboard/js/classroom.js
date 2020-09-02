@@ -37,7 +37,7 @@ var permissionManager   = new permissionManagerClass();
 var attentionManager    = new attentionManagerClass();
 
 //=============================================================================================
-
+console.log($.i18n( 'TOP_CAMERA' ));
 // 상단 버튼 도움말
 const topButtonContents = {
   top_all_controll      : "전체 제어",

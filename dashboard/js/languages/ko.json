@@ -25,7 +25,6 @@
     "NO_ROOM_ERROR":"방 정보를 확인해주세요",
     "FULL_ROOM_ERROR":"방이 가득 찼습니다.",
 
-
     "_CLASS_":"클래스",
 
     "CHAT_PLACEHOLDER":"메세지를 입력하세요",
@@ -40,6 +39,7 @@
     "CONFIRM":"확인",
     "OK":"확인",
     "CANCEL":"취소",
+    "CLOSE":"닫기",
     "ATTENTION_PLEASE":"집중하세요",
     "FOOTAGE":"동영상",
     "ENTER_URL":"URL을 입력하세요",
@@ -60,7 +60,6 @@
     "STUDENT_SCREEN_PERMISSION":"화면 공유 권한",
     "STUDENT_MIC_PERMISSION":"마이크 권한",
     "STUDENT_SHARING_CANVAS":"판서 공유 중",
-
 
     "_QUIZ_":"시험",
 
@@ -86,8 +85,11 @@
     "SUBMIT_FILE":"제출",
     "DRAG_DES":"마우스로 파일을 끌어오세요",
     "FILE_SELECT":"파일 선택",
-    
-
+    "NO_FILES":"아직 파일이 없습니다!",
+    "DELETE_OPEN_ERROR":"현재 열려있는 파일은 지울 수 없습니다",
+    "SAME_FILE_OPEN_ERROR":"같은 파일이 열려있습니다.",
+    "CLOSE_CURRENT_FILE":"현재 파일 닫기",
+    "SUBMIT_ASSIGNMENT":"숙제 제출",
 
     "_TOOLS_":"툴 도움말",
 
