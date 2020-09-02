@@ -17,10 +17,7 @@ function updateLanguage(){
 			MakeTitlePop("file", $.i18n('SHARE_FILE'));
 			MakeTitlePop("epub", $.i18n('SHARE_EPUB'));
 			MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
-			MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));
-			$('#textInputContainer .textInputUI').prop({
-				placeholder: $.i18n('TEXT_AND_ENTER')
-			})
+			MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));		
 			$('html').i18n();
 		});
 	});

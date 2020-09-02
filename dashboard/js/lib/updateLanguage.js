@@ -47,6 +47,7 @@ function updateLanguage(){
 			topButtonContents.top_record_video = $.i18n( 'TOP_RECORD_VIDEO' );
 			
 			GetWidgetFrame().updateLanguage();
+			GetWidgetFrame().$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));
 			$('html').i18n();
 		});
 	});
