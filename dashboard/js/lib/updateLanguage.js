@@ -38,16 +38,19 @@ function updateLanguage(){
 
 			$('.emojionearea-editor').attr("placeholder", $.i18n( 'CHAT_PLACEHOLDER' ));
 
-			topButtonContents.top_all_controll = $.i18n( 'MANAGE_ALL' );
-			topButtonContents.top_test = $.i18n( 'TOP_QUIZ' );
-			topButtonContents.top_alert = $.i18n( 'TOP_NOTIFY' );
-			topButtonContents.top_student = $.i18n( 'TOP_STUDNET_CANVAS' );
-			topButtonContents.top_camera = $.i18n( 'TOP_CAMERA' );
-			topButtonContents.top_save_alert = $.i18n( 'TOP_SAVE_ALERT' );
-			topButtonContents.top_record_video = $.i18n( 'TOP_RECORD_VIDEO' );
-			
-			GetWidgetFrame().updateLanguage();
-			GetWidgetFrame().$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));
+			try {
+				topButtonContents.top_all_controll = $.i18n( 'MANAGE_ALL' );
+				topButtonContents.top_test = $.i18n( 'TOP_QUIZ' );
+				topButtonContents.top_alert = $.i18n( 'TOP_NOTIFY' );
+				topButtonContents.top_student = $.i18n( 'TOP_STUDNET_CANVAS' );
+				topButtonContents.top_camera = $.i18n( 'TOP_CAMERA' );
+				topButtonContents.top_save_alert = $.i18n( 'TOP_SAVE_ALERT' );
+				topButtonContents.top_record_video = $.i18n( 'TOP_RECORD_VIDEO' );	
+				GetWidgetFrame().updateLanguage();
+				GetWidgetFrame().$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));	
+			}
+			catch{
+			}
 			$('html').i18n();
 		});
 	});
