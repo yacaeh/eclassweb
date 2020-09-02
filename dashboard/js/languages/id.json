@@ -10,5 +10,111 @@
     "CAMERA":"Kamera",
     "MIC":"Mikropon",
     "NETWORK":"Jaringan",
-    "REFRESH":"Menyegarkan"
+    "REFRESH":"Menyegarkan",
+    "TESTING":"Testing",
+    "ERROR":"Error",
+    "ROOM_NUMBER_ERROR":"Please enter room number",
+    "NO_NAME_ERROR":"Please enter name",
+    "ROOM_PASSWORD_ERROR":"Please enter room password",
+    "ROOM_INFO_ERROR":"Please check room info",
+    "NO_MIC_ERROR":"No microphone found!",
+    "NO_CAM_ERROR":"No cam found!",
+    "EXISTING_ROOM_ERROR":"Room already exists!",
+    "NO_ROOM_ERROR":"Please check room info",
+    "FULL_ROOM_ERROR":"Room full already!",
+
+    "_CLASS_":"클래스",
+
+    "CHAT_PLACEHOLDER":"Write your message here.",
+    "NOTIFICATION":"Notification",
+    "WARNING":"Warning",
+    "ASK_CLOSE_CURRENT":"Do you want to close current window?",
+    "EXIT_CONFIRM":"Are you sure you want to leave?",
+    "NOTIFICATION_WARNING":"Send notification to student?",
+    "YES":"YES",
+    "NO":"NO",
+    "ME":"Me",
+    "CONFIRM":"Confirm",
+    "OK":"Ok",
+    "CANCEL":"Cancel",
+    "ATTENTION_PLEASE":"attention please!",
+    "FOOTAGE":"Footage",
+    "ENTER_URL":"Enter URL",
+    "NO_DATA_STORE":"No data to store",
+    "STUDENT_JOIN":" Student joined!",
+    "STUDENT_LEFT":" Student left!",
+    "TEACHER_USING_FEATURE":"Teacher is using feature already",
+    "TEACHER_LEFT":"Teacher left. Return to previous page",
+    "NO_SCREEN_PERMISSION":"You don't have screen share permission",
+    "SOMEONE_USING_SCREEN":"Someone is using screen share already",
+
+    "_STUDNET_AUTH_":"학생 기능 부여",
+
+    "STUDENT_PERMISSION_ALREADY":"Another studnet has permission already",
+    "STUDENT_SHARE_SCREEN":"Screen Share",
+    "STUDENT_SHARE_MIC":"Mic",
+    "STUDENT_SHARE_CANVAS":"Share Canvas",
+    "STUDENT_SCREEN_PERMISSION":"Screen share permission",
+    "STUDENT_MIC_PERMISSION":"Mic permission",
+    "STUDENT_SHARING_CANVAS":"Sharing Canvas",
+
+
+    "_QUIZ_":"시험",
+
+    "QUIZ_CREATE":"Create Quiz",
+    "QUIZ_NUM":"# Q",
+    "QUIZ_TIME":"Time",
+    "QUIZ_MINUTES":"(Min)",
+    "QUIZ_SETTING":"Setting",
+    "QUIZ_START":"Quiz Start",
+    "QUIZ_ANSWER_ERROR":"You have to answer every questions.",
+    "QUIZ_ON":"Quiz On",
+    "QUIZ_END":"Quiz End",
+    "QUIZ_END_WARNING":"You can close after the quiz",
+    "QUIZ_SUBMIT":"Submit quiz",
+    "QUIZ_SUBMIT_WARNING":"You must fill questions",
+    "RECORD":"Record Class",
+
+    "_FILE_MANAGER_":"파일 관리자",
+
+    "FILE_MANAGER":"File manger",
+    "ASSIGNMENT":"Assignmnet",
+    "SEARCH":"Search",
+    "SUBMIT_FILE":"Submit file",
+    "DRAG_DES":"Drag files here",
+    "FILE_SELECT":"Select File",
+    
+
+
+    "_TOOLS_":"툴 도움말",
+
+    "CANVAS_ON_OFF":"Marker on & off",
+    "PENCIL":"Pencil",
+    "MARKER":"Marker",
+    "ERASER":"Eraser",
+    "TEXT":"Write a text",
+    "UNDO":"Undo",
+    "CLEAR_CANVAS":"Clear Canvas",
+    "SHARE_SCREEN":"Share my screen",
+    "SHARE_3D":"Share 3D models",
+    "SHARE_YOUTUBE":"Share Youtube URLs",
+    "SHARE_FILE":"Share files",
+    "SHARE_EPUB":"Share E-Pub",
+    
+    "_TOP_TOOLS_":"상단 도움말",
+    
+    "MANAGE_ALL":"Manage All",
+    "TOP_QUIZ":"Quiz",
+    "TOP_NOTIFY":"Notification",
+    "TOP_CAMERA":"Studnet Camera",
+    "TOP_STUDNET_CANVAS":"Student Marker",
+    "TOP_SAVE_ALERT":"Save Notifications",
+    "TOP_RECORD_VIDEO":"Record Video",
+
+    "_EXTRA_":"기타",
+
+    "QUIZ_FILL_ERROR":"You must fill questions first",
+    "QUIZ_MAX_ERROR":"Max number of questions is 200",
+    "QUIZ_TIME_ERROR":"Time setting error"
+
 }

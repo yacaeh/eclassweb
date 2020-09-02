@@ -1,3 +1,5 @@
+let language;
+
 function updateLanguage(){
 	jQuery(function($) {
 		var i18n = $.i18n()

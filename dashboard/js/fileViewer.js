@@ -660,14 +660,14 @@ function fileUploadModal(message, btn, callback) {
     console.log(message);
     getUploadFileList();
     $("#confirm-title2").show();
-    $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
+    $('#btn-confirm-action').html($.i18n('OK')).unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
         callback(true);
     });
 
-    $('#btn-confirm-close').html('취소');
+    $('#btn-confirm-close').html($.i18n('CANCEL'));
 
     $('.btn-confirm-close').unbind('click').bind('click', function (e) {
         e.preventDefault();
@@ -873,7 +873,10 @@ function deleteUploadedFile(filename, extraPath) {
 }
 
 function loadFileInput() {
+    var lang = language;
+    if (lang == 'ko'){lang='kr';}
 
+    console.log("lang",lang);
     $(document).ready(function () {
         let extraPath = "";
 
@@ -883,14 +886,14 @@ function loadFileInput() {
         $("#test-upload").fileinput({
             'theme': 'fas',
             'showPreview': true,
-            'language': 'kr',
+            'language': lang,
             'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg", "odt"],
             'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
             'elErrorContainer': '#errorBlock'
         });
         $("#file-explorer").fileinput({
             'theme': 'explorer-fas',
-            'language': 'kr',
+            'language': lang,
             'uploadUrl': fileServerUrl + '/upload',
             fileActionSettings: {
                 showZoom: false,
