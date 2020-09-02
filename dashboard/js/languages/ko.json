@@ -75,6 +75,7 @@
     "QUIZ_END_WARNING":"시험 종료 후 닫을 수 있습니다",
     "QUIZ_SUBMIT":"제출 하기",
     "QUIZ_SUBMIT_WARNING":"아직 답안지 작성이 완료 안됐습니다",
+    "SCORE":"점수",
     "RECORD":"수업녹화",
 
     "_FILE_MANAGER_":"파일 관리자",

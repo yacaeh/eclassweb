@@ -424,11 +424,11 @@ examObj.exportExam = function () {
     // export excel data
     function getSubmitData() {
         var contents = [];
-        contents[0] = ['이름', '점수'];   // 타이틀        
+        contents[0] = [$.i18n('NAME'), $.i18n('SCORE')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for (var i = 0; i < examObj.questionCount; ++i) {
-            contents[0][i + prefix] = `${i + 1}번`;
+            contents[0][i + prefix] = `${i + 1}`;
         }
 
         var row = 1;
@@ -541,7 +541,7 @@ function setStudentOMR(quesCount, examTime) {
     var question = '';
 
     question += "<div class='exam-header'>";
-    question += "<div id='is-testing'>시험 중</div>";
+    question += "<div id='is-testing'>"+$.i18n('QUIZ_ON')+"</div>";
     question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
     question += '</div>';
     question += "<div class='exam-overflow exam-border-bottom'>";
@@ -560,7 +560,7 @@ function setStudentOMR(quesCount, examTime) {
     question += '</div>';
     question += `</div>`;
     question +=
-        "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>제출하기</button>";
+        "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>"+$.i18n('QUIZ_SUBMIT')+"</button>";
     $('#exam-omr').html(question);
 
     examTime *= 60;

@@ -211,7 +211,7 @@ class ScreenShareManagerClass{
     var on = btn.classList.contains("on");
     if (!connection.extra.roomOwner &&
       connection.userid != classroomInfo.classPermission) {
-      alert('화면 공유 권한이 없습니다');
+      alert($.i18n('NO_SCREEN_PERMISSION'));
       btn.classList.remove("on");
       btn.classList.remove("selected-shape");
       return;
@@ -228,7 +228,7 @@ class ScreenShareManagerClass{
     }
 
     if (classroomInfo.shareScreen.state) {
-      alert("다른 사람이 화면 공유를 사용 중 입니다.")
+      alert($.i18n('SOMEONE_USING_SCREEN'));
       btn.classList.remove("on");
       btn.classList.remove("selected-shape");
       return;

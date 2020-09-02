@@ -75,6 +75,7 @@
     "QUIZ_END_WARNING":"You can close after the quiz",
     "QUIZ_SUBMIT":"Submit quiz",
     "QUIZ_SUBMIT_WARNING":"You must fill questions",
+    "SCORE":"Score",
     "RECORD":"Record Class",
 
     "_FILE_MANAGER_":"파일 관리자",
