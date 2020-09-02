@@ -255,8 +255,16 @@ class classroomManagerClass {
         connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
         console.debug('Connected with ',"[",event.extra.userFullName,"]", "[",event.userid,"]");
+        
+        console.log(event.extra.roomOwner);
+
+        if(event.extra.roomOwner){
+            this.rejoinTeacher();
+        }
 
         if (!connection.extra.roomOwner) return;
+
+   
 
         ChattingManager.enterStudent(event);
 
@@ -311,9 +319,7 @@ class classroomManagerClass {
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
   
         if(event.userid == GetOwnerId()){
-          connection.socket._callbacks.$disconnect.length = 0
-          connection.socket.disconnect();
-          alertBox("선생님이 나갔습니다. 이전 화면으로 돌아갑니다","알림", classroomManager.gotoMain, "확인")
+            this.leftTeacher();
         }
       
         if (!connection.extra.roomOwner) return;
@@ -424,13 +430,22 @@ class classroomManagerClass {
     createRoom(){
         console.log('Opening Class!');
         classroomManager.setTeacher();
-        connection.open(params.sessionid, function (isRoomOpened, roomid, error) {
-            if (!isRoomOpened) {
+        connection.open(params.sessionid, function (isRoomOpened, roomid, command) {
+            console.log(command);
+            
+            if (command == "room already exist") {
                 alert("이미 존재하는 방입니다.");
                 classroomManager.gotoMain();
             }
-            else if (error) {
-                connection.rejoin(params.sessionid);
+            else if (command == "owner rejoin"){
+                connection.join({
+                    sessionid: params.sessionid,
+                    userid: connection.channel,
+                    session: connection.session
+                }, function(a,b,c){
+                    connection.socket.on('disconnect', () => location.reload())
+                    console.log(a,b,c);
+                })
             }
             else {
                 classroomCommand.joinRoom();
@@ -509,4 +524,17 @@ class classroomManagerClass {
         }
     };
 
+    leftTeacher(){
+        canvasManager.clearTeacherCanvas();
+        console.debug("선생님 나감");
+        screenshareManager.hide();
+    }
+
+    rejoinTeacher(){
+        console.debug("teacher rejoin");
+    }
+
+    updateClassroomInfo(callback){
+        connection.socket.emit("update-room-info", classroomInfo, callback);
+    }
 }

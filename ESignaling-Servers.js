@@ -564,10 +564,6 @@ module.exports = exports = function(socket, config) {
                 if (!listOfRooms[roomid]) return; // find a solution?
 
                 if (listOfRooms[roomid].participants.length >= listOfRooms[roomid].maxParticipantsAllowed && listOfRooms[roomid].participants.indexOf(socket.userid) === -1) {
-                    // room is full
-                    // todo: how to tell user that room is full?
-                    // do not fire "room-full" event
-                    // find something else
                     return;
                 }
 
@@ -609,12 +605,17 @@ module.exports = exports = function(socket, config) {
                 if (!listOfRooms[roomid]) {
                     listOfRooms[roomid] = {
                         maxParticipantsAllowed: parseInt(params.maxParticipantsAllowed || 1000) || 1000,
+                        realowner : userid,
                         owner: userid, // this can change if owner leaves and if control shifts
                         participants: [userid],
                         extra: {},
                         info : {
                             roomOpenTime : new Date().getTime(),    // 현재 시간 저장
                             allControl : false,
+                            movierender : {
+                                state : false,
+                                url : undefined,
+                            },
                             shareScreen : false,
                             share3D : {
                                 state : false,
@@ -623,8 +624,12 @@ module.exports = exports = function(socket, config) {
                             pdf : {
                                 state : false
                             },
-                            exam : false
-                        }, // usually owner's extra-data
+                            exam : false,
+                            viewer : {
+                                state : false,
+                                url : undefined
+                            }
+                        }, 
                         socketMessageEvent: '',
                         socketCustomEvent: '',
                         identifier: '',
@@ -651,9 +656,12 @@ module.exports = exports = function(socket, config) {
                 var roomid = socket.admininfo.sessionid;
 
                 if (roomid && listOfRooms[roomid]) {
+
                     if (socket.userid === listOfRooms[roomid].owner) {
-                        if (autoCloseEntireSession === false && listOfRooms[roomid].participants.length > 1) {
+
+                        if (listOfRooms[roomid].participants.length > 1) {
                             var firstParticipant;
+
                             listOfRooms[roomid].participants.forEach(function(pid) {
                                 if (firstParticipant || pid === socket.userid) return;
                                 if (!listOfUsers[pid]) return;
@@ -661,13 +669,8 @@ module.exports = exports = function(socket, config) {
                             });
 
                             if (firstParticipant) {
-                                // reset owner priviliges
-                                listOfRooms[roomid].owner = firstParticipant.socket.userid;
-
-                                // redundant?
-                                firstParticipant.socket.emit('set-isInitiator-true', roomid);
-
-                                // remove from room's participants list
+                                // listOfRooms[roomid].owner = "undefined";
+                                // firstParticipant.socket.emit('set-isInitiator-true', roomid);
                                 var newParticipantsList = [];
                                 listOfRooms[roomid].participants.forEach(function(pid) {
                                     if (pid != socket.userid) {
@@ -675,13 +678,20 @@ module.exports = exports = function(socket, config) {
                                     }
                                 });
                                 listOfRooms[roomid].participants = newParticipantsList;
-                            } else {
+                            } 
+                            else {
+                                console.log("DELETED 1")
                                 delete listOfRooms[roomid];
                             }
-                        } else {
+                        } 
+                        
+                        else {
+                            console.log("DELETED 2")
                             delete listOfRooms[roomid];
                         }
-                    } else {
+                    } 
+                    
+                    else {
                         var newParticipantsList = [];
                         listOfRooms[roomid].participants.forEach(function(pid) {
                             if (pid && pid != socket.userid && listOfUsers[pid]) {
@@ -690,6 +700,7 @@ module.exports = exports = function(socket, config) {
                         });
                         listOfRooms[roomid].participants = newParticipantsList;
                     }
+
                 }
             } catch (e) {
                 pushLogs(config, 'closeOrShiftRoom', e);
@@ -698,7 +709,6 @@ module.exports = exports = function(socket, config) {
 
         socket.on(socketMessageEvent, function(message, callback) {
             if (message.remoteUserId && message.remoteUserId === socket.userid) {
-                // remoteUserId MUST be unique
                 return;
             }
 
@@ -743,32 +753,6 @@ module.exports = exports = function(socket, config) {
                 }
 
                 // if someone tries to join a person who is absent
-                // -------------------------------------- DISABLED
-                if (false && message.message.newParticipationRequest) {
-                    var waitFor = 60 * 10; // 10 minutes
-                    var invokedTimes = 0;
-                    (function repeater() {
-                        if (typeof socket == 'undefined' || !listOfUsers[socket.userid]) {
-                            return;
-                        }
-
-                        invokedTimes++;
-                        if (invokedTimes > waitFor) {
-                            socket.emit('user-not-found', message.remoteUserId);
-                            return;
-                        }
-
-                        // if user just come online
-                        if (listOfUsers[message.remoteUserId] && listOfUsers[message.remoteUserId].socket) {
-                            joinARoom(message);
-                            return;
-                        }
-
-                        setTimeout(repeater, 1000);
-                    })();
-
-                    return;
-                }
 
                 onMessageCallback(message);
             } catch (e) {
@@ -847,10 +831,17 @@ module.exports = exports = function(socket, config) {
 
             try {
                 // if already joined a room, either leave or close it
+                if(listOfRooms[arg.sessionid] && 
+                    listOfRooms[arg.sessionid].participants.indexOf(listOfRooms[arg.sessionid].owner) == -1 ){
+                    console.log("owner rejoin");
+                    listOfRooms[arg.sessionid].owner = socket.userid;
+                    callback(false, "owner rejoin");
+                }
+
                 closeOrShiftRoom();
 
                 if (listOfRooms[arg.sessionid] && listOfRooms[arg.sessionid].participants.length) {
-                    callback(false, CONST_STRINGS.ROOM_NOT_AVAILABLE);
+                    callback(false, "room already exist");
                     return;
                 }
 
@@ -1068,34 +1059,27 @@ module.exports = exports = function(socket, config) {
             Custom Code
         */
        
-
-        socket.on ('update-room-info', function(success, error) {
-           
+        socket.on ('get-room-info', function(success, error) {
             call_getRoom(room => {
                 success(room.info);
-            }, error => {
-                error(error);
+            }, errorm => {
+                if(error)
+                    error(errorm);
             });
         });
 
-  
-
-        socket.on ('toggle-all-control',function(success, error) {
-
-            // check room owner
-            //call_getRoom_only_roomOwner
-
+        socket.on('update-room-info', function(data, callback){
             call_getRoom(room => {
-                room.info.allControl = !room.info.allControl;
-                success(room.info.allControl);
+                room.info = data;
+                if(callback)
+                    callback('ok');
             }, e => {
-                error(e);
-            });
-        });
+                console.log(e)
+            })
+        })
 
         socket.on ('set-share-screen', function(_state, _callback) {
             call_getRoom(room => {
-                //  현재 상태가 같으면... 리턴
                 if(room.info.shareScreen == _state)
                 {
                     callBackPackingData (false, 'same state', _callback);
@@ -1110,27 +1094,8 @@ module.exports = exports = function(socket, config) {
             });
         });
 
-        socket.on ('toggle-share-3D', function(_callback){
-            call_getRoom(room => {
-                room.info.share3D.state = !room.info.share3D.state;
-                callBackPackingData (true, room.info.share3D.state, _callback);
-            }, e => {
-                callBackPackingData(false, e, _callback);
-            });
-        });
-
-        socket.on('toggle-share-pdf', function(_callback){
-            call_getRoom(room => {
-                room.info.pdf.state = !room.info.pdf.state;
-                callBackPackingData (true, room.info.pdf.state, _callback);
-            }, e => {
-                callBackPackingData(false, e, _callback);
-            });
-        });
-
         socket.on("show-class-status", function(callback){
-            console.log("SHOW?")
-            callback(listOfRooms)
+            callback(listOfRooms[getRoomId()].info)
         })
         //--------------------------------------------------------------------------------//
         function callBackPackingData (_result, _data, _callBack) {
@@ -1172,10 +1137,13 @@ module.exports = exports = function(socket, config) {
             const roomId = getRoomId();    
             if(null == roomId) return { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
             var room = listOfRooms[roomId];
-            if(!room) return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
+
+            if(!room) {
+                return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
+            }
+
             return room;
         };
-
 
         function getRoomId () {
             if(socket.admininfo)
@@ -1219,13 +1187,14 @@ module.exports = exports = function(socket, config) {
             else if(room.owner == socket.userid){
                 json.userList[user.userid].leftTime = GetTime().time;
                 json.roomCloseTime = GetTime().time;
-                console.log("Delete Room",socket.userid);
+                listOfRooms[getRoomId()].info.shareScreen = false;
+                console.log("Teacher Left Class",socket.userid);
             }
             fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
         }
 
         function GetLogFilePath(){
-            return "./logs/" + getRoom().openTime + "_" + getRoom().owner + ".json";
+            return "./logs/" + getRoom().openTime + "_" + getRoom().realowner + ".json";
         }
 
         function GetUserData(){

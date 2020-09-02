@@ -87,7 +87,6 @@ connection.enableFileSharing      = false;
 connection.socketMessageEvent     = 'canvas-dashboard-demo';
 connection.extra.userFullName     = params.userFullName;
 connection.publicRoomIdentifier   = params.publicRoomIdentifier;
-connection.autoCloseEntireSession = false;
 connection.maxParticipantsAllowed = 40;
 connection.password               = params.password;
 connection.enableLogs             = false;
@@ -295,16 +294,12 @@ connection.onmessage = function (event) {
   if (event.data.MoiveURL) {
     isSharingMovie = event.data.MoiveURL.enable;
 
-    var moveURL = event.data.MoiveURL;
-    if (moveURL.type == 'YOUTUBE')
-      embedYoutubeContent(moveURL.enable, moveURL.url, false);
-    else if (moveURL.type == 'VIDEO')
-      VideoEdunetContent(moveURL.enable, moveURL.url, false);
-    else if (moveURL.type == 'GOOGLE_DOC_PRESENTATION')
-      iframeGoogleDoc_Presentation(moveURL.enable, moveURL.url, false);
-    else
-      iframeEdunetContent(moveURL.enable, moveURL.url, false);
+    let moveURL = event.data.MoiveURL;
+    let url = moveURL.url;
+    let type = moveURL.type
+    let enable = moveURL.enable
 
+    OnMovieRender(enable, type, url);
     return;
   }
 
@@ -323,3 +318,11 @@ connection.onmessage = function (event) {
     designer.syncData(event.data);
   }
 };
+
+function showstatus(){
+  connection.socket.emit("show-class-status", 
+  (rooms) => {
+    console.log(rooms)
+  })
+}
+

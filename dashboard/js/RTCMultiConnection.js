@@ -4301,8 +4301,9 @@ var RTCMultiConnection = function(roomid, forceOptions) {
         connection.waitingForLocalMedia = false;
 
         connection.open = function(roomid, callback) {
-            callback = callback || function() {};
+            console.log(roomid,"open");
 
+            callback = callback || function() {};
             connection.waitingForLocalMedia = true;
             connection.isInitiator = true;
 
@@ -4310,10 +4311,11 @@ var RTCMultiConnection = function(roomid, forceOptions) {
 
             connectSocket(function() {
                 if (isData(connection.session)) {
+                    console.log("2")
                     openRoom(callback);
                     return;
                 }
-
+                
                 connection.captureUserMedia(function() {
                     openRoom(callback);
                 });

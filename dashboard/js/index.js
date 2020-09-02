@@ -244,13 +244,6 @@ $('#btn-create-room').click(function () {
                 return;
             }
 
-            // if (!connection.DetectRTC.hasWebcam) {
-            //     console.log("user has no cam!");
-            //     alertBox('웹캠이 없습니다', '에러');
-            //     $('#btn-create-room').html(initialHTML).prop('disabled', false);
-            //     return;
-            // }
-
             if (isRoomExist === true && !extra._room.teacher_rejoin) {
                 alertBox('이미 존재하는 방입니다.', '에러');
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
@@ -266,6 +259,7 @@ $('#btn-create-room').click(function () {
             connection.isInitiator = true;
             connection.session.oneway = true;
             openCanvasDesigner();
+            
             $('#btn-create-room').html(initialHTML).prop('disabled', false);
         });
 

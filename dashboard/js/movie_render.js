@@ -13,6 +13,12 @@ function Movie_Render_Button(btn){
     
     if(visible == "inline-block")
     {
+        classroomInfo.movierender = {
+            state : false,
+            url : undefined
+        };
+        classroomManager.updateClassroomInfo(function(){});
+
         isSharingMovie = false;
         urlform.style.display = "none";
         embedYoutubeContent(false,"", true);
@@ -25,11 +31,20 @@ function Movie_Render_Button(btn){
 
 function _Send_Moive_Video(_type, _url, _visible , _send)
 {
-    // _Movie_Button_Enable(top_movie_jthis,_visible);
+    classroomInfo.movierender = {
+        state : _visible,
+        type : _type,
+        url : _url,
+    };
+
+    classroomManager.updateClassroomInfo(function(){})
 
     if (_send == true) {
         connection.send({
-            MoiveURL: { enable: _visible , type : _type, url:_url }
+            MoiveURL: { 
+                enable: _visible , 
+                type : _type, 
+                url:_url }
         });
     }
 }
@@ -48,21 +63,30 @@ function _Movie_Button_Enable(jthis,visible)
     }
 }
 
-
 function _Movie_Render_key_event() {
     if (window.event.keyCode == 13) {
-
-         // 엔터키가 눌렸을 때 실행할 내용
          _Movie_Render_Func();
     }
 }
 
+function OnMovieRender(state, type , url){
+    if (type == 'YOUTUBE')
+      embedYoutubeContent(state, url, false);
+    else if (type == 'VIDEO')
+      VideoEdunetContent(state, url, false);
+    else if (type == 'GOOGLE_DOC_PRESENTATION')
+      iframeGoogleDoc_Presentation(state, url, false);
+    else
+      iframeEdunetContent(state, url, false);
+
+}
+
 function _Movie_Render_Func() {
     let urlinput = document.getElementById("urlinput");
+
     const url = urlinput.value;
-    
-    //console.log(movie_url);
     const movie_type = getMovieType(url);
+    
 
     if(movie_type == "YOUTUBE") {
         embedYoutubeContent(true, setURLString(url), true);
@@ -75,7 +99,8 @@ function _Movie_Render_Func() {
     else{        
         iframeEdunetContent(true,url,true);
     }
-    
+
+
     urlinput.value = '';
 }
 

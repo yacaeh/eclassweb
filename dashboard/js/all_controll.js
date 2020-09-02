@@ -37,9 +37,7 @@ function onAllControlValue(_allControl) {
 function _AllCantrallFunc() {
     top_all_controll_jthis = $("#top_all_controll");
     top_all_controll_jthis.click(() => {
-        connection.socket.emit('toggle-all-control', (changeControl) => {
-            classroomInfo.allControl = changeControl;
-            updateControlView(true);
-        });
+        classroomInfo.allControl = !classroomInfo.allControl;
+        classroomManager.updateClassroomInfo(() => updateControlView(true));
     })
 }

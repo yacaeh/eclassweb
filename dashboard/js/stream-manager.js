@@ -345,17 +345,14 @@ class ScreenShareManagerClass{
     }
   }
   streamstart(stream){
-    console.log(stream);
     console.debug("Find Screenshare stream",stream.streamid);
     let parent = this.get().parentElement;
     parent.removeChild(this.get());
-    let element = stream.mediaElement;
-    element.setAttribute('id', "screen-viewer"); 
-    element.volume = 0.3;
-    parent.appendChild(element);
+    stream.mediaElement.setAttribute('id', "screen-viewer"); 
+    stream.mediaElement.muted = true;
+    stream.mediaElement.volume = 0.3;
+    parent.appendChild(stream.mediaElement);
     this.show();
-    element.muted = true;
-    element.play();
   }
 
   eventListener(event) {

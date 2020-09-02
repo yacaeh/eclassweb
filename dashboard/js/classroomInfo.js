@@ -51,7 +51,7 @@ classroomCommand = {
     */
     joinRoom : function () {  
         console.debug("join room...");
-        connection.socket.emit ('update-room-info', (_info) => {
+        connection.socket.emit ('get-room-info', (_info) => {
             classroomInfo.roomOpenTime      = _info.roomOpenTime;
             classroomInfo.allControl        = _info.allControl;
             classroomInfo.shareScreen.state = _info.shareScreen;
@@ -59,6 +59,8 @@ classroomCommand = {
             classroomInfo.exam              = _info.exam;
             classroomInfo.classPermission   = _info.classPermission;
             classroomInfo.micPermission     = _info.micPermission;
+            classroomInfo.viewer            = _info.viewer;
+            classroomInfo.movierender       = _info.movierender;
 
             updateClassTime ();
             if(connection.extra.roomOwner)
@@ -108,6 +110,7 @@ classroomCommand = {
         if(classroomInfo.allControl) {
             updateControlView(false);
         }        
+
         if(classroomInfo.share3D.state) {                  
             sync3DModel ();
         }
@@ -127,6 +130,12 @@ classroomCommand = {
         if(classroomInfo.shareScreen.state){
             screenshareManager.rejoin();
         }
+
+        if(classroomInfo.movierender.state){
+            let data = classroomInfo.movierender;
+            OnMovieRender(data.state, data.type, data.url);
+        }
+
     },
 
 

@@ -448,6 +448,8 @@ mfileViewer.onopen = function (_type, _url) {
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
 
+    classroomManager.updateClassroomInfo();
+    
     if (connection.extra.roomOwner) {
         connection.send({
             viewer: {
