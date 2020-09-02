@@ -167,16 +167,14 @@ class permissionManagerClass{
 
   // for student ==================================================================
   setClassPermission() {
-    console.log("GET CLASS PERMISSION");
-    document.getElementById("class_permission").innerHTML = "화면 공유 권한";
+    console.debug("Get Screen share permission");
+    Show("student_screenshare");
     window.permission = true;
   };
 
   disableClassPermission() {
-    console.log("LOST CLASS PERMISSION");
-    document.getElementById("class_permission").innerHTML = "";
-    console.log(classroomInfoLocal.shareScreen.state);
-
+    console.debug("Lost Screen share permission");
+    Hide("student_screenshare");
     if (classroomInfoLocal.shareScreen.state) {
       screenshareManager.isSharingScreen = false;
       if (typeof (screenshareManager.lastStream) !== "undefined")
@@ -185,14 +183,23 @@ class permissionManagerClass{
     }
 
     window.permission = false;
-  }
+  };
+
   setMicPermission() {
-    console.log("GET MIC PERMISSION");
-    document.getElementById("mic_permission").innerHTML = "마이크 권한";
+    console.debug("Get mic permission");
+    Show("student_mic");
     this.unmute();
-  }
+  };
+
+  disableMicPermission() {
+    console.debug("Lost mic permission");
+    Hide("student_mic");
+    this.mute();
+  };
+
   setCanvasPermission(id) {
-    console.log("GET CANVAS PERMISSION");
+    console.debug("Get canvas share permission");
+    Show("student_canvas");
     connection.send({
       sendStudentPoint: true,
       isStudent: true,
@@ -202,14 +209,11 @@ class permissionManagerClass{
     })
   }
   disableCanvasPermission(id) {
-    console.log("LOST CANVAS PERMISSION");
+    console.debug("Lost canvas share permission");
+    Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
   }
-  disableMicPermission() {
-    console.log("LOST MIC PERMISSION");
-    document.getElementById("mic_permission").innerHTML = "";
-    this.mute();
-  }
+
 }
 
 

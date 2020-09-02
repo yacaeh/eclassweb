@@ -23,13 +23,13 @@ function updateControlView(send) {
 function onAllControlValue(_allControl) {
     classroomInfo.allControl = _allControl.state;
     if (classroomInfo.allControl) {
-        console.log("All Controll On");
-        Show("student-isallcontrol")
+        console.debug("All Controll On");
+        Show("student_isallcontrol")
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
     else {
-        console.log("All Controll Off");
-        Hide("student-isallcontrol")
+        console.debug("All Controll Off");
+        Hide("student_isallcontrol")
         classroomCommand.updateSyncRoom();
     }
 }

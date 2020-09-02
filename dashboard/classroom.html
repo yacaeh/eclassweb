@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
   
-  <link rel="stylesheet" href="/dashboard/css/classroom.min.css">
+  <link rel="stylesheet" href="/dashboard/css/classroom.css">
   <link href ="/favicon.ico" rel="shortcut icon" />
   <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/dashboard/css/emojionearea.min.css">
@@ -119,11 +119,12 @@
       <img style="display: none;" id="top_logo">
       <span id="my-name"></span>
       <span id="session-id"></span>
-      <img id="student-isallcontrol" src="/dashboard/img/lock.png" style="
-      display: none;
-      right: 60px;
-      position: absolute;
-      top: 10px;">
+      <img id="student_isallcontrol" class="permission-icon" src="/dashboard/img/lock.png">
+      <img id="student_screenshare" class="permission-icon" src="/dashboard/img/get_screenshare.png">
+      <img id="student_canvas" class="permission-icon" src="/dashboard/img/get_canvas.png">
+      <img id="student_mic" class="permission-icon" src="/dashboard/img/get_mic.png">
+
+
         <div class="icons">
           <span class="controll">
             <img class="top_icon top_all_controll_off" id="top_all_controll">
