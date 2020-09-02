@@ -25,7 +25,7 @@ examObj.init = function(){
                 rightTab.style.zIndex = 3;
             });
           } else {
-            alert("시험 종료 후 닫을 수 있습니다");
+            alert($.i18n('QUIZ_END_WARNING'));
           }
         }
         else {
@@ -650,7 +650,7 @@ function showExamStateForm() {
     }
     stateHtmlStr += '</div>';
     stateHtmlStr +=
-        "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>시험 종료</button>";
+        "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>"+$.i18n('QUIZ_END')+"</button>";
 
     $('#exam-state').html(stateHtmlStr);
 }
