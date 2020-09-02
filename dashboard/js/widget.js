@@ -6,6 +6,20 @@
 // https://github.com/muaz-khan/Canvas-Designer
 
 'use strict';
+function updateLanguage(){
+	jQuery(function($) {
+		i18n = $.i18n()
+		language = $( '.language option:selected' ).val();
+		i18n.locale = language;
+		i18n.load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
+		.done(function() {
+			$('html').i18n();
+		});
+	});
+	
+}
+
+updateLanguage();
 
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/css/NanumPen.ttf)');
 penFont.load().then((font) => {

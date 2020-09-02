@@ -23,9 +23,10 @@ function updateLanguage(){
 				placeholder: $.i18n( 'PASSWORD' )
 			});
 
-			$('.conversation-panel .emojionearea-editor').prop( {
-				placeholder: $.i18n( 'CHAT_PLACEHOLDER' )
+			$('.conversation-panel .emojionearea-editor').prop({
+				placeholder: $.i18n( 'CHAT_PLACEHOLDER' ),
 			});
+	        console.log("Language placeholder!");
 
 			$( '#exam-time' ).prop( {
 				placeholder: $.i18n( 'QUIZ_MINUTES' )
@@ -44,3 +45,4 @@ function updateLanguage(){
 
 updateLanguage();
 
+//right-tab > div.chatting > div.conversation-panel > div.emojionearea.emojionearea-inline > div.emojionearea-editor

@@ -40,8 +40,7 @@ class ChattingManagerClass{
             autocomplete: true,
             inline: true,
             hidePickerOnBlur: true,
-            placeholder: $.i18n( 'CHAT_PLACEHOLDER' ),
-        
+            placeholder: 'replace this',
             events: {
                 focus: function () {
                     $('.emojionearea-category')
