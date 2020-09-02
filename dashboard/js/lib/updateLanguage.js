@@ -35,10 +35,9 @@ function updateLanguage(){
 			$( '#urlform #urlinput' ).prop( {
 				placeholder: $.i18n( 'ENTER_URL' )
 			});
-			console.log("Placeholder for chat");
-			$('#txt-chat-message .emojionearea .emojionearea-editor').prop({
-				placeholder: $.i18n( 'CHAT_PLACEHOLDER' ),
-			});
+
+			$('.emojionearea-editor').attr("placeholder", $.i18n( 'CHAT_PLACEHOLDER' ));
+
 			topButtonContents.top_all_controll = $.i18n( 'MANAGE_ALL' );
 			topButtonContents.top_test = $.i18n( 'TOP_QUIZ' );
 			topButtonContents.top_alert = $.i18n( 'TOP_NOTIFY' );
@@ -49,14 +48,9 @@ function updateLanguage(){
 			
 			GetWidgetFrame().updateLanguage();
 			$('html').i18n();
-			console.log("Load Language!");
 		});
 	});
 
 }
 
 updateLanguage();
-console.log("updatLanguage");
-console.log(window.self);
-console.log(window.self);
-console.log(window.iAmGlobal);
