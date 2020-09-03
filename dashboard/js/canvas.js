@@ -175,18 +175,18 @@ function checkSharing() {
 
 function removeOnSelect(btn) {
     if (!connection.extra.roomOwner) {
-        alert("선생님이 다른 기능을 사용 중 입니다")
+        alert($.i18n( 'TEACHER_USING_FEATURE' ))
         return;
     }
 
     if (classroomInfoLocal.shareScreenByStudent) {
-        alert("학생이 화면 공유 중 입니다.");
+        alert($.i18n( 'SOMEONE_USING_SCREEN' ));
         btn.classList.remove("on");
         btn.classList.remove("selected-shape");
         return;
     }
 
-    alertBox("현재 기능을 종료합니까?", "알림", function () {
+    alertBox($.i18n( 'ASK_CLOSE_CURRENT' ), $.i18n( 'NOTIFICATION' ), function () {
         if (classroomInfo.share3D.state) {
             GetWidgetFrame().document.getElementById("3d_view").click();
             classroomInfo.share3D.state = false;

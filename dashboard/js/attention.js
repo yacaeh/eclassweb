@@ -22,10 +22,10 @@ class attentionManagerClass{
 
         if(connection.extra.roomOwner)
         {
-            alertBox("<span>학생들에게 알림을 보내겠습니까?</span>  ", "알림", () => {
+            alertBox("<span>"+$.i18n( 'NOTIFICATION_WARNING' )+"</span>  ", $.i18n( 'NOTIFICATION' ), () => {
                 attentionManager.totalCount++;
                 attentionManager.teacherRequest[attentionManager.totalCount] = {
-                    name : '집중하세요',
+                    name : $.i18n( 'ATTENTION_PLEASE' ),
                 }
                 callback();
                 connection.send ({
@@ -59,7 +59,7 @@ class attentionManagerClass{
 
     exportAttention(){
         if( attentionManager.totalCount <= 0 ){
-            alert("저장할 데이터가 없습니다");
+            alert($.i18n( 'NO_DATA_STORE' ));
             return false;
         } 
         if(connection.extra.roomOwner) {
@@ -99,11 +99,11 @@ class attentionManagerClass{
 
     getSubmitData () {
         let contents = [];        
-        contents[0] = ['이름', '응답'];   // 타이틀        
+        contents[0] = [$.i18n('NAME'), $.i18n('ANSWER')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for(let i = 0; i < this.totalCount; ++i) {
-            contents[0][i+prefix] = `${i+1}번`;
+            contents[0][i+prefix] = `${i+1}`;
         }        
         
         let row = 1;

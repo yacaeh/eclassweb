@@ -18,7 +18,7 @@ class permissionManagerClass{
         case "classP":
           if (this.classList.contains("off")) {
             if (classroomInfo.classPermission != undefined) {
-              alert('이미 다른 학생에게 권한이 있습니다.');
+              alert($.i18n('STUDENT_PERMISSION_ALREADY'));
               return false;
             }
             permissionManager.AddClassPermission(pid);
@@ -30,7 +30,7 @@ class permissionManagerClass{
         case "micP":
           if (this.classList.contains("off")) {
             if (classroomInfo.micPermission != undefined) {
-              alert('이미 다른 학생에게 권한이 있습니다.');
+              alert($.i18n('STUDENT_PERMISSION_ALREADY'));
               return false;
             }
             permissionManager.AddMicPermission(pid);
@@ -168,7 +168,7 @@ class permissionManagerClass{
   // for student ==================================================================
   setClassPermission() {
     console.log("GET CLASS PERMISSION");
-    document.getElementById("class_permission").innerHTML = "화면 공유 권한";
+    document.getElementById("class_permission").innerHTML = $.i18n('STUDENT_SCREEN_PERMISSION');
     window.permission = true;
   };
 
@@ -188,7 +188,7 @@ class permissionManagerClass{
   }
   setMicPermission() {
     console.log("GET MIC PERMISSION");
-    document.getElementById("mic_permission").innerHTML = "마이크 권한";
+    document.getElementById("mic_permission").innerHTML = $.i18n('STUDENT_PERMISSION_ALREADY');
     this.unmute();
   }
   setCanvasPermission(id) {

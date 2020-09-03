@@ -154,7 +154,7 @@ classroomCommand = {
 
 classroomCommand.receivAlert = function () {
     var alertTimeHandler;    
-    alertBox("<progress max='100' value='100' class='alert-progress exam-state-progress'></progress>", "알림", () => {
+    alertBox("<progress max='100' value='100' class='alert-progress exam-state-progress'></progress>", $.i18n('NOTIFICATION'), () => {
         response ('yes');
     }, () => {
         response ('no');
