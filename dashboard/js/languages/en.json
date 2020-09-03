@@ -54,9 +54,9 @@
     "_STUDNET_AUTH_":"학생 기능 부여",
 
     "STUDENT_PERMISSION_ALREADY":"Another studnet has permission already",
-    "STUDENT_SHARE_SCREEN":"Screen Share",
+    "STUDENT_SHARE_SCREEN":"Screen",
     "STUDENT_SHARE_MIC":"Mic",
-    "STUDENT_SHARE_CANVAS":"Share Canvas",
+    "STUDENT_SHARE_CANVAS":"Canvas",
     "STUDENT_SCREEN_PERMISSION":"Screen share permission",
     "STUDENT_MIC_PERMISSION":"Mic permission",
     "STUDENT_SHARING_CANVAS":"Sharing Canvas",
