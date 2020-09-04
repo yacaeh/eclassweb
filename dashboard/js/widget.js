@@ -1910,24 +1910,29 @@ function canvasresize(id){
 
 
 function MakeTitlePop(element, contents){
-    let ele = document.getElementById(element);
-    let pop = document.getElementById("titlebox");
+    try{
+        let ele = document.getElementById(element);
+        let pop = document.getElementById("titlebox");    
+        ele.addEventListener("mouseover", function(){
+            if(this.classList.contains("off"))
+                return false;
+    
+            pop.style.display = 'block';
+            let rect = ele.getBoundingClientRect();
+            let y= rect.y;
+            let height = 7;
+            pop.style.top =  y + height+  'px';
+            pop.children[0].innerHTML = contents;
+        })
+    
+        ele.addEventListener("mouseleave", function(){
+            pop.style.display = 'none';
+        })
+    }
+    catch (e) {
+        console.log(e);
+    }
 
-    ele.addEventListener("mouseover", function(){
-        if(this.classList.contains("off"))
-            return false;
-
-        pop.style.display = 'block';
-        let rect = ele.getBoundingClientRect();
-        let y= rect.y;
-        let height = 7;
-        pop.style.top =  y + height+  'px';
-        pop.children[0].innerHTML = contents;
-    })
-
-    ele.addEventListener("mouseleave", function(){
-        pop.style.display = 'none';
-    })
 }
 
 
