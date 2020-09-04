@@ -1,11 +1,28 @@
-window.language = 'ko'; //Global variable declaration with window.
+try{
+	console.log("init locale");
+	console.log(localStorage.getItem('locale'));
+	window.language = localStorage.getItem('locale');
+}
+catch{
+	window.language = 'ko'
+	localStorage.setItem('locale', window.language);
+}
 window.i18n
+
+function saveLocale(){
+		window.language = $( '.language option:selected' ).val();
+		localStorage.setItem('locale', window.language);
+		updateLanguage();
+}
+
 function updateLanguage(){
 	console.log("Update language on change!");
 	jQuery(function($) {
-		window.i18n = $.i18n()
-		window.language = $( '.language option:selected' ).val();
+		window.i18n = $.i18n();
+		window.language = localStorage.getItem('locale');
+		//window.language = $( '.language option:selected' ).val();
 		window.i18n.locale = window.language;
+		//localStorage.setItem('locale', window.language);
 		window.i18n.load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
 		.done(function() {
 			$( "title" ).prop( {
