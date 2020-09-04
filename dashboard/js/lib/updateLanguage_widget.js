@@ -4,8 +4,6 @@ function updateLanguage(){
 		i18n.locale = window.top.language;
 		$.i18n().load( '/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale )
 		.done(function() {
-			MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
-			MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));		
 			MakeTitlePop("onoff-icon",$.i18n('CANVAS_ON_OFF'));
 			MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
 			MakeTitlePop("markerIcon", $.i18n('MARKER'));
@@ -18,6 +16,8 @@ function updateLanguage(){
 			MakeTitlePop("movie", $.i18n('SHARE_YOUTUBE'));
 			MakeTitlePop("file", $.i18n('SHARE_FILE'));
 			MakeTitlePop("epub", $.i18n('SHARE_EPUB'));
+			MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
+			MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));		
 			$('html').i18n();
 		});
 	});
