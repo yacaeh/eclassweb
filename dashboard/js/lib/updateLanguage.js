@@ -1,10 +1,8 @@
-try{
-	window.language = localStorage.getItem('locale');
+if (localStorage.getItem("locale") === null) {
+	localStorage.setItem('locale', 'en');
 }
-catch{
-	window.language = 'ko'
-	localStorage.setItem('locale', window.language);
-}
+
+window.language = localStorage.getItem('locale');
 window.i18n
 
 function saveLocale(){
