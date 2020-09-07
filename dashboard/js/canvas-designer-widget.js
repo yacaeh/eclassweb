@@ -72,23 +72,23 @@ function CanvasDesigner() {
         });
     }
 
-    var syncDataListener = function(data) {};
-    var syncAllPoint = function(data) {};
-    var dataURLListener = function(dataURL) {};
-    var captureStreamCallback = function() {};
+    var syncDataListener = function (data) { };
+    var syncAllPoint = function (data) { };
+    var dataURLListener = function (dataURL) { };
+    var captureStreamCallback = function () { };
 
     function onMessage(event) {
-        if(event.data.SyncAllPoint){
+        if (event.data.SyncAllPoint) {
             syncAllPoint(event.data.SyncAllPoint);
             return;
         }
-            
+
 
         if (!event.data || event.data.uid !== designer.uid) return;
 
-        if(!!event.data.sdp) {
-            webrtcHandler.createAnswer(event.data, function(response) {
-                if(response.sdp) {
+        if (!!event.data.sdp) {
+            webrtcHandler.createAnswer(event.data, function (response) {
+                if (response.sdp) {
                     designer.postMessage(response);
                     return;
                 }
@@ -99,7 +99,7 @@ function CanvasDesigner() {
         }
 
         if (!!event.data.canvasDesignerSyncData) {
-            if(event.data.canvasDesignerSyncData.points)
+            if (event.data.canvasDesignerSyncData.points)
                 designer.pointsLength = event.data.canvasDesignerSyncData.points.length;
             syncDataListener(event.data.canvasDesignerSyncData);
             return;
@@ -126,13 +126,13 @@ function CanvasDesigner() {
 
     designer.uid = getRandomString();
 
-    designer.appendTo = function(parentNode, callback) {
-        callback = callback || function() {};
+    designer.appendTo = function (parentNode, callback) {
+        callback = callback || function () { };
 
         designer.iframe = document.createElement('iframe');
-        
+
         // designer load callback
-        designer.iframe.onload = function() {
+        designer.iframe.onload = function () {
             callback();
             callback = null;
         };
@@ -148,7 +148,7 @@ function CanvasDesigner() {
         parentNode.appendChild(designer.iframe);
     };
 
-    designer.destroy = function() {
+    designer.destroy = function () {
         if (designer.iframe) {
             designer.iframe.parentNode.removeChild(designer.iframe);
             designer.iframe = null;
@@ -156,27 +156,27 @@ function CanvasDesigner() {
         window.removeEventListener('message', onMessage);
     };
 
-    designer.addSyncListener = function(callback) {
+    designer.addSyncListener = function (callback) {
         syncDataListener = callback;
     };
 
-    designer.pointSyncListener = function(callback) {
+    designer.pointSyncListener = function (callback) {
         syncAllPoint = callback;
     };
 
     designer.syncData = syncData;
 
-    designer.setTools = function(_tools) {
+    designer.setTools = function (_tools) {
         tools = _tools;
     };
 
-    designer.setSelected = function(icon) {
+    designer.setSelected = function (icon) {
         if (typeof tools[icon] !== 'undefined') {
             selectedIcon = icon;
         }
     };
 
-    designer.toDataURL = function(format, callback) {
+    designer.toDataURL = function (format, callback) {
         dataURLListener = callback;
 
         if (!designer.iframe) return;
@@ -186,7 +186,7 @@ function CanvasDesigner() {
         });
     };
 
-    designer.sync = function() {
+    designer.sync = function () {
         if (!designer.iframe) return;
         designer.postMessage({
             syncPoints: true
@@ -195,7 +195,7 @@ function CanvasDesigner() {
 
     designer.pointsLength = 0;
 
-    designer.undo = function(index) {
+    designer.undo = function (index) {
         if (!designer.iframe) return;
 
         designer.postMessage({
@@ -204,14 +204,14 @@ function CanvasDesigner() {
         });
     };
 
-    designer.postMessage = function(message) {
+    designer.postMessage = function (message) {
         if (!designer.iframe) return;
 
         message.uid = designer.uid;
         designer.iframe.contentWindow.postMessage(message, '*');
     };
 
-    designer.captureStream = function(callback) {
+    designer.captureStream = function (callback) {
         if (!designer.iframe) return;
 
         captureStreamCallback = callback;
@@ -228,7 +228,7 @@ function CanvasDesigner() {
         });
     };
 
-    designer.renderStream = function() {
+    designer.renderStream = function () {
         if (!designer.iframe) return;
 
         designer.postMessage({

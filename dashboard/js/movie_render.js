@@ -1,63 +1,59 @@
 var top_movie_jthis;
-var move_url_div =  $("#urlform");
+var move_url_div = $("#urlform");
 
-function Movie_Render_Button(btn){
-    if(!isSharingMovie && checkSharing()){
-      removeOnSelect(btn);
-      return;
+function Movie_Render_Button(btn) {
+    if (!isSharingMovie && checkSharing()) {
+        removeOnSelect(btn);
+        return;
     }
-  
+
     var visible = urlform.style.display;
-        
+
     //console.log(visible);
-    
-    if(visible == "inline-block")
-    {
+
+    if (visible == "inline-block") {
         classroomInfo.movierender = {
-            state : false,
-            url : undefined
+            state: false,
+            url: undefined
         };
-        classroomManager.updateClassroomInfo(function(){});
+        classroomManager.updateClassroomInfo(function () { });
 
         isSharingMovie = false;
         urlform.style.display = "none";
-        embedYoutubeContent(false,"", true);
+        embedYoutubeContent(false, "", true);
     }
-    else{
+    else {
         isSharingMovie = true;
         urlform.style.display = "inline-block";
     }
 }
 
-function _Send_Moive_Video(_type, _url, _visible , _send)
-{
+function _Send_Moive_Video(_type, _url, _visible, _send) {
     classroomInfo.movierender = {
-        state : _visible,
-        type : _type,
-        url : _url,
+        state: _visible,
+        type: _type,
+        url: _url,
     };
 
-    classroomManager.updateClassroomInfo(function(){})
+    classroomManager.updateClassroomInfo(function () { })
 
     if (_send == true) {
         connection.send({
-            MoiveURL: { 
-                enable: _visible , 
-                type : _type, 
-                url:_url }
+            MoiveURL: {
+                enable: _visible,
+                type: _type,
+                url: _url
+            }
         });
     }
 }
 
-function _Movie_Button_Enable(jthis,visible)
-{
-    if(visible)
-    {
+function _Movie_Button_Enable(jthis, visible) {
+    if (visible) {
         jthis.addClass('top_share_video_on');
         jthis.removeClass('top_share_video_off')
     }
-    else
-    {
+    else {
         jthis.addClass('top_share_video_off');
         jthis.removeClass('top_share_video_on')
     }
@@ -65,19 +61,19 @@ function _Movie_Button_Enable(jthis,visible)
 
 function _Movie_Render_key_event() {
     if (window.event.keyCode == 13) {
-         _Movie_Render_Func();
+        _Movie_Render_Func();
     }
 }
 
-function OnMovieRender(state, type , url){
+function OnMovieRender(state, type, url) {
     if (type == 'YOUTUBE')
-      embedYoutubeContent(state, url, false);
+        embedYoutubeContent(state, url, false);
     else if (type == 'VIDEO')
-      VideoEdunetContent(state, url, false);
+        VideoEdunetContent(state, url, false);
     else if (type == 'GOOGLE_DOC_PRESENTATION')
-      iframeGoogleDoc_Presentation(state, url, false);
+        iframeGoogleDoc_Presentation(state, url, false);
     else
-      iframeEdunetContent(state, url, false);
+        iframeEdunetContent(state, url, false);
 
 }
 
@@ -86,27 +82,26 @@ function _Movie_Render_Func() {
 
     const url = urlinput.value;
     const movie_type = getMovieType(url);
-    
 
-    if(movie_type == "YOUTUBE") {
+
+    if (movie_type == "YOUTUBE") {
         embedYoutubeContent(true, setURLString(url), true);
     }
-    else if( movie_type == "ESTUDY" || movie_type == "MOVIE" || url.indexOf("mp4") !== -1 ) {
+    else if (movie_type == "ESTUDY" || movie_type == "MOVIE" || url.indexOf("mp4") !== -1) {
         VideoEdunetContent(true, setURLString(url), true);
-    }else if( movie_type == "GOOGLE_DOC_PRESENTATION" ){
-        iframeGoogleDoc_Presentation(true,setURLString(url),true);
+    } else if (movie_type == "GOOGLE_DOC_PRESENTATION") {
+        iframeGoogleDoc_Presentation(true, setURLString(url), true);
     }
-    else{        
-        iframeEdunetContent(true,url,true);
+    else {
+        iframeEdunetContent(true, url, true);
     }
 
 
     urlinput.value = '';
 }
 
-function embedYoutubeContent(bshow, url, send)
-{ 
-    if( bshow ){
+function embedYoutubeContent(bshow, url, send) {
+    if (bshow) {
         var viwerEdunet = document.getElementById("edunetContent");
         eraseEdunetContent(document.getElementById("webview_edunet"));
 
@@ -128,7 +123,7 @@ function embedYoutubeContent(bshow, url, send)
         //console.log("param create");
         var param = document.createElement("param");
         param.name = "movie";
-        param.value = "https://www.youtube.com/v/"+ url +"?version=3";
+        param.value = "https://www.youtube.com/v/" + url + "?version=3";
         obj.appendChild(param);
 
         //console.log("param1 create");
@@ -144,31 +139,31 @@ function embedYoutubeContent(bshow, url, send)
         obj.appendChild(param2);
 
         //<embed src="https://www.youtube.com/v/ugx2S5jdmXs?version=3" type="application/x-shockwave-flash" width="640" height="360" allowscriptaccess="always" allowfullscreen="true"></embed>
-        
+
         //console.log("embed create");
         var embed = document.createElement("embed");
         embed.src = "https://www.youtube.com/v/" + url + "?version=3";
-        embed.type= "application/x-shockwave-flash";
+        embed.type = "application/x-shockwave-flash";
         embed.width = "100%";
         embed.height = "100%";
         embed.allowscriptaccess = "always";
         embed.allowfullscreen = "true";
-        obj.appendChild(embed);		
-        
-        viwerEdunet.style.display = "inline-block";
-        
-    }
-    else{
-        let viwerEdunet = document.getElementById("webview_edunet");        
-        eraseEdunetContent(viwerEdunet);
-    } 
+        obj.appendChild(embed);
 
-    _Send_Moive_Video("YOUTUBE",url, bshow, send);
+        viwerEdunet.style.display = "inline-block";
+
+    }
+    else {
+        let viwerEdunet = document.getElementById("webview_edunet");
+        eraseEdunetContent(viwerEdunet);
+    }
+
+    _Send_Moive_Video("YOUTUBE", url, bshow, send);
 }
 
 function VideoEdunetContent(bshow, url, send) {
-    if( bshow ){
-        var viwerEdunet = document.getElementById("edunetContent");        
+    if (bshow) {
+        var viwerEdunet = document.getElementById("edunetContent");
         eraseEdunetContent(document.getElementById("webview_edunet"));
 
         var videoContent = document.createElement("video");
@@ -186,43 +181,43 @@ function VideoEdunetContent(bshow, url, send) {
             if (this.buffered.length > 0) {
                 var percentage = Math.floor((100 / videoContent.duration) * videoContent.currentTime);
                 //console.log(percentage);
-            } 
-        }, false); 
+            }
+        }, false);
         viwerEdunet.style.display = "inline-block";
-    }else{
+    } else {
         var webview_cam = document.getElementById("webview_edunet");
-        if( webview_cam !== null ){
+        if (webview_cam !== null) {
             var viwer = document.getElementById("edunetContent");
             viwer.removeChild(webview_cam);
             viwer.style.display = "none";
         }
     }
-    _Send_Moive_Video("VIDEO",url, bshow, send);
+    _Send_Moive_Video("VIDEO", url, bshow, send);
 }
 
 function iframeEdunetContent(bshow, url, send) {
-    if( bshow ){
+    if (bshow) {
         let viwerEdunet = document.getElementById("edunetContent");
         eraseEdunetContent(document.getElementById("webview_edunet"));
-                
+
         let ifrmEdunetContent = document.createElement("iframe");
         ifrmEdunetContent.setAttribute("src", url);
         ifrmEdunetContent.setAttribute("id", "webview_edunet");
         ifrmEdunetContent.style.width = "100%";
         ifrmEdunetContent.style.height = "100%";
         ifrmEdunetContent.frameBorder = "0";
-        
+
         viwerEdunet.appendChild(ifrmEdunetContent);
-        viwerEdunet.style.display = "inline-block";        
-    }else{
+        viwerEdunet.style.display = "inline-block";
+    } else {
         let webview_cam = document.getElementById("webview_edunet");
-        if( webview_cam !== null ){
+        if (webview_cam !== null) {
             var viwer = document.getElementById("edunetContent");
             viwer.removeChild(webview_cam);
             viwer.style.display = "none";
         }
     }
-    _Send_Moive_Video("IFRAME",url, bshow, send);
+    _Send_Moive_Video("IFRAME", url, bshow, send);
 }
 
 // iframe 접근이 안된다.
@@ -233,12 +228,12 @@ function iframeEdunetContent(bshow, url, send) {
 
 //     timerGoogleDocPresentationId = setInterval(()=>{
 //         let webview_edunet_url = document.getElementById("webview_edunet").contentWindow.location.href;
-        
+
 //         console.log(webview_edunet_url)
 
 //         if( oldGoogleDocPresentationPage !== webview_edunet_url ){
 //             oldGoogleDocPresentationPage = webview_edunet_url;
-            
+
 //             _Send_Moive_Video("GOOGLE_DOC_PRESENTATION", oldGoogleDocPresentationPage, true, true);
 //         }
 //     }, 1000);
@@ -246,34 +241,34 @@ function iframeEdunetContent(bshow, url, send) {
 
 //var google_doc_presentation = false;
 function iframeGoogleDoc_Presentation(bshow, url, send) {
-    if( bshow ){
+    if (bshow) {
         // if( google_doc_presentation ){            
         //     let webview_edunet = document.getElementById("webview_edunet");
         //     webview_edunet.setAttribute("src", url);
         // }else{
-            let viwerEdunet = document.getElementById("edunetContent");
-            eraseEdunetContent(document.getElementById("webview_edunet"));
-                    
-            console.log(url);
+        let viwerEdunet = document.getElementById("edunetContent");
+        eraseEdunetContent(document.getElementById("webview_edunet"));
 
-            let ifrmEdunetContent = document.createElement("iframe");
-            ifrmEdunetContent.setAttribute("src", url);
-            ifrmEdunetContent.setAttribute("id", "webview_edunet");
-            ifrmEdunetContent.style.width = "100%";
-            ifrmEdunetContent.style.height = "100%";
-            ifrmEdunetContent.frameBorder = "0";
-            
-            viwerEdunet.appendChild(ifrmEdunetContent);
-            viwerEdunet.style.display = "inline-block";
+        console.log(url);
 
-            // if( send ) //선생이다.
-            //     StartWatchGooglePresentation();
+        let ifrmEdunetContent = document.createElement("iframe");
+        ifrmEdunetContent.setAttribute("src", url);
+        ifrmEdunetContent.setAttribute("id", "webview_edunet");
+        ifrmEdunetContent.style.width = "100%";
+        ifrmEdunetContent.style.height = "100%";
+        ifrmEdunetContent.frameBorder = "0";
+
+        viwerEdunet.appendChild(ifrmEdunetContent);
+        viwerEdunet.style.display = "inline-block";
+
+        // if( send ) //선생이다.
+        //     StartWatchGooglePresentation();
         // }
-        
+
         // google_doc_presentation = true;
-    }else{
+    } else {
         let webview_edunet = document.getElementById("webview_edunet");
-        if( webview_edunet !== null ){
+        if (webview_edunet !== null) {
             let viwer = document.getElementById("edunetContent");
             viwer.removeChild(webview_edunet);
             viwer.style.display = "none";
@@ -284,7 +279,7 @@ function iframeGoogleDoc_Presentation(bshow, url, send) {
         //google_doc_presentation = false;
     }
 
-    _Send_Moive_Video("GOOGLE_DOC_PRESENTATION",url, bshow, send);
+    _Send_Moive_Video("GOOGLE_DOC_PRESENTATION", url, bshow, send);
 }
 
 function eraseEdunetContent(viwerEdunet) {
@@ -297,68 +292,60 @@ function eraseEdunetContent(viwerEdunet) {
     }
 }
 
-function setURLString(_url)
-{
+function setURLString(_url) {
     var movieURL = _url;
     var url = _url;
 
     const movie_type = getMovieType(url);
 
-    if(movie_type == "YOUTUBE")
-    {
+    if (movie_type == "YOUTUBE") {
         //"<iframe width="560" height="315" src="https://www.youtube.com/embed/3o-A37oDxKw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>"
         var embed_str = "embed/";
 
         //유튜브 일경우
         let startIndex = url.indexOf(embed_str);
-        if (startIndex != -1)
-        {
+        if (startIndex != -1) {
             let endIndex = url.indexOf("?");
-            if (endIndex == -1)
-            {
+            if (endIndex == -1) {
                 endIndex = url.indexOf("frameborder=") - 2;
             }
 
             movieURL = url.substring(startIndex + embed_str.length, endIndex);
         }
-        else
-        {
+        else {
             let check_str = "watch?v=";
             startIndex = url.indexOf(check_str);
             let len = url.length;
-            if (startIndex != -1)
-            {
+            if (startIndex != -1) {
                 //movieURL = url.replace(check_str, "");
-                movieURL = url.substring(startIndex + check_str.length, len);            
+                movieURL = url.substring(startIndex + check_str.length, len);
             }
         }
     }
-    else if(movie_type == "ESTUDY")
-    {
+    else if (movie_type == "ESTUDY") {
         //e학습터
-        if(_url.indexOf(".jpg") != -1){
+        if (_url.indexOf(".jpg") != -1) {
             movieURL = url.replace('.jpg', '.mp4');
-        }else if(_url.indexOf(".JPG") != -1){
+        } else if (_url.indexOf(".JPG") != -1) {
             movieURL = url.replace('.JPG', '.mp4');
-        }else{
+        } else {
             movieURL = url;
         }
     }
-    else if(movie_type == "VIDEO")
-    {
+    else if (movie_type == "VIDEO") {
         //에듀넷 일 경우
         movieURL = _url;
-    }else if(movie_type == "GOOGLE_DOC_PRESENTATION"){
+    } else if (movie_type == "GOOGLE_DOC_PRESENTATION") {
         //구글 DOCS
         //<iframe src="https://docs.google.com/presentation/d/e/2PACX-1vRCZDW7lt-7TEKbZJ_9qho5ocP00d-G3maf7qha9hyCuXo1vB0PHCKv-2EdwOW3Yvx1nSnVBJL2sAHF/embed?start=false&loop=false&delayms=3000" frameborder="0" width="960" height="569" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-        
-        if(_url.indexOf(`<iframe src="`) != -1){
+
+        if (_url.indexOf(`<iframe src="`) != -1) {
             movieURL = url.replace(`<iframe src="`, '');
         }
 
         let strlen = movieURL.indexOf(`"`);
-        if(strlen != -1 ){
-            movieURL = movieURL.substring(0,strlen);
+        if (strlen != -1) {
+            movieURL = movieURL.substring(0, strlen);
         }
     }
 
@@ -368,22 +355,17 @@ function setURLString(_url)
 //에듀넷 : http://content-cdn.edunet.net/edudata/content/midd/g2/com/soc/midd_g2_com_soc_15187.mp4?token=st=1593864169~exp=1593871369~acl=/edudata/content/midd/g2/com/soc/midd_g2_com_soc_15187.mp4~hmac=c20c6534e1fd9e1de2d1b8a15c5f156ea7d18501eb6539417e25966c3a712df7
 //e학습터 : https://static-cdn.edunet.net/edudata/content/elem/g6/s01/sci/elem_g6_s01_sci_14905.jpg
 
-function getMovieType(_url)
-{
-    if(_url.indexOf("youtube") != -1)
-    {
-        return  "YOUTUBE";
+function getMovieType(_url) {
+    if (_url.indexOf("youtube") != -1) {
+        return "YOUTUBE";
     }
-    else if(_url.indexOf("static-cdn") != -1)
-    {
+    else if (_url.indexOf("static-cdn") != -1) {
         return "ESTUDY";
     }
-    else if(_url.indexOf("docs.google.com") != -1)
-    {
+    else if (_url.indexOf("docs.google.com") != -1) {
         return "GOOGLE_DOC_PRESENTATION"
     }
-    else 
-    {
+    else {
         return "VIDEO";
     }
 }

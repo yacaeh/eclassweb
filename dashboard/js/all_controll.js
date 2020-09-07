@@ -5,18 +5,24 @@
 var top_all_controll_jthis;
 
 function updateControlView(send) {
-    if (classroomInfo.allControl) {
-        top_all_controll_jthis.addClass('top_all_controll_on');
-        top_all_controll_jthis.removeClass('top_all_controll_off')
+    if (connection.extra.roomOwner) {
+        if (classroomInfo.allControl) {
+            top_all_controll_jthis.addClass('top_all_controll_on');
+            top_all_controll_jthis.removeClass('top_all_controll_off')
+        }
+        else {
+            top_all_controll_jthis.addClass('top_all_controll_off');
+            top_all_controll_jthis.removeClass('top_all_controll_on')
+        }
     }
     else {
-        top_all_controll_jthis.addClass('top_all_controll_off');
-        top_all_controll_jthis.removeClass('top_all_controll_on')
+        classroomInfo.allControl ? Show("student-isallcontrol") : Hide("student-isallcontrol");
     }
 
+
     if (send == true) {
-        classroomInfo.allControl ? connection.send({allControl: {state: true,roomInfo: classroomInfo}})
-                                 : connection.send({allControl: {state: false}});
+        classroomInfo.allControl ? connection.send({ allControl: { state: true, roomInfo: classroomInfo } })
+            : connection.send({ allControl: { state: false } });
     }
 }
 

@@ -1,9 +1,9 @@
 var ver_time_table = false;
 
-if(ver_time_table){
+if (ver_time_table) {
     document.getElementById("login_form").parentElement.removeChild(document.getElementById("login_form"));
 }
-else{
+else {
     document.getElementById("time_table").parentElement.removeChild(document.getElementById("time_table"));
     document.getElementById("user-name").parentElement.removeChild(document.getElementById("user-name"));
 }
@@ -39,13 +39,13 @@ connection.sdpConstraints.mandatory = {
 $('#btn-join-hidden-room').click(function () {
     var roomid = $('#txt-roomid').val().toString();
     if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox($.i18n( 'ROOM_NUMBER_ERROR' ), $.i18n( 'ERROR' ));
+        alertBox($.i18n('ROOM_NUMBER_ERROR'), $.i18n('ERROR'));
         return;
     }
 
     var fullName = $('#txt-user-name').val().toString();
     if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox($.i18n('NO_NAME_ERROR'),  $.i18n( 'ERROR' ));
+        alertBox($.i18n('NO_NAME_ERROR'), $.i18n('ERROR'));
         return;
     }
 
@@ -53,7 +53,7 @@ $('#btn-join-hidden-room').click(function () {
 
     var roomPassword = $('#txt-room-password').val().toString();
     if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox($.i18n('ROOM_PASSWORD_ERROR'),  $.i18n( 'ERROR' ));
+        alertBox($.i18n('ROOM_PASSWORD_ERROR'), $.i18n('ERROR'));
         return;
     }
     connection.password = roomPassword;
@@ -63,22 +63,22 @@ $('#btn-join-hidden-room').click(function () {
             joinAHiddenRoom(roomid);
         }
         else {
-            alertBox($.i18n('ROOM_INFO_ERROR'),  $.i18n( 'ERROR' ));
+            alertBox($.i18n('ROOM_INFO_ERROR'), $.i18n('ERROR'));
         }
     });
     return;
 });
 
-function checkCamAndMicExist(){
-    connection.DetectRTC.load(function() {
-        
+function checkCamAndMicExist() {
+    connection.DetectRTC.load(function () {
+
         if (!connection.DetectRTC.hasMicrophone) {
             connection.mediaConstraints.audio = false;
             connection.session.audio = false;
             console.log("user has no mic!");
             alert($.i18n('NO_MIC_ERROR'));
         }
-    
+
         if (!connection.DetectRTC.hasWebcam) {
             connection.mediaConstraints.video = false;
             connection.session.video = false;
@@ -90,23 +90,23 @@ function checkCamAndMicExist(){
 }
 
 function looper() {
-    if(ver_time_table)
-    connection.socket.emit('get-public-rooms', publicRoomIdentifier, function (listOfRooms) {
-        ActiveClass(listOfRooms);
-        setTimeout(looper, 1000);
-    });
+    if (ver_time_table)
+        connection.socket.emit('get-public-rooms', publicRoomIdentifier, function (listOfRooms) {
+            ActiveClass(listOfRooms);
+            setTimeout(looper, 1000);
+        });
 }
 
 
-$('#btn-open-create-room-modal').click(function(e) {
+$('#btn-open-create-room-modal').click(function (e) {
     checkCamAndMicExist();
 });
 
-$('#btn-show-join-hidden-room').click(function(e) {
-  checkCamAndMicExist();
-  e.preventDefault();
-  $('#txt-room-password-hidden').parent().hide();
-  $('#joinRoomModel').modal('show');
+$('#btn-show-join-hidden-room').click(function (e) {
+    checkCamAndMicExist();
+    e.preventDefault();
+    $('#txt-room-password-hidden').parent().hide();
+    $('#joinRoomModel').modal('show');
 });
 
 
@@ -133,7 +133,7 @@ function joinAHiddenRoom(roomid) {
 }
 
 function openCanvasDesigner() {
-    
+
     $('#startRoomModel').modal('hide');
     var href = location.href + 'classroom.html?open=' + connection.isInitiator + '&sessionid=' + connection.sessionid + '&publicRoomIdentifier=' + connection.publicRoomIdentifier + '&userFullName=' + connection.extra.userFullName;
 
@@ -209,13 +209,13 @@ function confirmBox(message, callback) {
 $('#btn-create-room').click(function () {
     var roomid = $('#txt-roomid').val().toString();
     if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox($.i18n( 'ROOM_NUMBER_ERROR' ), $.i18n( 'ERROR' ));
+        alertBox($.i18n('ROOM_NUMBER_ERROR'), $.i18n('ERROR'));
         return;
     }
 
     var fullName = $('#txt-user-name').val().toString();
     if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox($.i18n( 'NO_NAME_ERROR' ), $.i18n( 'ERROR' ));
+        alertBox($.i18n('NO_NAME_ERROR'), $.i18n('ERROR'));
         return;
     }
 
@@ -223,7 +223,7 @@ $('#btn-create-room').click(function () {
 
     var roomPassword = $('#txt-room-password').val().toString();
     if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox($.i18n( 'ROOM_PASSWORD_ERROR' ), $.i18n( 'ERROR' ));
+        alertBox($.i18n('ROOM_PASSWORD_ERROR'), $.i18n('ERROR'));
         return;
     }
 
@@ -239,13 +239,13 @@ $('#btn-create-room').click(function () {
         connection.DetectRTC.load(function () {
             if (!connection.DetectRTC.hasMicrophone) {
                 console.log("user has no mic!");
-                alertBox($.i18n( 'NO_MIC_ERROR' ), $.i18n( 'ERROR' ));
+                alertBox($.i18n('NO_MIC_ERROR'), $.i18n('ERROR'));
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }
 
             if (isRoomExist === true && !extra._room.teacher_rejoin) {
-                alertBox( $.i18n( 'EXISTING_ROOM_ERROR' ), $.i18n( 'ERROR' ));
+                alertBox($.i18n('EXISTING_ROOM_ERROR'), $.i18n('ERROR'));
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }
@@ -259,7 +259,7 @@ $('#btn-create-room').click(function () {
             connection.isInitiator = true;
             connection.session.oneway = true;
             openCanvasDesigner();
-            
+
             $('#btn-create-room').html(initialHTML).prop('disabled', false);
         });
 
@@ -272,5 +272,5 @@ $('#chk-room-password').change(function () {
     $('#txt-room-password').focus();
 });
 
-if(ver_time_table)
+if (ver_time_table)
     MakeTimeTable("time_table", 7, 5);

@@ -6,27 +6,27 @@
 // https://github.com/muaz-khan/Canvas-Designer
 
 'use strict';
-$(window).bind("load", function() {
+$(window).bind("load", function () {
     updateLanguage();
 });
 
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/fonts/NanumPen.ttf)');
 penFont.load().then((font) => {
-  document.fonts.add(font);
+    document.fonts.add(font);
 });
 
 const gothicFont = new FontFace('나눔고딕', 'url(/dashboard/fonts/NanumBarunGothic.ttf)');
 gothicFont.load().then((font) => {
-  document.fonts.add(font);
+    document.fonts.add(font);
 });
 
-(function() {
+(function () {
     var teacherPoints = [];
     var studentPoints = {};
     var pointHistory = [];
     var markerpoint = [];
 
-    document.addEventListener("click", function(){
+    document.addEventListener("click", function () {
         window.focus();
     });
 
@@ -38,10 +38,10 @@ gothicFont.load().then((font) => {
         isMarker: true,
         isEraser: false,
         isText: false,
-        screenShare : false,
-        view3d : false,
+        screenShare: false,
+        view3d: false,
 
-        set: function(shape) {
+        set: function (shape) {
             let cache = this;
             cache.isLine = cache.isPencil = cache.isMarker = cache.isEraser = cache.isText = false;
             cache['is' + shape] = true;
@@ -82,48 +82,48 @@ gothicFont.load().then((font) => {
     function getContext(id) {
         var canv = find(id),
             ctx = canv.getContext('2d');
-            canv.setAttribute('width', innerWidth - 50);
-            canv.setAttribute('height', innerHeight);
-            ctx.lineWidth = lineWidth;
-            ctx.strokeStyle = strokeStyle;
-            ctx.fillStyle = fillStyle;
-            ctx.font = font;
+        canv.setAttribute('width', innerWidth - 50);
+        canv.setAttribute('height', innerHeight);
+        ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = strokeStyle;
+        ctx.fillStyle = fillStyle;
+        ctx.font = font;
         return ctx;
     }
-   
-function normalizePoint (x, y) {
-    return [x / canvas.width, y / canvas.height];
-}
 
-function resizePoint (point) {
-    const p0 = canvas.width * point[0];
-    const p1 = canvas.height * point[1];
-    return [p0, p1];
-}
+    function normalizePoint(x, y) {
+        return [x / canvas.width, y / canvas.height];
+    }
 
-window.resize = function(){
-    canvasresize('main-canvas');
-    canvasresize('temp-canvas');
-    drawHelper.redraw();
-}
+    function resizePoint(point) {
+        const p0 = canvas.width * point[0];
+        const p1 = canvas.height * point[1];
+        return [p0, p1];
+    }
 
-function canvasresize(id){
-    var canv = find(id);
-    if(!canv)
-        return;
-    canv.setAttribute('width', innerWidth - 50);
-    canv.setAttribute('height', innerHeight);
-}
+    window.resize = function () {
+        canvasresize('main-canvas');
+        canvasresize('temp-canvas');
+        drawHelper.redraw();
+    }
+
+    function canvasresize(id) {
+        var canv = find(id);
+        if (!canv)
+            return;
+        canv.setAttribute('width', innerWidth - 50);
+        canv.setAttribute('height', innerHeight);
+    }
 
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
 
 
     var common = {
-        updateTextArea: function() {
+        updateTextArea: function () {
             var c = common;
         },
-        toFixed: function(input) {
+        toFixed: function (input) {
             return Number(input).toFixed(1);
         },
 
@@ -158,7 +158,7 @@ function canvasresize(id){
     }
 
     function clone(obj) {
-        if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
+        if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj)
             return obj;
 
         if (obj instanceof Date)
@@ -187,11 +187,11 @@ function canvasresize(id){
 
 
     var drawHelper = {
-        firstTime : false,
-        prepoint : [],
-        marking : false,
+        firstTime: false,
+        prepoint: [],
+        marking: false,
 
-        redraw: function() {
+        redraw: function () {
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
 
@@ -199,14 +199,14 @@ function canvasresize(id){
             context.lineJoin = "round";
 
             var _this = this;
-            
-            Object.keys(studentPoints).forEach(function(e){
-                studentPoints[e].forEach(function(data){
+
+            Object.keys(studentPoints).forEach(function (e) {
+                studentPoints[e].forEach(function (data) {
                     drawpoint(data.points);
                 })
             })
 
-            teacherPoints.forEach(function(data){
+            teacherPoints.forEach(function (data) {
                 drawpoint(data.points);
             })
 
@@ -214,7 +214,7 @@ function canvasresize(id){
 
             function drawpoint(points) {
                 points.forEach(function (point) {
-                    if (point == null ) return false;
+                    if (point == null) return false;
 
                     if (point[0] == "marker") {
 
@@ -222,14 +222,14 @@ function canvasresize(id){
                             context.beginPath();
                             _this.marking = true;
 
-                            if(point[1][0] != -1){
+                            if (point[1][0] != -1) {
                                 let opt = point[2];
                                 context.lineWidth = opt[0];
                                 context.strokeStyle = opt[1];
-                            } 
+                            }
                         }
-                    
-                        if(point[1][0] == -1){
+
+                        if (point[1][0] == -1) {
                             context.stroke();
                             _this.marking = false;
                             _this.prepoint = [];
@@ -238,7 +238,7 @@ function canvasresize(id){
 
                         const resizeP = resizePoint(point[1]);
 
-                        if(!_this.prepoint) _this.prepoint = [resizeP[0], resizeP[1]];
+                        if (!_this.prepoint) _this.prepoint = [resizeP[0], resizeP[1]];
                         if (_this.prepoint[0] == resizeP[0] && _this.prepoint[1] == resizeP[1]) {
                             context.beginPath();
                         }
@@ -252,7 +252,7 @@ function canvasresize(id){
                             _this.marking = !_this.marking;
                             context.stroke();
                         }
-    
+
                         if (point && point.length && _this[point[0]]) {
                             context.beginPath();
                             _this[point[0]](context, point[1], point[2]);
@@ -266,7 +266,7 @@ function canvasresize(id){
                     context.stroke();
                 }
 
-                if(!_this.firstTime){
+                if (!_this.firstTime) {
                     _this.firstTime = true;
                     drawpoint(points);
                 }
@@ -275,7 +275,7 @@ function canvasresize(id){
             }
         },
 
-        getOptions: function(opt) {
+        getOptions: function (opt) {
             opt = opt || {};
             return [
                 opt.lineWidth || lineWidth,
@@ -285,7 +285,7 @@ function canvasresize(id){
                 opt.font || font
             ];
         },
-        handleOptions: function(context, opt, isNoFillStroke) {
+        handleOptions: function (context, opt, isNoFillStroke) {
             opt = opt || this.getOptions();
 
             context.lineWidth = opt[0];
@@ -298,8 +298,8 @@ function canvasresize(id){
                 context.fill();
             }
         },
-        line: function(context, point, options) {
-            if(point[0] == -1){
+        line: function (context, point, options) {
+            if (point[0] == -1) {
                 context.beginPath();
                 this.prepoint = [];
                 return;
@@ -315,18 +315,18 @@ function canvasresize(id){
 
             context.moveTo(x, y);
             context.lineTo(p[0], p[1]);
-            
+
             this.prepoint[0] = p[0];
             this.prepoint[1] = p[1];
 
             this.handleOptions(context, options);
         },
-        marker: function(context, point, options) {
+        marker: function (context, point, options) {
             context.beginPath();
-            context.clearRect(0,0,innerWidth, innerHeight)
+            context.clearRect(0, 0, innerWidth, innerHeight)
 
             let pre = [];
-            for(let i = 0 ; i < point.length; i++){
+            for (let i = 0; i < point.length; i++) {
                 let p = point[i];
                 let x, y;
                 x = pre[0] || p[0];
@@ -338,8 +338,8 @@ function canvasresize(id){
             }
             this.handleOptions(context, options);
         },
-        text: function(context, point, options) {
-            const normal = resizePoint( [point[1], point[2]]);
+        text: function (context, point, options) {
+            const normal = resizePoint([point[1], point[2]]);
             this.handleOptions(context, options);
             context.font = options[4];
             context.fillStyle = textHandler.getFillColor(options[2]);
@@ -351,14 +351,14 @@ function canvasresize(id){
         ismousedown: false,
         prevX: 0,
         prevY: 0,
-        mousedown: function(e) {
+        mousedown: function (e) {
             var x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
             var t = this;
 
             // normlaize : 0 ~ 1
-            const normalized = normalizePoint (x, y);
+            const normalized = normalizePoint(x, y);
             let nx = normalized[0];
             let ny = normalized[1];
 
@@ -369,16 +369,16 @@ function canvasresize(id){
 
             tempContext.lineCap = 'round';
             let opt = pencilDrawHelper.getOptions();
-            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, [x,y]);
-            points[points.length] = ['line', [t.prevX, t.prevY], opt];   
+            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, [x, y]);
+            points[points.length] = ['line', [t.prevX, t.prevY], opt];
             document.getElementById("pencil-container").style.display = 'none';
         },
-        mouseup: function(e) {        
+        mouseup: function (e) {
             points[points.length] = ['line', [-1, -1]];
             pointHistory.push(points.length);
             this.ismousedown = false;
         },
-        mousemove: function(e) {
+        mousemove: function (e) {
             let x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -387,12 +387,12 @@ function canvasresize(id){
             let nx = normalized[0];
             let ny = normalized[1];
 
-            let t = this;            
+            let t = this;
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
                 let opt = pencilDrawHelper.getOptions()
-                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt , [x,y]);
+                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, [x, y]);
                 points[points.length] = ['line', [t.prevX, t.prevY], opt];
                 t.prevX = nx;
                 t.prevY = ny;
@@ -405,7 +405,7 @@ function canvasresize(id){
 
     var pencilDrawHelper = clone(drawHelper);
 
-    pencilDrawHelper.getOptions = function() {
+    pencilDrawHelper.getOptions = function () {
         return [pencilLineWidth, pencilStrokeStyle];
     }
 
@@ -414,7 +414,7 @@ function canvasresize(id){
         ismousedown: false,
         prevX: 0,
         prevY: 0,
-        mousedown: function(e) {
+        mousedown: function (e) {
             let x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -433,12 +433,12 @@ function canvasresize(id){
 
             document.getElementById("marker-container").style.display = 'none';
         },
-        mouseup: function(e) {
+        mouseup: function (e) {
             points[points.length] = ['marker', [-1, -1]];
             pointHistory.push(points.length);
             this.ismousedown = false;
         },
-        mousemove: function(e) {
+        mousemove: function (e) {
             let x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -450,7 +450,7 @@ function canvasresize(id){
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-             
+
                 markerpoint.push([x, y]);
                 let opt = markerDrawHelper.getOptions();
                 markerDrawHelper.marker(tempContext, markerpoint, opt, []);
@@ -466,16 +466,16 @@ function canvasresize(id){
 
     var markerDrawHelper = clone(drawHelper);
 
-    markerDrawHelper.getOptions = function() {
+    markerDrawHelper.getOptions = function () {
         return [markerLineWidth, markerStrokeStyle];
     }
 
-    function isNear(x,y, point){
+    function isNear(x, y, point) {
         let px = point[0]
         let py = point[1]
 
-        let dist = Math.pow(x - px,2) + Math.pow(y - py,2);
-        if(dist < 0.0005)
+        let dist = Math.pow(x - px, 2) + Math.pow(y - py, 2);
+        if (dist < 0.0005)
             return true;
         else return false;
     }
@@ -485,23 +485,23 @@ function canvasresize(id){
         prevX: 0,
         prevY: 0,
 
-        mousedown: function(e) {
+        mousedown: function (e) {
 
             let x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
             let t = this;
             t.ismousedown = true;
             const normalized = normalizePoint(x, y);
-            x =normalized[0];
-            y =normalized[1];
+            x = normalized[0];
+            y = normalized[1];
             t.prevX = x;
             t.prevY = y;
-            this.eraser(x,y);
+            this.eraser(x, y);
         },
-        mouseup: function(e) {
+        mouseup: function (e) {
             this.ismousedown = false;
         },
-        mousemove: function(e) {
+        mousemove: function (e) {
             let x = e.pageX - canvas.offsetLeft,
                 y = e.pageY - canvas.offsetTop;
 
@@ -512,61 +512,61 @@ function canvasresize(id){
             y = normalized[1];
 
             if (t.ismousedown) {
-                this.eraser(x,y)
+                this.eraser(x, y)
             }
         },
-        eraser(x,y){
+        eraser(x, y) {
             let pre = undefined;
             let _idx = undefined;
             let near = undefined;
 
-            points.forEach(function(point,idx){
-                try{
-                    if(point[0] == "text"){
+            points.forEach(function (point, idx) {
+                try {
+                    if (point[0] == "text") {
                         // const normalize = normalizePoint(point[1][1], point[1][2])
                         let tempPoint = [point[1][1], point[1][2]];
-                        near = isNear(x,y,tempPoint);
+                        near = isNear(x, y, tempPoint);
                     }
-                    else{
-                        near = isNear(x,y,point[1]);
+                    else {
+                        near = isNear(x, y, point[1]);
                     }
-                }   
+                }
                 catch{
                     console.error(points);
                 }
 
-                if(near){
-                    for(let i = 0 ; i < pointHistory.length; i++){
-                        if(idx < pointHistory[i]){
-    
-                            if(i == 0)
+                if (near) {
+                    for (let i = 0; i < pointHistory.length; i++) {
+                        if (idx < pointHistory[i]) {
+
+                            if (i == 0)
                                 pre = 0;
-                            else 
-                                pre = pointHistory[i-1];
-    
-                            _idx = i ;
+                            else
+                                pre = pointHistory[i - 1];
+
+                            _idx = i;
 
                             let numofpoint = pointHistory[i] - pre
                             points.splice(pre, numofpoint);
-                            pointHistory.splice(i,1);
-                            for(let z = i ; z < pointHistory.length; z++){
+                            pointHistory.splice(i, 1);
+                            for (let z = i; z < pointHistory.length; z++) {
                                 pointHistory[z] -= numofpoint;
                             }
                             lastPointIndex = points.length;
 
                             window.parent.currentPoints = points;
                             window.parent.currentHistory = pointHistory;
-                            
-                            if(_idx != undefined){
+
+                            if (_idx != undefined) {
                                 let data = {
-                                    points : [],
-                                    history : pointHistory,
-                                    command : "eraser",
-                                    idx : _idx,
-                                    userid : _uid,
+                                    points: [],
+                                    history: pointHistory,
+                                    command: "eraser",
+                                    idx: _idx,
+                                    userid: _uid,
 
                                 }
-                                
+
                                 // console.log("SEND ERASER",_uid, data);
                                 data.pageidx = window.parent.pointer_saver.nowIdx;
                                 window.parent.postMessage({
@@ -589,17 +589,17 @@ function canvasresize(id){
         selectedFontFamily: '나눔펜글씨',
         selectedFontSize: '48',
         lastFillStyle: 'black',
-        onShapeSelected: function() {
+        onShapeSelected: function () {
             document.getElementById("temp-canvas").className = "";
             document.getElementById("temp-canvas").classList.add("texti");
             this.x = this.y = this.pageX = this.pageY = 0;
             this.text = '';
         },
-        onShapeUnSelected: function() {
+        onShapeUnSelected: function () {
             this.text = '';
             this.showOrHideTextTools('hide');
         },
-        getFillColor: function(color) {
+        getFillColor: function (color) {
             color = (color || fillStyle).toLowerCase();
 
             if (color == 'rgba(255, 255, 255, 0)' || color == 'transparent' || color === 'white') {
@@ -609,7 +609,7 @@ function canvasresize(id){
             return color;
         },
         index: 0,
-        getOptions: function() {
+        getOptions: function () {
             let options = {
                 font: textHandler.selectedFontSize + 'px ' + textHandler.selectedFontFamily + '',
                 fillStyle: this.lastFillStyle,
@@ -620,21 +620,21 @@ function canvasresize(id){
             font = options.font;
             return options;
         },
-        appendPoints: function() {
+        appendPoints: function () {
             let options = textHandler.getOptions();
             const normal = normalizePoint(textHandler.x, textHandler.y)
             points[points.length] = ['text', ['"' + textHandler.text + '"', normal[0], normal[1]], drawHelper.getOptions(options)];
             pointHistory.push(points.length);
             syncPoints(false, "text");
         },
-        canvasInput:null,
-        updateInput: function(){
+        canvasInput: null,
+        updateInput: function () {
             document.querySelector(".textInputUI").focus();
             document.querySelector(".textInputUI").addEventListener('change', (event) => {
                 textHandler.text = event.target.value;
             });
         },
-        mousedown: function(e) {
+        mousedown: function (e) {
             //console.log("mouse down!");
             this.updateInput();
             if (!is.isText) return;
@@ -654,8 +654,8 @@ function canvasresize(id){
 
             this.showTextTools();
         },
-        mousemove: function(e) {},
-        showOrHideTextTools: function(show) {
+        mousemove: function (e) { },
+        showOrHideTextTools: function (show) {
             if (show === 'hide') {
                 if (this.lastFillStyle.length) {
                     fillStyle = this.lastFillStyle;
@@ -665,15 +665,15 @@ function canvasresize(id){
                 this.lastFillStyle = textHandler.lastFillStyle;
                 //fillStyle = 'black';
             }
-            
+
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
-            this.textInputBox.style.top = this.y -this.textInputBox.clientHeight + 'px';
+            this.textInputBox.style.top = this.y - this.textInputBox.clientHeight + 'px';
             // this.textInputContainer.style.position = 'relative';
 
             this.fontColorBox.style.display = show == 'show' ? 'grid' : 'none';
-            this.fontColorBox.style.left = this.x +'px';
-            this.fontColorBox.style.top =  this.y - this.textInputBox.clientHeight - this.fontColorBox.clientHeight -10 +'px';
+            this.fontColorBox.style.left = this.x + 'px';
+            this.fontColorBox.style.top = this.y - this.textInputBox.clientHeight - this.fontColorBox.clientHeight - 10 + 'px';
 
             this.fontFamilyBox.style.display = show == 'show' ? 'block' : 'none';
             this.fontSizeBox.style.display = show == 'show' ? 'block' : 'none';
@@ -684,7 +684,7 @@ function canvasresize(id){
             this.fontSizeBox.style.top = this.y + 'px';
             this.fontFamilyBox.style.top = this.y + 'px';
         },
-        showTextTools: function() {
+        showTextTools: function () {
             if (!this.fontFamilyBox || !this.fontSizeBox || !this.textInputBox || !this.fontColorBox) return;
 
             this.unselectAllFontFamilies();
@@ -692,8 +692,8 @@ function canvasresize(id){
 
             this.showOrHideTextTools('show');
 
-            this.eachFontFamily(function(child) {
-                child.onclick = function(e) {
+            this.eachFontFamily(function (child) {
+                child.onclick = function (e) {
                     e.preventDefault();
 
                     textHandler.showOrHideTextTools('hide');
@@ -704,8 +704,8 @@ function canvasresize(id){
                 child.style.fontFamily = child.innerHTML;
             });
 
-            this.eachFontSize(function(child) {
-                child.onclick = function(e) {
+            this.eachFontSize(function (child) {
+                child.onclick = function (e) {
                     e.preventDefault();
 
                     textHandler.showOrHideTextTools('hide');
@@ -715,8 +715,8 @@ function canvasresize(id){
                 };
                 // child.style.fontSize = child.innerHTML + 'px';
             });
-            this.eachFontColor(function(child) {
-                child.onclick = function(e) {
+            this.eachFontColor(function (child) {
+                child.onclick = function (e) {
                     e.preventDefault();
 
                     textHandler.showOrHideTextTools('hide');
@@ -730,12 +730,12 @@ function canvasresize(id){
 
         },
         //textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
-        eachFontColor: function(callback){
+        eachFontColor: function (callback) {
             var container = document.getElementById('textInputContainer');
             var template = container.getElementsByClassName("color_template_text")[0];
             var divs = [];
             template.innerHTML = '';
-            penColors.forEach(function(color){
+            penColors.forEach(function (color) {
                 var div = document.createElement("div");
                 div.dataset.color = color;
                 div.className = "color";
@@ -744,8 +744,8 @@ function canvasresize(id){
                 template.appendChild(div);
             });
 
-            for(var i= 0 ; i < divs.length; i++){
-                divs[i].addEventListener("click", function(){
+            for (var i = 0; i < divs.length; i++) {
+                divs[i].addEventListener("click", function () {
                     var nowColor = this.dataset.color;
                     divs.forEach(element => element.classList.remove("on"));
                     this.classList.add("on");
@@ -753,35 +753,35 @@ function canvasresize(id){
                 })
             }
         },
-        eachFontFamily: function(callback) {
+        eachFontFamily: function (callback) {
             var childs = this.fontFamilyBox.querySelectorAll('li');
             for (var i = 0; i < childs.length; i++) {
                 callback(childs[i]);
             }
         },
-        unselectAllFontFamilies: function() {
-            this.eachFontFamily(function(child) {
+        unselectAllFontFamilies: function () {
+            this.eachFontFamily(function (child) {
                 child.className = '';
                 if (child.innerHTML === textHandler.selectedFontFamily) {
                     child.className = 'font-family-selected';
                 }
             });
         },
-        eachFontSize: function(callback) {
+        eachFontSize: function (callback) {
             var childs = this.fontSizeBox.querySelectorAll('li');
             for (var i = 0; i < childs.length; i++) {
                 callback(childs[i]);
             }
         },
-        unselectAllFontSizes: function() {
-            this.eachFontSize(function(child) {
+        unselectAllFontSizes: function () {
+            this.eachFontSize(function (child) {
                 child.className = '';
                 if (child.innerHTML === textHandler.selectedFontSize) {
                     child.className = 'font-size-selected';
                 }
             });
         },
-        onReturnKeyPressed: function() {
+        onReturnKeyPressed: function () {
             //console.log(this.lastFillStyle);
             if (!textHandler.text || !textHandler.text.length) return;
             document.querySelector('.textInputUI').value = "";
@@ -798,10 +798,10 @@ function canvasresize(id){
         fontFamilyBox: document.querySelector('.fontSelectUl'),
         fontSizeBox: document.querySelector('.fontSizeUl'),
         fontColorBox: document.getElementById('textInputContainer').querySelector('.color_template_text'),
-        textInputContainer:document.getElementById('textInputContainer')
+        textInputContainer: document.getElementById('textInputContainer')
     };
 
-  
+
     var icons = {};
     if (params.icons) {
         try {
@@ -827,17 +827,17 @@ function canvasresize(id){
         undo: icons.undo || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABPxJREFUeNrsnVuIVVUYx9dpQiIdvOBtDGa8RILSQz4koWYvRZeXEkRztJd8ExGkSPBRSxDMB0ESxBBpSnyLMCGJChV6SSURpEkcZia8RjqpmTTT97HXYQYcZ87Za5+z917f7wd/BhT1eNZvfWutvdbeuzI0NOTALk/wFSAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAlBq9LyAkJeY5yWeSmabbz6gA70n6JX9LplkWwNoQME/yleSwZI7ktn6HzAFsoL3+R8kaBv5hnjTS63fR8DYrAL3eaAWg1xuuAPR6oxWAXm+4AtDrjVYA7fWfSNbSlPYqQLXX0/jGKgC93nAFoNcbrQD0esMVgF5vtALQ6w1XAHq90QqQR6//jwpgt9dXJE9LWqwKUAk91lWpVEI/Q4fkY0lnDv9/7f2/Sf5yyfEw/XlLck3SI+mT9PqfA0VswOD2y1mATt/4HQXuJPcl170oFyVnJeckl/zvIUDKsV4b/t2SVs5/Jb9Lzki+l/wg+aOMAuRxKniDL69DEUUrxDE/f5nWbAHKcix8ruTLyBp+tFyW7JY8jwDDrI+w14+Xu5IjkhctCzDPSK8fK/9IDrrkTiRTAmww2OvHii4tt/nrDlELoGP9FzT4Y6Mrh5diFaCTXl9T9KLShzEJMJexPlW6JDPKLsBGfxGEBk2XXyQL8xIgi82gQQchvCA5IVma27XkDIaADiZ+mawSXolhEniFxkydm5KVLANt56pkSQwXgqgG6dMtaY/hUjBzg/TR01ETY9kMWkc1SJW9sW0HUw3qiy6x34lFAOYG6aLf1eyYBGBuUH8OxCYAc4P6omcQl8UoQN5zg0G/M6enex8WXILv3Cj3cYS2XxHuCxh5gGRnrevfjPhT8qo/tTPJZ6pLnh/c7uXU4WqBZLrL/0aatyTHy34qeLxq0NXEXqWneVvH+UwtXoiXJZslR3M883DSJXczRTUEPG6l0Iwv+Ybv2fUyRfKGZJ9L7g9olgB6J9MKCwI0a26QVoCRTJa87ZL7AgaaIMEhKwJUWd/AlUIWAoxkkZ/HXG7wjmGbJQEaWQ2yFqCKHvPa6jd1GiHBRmsCNGpu0CgBqsxyydNL72UswNdWBci6GjRagCp6DPznDAXQW9jnWBUgy7lBswSorhz2ZyjBKusCZFENmilAlS2SBxkIsAcBwncY8xBAWe2G31eUNj/plUkECNthzEsA5U1/KTrkFPFMBAirBnkKoLwuuROwkbWc18Y9ilaBlX5PoejoDSHv++3euvfhXHL7fRCxvjSqx1eC6oMpioxeQv4g5Z99NvhfN/Dm0LFWCnkPASPZk2IY+Jw5QNjcoEgCTJB8W6cA3yBA2EqhSAIoz7j6NpJOI0D6atDnL8jMKNhne81PCmsR4FcESM98l7w+vq2An21HjQJ0I0A4RVwJPSU5VYMAvVwHCKeID7jQQ6qbXPIA67FoidF+SDjvkrME5sofDPOpS84RNKx6IUCx0aFgq1+tUAGMog+WPIAAttFl4ZVRfr2CADbQo+DbEcA2+iTW4whgF73w85HL+OVVCFAuLjh/GNQzIfQvLNLt4VAbrX4o0FfS9Ev7Lc5VACg3DAEIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgApeN/AQYAUjtq/Zx6jVYAAAAASUVORK5CYII=',
 
         clearCanvas: icons.clearCanvas || '',
-        on : icons.on || '',
-        off : icons.off || '',
-        screenShare : icons.screenShare || '',
-        view3d : icons.view3d || '',
-        movie : icons.movie || '',
-        file : icons.file,
-        epub : icons.epub,
-        callteacher : icons.callteacher,
-        fulloff : icons.fulloff,
-        fullon : icons.fullon,
-        homework : icons.homework,
+        on: icons.on || '',
+        off: icons.off || '',
+        screenShare: icons.screenShare || '',
+        view3d: icons.view3d || '',
+        movie: icons.movie || '',
+        file: icons.file,
+        epub: icons.epub,
+        callteacher: icons.callteacher,
+        fulloff: icons.fulloff,
+        fullon: icons.fullon,
+        homework: icons.homework,
     };
 
 
@@ -854,7 +854,7 @@ function canvasresize(id){
         lineWidth: true,
         colorsPicker: true,
         code: true,
-        
+
         clearCanvas: true,
         onoff: true,
         undo: true,
@@ -865,7 +865,7 @@ function canvasresize(id){
         try {
             var t = JSON.parse(params.tools);
             tools = t;
-        } catch (e) {}
+        } catch (e) { }
     }
 
     if (tools.code === true) {
@@ -905,11 +905,11 @@ function canvasresize(id){
         setSelection(firstMatch, window.selectedIcon);
     }
 
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         setDefaultSelectedIcon();
     }, false);
 
-    (function() {
+    (function () {
         var cache = {};
 
         function getContext(id) {
@@ -920,14 +920,14 @@ function canvasresize(id){
         }
 
         function bindEvent(context, shape) {
-            addEvent(context.canvas, 'click', function() {
+            addEvent(context.canvas, 'click', function () {
 
                 if (textHandler.text.length) {
                     textHandler.appendPoints();
                 }
 
                 if (shape === 'Text') {
-                    if(this.classList.contains("off"))
+                    if (this.classList.contains("off"))
                         return false;
                     textHandler.onShapeSelected();
                 } else {
@@ -943,10 +943,10 @@ function canvasresize(id){
                     find('copy-all').checked = true;
                     find('copy-last').checked = false;
                 }
-         
+
                 if (this.id === 'eraserIcon') {
-                    if(this.classList.contains('off'))
-                    return false;
+                    if (this.classList.contains('off'))
+                        return false;
 
                     document.getElementById("temp-canvas").className = "";
                     document.getElementById("temp-canvas").classList.add("eraser");
@@ -969,12 +969,12 @@ function canvasresize(id){
             var context = getContext('undo');
 
             var image = new Image();
-            image.onload = function() {
+            image.onload = function () {
                 context.drawImage(image, 0, 0, 28, 28);
 
-                document.querySelector('#undo').onclick = function() {
-                    if(this.classList.contains('off'))
-                    return false;
+                document.querySelector('#undo').onclick = function () {
+                    if (this.classList.contains('off'))
+                        return false;
 
                     if (points.length) {
                         let idx = pointHistory.length - 2;
@@ -1012,7 +1012,7 @@ function canvasresize(id){
             };
             image.src = data_uris.view3d;
 
-            document.getElementById('3d_view').onclick = function() {
+            document.getElementById('3d_view').onclick = function () {
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
             }
@@ -1023,7 +1023,7 @@ function canvasresize(id){
             document.getElementById('3d_view').style.display = 'block';
         }
 
-        
+
         function decorateHomework() {
             let image = new Image();
             image.onload = () => {
@@ -1032,8 +1032,8 @@ function canvasresize(id){
             image.src = data_uris.homework;
         }
 
-            decorateHomework();
-            document.getElementById('homework').style.display = 'block';
+        decorateHomework();
+        document.getElementById('homework').style.display = 'block';
 
         function decoratemovie() {
             let image = new Image();
@@ -1042,7 +1042,7 @@ function canvasresize(id){
             };
             image.src = data_uris.movie;
 
-            document.getElementById('movie').onclick = function(){
+            document.getElementById('movie').onclick = function () {
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
             }
@@ -1053,7 +1053,7 @@ function canvasresize(id){
             document.getElementById('movie').style.display = 'block';
         }
 
-        
+
         function decoratecallteacher() {
             let image = new Image();
             image.onload = () => {
@@ -1108,9 +1108,9 @@ function canvasresize(id){
 
             // END INIT PENCIL
 
-            addEvent(canvas, 'click', function(){
+            addEvent(canvas, 'click', function () {
                 hideContainers();
-                if(this.classList.contains('off'))
+                if (this.classList.contains('off'))
                     return false;
 
                 document.getElementById("temp-canvas").className = "";
@@ -1141,7 +1141,7 @@ function canvasresize(id){
             var context = getContext('markerIcon');
 
             var image = new Image();
-            image.onload = function() {
+            image.onload = function () {
                 context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Marker');
             };
@@ -1156,13 +1156,13 @@ function canvasresize(id){
 
             // START INIT MARKER
             markerStrokeStyle = hexToRGBA("#F12A2A", alpha)
-     
-        
+
+
 
             // END INIT MARKER
 
-            addEvent(canvas, 'click', function() {
-                if(this.classList.contains('off'))
+            addEvent(canvas, 'click', function () {
+                if (this.classList.contains('off'))
                     return false;
                 hideContainers();
                 document.getElementById("temp-canvas").className = "";
@@ -1179,7 +1179,7 @@ function canvasresize(id){
                 markerStrokeStyle = hexToRGBA(fillStyleText.value, alpha);
             });
 
-    
+
         }
 
         if (tools.marker === true) {
@@ -1244,11 +1244,11 @@ function canvasresize(id){
             };
             image.src = data_uris.clearCanvas;
 
-            document.querySelector('#clearCanvas').onclick = function(){
-                if(this.classList.contains('off'))
-                return false;
+            document.querySelector('#clearCanvas').onclick = function () {
+                if (this.classList.contains('off'))
+                    return false;
 
-                if(points.length < 1){
+                if (points.length < 1) {
                     return false;
                 }
 
@@ -1288,7 +1288,7 @@ function canvasresize(id){
             };
             image.src = data_uris.epub;
 
-            document.getElementById('epub').onclick = function(){
+            document.getElementById('epub').onclick = function () {
                 this.classList.toggle("on");
                 this.classList.toggle("selected-shape");
             }
@@ -1299,7 +1299,7 @@ function canvasresize(id){
             document.getElementById('epub').style.display = 'block';
         }
 
-        function decorateonoff(){
+        function decorateonoff() {
             var context = getContext('onoff-icon');
 
             var image = new Image();
@@ -1308,17 +1308,17 @@ function canvasresize(id){
                 context.drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.on;
-            
-            document.querySelector('#onoff-icon').onclick = function(){
+
+            document.querySelector('#onoff-icon').onclick = function () {
                 this.classList.toggle("on");
                 // this.classList.toggle("off");
 
                 var isOn = this.classList.contains("on");
-                
-                function changeColor(id, alpha){
+
+                function changeColor(id, alpha) {
                     var ctx = getContext(id.id);
                     var nimage = new Image();
-                    
+
                     nimage.onload = () => {
                         ctx.globalAlpha = alpha;
                         ctx.clearRect(0, 0, 40, 40);
@@ -1327,23 +1327,23 @@ function canvasresize(id){
                     nimage.src = id.toDataURL();
                 }
 
-                function returnColor(id){
-                    var ctx =getContext(id.id);
+                function returnColor(id) {
+                    var ctx = getContext(id.id);
                     var nimage = new Image();
-                    nimage.onload = () =>{
+                    nimage.onload = () => {
                         ctx.globalAlpha = 1;
-                        ctx.clearRect(0,0,40,40);
-                        ctx.drawImage(nimage,0,0,28,28);
+                        ctx.clearRect(0, 0, 40, 40);
+                        ctx.drawImage(nimage, 0, 0, 28, 28);
                     }
                     nimage.src = data_uris[id.id];
                 }
 
-                if(isOn){
+                if (isOn) {
 
                     image.src = data_uris.on;
                     var icons = document.getElementById('tool-box').children;
-                    for(var i = 0 ; i < icons.length; i++){
-                        if(!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
+                    for (var i = 0; i < icons.length; i++) {
+                        if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
                             continue;
                         returnColor(icons[i]);
                         icons[i].classList.remove("off");
@@ -1352,20 +1352,20 @@ function canvasresize(id){
                     document.getElementById("main-canvas").style.display = 'block';
                     document.getElementById("temp-canvas").style.display = 'block';
                 }
-                else{
+                else {
                     image.src = data_uris.off;
                     var icons = document.getElementById('tool-box').children;
-                    for(var i = 0 ; i < icons.length; i++){
+                    for (var i = 0; i < icons.length; i++) {
 
-                        if(!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
+                        if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
                             continue;
 
-                            var dis = icons[i].style.display;
-        
-                            if(dis == 'block'){
-                                changeColor(icons[i], 0.3);
-                                icons[i].classList.remove("on");
-                                icons[i].classList.add("off");
+                        var dis = icons[i].style.display;
+
+                        if (dis == 'block') {
+                            changeColor(icons[i], 0.3);
+                            icons[i].classList.remove("on");
+                            icons[i].classList.add("off");
                         }
                     }
 
@@ -1382,7 +1382,7 @@ function canvasresize(id){
             decorateonoff();
             document.getElementById('onoff-icon').style.display = 'block';
         }
-        
+
         var isAbsolute = find('is-absolute-points'),
             isShorten = find('is-shorten-code');
 
@@ -1391,10 +1391,10 @@ function canvasresize(id){
     })();
 
     function hideContainers() {
-        var 
+        var
             markerContainer = find('marker-container'),
             pencilContainer = find('pencil-container');
-            markerContainer.style.display =
+        markerContainer.style.display =
             pencilContainer.style.display = 'none';
     }
 
@@ -1414,17 +1414,17 @@ function canvasresize(id){
 
     var canvas = tempContext.canvas;
 
-    function TouchConverter(e){
+    function TouchConverter(e) {
         var r = {
-            pageX : e.touches[0].pageX,
-            pageY : e.touches[0].pageY,
-        }   
+            pageX: e.touches[0].pageX,
+            pageY: e.touches[0].pageY,
+        }
         return r;
 
     }
 
-    addEvent(canvas, 'touchstart mousedown', function(e) {
-        if(e.touches){
+    addEvent(canvas, 'touchstart mousedown', function (e) {
+        if (e.touches) {
             e = TouchConverter(e);
         }
 
@@ -1435,10 +1435,10 @@ function canvasresize(id){
         else if (cache.isText) textHandler.mousedown(e);
         else if (cache.isMarker) markerHandler.mousedown(e);
 
-        if(!cache.isMarker)
+        if (!cache.isMarker)
             drawHelper.redraw();
-        
-            preventStopEvent(e);
+
+        preventStopEvent(e);
     });
 
     function preventStopEvent(e) {
@@ -1455,7 +1455,7 @@ function canvasresize(id){
         }
     }
 
-    addEvent(canvas, 'touchend mouseup', function(e) {
+    addEvent(canvas, 'touchend mouseup', function (e) {
         let cache = is;
         let command = "default";
 
@@ -1471,28 +1471,28 @@ function canvasresize(id){
             command = "marker";
             markerHandler.mouseup(e);
         }
-    
+
 
         !cache.isPdf && drawHelper.redraw();
 
-        if(!cache.isEraser) {
+        if (!cache.isEraser) {
             syncPoints(false, command);
         }
 
         preventStopEvent(e);
     });
 
-    addEvent(canvas, 'touchmove mousemove', function(e) {
-        if(e.touches){
+    addEvent(canvas, 'touchmove mousemove', function (e) {
+        if (e.touches) {
             e = TouchConverter(e);
         }
 
         var cache = is;
 
-        if (cache.isPencil)    pencilHandler.mousemove(e);
-        else if (cache.isEraser)    eraserHandler.mousemove(e);
-        else if (cache.isText)      textHandler.mousemove(e);
-        else if (cache.isMarker)    markerHandler.mousemove(e);
+        if (cache.isPencil) pencilHandler.mousemove(e);
+        else if (cache.isEraser) eraserHandler.mousemove(e);
+        else if (cache.isText) textHandler.mousemove(e);
+        else if (cache.isMarker) markerHandler.mousemove(e);
 
         preventStopEvent(e);
     });
@@ -1519,13 +1519,13 @@ function canvasresize(id){
             if (points.length) {
                 var idx = pointHistory.length - 2;
 
-                if(idx == -1 ){
+                if (idx == -1) {
                     points = []
                 }
-                else{
+                else {
                     points.length = pointHistory[idx];
                 }
-                
+
                 pointHistory.pop();
                 drawHelper.redraw();
             }
@@ -1547,7 +1547,7 @@ function canvasresize(id){
     var lastPointIndex = 0;
     var uid;
 
-    window.addEventListener('message', function(event) {
+    window.addEventListener('message', function (event) {
         if (!event.data) return;
 
         if (!uid) {
@@ -1555,7 +1555,7 @@ function canvasresize(id){
         }
 
         if (event.data.captureStream) {
-            webrtcHandler.createOffer(function(sdp) {
+            webrtcHandler.createOffer(function (sdp) {
                 sdp.uid = uid;
                 window.parent.postMessage(sdp, '*');
             });
@@ -1635,22 +1635,22 @@ function canvasresize(id){
             return;
         }
 
-        if(event.data.SyncAllPoint){
+        if (event.data.SyncAllPoint) {
             console.error("OK!");
         }
 
         if (!event.data.canvasDesignerSyncData) return;
 
         var data = event.data.canvasDesignerSyncData;
-        if(data.isStudent){
+        if (data.isStudent) {
             var id = data.userid;
-            if(id == undefined){
-                Object.keys(studentPoints).forEach(function(key){
+            if (id == undefined) {
+                Object.keys(studentPoints).forEach(function (key) {
                     studentPoints[key].length = 0;
                 })
             }
-            else{
-                if(!studentPoints[id])
+            else {
+                if (!studentPoints[id])
                     studentPoints[id] = []
                 PushPoints(data, studentPoints[id]);
             }
@@ -1666,16 +1666,16 @@ function canvasresize(id){
 
     var _uid = window.parent.connection.userid;
 
-    function PushPoints(data, array){
-        
-        switch(data.command){
-            case "eraser" :
-                array.splice(data.idx,1);
+    function PushPoints(data, array) {
+
+        switch (data.command) {
+            case "eraser":
+                array.splice(data.idx, 1);
                 break;
-            case "clear" :
+            case "clear":
                 array.length = 0;
                 break;
-            case "my" :
+            case "my":
                 points = data.points;
                 pointHistory = data.history;
                 window.parent.currentPoints = points;
@@ -1684,8 +1684,8 @@ function canvasresize(id){
             case "default":
             case "loaddata":
                 var startIdx = 0;
-                data.history.forEach(function(history){
-                    if(startIdx == history)
+                data.history.forEach(function (history) {
+                    if (startIdx == history)
                         return false;
                     var points = data.points.slice(startIdx, history);
                     var command = points[0][0];
@@ -1693,18 +1693,18 @@ function canvasresize(id){
                     startIdx = history;
 
                     var d = {
-                        points : points,
-                        command : command,
-                        startIndex : startIndex,
-                        userid : data.userid,
+                        points: points,
+                        command: command,
+                        startIndex: startIndex,
+                        userid: data.userid,
                     }
                     array.push(d);
                 })
                 break;
             case "load":
                 array.length = 0;
-                data.history.forEach(function(history){
-                    if(startIdx == history)
+                data.history.forEach(function (history) {
+                    if (startIdx == history)
                         return false;
                     var points = data.points.slice(startIdx, history);
                     var command = points[0][0];
@@ -1712,15 +1712,15 @@ function canvasresize(id){
                     startIdx = history;
 
                     var d = {
-                        points : points,
-                        command : command,
-                        startIndex : startIndex,
-                        userid : data.userid,
+                        points: points,
+                        command: command,
+                        startIndex: startIndex,
+                        userid: data.userid,
                     }
                     array.push(d);
                 })
                 break;
-            case "clearcanvas" :
+            case "clearcanvas":
                 points.length = 0;
                 pointHistory.length = 0
                 window.parent.currentPoints = points;
@@ -1729,7 +1729,7 @@ function canvasresize(id){
             case "clearstudent":
                 array.length = 0;
                 break;
-            default :
+            default:
                 array.push(data);
         }
     }
@@ -1775,15 +1775,15 @@ function canvasresize(id){
     }
 
     var webrtcHandler = {
-        createOffer: function(callback) {
+        createOffer: function (callback) {
             var captureStream = document.getElementById('main-canvas').captureStream();
             var peer = this.getPeer();
 
-            captureStream.getTracks().forEach(function(track) {
+            captureStream.getTracks().forEach(function (track) {
                 peer.addTrack(track, captureStream);
             });
 
-            peer.onicecandidate = function(event) {
+            peer.onicecandidate = function (event) {
                 if (!event || !!event.candidate) {
                     return;
                 }
@@ -1796,20 +1796,20 @@ function canvasresize(id){
             peer.createOffer({
                 OfferToReceiveAudio: false,
                 OfferToReceiveVideo: false
-            }).then(function(sdp) {
+            }).then(function (sdp) {
                 peer.setLocalDescription(sdp);
             });
         },
-        setRemoteDescription: function(sdp) {
-            this.peer.setRemoteDescription(new RTCSessionDescription(sdp)).then(function() {
+        setRemoteDescription: function (sdp) {
+            this.peer.setRemoteDescription(new RTCSessionDescription(sdp)).then(function () {
                 if (typeof setTemporaryLine === 'function') {
                     setTemporaryLine();
                 }
             });
         },
-        createAnswer: function(sdp, callback) {
+        createAnswer: function (sdp, callback) {
             var peer = this.getPeer();
-            peer.onicecandidate = function(event) {
+            peer.onicecandidate = function (event) {
                 if (!event || !!event.candidate) {
                     return;
                 }
@@ -1819,23 +1819,23 @@ function canvasresize(id){
                     type: peer.localDescription.type
                 });
             };
-            this.peer.setRemoteDescription(new RTCSessionDescription(sdp)).then(function() {
+            this.peer.setRemoteDescription(new RTCSessionDescription(sdp)).then(function () {
                 peer.createAnswer({
                     OfferToReceiveAudio: false,
                     OfferToReceiveVideo: true
-                }).then(function(sdp) {
+                }).then(function (sdp) {
                     peer.setLocalDescription(sdp);
                 });
             });
 
-            peer.ontrack = function(event) {
+            peer.ontrack = function (event) {
                 console.error("ONTRACK..")
                 callback({
                     stream: event.streams[0]
                 });
             };
         },
-        getPeer: function() {
+        getPeer: function () {
             let WebRTC_Native_Peer = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
             let peer = new WebRTC_Native_Peer(null);
             this.peer = peer;
@@ -1845,8 +1845,8 @@ function canvasresize(id){
 
 
     let c = document.getElementsByClassName("i");
-    for(let i = 0 ; i < c.length; i++){
-        c[i].addEventListener("click", function(){
+    for (let i = 0; i < c.length; i++) {
+        c[i].addEventListener("click", function () {
             document.getElementById("marker-container").style.display = 'none';
             document.getElementById("pencil-container").style.display = 'none';
         })
@@ -1854,7 +1854,7 @@ function canvasresize(id){
 
     var penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
 
-    SliderSetting("pencileslider", "pencil-stroke-style",1 , 22, 3, function(v){
+    SliderSetting("pencileslider", "pencil-stroke-style", 1, 22, 3, function (v) {
         var pencilDrawHelper = clone(drawHelper);
         pencilDrawHelper.getOptions = () => {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, font];
@@ -1862,7 +1862,7 @@ function canvasresize(id){
         pencilLineWidth = v;
     });
 
-    SliderSetting("markerslider", "marker-stroke-style",14, 40, 21, function(v){
+    SliderSetting("markerslider", "marker-stroke-style", 14, 40, 21, function (v) {
         var markerDrawHelper = clone(drawHelper);
         markerDrawHelper.getOptions = () => {
             return [markerLineWidth, markerStrokeStyle, fillStyle, globalAlpha, font];
@@ -1873,7 +1873,7 @@ function canvasresize(id){
     ColorSetting('pencil-container', penColors);
     ColorSetting('marker-container', penColors);
 
-    function ColorSetting(_container, colors){
+    function ColorSetting(_container, colors) {
         let container = document.getElementById(_container);
         let template = container.getElementsByClassName("color_template")[0];
         let divs = [];
@@ -1881,8 +1881,8 @@ function canvasresize(id){
         function hexToRGBA(h, alpha) {
             return 'rgba(' + hexToRGB(h).join(',') + ',' + alpha + ')';
         }
-        
-        colors.forEach(function(color){
+
+        colors.forEach(function (color) {
             let div = document.createElement("div");
             div.dataset.color = color;
             div.className = "color";
@@ -1891,14 +1891,14 @@ function canvasresize(id){
             template.appendChild(div);
         });
 
-        for(let i= 0 ; i < divs.length; i++){
-            divs[i].addEventListener("click", function(){
+        for (let i = 0; i < divs.length; i++) {
+            divs[i].addEventListener("click", function () {
                 let nowColor = this.dataset.color;
                 divs.forEach(element => element.classList.remove("on"));
                 this.classList.add("on");
-                if(_container == "pencil-container")
+                if (_container == "pencil-container")
                     pencilStrokeStyle = nowColor;
-                else if(_container == "marker-container")
+                else if (_container == "marker-container")
                     markerStrokeStyle = hexToRGBA(nowColor, 0.2);
             })
         }
@@ -1909,32 +1909,32 @@ function canvasresize(id){
 
 
 
-function MakeTitlePop(element, contents){
+function MakeTitlePop(element, contents) {
     let ele = document.getElementById(element);
     let pop = document.getElementById("titlebox");
 
-    if(!ele)
+    if (!ele)
         return;
 
-    ele.addEventListener("mouseover", function(){
-        if(this.classList.contains("off"))
+    ele.addEventListener("mouseover", function () {
+        if (this.classList.contains("off"))
             return false;
 
         pop.style.display = 'block';
         let rect = ele.getBoundingClientRect();
-        let y= rect.y;
+        let y = rect.y;
         let height = 7;
-        pop.style.top =  y + height+  'px';
+        pop.style.top = y + height + 'px';
         pop.children[0].innerHTML = contents;
     })
 
-    ele.addEventListener("mouseleave", function(){
+    ele.addEventListener("mouseleave", function () {
         pop.style.display = 'none';
     })
 }
 
 
-function SliderSetting(element, targetinput, min, max, defaultv, callback){
+function SliderSetting(element, targetinput, min, max, defaultv, callback) {
     max -= min;
 
     let slider = document.getElementById(element);
@@ -1944,67 +1944,67 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback){
     let isClick = false;
 
     Set(defaultv);
-    function Set(v){
+    function Set(v) {
         slider.parentElement.style.display = "block";
         let ratio = (v - min) / max;
         let sliderWidth = slider.getBoundingClientRect().width;
         // back.getBoundingClientRect().width = (ratio * sliderWidth) + 'px';
         back.style.width = (ratio * sliderWidth) + 'px';
-        bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+        bar.style.left = (ratio * sliderWidth) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (max * ratio).toFixed(0) * 1 + min;
         slider.parentElement.style.display = "none";
         callback(v);
     }
 
-    bar.addEventListener("mousedown", function(){
+    bar.addEventListener("mousedown", function () {
         isClick = true;
     })
 
-    window.addEventListener("mousemove", function(e){
-        if(isClick){
+    window.addEventListener("mousemove", function (e) {
+        if (isClick) {
             let sliderLeft = slider.getBoundingClientRect().left;
             let sliderWidth = slider.getBoundingClientRect().width;
             let mousex = e.x;
             let ratio = (mousex - sliderLeft) / sliderWidth;
             ratio = Math.min(Math.max(0, ratio), 1);
             back.style.width = (ratio * sliderWidth) + 'px';
-            bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+            bar.style.left = (ratio * sliderWidth) - bar.getBoundingClientRect().width / 2 + 'px';
             sliderval.value = (max * ratio).toFixed(0) * 1 + min;
         }
     })
 
-    document.getElementById("temp-canvas").addEventListener("mouseup", function(){
-        if(isClick){
+    document.getElementById("temp-canvas").addEventListener("mouseup", function () {
+        if (isClick) {
             isClick = false;
             callback(sliderval.value);
         }
     })
 
-    window.addEventListener("mouseup", function(){
-        if(isClick){
+    window.addEventListener("mouseup", function () {
+        if (isClick) {
             isClick = false;
             callback(sliderval.value);
         }
     })
 
-    slider.addEventListener("mousedown", function(e){
+    slider.addEventListener("mousedown", function (e) {
         var sliderWidth = slider.getBoundingClientRect().width;
         var mousex = e.offsetX;
-        isClick= true;
+        isClick = true;
 
-        if(e.target == bar){
+        if (e.target == bar) {
             return false;
         }
         var ratio = mousex / sliderWidth;
         ratio = Math.min(Math.max(0, ratio), 1);
         back.style.width = (ratio * sliderWidth) + 'px';
-        bar.style.left = (ratio * sliderWidth ) - bar.getBoundingClientRect().width / 2 + 'px';
+        bar.style.left = (ratio * sliderWidth) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (max * ratio).toFixed(0) * 1 + min;
     })
 }
 
 function handleDragDropEvent(oEvent) {
     oEvent.preventDefault();
-  }
+}
 
 

@@ -18,7 +18,7 @@ var CONST_STRINGS = require('rtcmulticonnection-server/node_scripts/CONST_STRING
 
 var isAdminAuthorized = require('rtcmulticonnection-server/node_scripts/verify-admin.js');
 
-module.exports = exports = function(socket, config) {
+module.exports = exports = function (socket, config) {
     config = config || {};
 
     socket.server.engine.pingTimeout = 50000000
@@ -60,7 +60,7 @@ module.exports = exports = function(socket, config) {
     }
 
     function sendToAdmin(all) {
-        if(config.enableAdmin !== true) {
+        if (config.enableAdmin !== true) {
             return;
         }
 
@@ -68,7 +68,7 @@ module.exports = exports = function(socket, config) {
             if (adminSocket) {
                 var users = [];
                 // temporarily disabled
-                config.enableAdmin === true && Object.keys(listOfUsers).forEach(function(userid) {
+                config.enableAdmin === true && Object.keys(listOfUsers).forEach(function (userid) {
                     try {
                         var item = listOfUsers[userid];
                         if (!item) return; // maybe user just left?
@@ -92,7 +92,7 @@ module.exports = exports = function(socket, config) {
                 });
 
                 var scalableBroadcastUsers = 0;
-                if(ScalableBroadcast && ScalableBroadcast._) {
+                if (ScalableBroadcast && ScalableBroadcast._) {
                     scalableBroadcastUsers = ScalableBroadcast._.getUsers();
                 }
 
@@ -109,11 +109,11 @@ module.exports = exports = function(socket, config) {
     }
 
     function handleAdminSocket(socket, params) {
-        if(config.enableAdmin !== true || !params.adminUserName || !params.adminPassword) {
+        if (config.enableAdmin !== true || !params.adminUserName || !params.adminPassword) {
             socket.emit('admin', {
                 error: 'Please pass "adminUserName" and "adminPassword" via socket.io parameters.'
             });
-            
+
             pushLogs(config, 'invalid-admin', {
                 message: CONST_STRINGS.INVALID_ADMIN_CREDENTIAL,
                 stack: 'name: ' + params.adminUserName + '\n' + 'password: ' + params.adminPassword
@@ -142,19 +142,19 @@ module.exports = exports = function(socket, config) {
         });
 
         adminSocket = socket;
-       
-        socket.on('get-log-list', function(e){
+
+        socket.on('get-log-list', function (e) {
             let filelist = fs.readdirSync('./logs')
             filelist = filelist.reverse();
             e(filelist);
         })
 
-        socket.on('delete-log-file', function(name, callback){
+        socket.on('delete-log-file', function (name, callback) {
             fs.unlinkSync('./logs/' + name);
             callback(200);
         })
 
-        socket.on('admin', function(message, callback) {
+        socket.on('admin', function (message, callback) {
             if (!isAdminAuthorized(params, config)) {
                 socket.emit('admin', {
                     error: 'Invalid admin username or password.'
@@ -169,7 +169,7 @@ module.exports = exports = function(socket, config) {
                 return;
             }
 
-            callback = callback || function() {};
+            callback = callback || function () { };
 
             if (message.all === true) {
                 sendToAdmin(true);
@@ -222,7 +222,7 @@ module.exports = exports = function(socket, config) {
                     if (room) {
                         var participants = room.participants;
                         delete listOfRooms[message.roomid];
-                        participants.forEach(function(userid) {
+                        participants.forEach(function (userid) {
                             var user = listOfUsers[userid];
                             if (user) {
                                 user.socket.disconnect();
@@ -241,11 +241,11 @@ module.exports = exports = function(socket, config) {
     function onConnection(socket) {
         var params = socket.handshake.query;
 
-        if(!params.userid) {
+        if (!params.userid) {
             params.userid = (Math.random() * 100).toString().replace('.', '');
         }
 
-        if(!params.sessionid) {
+        if (!params.sessionid) {
             params.sessionid = (Math.random() * 100).toString().replace('.', '');
         }
 
@@ -297,7 +297,7 @@ module.exports = exports = function(socket, config) {
         socket.userid = params.userid;
         appendUser(socket, params);
 
-        socket.on('extra-data-updated', function(extra) {
+        socket.on('extra-data-updated', function (extra) {
             try {
                 if (!listOfUsers[socket.userid]) return;
 
@@ -332,7 +332,7 @@ module.exports = exports = function(socket, config) {
                         // room's extra must match owner's extra
                         listOfRooms[roomid].extra = extra;
                     }
-                    listOfRooms[roomid].participants.forEach(function(pid) {
+                    listOfRooms[roomid].participants.forEach(function (pid) {
                         try {
                             var user = listOfUsers[pid];
                             if (!user) {
@@ -353,8 +353,8 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('get-remote-user-extra-data', function(remoteUserId, callback) {
-            callback = callback || function() {};
+        socket.on('get-remote-user-extra-data', function (remoteUserId, callback) {
+            callback = callback || function () { };
             if (!remoteUserId || !listOfUsers[remoteUserId]) {
                 callback(CONST_STRINGS.USERID_NOT_AVAILABLE);
                 return;
@@ -363,19 +363,19 @@ module.exports = exports = function(socket, config) {
         });
 
         var dontDuplicateListeners = {};
-        socket.on('set-custom-socket-event-listener', function(customEvent) {
+        socket.on('set-custom-socket-event-listener', function (customEvent) {
             if (dontDuplicateListeners[customEvent]) return;
             dontDuplicateListeners[customEvent] = customEvent;
 
-            socket.on(customEvent, function(message) {
+            socket.on(customEvent, function (message) {
                 try {
                     socket.broadcast.emit(customEvent, message);
-                } catch (e) {}
+                } catch (e) { }
             });
         });
 
-        socket.on('changed-uuid', function(newUserId, callback) {
-            callback = callback || function() {};
+        socket.on('changed-uuid', function (newUserId, callback) {
+            callback = callback || function () { };
 
             try {
                 if (listOfUsers[socket.userid] && listOfUsers[socket.userid].socket.userid == socket.userid) {
@@ -399,9 +399,9 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('set-password', function(password, callback) {
+        socket.on('set-password', function (password, callback) {
             try {
-                callback = callback || function() {};
+                callback = callback || function () { };
 
                 if (!socket.admininfo) {
                     callback(null, null, CONST_STRINGS.DID_NOT_JOIN_ANY_ROOM);
@@ -422,7 +422,7 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('disconnect-with', function(remoteUserId, callback) {
+        socket.on('disconnect-with', function (remoteUserId, callback) {
             try {
                 if (listOfUsers[socket.userid] && listOfUsers[socket.userid].connectedWith[remoteUserId]) {
                     delete listOfUsers[socket.userid].connectedWith[remoteUserId];
@@ -443,22 +443,22 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('close-entire-session', function(callback) {
+        socket.on('close-entire-session', function (callback) {
             try {
-                if(!callback || typeof callback !== 'function') {
-                    callback = function() {};
+                if (!callback || typeof callback !== 'function') {
+                    callback = function () { };
                 }
 
                 var user = listOfUsers[socket.userid];
 
-                if(!user) return callback(false, CONST_STRINGS.USERID_NOT_AVAILABLE);
-                if(!user.roomid) return callback(false, CONST_STRINGS.ROOM_NOT_AVAILABLE);
-                if(!socket.admininfo) return callback(false, CONST_STRINGS.INVALID_SOCKET);
+                if (!user) return callback(false, CONST_STRINGS.USERID_NOT_AVAILABLE);
+                if (!user.roomid) return callback(false, CONST_STRINGS.ROOM_NOT_AVAILABLE);
+                if (!socket.admininfo) return callback(false, CONST_STRINGS.INVALID_SOCKET);
 
                 var room = listOfRooms[user.roomid];
-                if(!room) return callback(false, CONST_STRINGS.ROOM_NOT_AVAILABLE);
-                if(room.owner !== user.userid) return callback(false, CONST_STRINGS.ROOM_PERMISSION_DENIED);
-                
+                if (!room) return callback(false, CONST_STRINGS.ROOM_NOT_AVAILABLE);
+                if (room.owner !== user.userid) return callback(false, CONST_STRINGS.ROOM_PERMISSION_DENIED);
+
                 autoCloseEntireSession = true;
                 closeOrShiftRoom();
 
@@ -468,7 +468,7 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('check-presence', function(roomid, callback) {     
+        socket.on('check-presence', function (roomid, callback) {
             try {
                 if (!listOfRooms[roomid] || !listOfRooms[roomid].participants.length) {
                     callback(false, roomid, {
@@ -477,13 +477,13 @@ module.exports = exports = function(socket, config) {
                             isPasswordProtected: false
                         }
                     });
-                } 
+                }
                 else {
                     console.log("Room already exist")
-                    
+
 
                     var extra = listOfRooms[roomid].extra;
-                    if(typeof extra !== 'object' || !extra) {
+                    if (typeof extra !== 'object' || !extra) {
                         extra = {
                             value: extra
                         };
@@ -493,7 +493,7 @@ module.exports = exports = function(socket, config) {
                         isPasswordProtected: listOfRooms[roomid].password && listOfRooms[roomid].password.toString().replace(/ /g, '').length
                     };
 
-                    if(listOfRooms[roomid].participants.indexOf(listOfRooms[roomid].owner) == -1 ){
+                    if (listOfRooms[roomid].participants.indexOf(listOfRooms[roomid].owner) == -1) {
                         console.log("But owner isn't joined")
                         extra._room.teacher_rejoin = true
                     }
@@ -505,8 +505,8 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('owner-change',function(roomid, ownerid, callback){
-            console.log("Owner change :",listOfRooms[roomid].owner + " => " + ownerid)
+        socket.on('owner-change', function (roomid, ownerid, callback) {
+            console.log("Owner change :", listOfRooms[roomid].owner + " => " + ownerid)
             listOfRooms[roomid].owner = ownerid;
         })
 
@@ -585,7 +585,7 @@ module.exports = exports = function(socket, config) {
 
                 if (enableScalableBroadcast === false) {
                     // connect with all participants
-                    listOfRooms[roomid].participants.forEach(function(pid) {
+                    listOfRooms[roomid].participants.forEach(function (pid) {
                         if (pid === socket.userid || !listOfUsers[pid]) return;
 
                         var user = listOfUsers[pid];
@@ -605,31 +605,44 @@ module.exports = exports = function(socket, config) {
                 if (!listOfRooms[roomid]) {
                     listOfRooms[roomid] = {
                         maxParticipantsAllowed: parseInt(params.maxParticipantsAllowed || 1000) || 1000,
-                        realowner : userid,
+                        realowner: userid,
                         owner: userid, // this can change if owner leaves and if control shifts
                         participants: [userid],
                         extra: {},
-                        info : {
-                            roomOpenTime : new Date().getTime(),    // 현재 시간 저장
-                            allControl : false,
-                            movierender : {
-                                state : false,
-                                url : undefined,
+                        info: {
+                            roomOpenTime: new Date().getTime(),    // 현재 시간 저장
+                            allControl: false,
+                            movierender: {
+                                state: false,
+                                url: undefined,
                             },
-                            shareScreen : false,
-                            share3D : {
-                                state : false,
-                                data : {}                                
+                            shareScreen: {
+                                state: undefined,
+                                id: undefined,
                             },
-                            pdf : {
-                                state : false
+                            epub: {
+                                state: false,
+                                page: 0,
+                                data: {
+                                    src: undefined,
+                                }
                             },
-                            exam : false,
-                            viewer : {
-                                state : false,
-                                url : undefined
-                            }
-                        }, 
+                            share3D: {
+                                state: false,
+                                data: {}
+                            },
+                            pdf: {
+                                state: false
+                            },
+                            exam: false,
+                            viewer: {
+                                state: false,
+                                url: undefined
+                            },
+                            classPermission: undefined,
+                            micPermission: undefined,
+                            canvasPermission: [],
+                        },
                         socketMessageEvent: '',
                         socketCustomEvent: '',
                         identifier: '',
@@ -662,7 +675,7 @@ module.exports = exports = function(socket, config) {
                         if (listOfRooms[roomid].participants.length > 1) {
                             var firstParticipant;
 
-                            listOfRooms[roomid].participants.forEach(function(pid) {
+                            listOfRooms[roomid].participants.forEach(function (pid) {
                                 if (firstParticipant || pid === socket.userid) return;
                                 if (!listOfUsers[pid]) return;
                                 firstParticipant = listOfUsers[pid];
@@ -672,28 +685,28 @@ module.exports = exports = function(socket, config) {
                                 // listOfRooms[roomid].owner = "undefined";
                                 // firstParticipant.socket.emit('set-isInitiator-true', roomid);
                                 var newParticipantsList = [];
-                                listOfRooms[roomid].participants.forEach(function(pid) {
+                                listOfRooms[roomid].participants.forEach(function (pid) {
                                     if (pid != socket.userid) {
                                         newParticipantsList.push(pid);
                                     }
                                 });
                                 listOfRooms[roomid].participants = newParticipantsList;
-                            } 
+                            }
                             else {
                                 console.log("DELETED 1")
                                 delete listOfRooms[roomid];
                             }
-                        } 
-                        
+                        }
+
                         else {
                             console.log("DELETED 2")
                             delete listOfRooms[roomid];
                         }
-                    } 
-                    
+                    }
+
                     else {
                         var newParticipantsList = [];
-                        listOfRooms[roomid].participants.forEach(function(pid) {
+                        listOfRooms[roomid].participants.forEach(function (pid) {
                             if (pid && pid != socket.userid && listOfUsers[pid]) {
                                 newParticipantsList.push(pid);
                             }
@@ -707,7 +720,7 @@ module.exports = exports = function(socket, config) {
             }
         }
 
-        socket.on(socketMessageEvent, function(message, callback) {
+        socket.on(socketMessageEvent, function (message, callback) {
             if (message.remoteUserId && message.remoteUserId === socket.userid) {
                 return;
             }
@@ -760,53 +773,53 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('is-valid-password', function(password, roomid, callback) {
+        socket.on('is-valid-password', function (password, roomid, callback) {
             try {
-                callback = callback || function() {};
-                
-                if(!password || !password.toString().replace(/ /g, '').length) {
+                callback = callback || function () { };
+
+                if (!password || !password.toString().replace(/ /g, '').length) {
                     callback(false, roomid, 'You did not enter the password.');
                     return;
                 }
 
-                if(!roomid || !roomid.toString().replace(/ /g, '').length) {
+                if (!roomid || !roomid.toString().replace(/ /g, '').length) {
                     callback(false, roomid, 'You did not enter the room-id.');
                     return;
                 }
 
-                if(!listOfRooms[roomid]) {
+                if (!listOfRooms[roomid]) {
                     callback(false, roomid, CONST_STRINGS.ROOM_NOT_AVAILABLE);
                     return;
                 }
 
-                if(!listOfRooms[roomid].password) {
+                if (!listOfRooms[roomid].password) {
                     callback(false, roomid, 'This room do not have any password.');
                     return;
                 }
 
-                if(listOfRooms[roomid].password === password) {
+                if (listOfRooms[roomid].password === password) {
                     callback(true, roomid, false);
                 }
                 else {
                     callback(false, roomid, CONST_STRINGS.INVALID_PASSWORD);
                 }
             }
-            catch(e) {
+            catch (e) {
                 pushLogs('is-valid-password', e);
             }
         });
 
-        socket.on('get-public-rooms', function(identifier, callback) {
+        socket.on('get-public-rooms', function (identifier, callback) {
             try {
-                if(!identifier || !identifier.toString().length || !identifier.toString().replace(/ /g, '').length) {
+                if (!identifier || !identifier.toString().length || !identifier.toString().replace(/ /g, '').length) {
                     callback(null, CONST_STRINGS.PUBLIC_IDENTIFIER_MISSING);
                     return;
                 }
 
                 var rooms = [];
-                Object.keys(listOfRooms).forEach(function(key) {
+                Object.keys(listOfRooms).forEach(function (key) {
                     var room = listOfRooms[key];
-                    if(!room || !room.identifier || !room.identifier.toString().length || room.identifier !== identifier) return;
+                    if (!room || !room.identifier || !room.identifier.toString().length || room.identifier !== identifier) return;
                     rooms.push({
                         maxParticipantsAllowed: room.maxParticipantsAllowed,
                         owner: room.owner,
@@ -821,18 +834,18 @@ module.exports = exports = function(socket, config) {
 
                 callback(rooms);
             }
-            catch(e) {
+            catch (e) {
                 pushLogs('get-public-rooms', e);
             }
         });
 
-        socket.on('open-room', function(arg, callback) {
-            callback = callback || function() {};
+        socket.on('open-room', function (arg, callback) {
+            callback = callback || function () { };
 
             try {
                 // if already joined a room, either leave or close it
-                if(listOfRooms[arg.sessionid] && 
-                    listOfRooms[arg.sessionid].participants.indexOf(listOfRooms[arg.sessionid].owner) == -1 ){
+                if (listOfRooms[arg.sessionid] &&
+                    listOfRooms[arg.sessionid].participants.indexOf(listOfRooms[arg.sessionid].owner) == -1) {
                     console.log("owner rejoin");
                     listOfRooms[arg.sessionid].owner = socket.userid;
                     callback(false, "owner rejoin");
@@ -871,9 +884,9 @@ module.exports = exports = function(socket, config) {
             }
 
             // append this user into participants list
-            appendToRoom(arg.sessionid, socket.userid);            
+            appendToRoom(arg.sessionid, socket.userid);
 
-            try {               
+            try {
                 // override owner & session
                 if (enableScalableBroadcast === true) {
                     if (Object.keys(listOfRooms[arg.sessionid]).length == 1) {
@@ -889,9 +902,9 @@ module.exports = exports = function(socket, config) {
                     listOfRooms[arg.sessionid].socketCustomEvent = listOfUsers[socket.userid].socketCustomEvent;
                     listOfRooms[arg.sessionid].maxParticipantsAllowed = parseInt(params.maxParticipantsAllowed || 1000) || 1000;
 
-                    if(arg.identifier && arg.identifier.toString().length) {
+                    if (arg.identifier && arg.identifier.toString().length) {
                         listOfRooms[arg.sessionid].identifier = arg.identifier;
-                    }  
+                    }
 
                     try {
                         if (typeof arg.password !== 'undefined' && arg.password.toString().length) {
@@ -901,7 +914,7 @@ module.exports = exports = function(socket, config) {
                     } catch (e) {
                         pushLogs(config, 'open-room.password', e);
                     }
-                }               
+                }
 
                 // admin info are shared only with /admin/
                 listOfUsers[socket.userid].socket.admininfo = {
@@ -916,7 +929,7 @@ module.exports = exports = function(socket, config) {
                 pushLogs(config, 'open-room', e);
             }
 
-            sendToAdmin();     
+            sendToAdmin();
 
             try {
                 callback(true);
@@ -927,8 +940,8 @@ module.exports = exports = function(socket, config) {
             OpenRoom();
         });
 
-        socket.on('join-room', function(arg, callback) {
-            callback = callback || function() {};
+        socket.on('join-room', function (arg, callback) {
+            callback = callback || function () { };
 
             try {
                 closeOrShiftRoom();
@@ -1008,7 +1021,7 @@ module.exports = exports = function(socket, config) {
             }
         });
 
-        socket.on('disconnect', function(reason) {
+        socket.on('disconnect', function (reason) {
             try {
                 if (socket && socket.namespace && socket.namespace.sockets) {
                     delete socket.namespace.sockets[this.id];
@@ -1026,7 +1039,7 @@ module.exports = exports = function(socket, config) {
                         // sending duplicate message to same socket?
                         if (listOfUsers[s] && listOfUsers[s].connectedWith[socket.userid]) {
                             delete listOfUsers[s].connectedWith[socket.userid];
-                            listOfUsers[s].socket.emit('user-disconnected', socket.userid ,reason + "4");
+                            listOfUsers[s].socket.emit('user-disconnected', socket.userid, reason + "4");
                         }
                     }
                 }
@@ -1035,19 +1048,19 @@ module.exports = exports = function(socket, config) {
             }
 
             // console.log("LEFT")
-            if(listOfRooms[getRoomId()])
-               LeftClass();
-    
-               closeOrShiftRoom();
+            if (listOfRooms[getRoomId()])
+                LeftClass();
+
+            closeOrShiftRoom();
             delete listOfUsers[socket.userid];
 
             if (socket.ondisconnect) {
-                console.error("if on disconnect",socket.userid);
+                console.error("if on disconnect", socket.userid);
                 try {
                     // scalable-broadcast.js
                     socket.ondisconnect();
                 }
-                catch(e) {
+                catch (e) {
                     pushLogs('socket.ondisconnect', e);
                 }
             }
@@ -1058,110 +1071,70 @@ module.exports = exports = function(socket, config) {
         /*
             Custom Code
         */
-       
-        socket.on ('get-room-info', function(success, error) {
+
+        socket.on('get-room-info', function (success, error) {
             call_getRoom(room => {
                 success(room.info);
             }, errorm => {
-                if(error)
+                if (error)
                     error(errorm);
             });
         });
 
-        socket.on('update-room-info', function(data, callback){
+        socket.on('update-room-info', function (data, callback) {
             call_getRoom(room => {
                 room.info = data;
-                if(callback)
+                if (callback)
                     callback('ok');
             }, e => {
                 console.log(e)
             })
         })
 
-        socket.on ('set-share-screen', function(_state, _callback) {
-            call_getRoom(room => {
-                if(room.info.shareScreen == _state)
-                {
-                    callBackPackingData (false, 'same state', _callback);
-                    if(error)
-                        error('same state');
-                    return;
-                }
-                room.info.shareScreen = _state;
-                callBackPackingData(true, room.info.shareScreen, _callback);
-            }, e => {
-                callBackPackingData(false, e, _callback);
-            });
-        });
-
-        socket.on("show-class-status", function(callback){
+        socket.on("show-class-status", function (callback) {
             callback(listOfRooms[getRoomId()].info)
         })
         //--------------------------------------------------------------------------------//
-        function callBackPackingData (_result, _data, _callBack) {
-            try {
-            if(!_callBack)  return;
 
-            if(_result) {
-                _callBack ({
-                    result : _result,
-                    data : _data
-                });
-            }
-            else
-             {
-                _callBack ({
-                    result : _result,
-                    error : _data
-                });
-
-             }
-            }
-            catch (e)
-            {       
-                console.error(`callback error ${e}`);         
-            }
-        }
-
-        function call_getRoom (success, error) {
+        function call_getRoom(success, error) {
             let room = getRoom();
-            if(room.error) {
-                error({error : room.error});
+            if (room.error) {
+                error({ error: room.error });
                 return;
             }
-            success (room);
+            success(room);
         };
 
 
-        function getRoom () {
-            const roomId = getRoomId();    
-            if(null == roomId) return { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
+        function getRoom() {
+            const roomId = getRoomId();
+            if (null == roomId) return { error: CONST_STRINGS.ROOM_NOT_AVAILABLE };
             var room = listOfRooms[roomId];
 
-            if(!room) {
-                return  { error : CONST_STRINGS.ROOM_NOT_AVAILABLE };           
+            if (!room) {
+                return { error: CONST_STRINGS.ROOM_NOT_AVAILABLE };
             }
 
             return room;
         };
 
-        function getRoomId () {
-            if(socket.admininfo)
+        function getRoomId() {
+            if (socket.admininfo)
                 return socket.admininfo.sessionid;
         };
 
         function OpenRoom() {
             let openTime = GetTime();
             let user = GetUserData();
-            console.log("Create Room",user.userid);
+            console.log("Create Room", user.userid);
             getRoom().openTime = openTime.full;
-            
+
             let data = {
-                roomOpenDate : openTime.date,
-                roomOpenTime : openTime.time,
-                roomOwner : user.userid,
-                userList : {}
-            }   
+                roomOpenDate: openTime.date,
+                roomOpenTime: openTime.time,
+                roomOwner: user.userid,
+                userList: {}
+            }
             data.userList[user.userid] = user;
             fs.writeFileSync("./logs/" + openTime.full + "_" + user.userid + ".json", JSON.stringify(data));
         }
@@ -1172,7 +1145,7 @@ module.exports = exports = function(socket, config) {
             let user = GetUserData();
             json.userList[user.userid] = user;
             fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
-            console.log("Join Student",socket.userid);  
+            console.log("Join Student", socket.userid);
         }
 
         function LeftClass() {
@@ -1180,34 +1153,33 @@ module.exports = exports = function(socket, config) {
             let json = JSON.parse(fs.readFileSync(GetLogFilePath()));
             let user = GetUserData();
 
-            if(room.owner != socket.userid){
+            if (room.owner != socket.userid) {
                 json.userList[user.userid].leftTime = GetTime().time;
-                console.log("Left student",socket.userid);
+                console.log("Left student", socket.userid);
             }
-            else if(room.owner == socket.userid){
+            else if (room.owner == socket.userid) {
                 json.userList[user.userid].leftTime = GetTime().time;
                 json.roomCloseTime = GetTime().time;
-                listOfRooms[getRoomId()].info.shareScreen = false;
-                console.log("Teacher Left Class",socket.userid);
+                console.log("Teacher Left Class", socket.userid);
             }
             fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
         }
 
-        function GetLogFilePath(){
+        function GetLogFilePath() {
             return "./logs/" + getRoom().openTime + "_" + getRoom().realowner + ".json";
         }
 
-        function GetUserData(){
+        function GetUserData() {
             return {
-                userid : socket.userid,
-                username : socket.admininfo.extra.userFullName,
-                enterTime : GetTime().time
+                userid: socket.userid,
+                username: socket.admininfo.extra.userFullName,
+                enterTime: GetTime().time
             }
         }
 
-        function GetTime(){
+        function GetTime() {
             let time = new Date();
-            
+
             let year = time.getFullYear();
             let month = time.getMonth() + 1;
             let day = time.getDate();
@@ -1220,9 +1192,9 @@ module.exports = exports = function(socket, config) {
             sec = ("00" + sec).slice(-2);
 
             return {
-                date : year + "-" + month + "-" + day,
-                time : hours + ":" + min + ":" + sec,
-                full : year + "-" + month + "-" + day + "_" + hours + "-" + min + "-" + sec
+                date: year + "-" + month + "-" + day,
+                time: hours + ":" + min + ":" + sec,
+                full: year + "-" + month + "-" + day + "_" + hours + "-" + min + "-" + sec
             }
         }
 

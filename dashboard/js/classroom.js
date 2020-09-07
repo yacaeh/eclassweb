@@ -14,84 +14,84 @@
 
 //=============================================================================================
 
-var debug               = false;
-var isSharing3D         = false;
-var isSharingMovie      = false;
-var isSharingFile       = false;
-var isSharingEpub       = false;
-let isFileViewer        = false;
+var debug = false;
+var isSharing3D = false;
+var isSharingMovie = false;
+var isSharingFile = false;
+var isSharingEpub = false;
+let isFileViewer = false;
 
-const widgetContainer   = document.getElementById("widget-container");
-const rightTab          = document.getElementById("right-tab")
+const widgetContainer = document.getElementById("widget-container");
+const rightTab = document.getElementById("right-tab")
 
-var connection          = new RTCMultiConnection();
-var screenRecorder      = new screenRecorderClass();
-var screenshareManager  = new ScreenShareManagerClass();
-var maincamManager      = new maincamManagerClass();
-var canvasManager       = new canvasManagerClass();
-var epubManager         = new epubManagerClass();
-var mobileHelper        = new mobileHelperClass();
-var pointer_saver       = new PointerSaver();
-var classroomManager    = new classroomManagerClass();
-var permissionManager   = new permissionManagerClass();
-var attentionManager    = new attentionManagerClass();
+var connection = new RTCMultiConnection();
+var screenRecorder = new screenRecorderClass();
+var screenshareManager = new ScreenShareManagerClass();
+var maincamManager = new maincamManagerClass();
+var canvasManager = new canvasManagerClass();
+var epubManager = new epubManagerClass();
+var mobileHelper = new mobileHelperClass();
+var pointer_saver = new PointerSaver();
+var classroomManager = new classroomManagerClass();
+var permissionManager = new permissionManagerClass();
+var attentionManager = new attentionManagerClass();
 
 //=============================================================================================
 
 // 상단 버튼 도움말
 const topButtonContents = {
-  top_all_controll      : "전체 제어",
-  top_test              : "시험",
-  top_alert             : "알림",
-  top_student           : "학생 판서",
-  top_camera            : "학생 카메라",
-  top_save_alert        : "알림 기록 저장",
-  top_record_video      : "화면 녹화"
+  top_all_controll: "전체 제어",
+  top_test: "시험",
+  top_alert: "알림",
+  top_student: "학생 판서",
+  top_camera: "학생 카메라",
+  top_save_alert: "알림 기록 저장",
+  top_record_video: "화면 녹화"
 }
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
   'screen_share': screenshareManager.btn,
-  '3d_view'     : _3DCanvasOnOff,
-  'movie'       : Movie_Render_Button,
-  'file'        : LoadFile,
-  'epub'        : epubManager.loadEpub,
-  'callteacher' : classroomManager.callTeacher,
-  'homework'    : HomeworkSubmit,
+  '3d_view': _3DCanvasOnOff,
+  'movie': Movie_Render_Button,
+  'file': LoadFile,
+  'epub': epubManager.loadEpub,
+  'callteacher': classroomManager.callTeacher,
+  'homework': HomeworkSubmit,
 }
 
 // Alt + 단축키
 const shortCut = [
-  {"onoff-icon"   : "a"},
-  {"pencilIcon"   : "q"},
-  {"markerIcon"   : "w"},
-  {"eraserIcon"   : "e"},
-  {"textIcon"     : "r"},
-  {"undo"         : "z"},
-  {"clearCanvas"  : "x"},
-  {"screen_share" : "1"},
-  {"3d_view"      : "2"},
-  {"movie"        : "3"},
-  {"file"         : "4"},
-  {"epub"         : "5"},
-  {"callteacher"  : "2"},
-  {"homework"     : "3"},
+  { "onoff-icon": "a" },
+  { "pencilIcon": "q" },
+  { "markerIcon": "w" },
+  { "eraserIcon": "e" },
+  { "textIcon": "r" },
+  { "undo": "z" },
+  { "clearCanvas": "x" },
+  { "screen_share": "1" },
+  { "3d_view": "2" },
+  { "movie": "3" },
+  { "file": "4" },
+  { "epub": "5" },
+  { "callteacher": "2" },
+  { "homework": "3" },
 ]
 
 //=============================================================================================
 
 console.log('Connection!');
 connection.socketURL = '/';
-connection.chunkSize              = 16000;
-connection.enableFileSharing      = false;
-connection.socketMessageEvent     = 'canvas-dashboard-demo';
-connection.extra.userFullName     = params.userFullName;
-connection.publicRoomIdentifier   = params.publicRoomIdentifier;
+connection.chunkSize = 16000;
+connection.enableFileSharing = false;
+connection.socketMessageEvent = 'canvas-dashboard-demo';
+connection.extra.userFullName = params.userFullName;
+connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
-connection.password               = params.password;
-connection.enableLogs             = false;
+connection.password = params.password;
+connection.enableLogs = false;
 
-screenshareManager.setFrameRate(1,2);
+screenshareManager.setFrameRate(1, 2);
 
 connection.session = {
   audio: false,
@@ -120,7 +120,7 @@ window.onWidgetLoaded = function () {
 let isSync = false;
 
 connection.onopen = function (event) {
-  if(!isSync){
+  if (!isSync) {
     classroomCommand.joinRoom();
     isSync = true;
   }
@@ -128,45 +128,45 @@ connection.onopen = function (event) {
 };
 
 connection.onclose = connection.onerror = connection.onleave = function (event) {
-  classroomManager.leftStudent(event);  
+  classroomManager.leftStudent(event);
 };
 
 connection.onstream = function (event) {
-  console.log('onstream!',event);
+  console.log('onstream!', event);
 
-  if(classroomInfoLocal.shareScreen.state && (classroomInfo.shareScreen.id == event.streamid)){
+  if (classroomInfo.shareScreen.state &&
+    (classroomInfo.shareScreen.id == event.streamid)) {
     screenshareManager.streamstart(event);
   };
 
-
-  if(event.share)
+  if (event.share)
     return;
 
   if (params.open === 'true' || params.open === true) {
     maincamManager.addStudentCam(event);
   }
-  else{
-    if(event.type == "local" && event.stream.isVideo){
+  else {
+    if (event.type == "local" && event.stream.isVideo) {
       event.mediaElement.pause();
       event.stream.mute("audio");
     }
-    else{
+    else {
       maincamManager.addTeacherCam(event);
     }
   }
 };
 
 connection.onstreamended = function (event) {
-  console.warn('onstreameneded!',event);
+  console.warn('onstreameneded!', event);
   screenshareManager.onclose(event);
 };
 
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  if (params.open === true || params.open === 'true') 
+  if (params.open === true || params.open === 'true')
     classroomManager.createRoom();
-  else 
+  else
     classroomManager.joinRoom();
   onWidgetLoaded();
 });
@@ -175,32 +175,26 @@ connection.onmessage = function (event) {
   if (debug)
     console.log(event);
 
-  if(permissionManager.eventListener(event))
+  if (permissionManager.eventListener(event))
     return;
 
-  if(screenshareManager.eventListener(event))
+  if (screenshareManager.eventListener(event))
     return;
 
-  if(maincamManager.eventListener(event))
+  if (maincamManager.eventListener(event))
     return;
 
-  if(ChattingManager.eventListener(event))
+  if (ChattingManager.eventListener(event))
     return;
 
-  if(canvasManager.eventListener(event))
+  if (canvasManager.eventListener(event))
     return;
 
-  if(classroomManager.eventListener(event))
+  if (classroomManager.eventListener(event))
     return;
 
   if (event.data === 'plz-sync-points') {
     designer.sync();
-    return;
-  }
-
-  if (event.data.roomInfo) {
-    classroomCommand.onReceiveRoomInfo(event.data);
-    console.debug("Synced class room info");
     return;
   }
 
@@ -217,7 +211,11 @@ connection.onmessage = function (event) {
   if (event.data.alertResponse) {
     classroomCommand.receiveAlertResponse(event.data.alertResponse);
     if (connection.extra.roomOwner)
-      attentionManager.submit({ userid: event.data.alertResponse.userid, name: event.data.alertResponse.name, response: event.data.alertResponse.response });
+      attentionManager.submit({
+        userid: event.data.alertResponse.userid,
+        name: event.data.alertResponse.name,
+        response: event.data.alertResponse.response
+      });
     return;
   }
 
@@ -233,12 +231,12 @@ connection.onmessage = function (event) {
     event.data.data.command = "load";
 
     if (event.extra.roomOwner && !connection.extra.roomOwner) {
-      if (pointer_saver.nowIdx == event.data.idx) 
+      if (pointer_saver.nowIdx == event.data.idx)
         designer.syncData(event.data.data);
     }
     else {
       event.data.data.isStudent = true;
-      if (pointer_saver.nowIdx == event.data.idx) 
+      if (pointer_saver.nowIdx == event.data.idx)
         designer.syncData(event.data.data);
     }
     return;
@@ -255,7 +253,7 @@ connection.onmessage = function (event) {
       canvasManager.clear();
     }
 
-    if(!(event.data.viewer.cmd == "pause" || event.data.viewer.cmd == "play")){
+    if (!(event.data.viewer.cmd == "pause" || event.data.viewer.cmd == "play")) {
       canvasManager.clear();
     }
 
@@ -270,9 +268,7 @@ connection.onmessage = function (event) {
 
   if (event.data.modelEnable) {
     canvasManager.clear();
-
-    var enable = event.data.modelEnable.enable;
-    setShared3DStateLocal(enable);
+    setShared3DStateLocal(event.data.modelEnable.enable);
     return;
   }
 
@@ -293,13 +289,8 @@ connection.onmessage = function (event) {
   //동영상 공유
   if (event.data.MoiveURL) {
     isSharingMovie = event.data.MoiveURL.enable;
-
     let moveURL = event.data.MoiveURL;
-    let url = moveURL.url;
-    let type = moveURL.type
-    let enable = moveURL.enable
-
-    OnMovieRender(enable, type, url);
+    OnMovieRender(moveURL.enable, moveURL.type, moveURL.url);
     return;
   }
 
@@ -319,10 +310,10 @@ connection.onmessage = function (event) {
   }
 };
 
-function showstatus(){
-  connection.socket.emit("show-class-status", 
-  (rooms) => {
-    console.log(rooms)
-  })
+function showstatus() {
+  connection.socket.emit("show-class-status",
+    (rooms) => {
+      console.log(rooms)
+    })
 }
 

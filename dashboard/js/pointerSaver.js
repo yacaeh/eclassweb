@@ -1,22 +1,21 @@
 class PointerSaver {
-    constructor(){
+    constructor() {
         this.container = {};
         this.nowIdx = 0;
         this.path = undefined;
     }
 
-    load_container(path){
-        if(this.path){
+    load_container(path) {
+        if (this.path) {
             this.save_container();
         }
         this.nowIdx = 0;
         this.path = path;
-        let json =  path + "_" + connection.extra.userFullName + ".json";
-        Get(json,function(e){
+        let json = path + "_" + connection.extra.userFullName + ".json";
+        Get(json, function (e) {
             let data = JSON.parse(e);
-            console.log("loaded container",path,name,data);
-            
-            if(data == 404 || Object.keys(data).length == 0){
+
+            if (data == 404 || Object.keys(data).length == 0) {
                 pointer_saver.container = {};
                 canvasManager.clear();
                 designer.sync();
@@ -27,110 +26,105 @@ class PointerSaver {
             window.currentPoints = data[0].points;
             window.currentHistory = data[0].history;
             data[0].command = "my";
-            
+
             designer.syncData(data[0]);
             designer.sync();
         })
     }
-    save_container(){
+    save_container() {
         this.save();
         let url = fileServerUrl + '/point';
         let name = connection.extra.userFullName;
         let data = {
-            filepath : this.path,
-            userId   : name,
-            point    : this.container
+            filepath: this.path,
+            userId: name,
+            point: this.container
         }
-        Post(url,JSON.stringify(data),function(e){
-            console.log(e);
+        Post(url, JSON.stringify(data), function (e) {
         })
-
-        console.log("save container",this.path,name,this.container)
-        console.log(JSON.stringify(data).length);
         this.path = undefined;
     }
-    save(){
+    save() {
         var point, history;
 
-        if(typeof window.currentPoints == "undefined")
+        if (typeof window.currentPoints == "undefined")
             return;
-        else 
-            point =  JSON.parse(JSON.stringify( window.currentPoints ))
+        else
+            point = JSON.parse(JSON.stringify(window.currentPoints))
 
-        if(typeof window.currentHistory == "undefined")
+        if (typeof window.currentHistory == "undefined")
             history = [];
-        else 
-            history = JSON.parse(JSON.stringify( window.currentHistory ))
+        else
+            history = JSON.parse(JSON.stringify(window.currentHistory))
 
         this.container[this.nowIdx] = {
-            points :  point,
-            history : history,
+            points: point,
+            history: history,
         }
         window.currentPoints = undefined;
         window.currentHistory = undefined;
 
         this.show();
     }
-    show(){
-        console.debug(this.container);
+    show() {
+        if (debug)
+            console.debug(this.container);
     }
-    load(idx){
+    load(idx) {
         this.nowIdx = idx;
         canvasManager.clear();
 
         this.get();
 
-        if(this.container[idx]){
+        if (this.container[idx]) {
             this.container[idx].command = "my";
 
             window.currentPoints = this.container[idx].points;
             window.currentHistory = this.container[idx].history;
 
-            if(this.container[idx].history.length == 0){
-                console.log("NO DATA")
+            if (this.container[idx].history.length == 0) {
                 return null;
             }
 
             designer.syncData(this.container[idx]);
         }
-        else{
-            console.log("There is no data");
+        else {
         }
 
     }
-    empty(){
+    empty() {
         this.container = {};
         this.nowIdx = 0;
     }
-    get(){
+    get() {
         connection.send({
-            getpointer: true ,
-            idx : this.nowIdx
+            getpointer: true,
+            idx: this.nowIdx
         });
     }
-    send(idx){
-    if(!(connection.extra.roomOwner || 
-        permissionManager.IsCanvasPermission(connection.userid))){
-        return;
-    }
-    
-    if(idx == this.nowIdx)
-    this.save(idx);
+    send(idx) {
+        if (!(connection.extra.roomOwner ||
+            permissionManager.IsCanvasPermission(connection.userid))) {
+            return;
+        }
 
-        if(this.container[idx])
+        if (idx == this.nowIdx)
+            this.save(idx);
+
+        if (this.container[idx])
             connection.send({
                 setpointer: true,
-                idx : idx,
-                data : this.container[idx],
+                idx: idx,
+                data: this.container[idx],
             })
-        else{
+        else {
             connection.send({
                 setpointer: true,
-                idx : "empty"
+                idx: "empty"
             })
         }
     }
-    close(){
+    close() {
         this.save(this.nowIdx);
     }
 }

@@ -124,6 +124,7 @@ function engineInit(canvas) {
 
 
 function remove3DCanvas() {
+    console.log("REMOVE 3d")
     scene.removeMesh(mesh);
     scene.meshes.forEach(element => element.dispose());
     scene.cleanCachedTextureBuffer();
