@@ -434,6 +434,8 @@ class maincamManagerClass{
     }
   }
   addStudentCam(event) {
+    let isFind = false;
+
     if(!event.stream.isVideo) return;
 
     try {
@@ -447,14 +449,21 @@ class maincamManagerClass{
         Hide(event.mediaElement)
       }
 
-      var childern = document.getElementById("student_list").children;
+      let childern = document.getElementById("student_list").children;
+      console.log(childern)
 
-      for (var i = 0; i < childern.length; i++) {
-        var child = childern[i];
+      for (let i = 0; i < childern.length; i++) {
+        let child = childern[i];
         if (child.dataset.id == event.userid) {
           child.appendChild(event.mediaElement);
+          console.log("FINEDED")
+          isFind = true;
           break;
         }
+      }
+
+      if(!isFind){
+        remainCams[event.userid] =  event.mediaElement;
       }
     }
 

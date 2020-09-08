@@ -282,11 +282,16 @@ class classroomManagerClass {
             img.style.display = 'none';
 
         canvasManager.canvas_array[id] = img;
+        
         let div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
-              <span style="display:none;" class="permissions"></span> \
-              <span class="student-overlay"></span> \
-              <span class="bor"></span> \
-              <span class="name">' + name + '</span></span>')
+        <span style="display:none;" class="permissions"></span> \
+        <span class="student-overlay"></span> \
+        <span class="bor"></span> \
+        <span class="name">' + name + '</span></span>')
+ 
+        if(remainCams.hasOwnProperty(id)){
+            div.append(remainCams[id])
+        };
         OnClickStudent(div, id, name);
 
         div[0].addEventListener("mouseover", function () {
@@ -458,7 +463,6 @@ class classroomManagerClass {
                     session: connection.session
                 }, function (a, b, c) {
                     connection.socket.on('disconnect', () => location.reload())
-                    console.log(a, b, c);
                 })
             }
             else {

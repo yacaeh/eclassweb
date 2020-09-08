@@ -19,6 +19,8 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
+
+let remainCams = {};
 let isFileViewer = false;
 
 const widgetContainer = document.getElementById("widget-container");
@@ -144,6 +146,7 @@ connection.onstream = function (event) {
 
   if (params.open === 'true' || params.open === true) {
     maincamManager.addStudentCam(event);
+    console.log("ADD STUDENT CAM")
   }
   else {
     if (event.type == "local" && event.stream.isVideo) {
