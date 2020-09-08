@@ -450,6 +450,7 @@ class classroomManagerClass {
 
     createRoom() {
         console.log('Opening Class!');
+        let isSync;
         classroomManager.setTeacher();
         connection.open(params.sessionid, function (isRoomOpened, roomid, command) {
             if (command == "room already exist") {
