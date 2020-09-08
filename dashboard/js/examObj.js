@@ -104,8 +104,6 @@ examObj.updateStudentAnswer = function (selectAnswer) {
             studentAnswerInfo.response[selectAnswer.questionNumber] = true;
     }
     classroomInfo.exam.studentAnswer[selectAnswer.userid] = examObj.studentsAnswer[selectAnswer.userid];
-    classroomManager.updateClassroomInfo();
-    
 };
 
 examObj.updateStudentAnswers = function (examAnswers) {
@@ -121,8 +119,10 @@ examObj.updateStudentAnswers = function (examAnswers) {
 };
 
 examObj.leftStudent = function (userid){
-    delete examObj.studentsAnswer[userid];
-    delete classroomInfo.exam.studentAnswer[userid];
+    if(examObj.isStart){
+        delete examObj.studentsAnswer[userid];
+        delete classroomInfo.exam.studentAnswer[userid];
+    }
 }
 
 examObj.updateSubmitStudent = function (submitStudent) {
@@ -385,8 +385,6 @@ examObj.receiveSelectExamAnswerFromStudent = function (selectAnswer) {
         questionNumber: selectAnswer.questionNumber,
         answerNumber: selectAnswer.answerNumber
     });
-    
-    classroomManager.updateClassroomInfo();
     
     examObj.updateExamAnswerStatisticsEach(selectAnswer.questionNumber); // 정답률
 };

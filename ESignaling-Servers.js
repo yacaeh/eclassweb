@@ -1094,6 +1094,16 @@ module.exports = exports = function (socket, config) {
         socket.on("show-class-status", function (callback) {
             callback(listOfRooms[getRoomId()].info)
         })
+
+        socket.on("screen-share-set", function(data, callback){
+            call_getRoom(room => {
+                room.info.shareScreen = data;
+                if (callback)
+                    callback('ok');
+            }, e => {
+                console.log(e)
+            })
+        })
         //--------------------------------------------------------------------------------//
 
         function call_getRoom(success, error) {
@@ -1152,6 +1162,10 @@ module.exports = exports = function (socket, config) {
             let room = listOfRooms[getRoomId()];
             let json = JSON.parse(fs.readFileSync(GetLogFilePath()));
             let user = GetUserData();
+
+            if(socket.userid == getRoom().info.shareScreen.userid){
+                getRoom().info.shareScreen = {};
+            }
 
             if (room.owner != socket.userid) {
                 json.userList[user.userid].leftTime = GetTime().time;
