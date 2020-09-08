@@ -193,11 +193,13 @@ class permissionManagerClass {
 
     window.permission = false;
   }
+
   setMicPermission() {
     console.log("GET MIC PERMISSION");
-    document.getElementById("mic_permission").innerHTML = $.i18n('STUDENT_PERMISSION_ALREADY');
+    document.getElementById("mic_permission").innerHTML = $.i18n('STUDENT_MIC_PERMISSION');
     this.unmute();
   }
+
   setCanvasPermission(id) {
     console.log("GET CANVAS PERMISSION");
     connection.send({

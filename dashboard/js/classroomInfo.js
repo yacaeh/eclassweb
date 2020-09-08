@@ -87,6 +87,44 @@ classroomCommand = {
         if (classroomInfo.exam.state){
             examObj.rejoin();
         }
+
+        if (connection.extra.roomOwner){
+            let list = document.getElementById("student_list");
+            let students = list.getElementsByClassName("student");
+            
+
+            for(let i = 0 ; i < students.length; i++){
+                let student = students[i];
+                let id = student.dataset.id;
+
+                if(classroomInfo.classPermission == id){
+                    FindInList(id).dataset.classPermission = true;
+                    MakeIcon(id, "screen");
+                }
+                
+                if(classroomInfo.micPermission == id){
+                    FindInList(id).dataset.micPermission = true;
+                    MakeIcon(id, "mic");
+                }
+                
+                if(classroomInfo.canvasPermission.includes(id)){
+                    FindInList(id).dataset.canvasPermission = true;
+                    MakeIcon(id, "canvas");
+                }
+            }
+            // if(classroomInfo.classPermission == id){
+            //     MakeIcon(id, "screen");
+            // }
+            
+            // if(classroomInfo.micPermission == id){
+            //     MakeIcon(id, "mic");
+            // }
+            
+            // if(classroomInfo.canvasPermission.includes(id)){
+            //     MakeIcon(id, "canvas");
+            // }
+
+        }
     },
 
     onSynchronizationClassRoom: function (_roomInfo) {

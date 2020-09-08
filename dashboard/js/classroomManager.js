@@ -272,7 +272,6 @@ class classroomManagerClass {
             return;
         }
 
-
         ChattingManager.enterStudent(event);
 
         let id = event.userid;
@@ -314,6 +313,21 @@ class classroomManagerClass {
 
             canvasManager.showingCanvasId = undefined;
         })
+
+        if(classroomInfo.classPermission == id){
+            FindInList(id).dataset.classPermission = true;
+            MakeIcon(id, "screen");
+        }
+        
+        if(classroomInfo.micPermission == id){
+            FindInList(id).dataset.micPermission = true;
+            MakeIcon(id, "mic");
+        }
+        
+        if(classroomInfo.canvasPermission.includes(id)){
+            FindInList(id).dataset.canvasPermission = true;
+            MakeIcon(id, "canvas");
+        }
 
         $("#student_list").append(div);
 
