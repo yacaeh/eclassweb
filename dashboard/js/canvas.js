@@ -60,10 +60,9 @@ class canvasManagerClass {
         if (event.data.canvassend) {
             let img = event.data.image;
             event.data.image = undefined;
-            // console.log(img.length / 1024 + "kb");
-            // console.log(event.data.points.length / 1024 + "kb");
             this.canvas_array[event.userid].src = img;
             if (event.userid == this.showingCanvasId) {
+                // canvasManager.clearStudentCanvas(event.userid);
                 designer.syncData(event.data);
             }
             return true;

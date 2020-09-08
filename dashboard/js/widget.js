@@ -1667,6 +1667,9 @@ gothicFont.load().then((font) => {
     var _uid = window.parent.connection.userid;
 
     function PushPoints(data, array) {
+        if(data.canvassend)
+            array.length = 0;
+
 
         switch (data.command) {
             case "eraser":

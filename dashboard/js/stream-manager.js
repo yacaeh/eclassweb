@@ -456,7 +456,6 @@ class maincamManagerClass{
         let child = childern[i];
         if (child.dataset.id == event.userid) {
           child.appendChild(event.mediaElement);
-          console.log("FINEDED")
           isFind = true;
           break;
         }
