@@ -1774,3 +1774,8 @@ body:fullscreen {
   height: 30px;
   margin-right: 10px;
 }
+
+.language {
+  position: absolute;
+  right: 0px;
+}

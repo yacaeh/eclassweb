@@ -121,6 +121,11 @@
     "TOP_SAVE_ALERT":"Simpan riwayat pemberitahuan",
     "TOP_RECORD_VIDEO":"Rekaman layar",
 
+    "STUDENT_ALLCONTROL":"Kontrol penuh",
+    "STUDENT_CANVAS":"Sedang membagi kanvas",
+    "STUDENT_MIC":"Sedang membagi mikropon",
+    "STUDENT_SCREEN_SHARE":"Aku berhak berbagi layar",
+
     "_EXTRA_":"기타",
 
     "QUIZ_FILL_ERROR":"Anda harus mengisi lembar jawaban terlebih dahulu",

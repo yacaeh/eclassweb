@@ -16,7 +16,7 @@ function updateControlView(send) {
         }
     }
     else {
-        classroomInfo.allControl ? Show("student-isallcontrol") : Hide("student-isallcontrol");
+        classroomInfo.allControl ? Show("student_isallcontrol") : Hide("student_isallcontrol");
     }
 
 

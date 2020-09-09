@@ -120,6 +120,11 @@
     "TOP_STUDNET_CANVAS":"Student Canvas",
     "TOP_SAVE_ALERT":"Save Notifications",
     "TOP_RECORD_VIDEO":"Record Video",
+    
+    "STUDENT_ALLCONTROL":"Teacher is managing this class.",
+    "STUDENT_CANVAS":"Being shared my canvas",
+    "STUDENT_MIC":"Being shared my microphone",
+    "STUDENT_SCREEN_SHARE":"Got screen sharing permission",
 
     "_EXTRA_":"기타",
 
