@@ -56,6 +56,7 @@
     "STUDENT_PERMISSION_ALREADY":"Another studnet has permission already",
     "STUDENT_SHARE_SCREEN":"Screen",
     "STUDENT_SHARE_MIC":"Mic",
+    "STUDENT_SHARE_CANVAS":"Canvas",
 
     "_QUIZ_":"시험",
 
