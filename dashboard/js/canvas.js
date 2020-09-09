@@ -3,7 +3,7 @@
 */
 
 class canvasManagerClass {
-    constructor(){
+    constructor() {
         this.sendMyCanvas = false;
         this.showingCanvasId = undefined;
         this.canvas_array = {};
@@ -11,12 +11,12 @@ class canvasManagerClass {
 
     }
 
-    init(){
+    init() {
         this.canvas = GetWidgetFrame().document.getElementById("main-canvas");
         this.sendCanvasDataToOwner();
     };
 
-    clear(){
+    clear() {
         this.clearCanvas();
         this.clearStudentCanvas();
         this.clearTeacherCanvas();
@@ -60,10 +60,9 @@ class canvasManagerClass {
         if (event.data.canvassend) {
             let img = event.data.image;
             event.data.image = undefined;
-            // console.log(img.length / 1024 + "kb");
-            // console.log(event.data.points.length / 1024 + "kb");
             this.canvas_array[event.userid].src = img;
-            if (event.userid == this.showingCanvasId){
+            if (event.userid == this.showingCanvasId) {
+                // canvasManager.clearStudentCanvas(event.userid);
                 designer.syncData(event.data);
             }
             return true;
@@ -76,7 +75,7 @@ class canvasManagerClass {
         };
 
     };
-    sendCanvasDataToOwner(){
+    sendCanvasDataToOwner() {
         if (connection.extra.roomOwner)
             return;
         setInterval(function () {
@@ -85,18 +84,18 @@ class canvasManagerClass {
             }
         }, 1000)
     };
-    sendCanvasDataToOwnerOneTime(){
+    sendCanvasDataToOwnerOneTime() {
         let canvas = this.canvas;
         let newcanvas = document.createElement("canvas");
         let width = Math.max(canvas.width / 4, 480);
         let height = Math.max(canvas.width / 4, 380)
         let newctx = newcanvas.getContext("2d");
-        
+
         newcanvas.width = width;
         newcanvas.height = height;
-    
+
         newctx.fillStyle = "#FFFFFF";
-        newctx.fillRect(0,0,newcanvas.width, newcanvas.height);
+        newctx.fillRect(0, 0, newcanvas.width, newcanvas.height);
         newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
 
         connection.send({
@@ -105,33 +104,33 @@ class canvasManagerClass {
             points: currentPoints,
             history: currentHistory,
             userid: connection.userid,
-            image : newcanvas.toDataURL('image/jpeg', 0.000001)
-          }, GetOwnerId())
+            image: newcanvas.toDataURL('image/jpeg', 0.000001)
+        }, GetOwnerId())
     };
 }
 
-var designer                = new CanvasDesigner();
+var designer = new CanvasDesigner();
 
-designer.widgetHtmlURL      = './widget.html';
-designer.widgetJsURL        = './js/widget.js';
-designer.icons.pencil       = '/dashboard/img/pen.png';
-designer.icons.marker       = '/dashboard/img/pen2.png';
-designer.icons.eraser       = '/dashboard/img/eraser.png';
-designer.icons.clearCanvas  = '/dashboard/img/trash.png';
-designer.icons.pdf          = '/dashboard/img/iconfinder_File.png';
-designer.icons.on           = '/dashboard/img/view_on.png';
-designer.icons.off          = '/dashboard/img/view_off.png';
-designer.icons.screenShare  = '/dashboard/img/screenshare.png';
-designer.icons.view3d       = '/dashboard/img/3D.png';
-designer.icons.view3don     = '/dashboard/img/3D.png';
-designer.icons.movie        = '/dashboard/img/videolink.png';
-designer.icons.file         = '/dashboard/img/openfile.png';
-designer.icons.text         = '/dashboard/img/text.png';
-designer.icons.epub         = '/dashboard/img/epub.png';
-designer.icons.callteacher  = '/dashboard/img/handsup.png';
-designer.icons.homework     = '/dashboard/img/homework.png';
-designer.icons.fulloff      = '/dashboard/img/cam_min.png';
-designer.icons.fullon       = '/dashboard/img/cam_max.png';
+designer.widgetHtmlURL = './widget.html';
+designer.widgetJsURL = './js/widget.js';
+designer.icons.pencil = '/dashboard/img/pen.png';
+designer.icons.marker = '/dashboard/img/pen2.png';
+designer.icons.eraser = '/dashboard/img/eraser.png';
+designer.icons.clearCanvas = '/dashboard/img/trash.png';
+designer.icons.pdf = '/dashboard/img/iconfinder_File.png';
+designer.icons.on = '/dashboard/img/view_on.png';
+designer.icons.off = '/dashboard/img/view_off.png';
+designer.icons.screenShare = '/dashboard/img/screenshare.png';
+designer.icons.view3d = '/dashboard/img/3D.png';
+designer.icons.view3don = '/dashboard/img/3D.png';
+designer.icons.movie = '/dashboard/img/videolink.png';
+designer.icons.file = '/dashboard/img/openfile.png';
+designer.icons.text = '/dashboard/img/text.png';
+designer.icons.epub = '/dashboard/img/epub.png';
+designer.icons.callteacher = '/dashboard/img/handsup.png';
+designer.icons.homework = '/dashboard/img/homework.png';
+designer.icons.fulloff = '/dashboard/img/cam_min.png';
+designer.icons.fullon = '/dashboard/img/cam_max.png';
 
 designer.addSyncListener(function (data) {
     var isStudent = permissionManager.IsCanvasPermission(data.userid);
@@ -175,18 +174,18 @@ function checkSharing() {
 
 function removeOnSelect(btn) {
     if (!connection.extra.roomOwner) {
-        alert("선생님이 다른 기능을 사용 중 입니다")
+        alert($.i18n('TEACHER_USING_FEATURE'))
         return;
     }
 
-    if (classroomInfoLocal.shareScreenByStudent) {
-        alert("학생이 화면 공유 중 입니다.");
+    if (classroomInfo.shareScreen.byStudent) {
+        alert($.i18n('SOMEONE_USING_SCREEN'));
         btn.classList.remove("on");
         btn.classList.remove("selected-shape");
         return;
     }
 
-    alertBox("현재 기능을 종료합니까?", "알림", function () {
+    alertBox($.i18n('ASK_CLOSE_CURRENT'), $.i18n('NOTIFICATION'), function () {
         if (classroomInfo.share3D.state) {
             GetWidgetFrame().document.getElementById("3d_view").click();
             classroomInfo.share3D.state = false;
@@ -194,7 +193,7 @@ function removeOnSelect(btn) {
 
         if (classroomInfo.shareScreen.state) {
             GetWidgetFrame().document.getElementById("screen_share").click();
-            classroomInfo.shareScreen.state = false;
+            screenshareManager.setClassroomInfo(false);
         }
 
         if (isSharingMovie) {

@@ -1,7 +1,11 @@
 const minify = require('terser');
 const fs = require('fs')
 const readline = require('readline')
-const path = "./dashboard/js";
+const jspath = "./dashboard/js";
+const csspath = "./dashboard/css";
+
+const cssminify = require('minify')
+
 
 let terserOptions = {
     compress: {
@@ -9,8 +13,11 @@ let terserOptions = {
     },
 }
 
-if (!fs.existsSync(path + '/original'))
-    fs.mkdirSync(path + '/original')
+if (!fs.existsSync(jspath + '/original'))
+    fs.mkdirSync(jspath + '/original')
+
+if (!fs.existsSync(csspath + '/original'))
+    fs.mkdirSync(csspath + '/original')
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -21,22 +28,27 @@ console.log("1 : minify");
 console.log("2 : return");
 
 rl.on("line", function (line) {
-    if (line == "1")
-        Minify();
-    else if (line == "2")
-        Return();
+    if (line == "1"){
+        MinifyJS();
+        MinifyCSS();
+    }
+    else if (line == "2"){
+        Return(jspath);
+        Return(csspath);
+    }
 
-    console.log("Finish")
+    console.log("Finished")
     rl.close();
 });
 
 
-function Minify() {
-    var dir = fs.readdirSync(path, { withFileTypes: true })
-    var original = fs.readdirSync(path +'/original');
+function MinifyJS() {
+    console.log("JS Minifying...")
+    var dir = fs.readdirSync(jspath, { withFileTypes: true })
+    var original = fs.readdirSync(jspath +'/original');
 
     if(original.length != 0){
-        console.log("Already minified");
+        console.log("JS Already minified");
         return;
     }
 
@@ -45,18 +57,54 @@ function Minify() {
         .map(dir => dir.name);
 
     filesNames.forEach((file) => {
-        console.log(file)
-        var z = fs.readFileSync(path + "/" + file, 'utf8')
+        var z = fs.readFileSync(jspath + "/" + file, 'utf8')
         var code = z;
         minify.minify(code, terserOptions).then((min) => {
-            let filepath = path + '/' + file;
-            fs.copyFileSync(path + '/' + file, path + '/original/' + file)
+            let filepath = jspath + '/' + file;
+            fs.copyFileSync(jspath + '/' + file, jspath + '/original/' + file)
             fs.writeFileSync(filepath, min.code);
         })
     })
+    console.log("JS Minify finished")
 }
 
-function Return() {
+function MinifyCSS() {
+    var dir = fs.readdirSync(csspath, { withFileTypes: true })
+    var original = fs.readdirSync(csspath +'/original');
+    console.log("CSS Minifying...")
+
+    if(original.length != 0){
+        console.log("CSS Already minified");
+        return;
+    }
+
+    const filesNames = dir
+        .filter(dir => dir.isFile())
+        .map(dir => dir.name);
+
+    const option = {
+        css : {
+            compatibility : '*'
+        }
+    }
+
+    
+    filesNames.forEach((file) => {
+        let filepath = csspath + "/" + file;
+        cssminify(filepath, option)
+            .then((min) => {
+                fs.copyFileSync(filepath, csspath + '/original/' + file)
+                fs.writeFileSync(filepath, min);
+            }) 
+            .catch(console.error)
+    })
+    
+
+
+    console.log("CSS Minify finished");
+}
+
+function Return(path) {
     var dir = fs.readdirSync(path, { withFileTypes: true })
     var original = fs.readdirSync(path +'/original');
 

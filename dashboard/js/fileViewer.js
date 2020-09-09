@@ -137,12 +137,12 @@ class fileViewerLoader {
         let frame = GetWidgetFrame();
         let fileViewer = frame.document.getElementById('file-viewer');
         let viewer = fileViewer.contentWindow.document.getElementById("viewer")
-        if(!viewer)
+        if (!viewer)
             return;
-            
+
         if (_lock) {
             viewer.style.pointerEvents = 'none';
-        } 
+        }
         else {
             viewer.style.pointerEvents = '';
         }
@@ -327,7 +327,7 @@ class fileViewer {
     }
 
     openFile(_url) {
-        
+
         if (_url == undefined || _url == null) {
             console.error('open file url error ' + _url);
             return;
@@ -436,7 +436,7 @@ class fileViewer {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 let pdfString = 'pdf';
-var mfileViewer         = new fileViewer();
+var mfileViewer = new fileViewer();
 
 
 mfileViewer.onopen = function (_type, _url) {
@@ -447,6 +447,8 @@ mfileViewer.onopen = function (_type, _url) {
     classroomInfo.viewer.type = _type;
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
+
+    classroomManager.updateClassroomInfo();
 
     if (connection.extra.roomOwner) {
         connection.send({
@@ -472,6 +474,7 @@ mfileViewer.onclose = function () {
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;
+    classroomManager.updateClassroomInfo();
 
     if (connection.extra.roomOwner) {
         connection.send({
@@ -627,19 +630,19 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
-function HomeworkSubmit(){
-    HomeworkUploadModal("숙제 제출")
+function HomeworkSubmit() {
+    HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
 }
 
 function HomeworkUploadModal(message, callback) {
-    callback = callback || function(){}
+    callback = callback || function () { }
 
     console.log(message);
     $('#btn-confirm-close').hide();
     $('#btn-confirm-file-close').hide();
     $("#confirm-title2").hide();
     $('#confirm-title').html(message).removeClass("selected");
-    $('#btn-confirm-action').html('닫기').unbind('click').bind('click', function (e) {
+    $('#btn-confirm-action').html($.i18n('CLOSE')).unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
@@ -655,19 +658,19 @@ function HomeworkUploadModal(message, callback) {
 }
 
 function fileUploadModal(message, btn, callback) {
-    callback = callback || function(){}
-    
+    callback = callback || function () { }
+
     console.log(message);
     getUploadFileList();
     $("#confirm-title2").show();
-    $('#btn-confirm-action').html('확인').unbind('click').bind('click', function (e) {
+    $('#btn-confirm-action').html($.i18n('OK')).unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
         callback(true);
     });
 
-    $('#btn-confirm-close').html('취소');
+    $('#btn-confirm-close').html($.i18n('CANCEL'));
 
     $('.btn-confirm-close').unbind('click').bind('click', function (e) {
         e.preventDefault();
@@ -678,7 +681,7 @@ function fileUploadModal(message, btn, callback) {
 
     $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
     $('#confirm-title').html(message).addClass("selected");
-    $('#confirm-title2').html("과제").removeClass("selected");
+    $('#confirm-title2').html($.i18n('ASSIGNMENT')).removeClass("selected");
     $('#confirm-box-topper').show();
 
     $('#confirm-box').modal({
@@ -688,7 +691,7 @@ function fileUploadModal(message, btn, callback) {
     if (!isFileViewer) $('#btn-confirm-file-close').hide();
     else {
         $('#btn-confirm-file-close').show();
-        $('#btn-confirm-file-close').html('현재 파일 닫기').unbind('click').bind('click', function (e) {
+        $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE')).unbind('click').bind('click', function (e) {
             e.preventDefault();
             unloadFileViewer();
         });
@@ -706,7 +709,7 @@ function ViewHomeworkList(btn) {
 }
 
 function ViewUploadList(btn) {
-    if(!connection.extra.roomOwner)
+    if (!connection.extra.roomOwner)
         return;
 
     btn.classList.add("selected");
@@ -727,10 +730,10 @@ function getUploadFileList(extraPath) {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
         if (xhr.readyState == xhr.DONE) {
-            if(xhr.status == 200){
+            if (xhr.status == 200) {
                 updateFileList(JSON.parse(xhr.responseText), extraPath);
             }
-            else{
+            else {
                 console.error("directory doesn't exist!", xhr.status);
                 updateFileList([], extraPath);
             }
@@ -747,29 +750,29 @@ function updateFileList(list, extraPath) {
     var re = /(?:\.([^.]+))?$/;
     var listElement = '<ul class="list-group-flush">';
 
-    if (list.length == 0){
-        listElement += '아직 파일이 없습니다!';
+    if (list.length == 0) {
+        listElement += $.i18n('NO_FILES');
     }
     else {
         list.files.forEach(file => {
             if (file.name == "homework" || re.exec(file.name)[1] == "json")
                 return;
-    
+
             var buttons = "";
             if (extraPath == "/homework") {
                 buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
             onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
             }
-    
+
             buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
           onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
           <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
           onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
-    
+
             listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
                 getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
                 '</label>' + buttons;
-        })    
+        })
     }
     listElement += '</ul>';
     var $listElement = $($.parseHTML(listElement));
@@ -843,11 +846,11 @@ function downloadUploadedFile(url, name) {
 }
 
 function deleteUploadedFile(filename, extraPath) {
-    if(mfileViewer.nowPath){
+    if (mfileViewer.nowPath) {
         var nowName = mfileViewer.nowPath.split('/');
         nowName = nowName[nowName.length - 1];
-        if(filename == nowName) {
-            alert("현재 열려있는 파일은 지울 수 없습니다")
+        if (filename == nowName) {
+            alert($.i18n('DELETE_OPEN_ERROR'));
             return;
         }
     }
@@ -873,7 +876,10 @@ function deleteUploadedFile(filename, extraPath) {
 }
 
 function loadFileInput() {
+    var lang = language;
+    if (lang == 'ko') { lang = 'kr'; }
 
+    console.log("lang", lang);
     $(document).ready(function () {
         let extraPath = "";
 
@@ -883,14 +889,14 @@ function loadFileInput() {
         $("#test-upload").fileinput({
             'theme': 'fas',
             'showPreview': true,
-            'language': 'kr',
+            'language': lang,
             'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg", "odt"],
             'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
             'elErrorContainer': '#errorBlock'
         });
         $("#file-explorer").fileinput({
             'theme': 'explorer-fas',
-            'language': 'kr',
+            'language': lang,
             'uploadUrl': fileServerUrl + '/upload',
             fileActionSettings: {
                 showZoom: false,
@@ -979,7 +985,7 @@ function LoadFile(btn) {
     }
     if (!connection.extra.roomOwner)
         return;
-    fileUploadModal("파일 관리자", btn, function (e) { });
+    fileUploadModal($.i18n('FILE_MANAGER'), btn, function (e) { });
 }
 
 
@@ -999,8 +1005,8 @@ function unloadFileViewer() {
 }
 
 function loadFileViewer(path) {
-    if(mfileViewer.nowPath == path){
-        alert("같은 파일이 열려있습니다.")
+    if (mfileViewer.nowPath == path) {
+        alert($.i18n('SAME_FILE_OPEN_ERROR'));
         return;
     }
 
@@ -1009,7 +1015,7 @@ function loadFileViewer(path) {
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
-    
+
     isSharingFile = true;
     isFileViewer = true;
     classroomCommand.openFile(path);

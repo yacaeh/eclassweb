@@ -1,11 +1,11 @@
-class ChattingManagerClass{
-    constructor(){
+class ChattingManagerClass {
+    constructor() {
         this.noticeElement = undefined;
         this.normalElement = undefined;
         this.self = undefined;
     }
 
-    init(){
+    init() {
         this.noticeElement = document.getElementById('noticewindow');
         this.normalElement = document.getElementById('conversation-panel');
         var notice = document.getElementById("notice");
@@ -32,47 +32,47 @@ class ChattingManagerClass{
             notice.classList.toggle('off');
             notice.classList.toggle('on');
         });
-        
-        $('#txt-chat-message').emojioneArea({
-            pickerPosition: 'top',
-            filtersPosition: 'bottom',
-            tones: false,
-            autocomplete: true,
-            inline: true,
-            hidePickerOnBlur: true,
-            placeholder: '메세지를 입력하세요',
-        
-            events: {
-                focus: function () {
-                    $('.emojionearea-category')
-                        .unbind('click')
-                        .bind('click', function () {
-                            $('.emojionearea-button-close').click();
-                        });
+        $(window).bind("load", function () {
+
+            $('#txt-chat-message').emojioneArea({
+                pickerPosition: 'top',
+                filtersPosition: 'bottom',
+                tones: false,
+                autocomplete: true,
+                inline: true,
+                hidePickerOnBlur: true,
+                placeholder: $.i18n('CHAT_PLACEHOLDER'),
+                events: {
+                    focus: function () {
+                        $('.emojionearea-category')
+                            .unbind('click')
+                            .bind('click', function () {
+                                $('.emojionearea-button-close').click();
+                            });
+                    },
                 },
-            },
+            });
         });
-    
         window.onkeyup = function (e) {
             var code = e.keyCode || e.which;
             if (code == 13) {
                 var chatMessage = $('.emojionearea-editor').html();
                 $('.emojionearea-editor').html('');
                 if (!chatMessage || !chatMessage.replace(/ /g, '').length) return;
-                ChattingManager.normal("나", chatMessage);
-                if(connection.extra.roomOwner)
+                ChattingManager.normal($.i18n('ME'), chatMessage);
+                if (connection.extra.roomOwner)
                     ChattingManager.notice(chatMessage);
                 connection.send({
-                    chatMessage : true,
-                    msg : chatMessage,
-                    name : connection.extra.userFullName
+                    chatMessage: true,
+                    msg: chatMessage,
+                    name: connection.extra.userFullName
                 })
 
             }
         };
 
     }
-    append(event){
+    append(event) {
         let div = document.createElement('div');
         let color = "#000000"
 
@@ -86,43 +86,43 @@ class ChattingManagerClass{
         if (event.data) {
             id = event.extra.userFullName || event.userid;
             if (event.extra.roomOwner == true) {
-                id += '(선생님)';
+                id += '(' + $.i18n('TEACHER') + ')';
                 color = "#C63EE8"
             }
-        } 
+        }
 
         this.normal(id, event.data.msg, color);
     }
-    enterStudent(event){
+    enterStudent(event) {
         let name = event.extra.userFullName;
         let div = document.createElement('div');
         div.className = 'teachermsg2 enter';
-        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>학생이 접속했습니다</b>';
+        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + $.i18n('STUDENT_JOIN') + '</b>';
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
-    leftStudent(event){
+    leftStudent(event) {
         let name = event.extra.userFullName;
-        if(name == undefined)
+        if (name == undefined)
             return;
 
         let div = document.createElement('div');
         div.className = 'teachermsg2 left';
-        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>학생이 나갔습니다</b>';
+        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + $.i18n('STUDENT_LEFT') + '</b>';
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
-    notice(msg){
+    notice(msg) {
         let div = document.createElement('div');
         div.className = 'teachermsg';
-        div.innerHTML = '<b> <font color="#C63EE8"> 선생님 </font>: </b>' + msg;
+        div.innerHTML = '<b> <font color="#C63EE8"> ' + $.i18n('TEACHER') + ' </font>: </b>' + msg;
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
-    normal(name, msg, color = "#3E93E8"){
+    normal(name, msg, color = "#3E93E8") {
         let div = document.createElement('div');
         div.className = 'message';
         div.innerHTML = '<b> <font color="' + color + '"> ' + name + ' </font>: </b>' + msg;
@@ -130,7 +130,7 @@ class ChattingManagerClass{
         this.normalElement.scrollTop = this.normalElement.clientHeight;
         this.normalElement.scrollTop = this.normalElement.scrollHeight - this.normalElement.scrollTop;
     }
-    eventListener(event){
+    eventListener(event) {
         if (event.data.chatMessage) {
             this.append(event);
             return true;
