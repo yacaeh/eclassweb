@@ -31,6 +31,7 @@ function Show(element) {
     return;
 
   if (typeof element === "string") {
+    console.log(element);
     document.getElementById(element).style.display = "block";
   }
   else {

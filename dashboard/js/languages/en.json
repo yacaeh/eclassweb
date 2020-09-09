@@ -57,9 +57,6 @@
     "STUDENT_SHARE_SCREEN":"Screen",
     "STUDENT_SHARE_MIC":"Mic",
     "STUDENT_SHARE_CANVAS":"Canvas",
-    "STUDENT_SCREEN_PERMISSION":"Screen share permission",
-    "STUDENT_MIC_PERMISSION":"Mic permission",
-    "STUDENT_SHARING_CANVAS":"Sharing Canvas",
 
     "_QUIZ_":"시험",
 
@@ -120,6 +117,11 @@
     "TOP_STUDNET_CANVAS":"Student Canvas",
     "TOP_SAVE_ALERT":"Save Notifications",
     "TOP_RECORD_VIDEO":"Record Video",
+    
+    "STUDENT_ALLCONTROL":"Teacher is managing this class.",
+    "STUDENT_CANVAS":"Your canvas is being shared",
+    "STUDENT_MIC":"Your voice is being shared",
+    "STUDENT_SCREEN_SHARE":"You have screen share permission",
 
     "_EXTRA_":"기타",
 

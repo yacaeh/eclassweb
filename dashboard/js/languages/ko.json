@@ -57,9 +57,6 @@
     "STUDENT_SHARE_SCREEN":"화면 공유",
     "STUDENT_SHARE_MIC":"마이크",
     "STUDENT_SHARE_CANVAS":"판서 공유",
-    "STUDENT_SCREEN_PERMISSION":"화면 공유 권한",
-    "STUDENT_MIC_PERMISSION":"마이크 권한",
-    "STUDENT_SHARING_CANVAS":"판서 공유 중",
 
     "_QUIZ_":"시험",
 
@@ -120,6 +117,11 @@
     "TOP_STUDNET_CANVAS":"학생 판서",
     "TOP_SAVE_ALERT":"알림 기록 저장",
     "TOP_RECORD_VIDEO":"화면 녹화",
+
+    "STUDENT_ALLCONTROL":"선생님이 전체 제어 중 입니다",
+    "STUDENT_CANVAS":"나의 판서가 공유되고 있습니다",
+    "STUDENT_MIC":"나의 마이크가 공유되고 있습니다",
+    "STUDENT_SCREEN_SHARE":"화면 공유 권한이 있습니다",
 
     "_EXTRA_":"기타",
 

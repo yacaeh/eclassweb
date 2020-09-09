@@ -42,13 +42,17 @@ var attentionManager = new attentionManagerClass();
 
 // 상단 버튼 도움말
 const topButtonContents = {
-  top_all_controll: "전체 제어",
-  top_test: "시험",
-  top_alert: "알림",
-  top_student: "학생 판서",
-  top_camera: "학생 카메라",
-  top_save_alert: "알림 기록 저장",
-  top_record_video: "화면 녹화"
+  top_all_controll      : "전체 제어",
+  top_test              : "시험",
+  top_alert             : "알림",
+  top_student           : "학생 판서",
+  top_camera            : "학생 카메라",
+  top_save_alert        : "알림 기록 저장",
+  top_record_video      : "화면 녹화",
+  student_isallcontrol  : "선생님이 전체 제어 중 입니다",
+  student_screenshare   : "화면 공유 권한을 획득한 상태입니다",
+  student_canvas        : "나의 판서를 공유 중 입니다.",
+  student_mic           : "마이크 권한을 획득한 상태입니다"
 }
 
 // 좌측 버튼 기능

@@ -56,6 +56,11 @@ function updateLanguage(){
 				topButtonContents.top_camera = $.i18n( 'TOP_CAMERA' );
 				topButtonContents.top_save_alert = $.i18n( 'TOP_SAVE_ALERT' );
 				topButtonContents.top_record_video = $.i18n( 'TOP_RECORD_VIDEO' );	
+				topButtonContents.student_isallcontrol  = $.i18n('STUDENT_ALLCONTROL');
+				topButtonContents.student_screenshare   = $.i18n('STUDENT_SCREEN_SHARE');
+				topButtonContents.student_canvas        = $.i18n('STUDENT_CANVAS');
+				topButtonContents.student_mic           = $.i18n('STUDENT_MIC');
+
 				GetWidgetFrame().updateLanguage();
 				GetWidgetFrame().$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));	
 			}

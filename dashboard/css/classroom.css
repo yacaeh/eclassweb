@@ -394,7 +394,7 @@ hr {
 }
 
 
-.right-tab {
+#right-tab {
   position: absolute;
   width: 17.7%;
   bottom: 0px;
@@ -524,6 +524,7 @@ hr {
   vertical-align: middle;
   line-height: 36px;
   position: relative;
+  pointer-events: none;
 }
 
 #recording-time {
@@ -589,6 +590,7 @@ hr {
   position: absolute;
   top: 10px;
   right: 3px;
+  pointer-events: none;
 }
 
 .icons {
@@ -1762,3 +1764,18 @@ body:fullscreen {
   display: flex;
 }
 
+.permission-icon{
+  display: none;
+  right: 17.7%;
+  position: relative;
+  top: 10px;
+  float: right;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.language {
+  position: absolute;
+  right: 0px;
+}

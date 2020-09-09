@@ -57,10 +57,6 @@
     "STUDENT_SHARE_SCREEN":"Berbagi layar",
     "STUDENT_SHARE_MIC":"Mic",
     "STUDENT_SHARE_CANVAS":"Bagikan Kanvas",
-    "STUDENT_SCREEN_PERMISSION":"Izin berbagi layar",
-    "STUDENT_MIC_PERMISSION":"Izin mikrofon",
-    "STUDENT_SHARING_CANVAS":"Berbagi Kanvas",
-
 
     "_QUIZ_":"Ujian",
 
@@ -120,6 +116,11 @@
     "TOP_STUDNET_CANVAS":"Kanvas siswa",
     "TOP_SAVE_ALERT":"Simpan riwayat pemberitahuan",
     "TOP_RECORD_VIDEO":"Rekaman layar",
+
+    "STUDENT_ALLCONTROL":"Kontrol penuh",
+    "STUDENT_CANVAS":"Kanvas Anda sedang dibagikan",
+    "STUDENT_MIC":"Suara Anda sedang dibagikan",
+    "STUDENT_SCREEN_SHARE":"Anda memiliki izin berbagi layar",
 
     "_EXTRA_":"기타",
 
