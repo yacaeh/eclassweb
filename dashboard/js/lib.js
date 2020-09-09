@@ -2,10 +2,10 @@
 // 이벤트 추가
 function AddEvent(id, event, callback) {
   var element = document.getElementById(id);
-  if(element)
-  element.addEventListener(event, function () {
-    callback(this);
-  })
+  if (element)
+    element.addEventListener(event, function () {
+      callback(this);
+    })
 }
 
 // 방장의 id를 받아옴
@@ -55,20 +55,20 @@ function alertBox(message, title, callback_yes, callback_no) {
   rightTab.style.zIndex = 1;
 
 
-  callback_yes  = callback_yes  || function () { };
+  callback_yes = callback_yes || function () { };
 
-  if(typeof(callback_no) == "string" ){
+  if (typeof (callback_no) == "string") {
     $('.btn-alert-no').hide();
     $('.btn-alert-yes').text($.i18n('CONFIRM'));
-    $('.btn-alert-yes').css("width" ,"100%");
+    $('.btn-alert-yes').css("width", "100%");
   }
-  else{
+  else {
     $('.btn-alert-no').show();
     $('.btn-alert-yes').text($.i18n('YES'));
-    $('.btn-alert-yes').css("width" ,"50%");
+    $('.btn-alert-yes').css("width", "50%");
   }
 
-  callback_no   = callback_no   || function () { };
+  callback_no = callback_no || function () { };
 
   var clickCount = 0;
 
@@ -118,7 +118,7 @@ function Get(url, callback) {
     if (xml.readyState == xml.DONE && xml.status == 200) {
       callback(xml.responseText);
     }
-    else if(xml.readyState == xml.DONE && xml.status == 404){
+    else if (xml.readyState == xml.DONE && xml.status == 404) {
       callback(xml.status);
     }
 

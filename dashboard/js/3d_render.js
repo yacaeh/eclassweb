@@ -124,6 +124,7 @@ function engineInit(canvas) {
 
 
 function remove3DCanvas() {
+    console.log("REMOVE 3d")
     scene.removeMesh(mesh);
     scene.meshes.forEach(element => element.dispose());
     scene.cleanCachedTextureBuffer();
@@ -154,25 +155,14 @@ function updateShared3DData(_pos, _rot) {
 */
 function sync3DModel() {
     var data = classroomInfo.share3D.data;
-
     if (classroomInfo.share3D.state != isSharing3D) {
         isSharing3D = classroomInfo.share3D.state
         setShared3DStateLocal(classroomInfo.share3D.state);;
     }
-
     set3DModelStateData(data.newPosition, data.newRotation);
 }
 
-function setShared3DStateServer(_state) {
-    connection.socket.emit('toggle-share-3D', (result) => {
-        if (result.result) {
-            setShared3DStateLocal(result.data);
-            connection.send({
-                modelEnable: { enable: classroomInfo.share3D.state }
-            });
-        }
-    })
-}
+
 
 function setShared3DStateLocal(_state) {
     classroomInfo.share3D.state = _state;
@@ -187,9 +177,14 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
-    
     canvasManager.clear();
-    const isViewer = classroomInfo.share3D.state;
-    isSharing3D = !isViewer;
-    setShared3DStateServer(!isViewer);
+    const isViewer = !classroomInfo.share3D.state;
+    classroomInfo.share3D.state = isViewer;
+    isSharing3D = isViewer;
+    classroomManager.updateClassroomInfo(() => {
+        setShared3DStateLocal(isViewer)
+        connection.send({
+            modelEnable: { enable: classroomInfo.share3D.state }
+        });
+    })
 }

@@ -137,12 +137,12 @@ class fileViewerLoader {
         let frame = GetWidgetFrame();
         let fileViewer = frame.document.getElementById('file-viewer');
         let viewer = fileViewer.contentWindow.document.getElementById("viewer")
-        if(!viewer)
+        if (!viewer)
             return;
-            
+
         if (_lock) {
             viewer.style.pointerEvents = 'none';
-        } 
+        }
         else {
             viewer.style.pointerEvents = '';
         }
@@ -327,7 +327,7 @@ class fileViewer {
     }
 
     openFile(_url) {
-        
+
         if (_url == undefined || _url == null) {
             console.error('open file url error ' + _url);
             return;
@@ -436,7 +436,7 @@ class fileViewer {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 let pdfString = 'pdf';
-var mfileViewer         = new fileViewer();
+var mfileViewer = new fileViewer();
 
 
 mfileViewer.onopen = function (_type, _url) {
@@ -447,6 +447,8 @@ mfileViewer.onopen = function (_type, _url) {
     classroomInfo.viewer.type = _type;
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
+
+    classroomManager.updateClassroomInfo();
 
     if (connection.extra.roomOwner) {
         connection.send({
@@ -472,6 +474,7 @@ mfileViewer.onclose = function () {
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;
+    classroomManager.updateClassroomInfo();
 
     if (connection.extra.roomOwner) {
         connection.send({
@@ -627,12 +630,12 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
-function HomeworkSubmit(){
+function HomeworkSubmit() {
     HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
 }
 
 function HomeworkUploadModal(message, callback) {
-    callback = callback || function(){}
+    callback = callback || function () { }
 
     console.log(message);
     $('#btn-confirm-close').hide();
@@ -655,8 +658,8 @@ function HomeworkUploadModal(message, callback) {
 }
 
 function fileUploadModal(message, btn, callback) {
-    callback = callback || function(){}
-    
+    callback = callback || function () { }
+
     console.log(message);
     getUploadFileList();
     $("#confirm-title2").show();
@@ -706,7 +709,7 @@ function ViewHomeworkList(btn) {
 }
 
 function ViewUploadList(btn) {
-    if(!connection.extra.roomOwner)
+    if (!connection.extra.roomOwner)
         return;
 
     btn.classList.add("selected");
@@ -727,10 +730,10 @@ function getUploadFileList(extraPath) {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
         if (xhr.readyState == xhr.DONE) {
-            if(xhr.status == 200){
+            if (xhr.status == 200) {
                 updateFileList(JSON.parse(xhr.responseText), extraPath);
             }
-            else{
+            else {
                 console.error("directory doesn't exist!", xhr.status);
                 updateFileList([], extraPath);
             }
@@ -747,29 +750,29 @@ function updateFileList(list, extraPath) {
     var re = /(?:\.([^.]+))?$/;
     var listElement = '<ul class="list-group-flush">';
 
-    if (list.length == 0){
+    if (list.length == 0) {
         listElement += $.i18n('NO_FILES');
     }
     else {
         list.files.forEach(file => {
             if (file.name == "homework" || re.exec(file.name)[1] == "json")
                 return;
-    
+
             var buttons = "";
             if (extraPath == "/homework") {
                 buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
             onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
             }
-    
+
             buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
           onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
           <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
           onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
-    
+
             listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
                 getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
                 '</label>' + buttons;
-        })    
+        })
     }
     listElement += '</ul>';
     var $listElement = $($.parseHTML(listElement));
@@ -843,10 +846,10 @@ function downloadUploadedFile(url, name) {
 }
 
 function deleteUploadedFile(filename, extraPath) {
-    if(mfileViewer.nowPath){
+    if (mfileViewer.nowPath) {
         var nowName = mfileViewer.nowPath.split('/');
         nowName = nowName[nowName.length - 1];
-        if(filename == nowName) {
+        if (filename == nowName) {
             alert($.i18n('DELETE_OPEN_ERROR'));
             return;
         }
@@ -874,9 +877,9 @@ function deleteUploadedFile(filename, extraPath) {
 
 function loadFileInput() {
     var lang = language;
-    if (lang == 'ko'){lang='kr';}
+    if (lang == 'ko') { lang = 'kr'; }
 
-    console.log("lang",lang);
+    console.log("lang", lang);
     $(document).ready(function () {
         let extraPath = "";
 
@@ -1002,7 +1005,7 @@ function unloadFileViewer() {
 }
 
 function loadFileViewer(path) {
-    if(mfileViewer.nowPath == path){
+    if (mfileViewer.nowPath == path) {
         alert($.i18n('SAME_FILE_OPEN_ERROR'));
         return;
     }
@@ -1012,7 +1015,7 @@ function loadFileViewer(path) {
     var btn = GetWidgetFrame().document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
-    
+
     isSharingFile = true;
     isFileViewer = true;
     classroomCommand.openFile(path);
