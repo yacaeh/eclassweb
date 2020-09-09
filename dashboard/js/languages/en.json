@@ -118,9 +118,9 @@
     "TOP_RECORD_VIDEO":"Record Video",
     
     "STUDENT_ALLCONTROL":"Teacher is managing this class.",
-    "STUDENT_CANVAS":"Being shared my canvas",
-    "STUDENT_MIC":"Being shared my microphone",
-    "STUDENT_SCREEN_SHARE":"Got screen sharing permission",
+    "STUDENT_CANVAS":"Your canvas is being shared",
+    "STUDENT_MIC":"Your voice is being shared",
+    "STUDENT_SCREEN_SHARE":"You have screen share permission",
 
     "_EXTRA_":"기타",
 

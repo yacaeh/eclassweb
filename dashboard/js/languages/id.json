@@ -118,9 +118,9 @@
     "TOP_RECORD_VIDEO":"Rekaman layar",
 
     "STUDENT_ALLCONTROL":"Kontrol penuh",
-    "STUDENT_CANVAS":"Sedang membagi kanvas",
-    "STUDENT_MIC":"Sedang membagi mikropon",
-    "STUDENT_SCREEN_SHARE":"Aku berhak berbagi layar",
+    "STUDENT_CANVAS":"Kanvas Anda sedang dibagikan",
+    "STUDENT_MIC":"Suara Anda sedang dibagikan",
+    "STUDENT_SCREEN_SHARE":"Anda memiliki izin berbagi layar",
 
     "_EXTRA_":"기타",
 
