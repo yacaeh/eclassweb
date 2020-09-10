@@ -1581,49 +1581,6 @@ gothicFont.load().then((font) => {
             return;
         }
 
-        if (event.data.undo && points.length) {
-            var index = event.data.index;
-
-            if (index === 'all') {
-                points = [];
-                drawHelper.redraw();
-                syncPoints(true);
-                return;
-            }
-
-            if (index.numberOfLastShapes) {
-                try {
-                    points.length -= index.numberOfLastShapes;
-                } catch (e) {
-                    points = [];
-                }
-
-                drawHelper.redraw();
-                syncPoints(true);
-                return;
-            }
-
-            if (index === -1) {
-                points.length = points.length - 1;
-                drawHelper.redraw();
-                syncPoints(true);
-                return;
-            }
-
-            if (points[index]) {
-                var newPoints = [];
-                for (var i = 0; i < points.length; i++) {
-                    if (i !== index) {
-                        newPoints.push(points[i]);
-                    }
-                }
-                points = newPoints;
-                drawHelper.redraw();
-                syncPoints(true);
-            }
-            return;
-        }
-
         if (event.data.syncPoints) {
             syncPoints(true);
             return;
@@ -1642,6 +1599,7 @@ gothicFont.load().then((font) => {
         if (!event.data.canvasDesignerSyncData) return;
 
         var data = event.data.canvasDesignerSyncData;
+
         if (data.isStudent) {
             var id = data.userid;
             if (id == undefined) {
@@ -1659,7 +1617,6 @@ gothicFont.load().then((font) => {
             PushPoints(data, teacherPoints);
         }
 
-
         lastPointIndex = points.length;
         drawHelper.redraw();
     }, false);
@@ -1672,6 +1629,9 @@ gothicFont.load().then((font) => {
 
 
         switch (data.command) {
+            case "undo" :
+                array.splice(-1)
+                break;
             case "eraser":
                 array.splice(data.idx, 1);
                 break;
@@ -1709,12 +1669,12 @@ gothicFont.load().then((font) => {
                 data.history.forEach(function (history) {
                     if (startIdx == history)
                         return false;
-                    var points = data.points.slice(startIdx, history);
-                    var command = points[0][0];
-                    var startIndex = startIdx;
+                    let points = data.points.slice(startIdx, history);
+                    let command = points[0][0];
+                    let startIndex = startIdx;
                     startIdx = history;
 
-                    var d = {
+                    let d = {
                         points: points,
                         command: command,
                         startIndex: startIndex,
