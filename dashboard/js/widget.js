@@ -635,13 +635,9 @@ gothicFont.load().then((font) => {
             });
         },
         mousedown: function (e) {
-            //console.log("mouse down!");
             this.updateInput();
-            if (!is.isText) return;
 
-            if (textHandler.text.length) {
-                this.appendPoints();
-            }
+            if (!is.isText) return;
 
             textHandler.x = textHandler.y = 0;
             textHandler.text = '';
@@ -707,9 +703,12 @@ gothicFont.load().then((font) => {
 
             this.eachFontSize(function (child) {
                 child.onclick = function (e) {
+                    _this.eachFontSize(function(child){
+                        child.className = '';
+                    })
                     e.preventDefault();
                     textHandler.selectedFontSize = this.innerHTML;
-                    this.className = 'font-family-selected';
+                    this.className = 'font-size-selected';
                 };
             });
 
@@ -780,11 +779,11 @@ gothicFont.load().then((font) => {
             if (!textHandler.text || !textHandler.text.length) return;
             document.querySelector('.textInputUI').value = "";
             var fontSize = parseInt(textHandler.selectedFontSize) || 48;
-            this.mousedown({
-                pageX: this.pageX,
-                // pageY: parseInt(tempContext.measureText(textHandler.text).height * 2) + 10
-                pageY: this.pageY + fontSize + 5
-            });
+            this.appendPoints();
+            // this.mousedown({
+                // pageX: this.pageX,
+                // pageY: this.pageY + fontSize + 5
+            // });
             drawHelper.redraw();
             this.showOrHideTextTools('hide');
         },
