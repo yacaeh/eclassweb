@@ -691,13 +691,14 @@ gothicFont.load().then((font) => {
             this.unselectAllFontSizes();
 
             this.showOrHideTextTools('show');
+            let _this = this;
 
             this.eachFontFamily(function (child) {
                 child.onclick = function (e) {
+                    _this.eachFontFamily(function(child){
+                        child.className = '';
+                    })
                     e.preventDefault();
-
-                    textHandler.showOrHideTextTools('hide');
-
                     textHandler.selectedFontFamily = this.innerHTML;
                     this.className = 'font-family-selected';
                 };
@@ -707,24 +708,17 @@ gothicFont.load().then((font) => {
             this.eachFontSize(function (child) {
                 child.onclick = function (e) {
                     e.preventDefault();
-
-                    textHandler.showOrHideTextTools('hide');
-
                     textHandler.selectedFontSize = this.innerHTML;
                     this.className = 'font-family-selected';
                 };
-                // child.style.fontSize = child.innerHTML + 'px';
             });
+
             this.eachFontColor(function (child) {
                 child.onclick = function (e) {
                     e.preventDefault();
-
-                    textHandler.showOrHideTextTools('hide');
-
                     textHandler.selectedFontColor = this.innerHTML;
                     this.className = 'font-color-selected';
                 };
-                // child.style.fontSize = child.innerHTML + 'px';
             });
             document.getElementsByClassName("textInputUI")[0].focus();
 
