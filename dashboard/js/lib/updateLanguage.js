@@ -6,13 +6,19 @@ window.language = localStorage.getItem('locale');
 window.i18n
 
 function saveLocale(){
-		window.language = $( '.language option:selected' ).val();
-		localStorage.setItem('locale', window.language);
-		updateLanguage();
+	window.language = $( '.language option:selected' ).val();
+	localStorage.setItem('locale', window.language);
+	updateLanguage();
 }
 
 function updateLanguage(){
 	jQuery(function($) {
+		let options = document.getElementsByClassName("language")[0].children;
+		for(let i = 0; i < options.length; i++){
+			if(options[i].value == localStorage.getItem("locale"))
+				options[i].setAttribute("selected",'');
+		}
+
 		window.i18n = $.i18n();
 		window.language = localStorage.getItem('locale');
 		window.i18n.locale = window.language;
