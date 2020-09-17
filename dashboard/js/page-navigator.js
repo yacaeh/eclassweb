@@ -71,6 +71,7 @@ pageNavigator = {
     }
 
     this.inputevent = function () {
+      console.log("humm?")
       var idx = Math.max(1, Math.min(self.maxidx.value, this.inputwindow.value));
       this.inputwindow.value = idx;
       mfileViewer.updateViewer({
