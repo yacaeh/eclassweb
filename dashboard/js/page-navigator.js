@@ -148,15 +148,15 @@ pageNavigator = {
     this.idx++;
   },
   select: function (idx) {
-    if(this.list.children[idx].classList.contains('selected'))
+    if(this.list.children[idx].classList.contains("selected")){
       return;
+    }
 
-      var pre = this.list.getElementsByClassName("selected")[0];
-
+    var pre = this.list.getElementsByClassName("selected")[0];
     if (pre)
       pre.classList.remove("selected");
 
-      this.list.children[idx].classList.add("selected");
+    this.list.children[idx].classList.add("selected");
     this.list.children[idx].scrollIntoView({ block: "center" });
     document.getElementById("epubidx").value = idx + 1;
   },

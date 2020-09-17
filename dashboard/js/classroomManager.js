@@ -341,22 +341,24 @@ class classroomManagerClass {
             canvasManager.showingCanvasId = undefined;
         })
 
-        if(classroomInfo.classPermission == id){
-            FindInList(id).dataset.classPermission = true;
+        document.getElementById("student_list").appendChild(span);
+
+        
+        if (classroomInfo.classPermission == id) {
+            span.dataset.classPermission = true;
             MakeIcon(id, "screen");
         }
-        
-        if(classroomInfo.micPermission == id){
-            FindInList(id).dataset.micPermission = true;
+
+        if (classroomInfo.micPermission == id) {
+            span.dataset.micPermission = true;
             MakeIcon(id, "mic");
         }
-        
-        if(classroomInfo.canvasPermission.includes(id)){
-            FindInList(id).dataset.canvasPermission = true;
+
+        if (classroomInfo.canvasPermission.includes(id)) {
+            span.dataset.canvasPermission = true;
             MakeIcon(id, "canvas");
         }
 
-        document.getElementById("student_list").appendChild(span);
         span.appendChild(img);
         this.studentListResize();
         canvasManager.canvas_array[id] = img;
