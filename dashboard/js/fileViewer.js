@@ -165,8 +165,6 @@ class pdfViewer {
     }
 
     showPage(_page) {
-
-        //  현재 같은 페이지이면 바꾸지 않는다.
         if (this.checkSamePage(_page)) return;
 
         let fileViewer = this.getElementFileViewer();

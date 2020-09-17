@@ -252,7 +252,7 @@ function PDFViewerPlugin() {
         window.parent.parent.pageNavigator.push(thumbnail, function(){
             var idx = (this.getAttribute("idx") * 1) + 1;
             self.showPage(idx)
-            window.parent.parent.showPage(idx);
+
         })
 
         createdPageCount += 1;
@@ -396,6 +396,10 @@ function PDFViewerPlugin() {
     };
 
     this.showPage = function ( n ) {
+        if(currentPage == n)
+            return;
+
+        window.parent.parent.showPage(n);     
         domPages[currentPage - 1].style.display = "none";
         currentPage                             = n;
         ensurePageRendered(pages[n - 1]);

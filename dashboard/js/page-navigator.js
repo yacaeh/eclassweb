@@ -71,6 +71,7 @@ pageNavigator = {
     }
 
     this.inputevent = function () {
+      console.log("humm?")
       var idx = Math.max(1, Math.min(self.maxidx.value, this.inputwindow.value));
       this.inputwindow.value = idx;
       mfileViewer.updateViewer({
@@ -147,10 +148,15 @@ pageNavigator = {
     this.idx++;
   },
   select: function (idx) {
-    var pre = this.list.getElementsByClassName("selected")[0];
+    if(this.list.children[idx].classList.contains('selected'))
+      return;
+
+      var pre = this.list.getElementsByClassName("selected")[0];
+
     if (pre)
       pre.classList.remove("selected");
-    this.list.children[idx].classList.add("selected");
+
+      this.list.children[idx].classList.add("selected");
     this.list.children[idx].scrollIntoView({ block: "center" });
     document.getElementById("epubidx").value = idx + 1;
   },
