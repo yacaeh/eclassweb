@@ -295,7 +295,8 @@ function button(t, c, on) {
 }
 
 function FindInList(id) {
-  return $("#student_list").find("span[data-id=" + id + "]")[0];
+  let finded = $("#student_list").find("span[data-id=" + id + "]")[0];
+  return finded ? finded : undefined;
 }
 
 function MakeIcon(id, type) {

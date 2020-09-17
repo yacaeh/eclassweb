@@ -112,18 +112,6 @@ classroomCommand = {
                     MakeIcon(id, "canvas");
                 }
             }
-            // if(classroomInfo.classPermission == id){
-            //     MakeIcon(id, "screen");
-            // }
-            
-            // if(classroomInfo.micPermission == id){
-            //     MakeIcon(id, "mic");
-            // }
-            
-            // if(classroomInfo.canvasPermission.includes(id)){
-            //     MakeIcon(id, "canvas");
-            // }
-
         }
     },
 
