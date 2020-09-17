@@ -93,8 +93,7 @@ class ChattingManagerClass {
 
         this.normal(id, event.data.msg, color);
     }
-    enterStudent(event) {
-        let name = event.extra.userFullName;
+    enterStudent(name) {
         let div = document.createElement('div');
         div.className = 'teachermsg2 enter';
         div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + $.i18n('STUDENT_JOIN') + '</b>';

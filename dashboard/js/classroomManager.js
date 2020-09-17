@@ -272,7 +272,6 @@ class classroomManagerClass {
             return;
         }
 
-        ChattingManager.enterStudent(event);
 
         let id = event.userid;
         let name = event.extra.userFullName;
@@ -282,19 +281,42 @@ class classroomManagerClass {
             img.style.display = 'none';
 
         canvasManager.canvas_array[id] = img;
-        
-        let div = $(' <span data-id="' + id + '" data-name="' + name + '" class="student">\
-        <span style="display:none;" class="permissions"></span> \
-        <span class="student-overlay"></span> \
-        <span class="bor"></span> \
-        <span class="name">' + name + '</span></span>')
- 
-        if(remainCams.hasOwnProperty(id)){
-            div.append(remainCams[id])
-        };
-        OnClickStudent(div, id, name);
 
-        div[0].addEventListener("mouseover", function () {
+        let span = document.createElement("span");
+        span.dataset.id = id;
+        span.className = "student";
+
+        let per = document.createElement('span');
+        per.style.display = 'none';
+        per.className ="permissions";
+
+        let overlay = document.createElement('span');
+        overlay.className = "student-overlay";
+
+        let bor = document.createElement('span');
+        bor.className = "bor";
+
+        let namespan = document.createElement('span');
+        namespan.className = "name";
+
+        span.appendChild(per);
+        span.appendChild(overlay);
+        span.appendChild(bor);
+        span.appendChild(namespan);
+
+        connection.socket.emit("get-user-name", id, function(e){
+            namespan.innerHTML = e;
+            span.dataset.name = e;
+            ChattingManager.enterStudent(e);
+        })
+
+        if(remainCams.hasOwnProperty(id)){
+            span.appendChild(remainCams[id])
+        };
+
+        OnClickStudent(span, id, name);
+
+        span.addEventListener("mouseover", function () {
             if (classroomInfo.canvasPermission.includes(id))
                 return;
 
@@ -306,7 +328,7 @@ class classroomManagerClass {
             canvasManager.showingCanvasId = id;
         })
 
-        div[0].addEventListener("mouseleave", function () {
+        span.addEventListener("mouseleave", function () {
             if (!classroomInfo.showcanvas)
                 connection.send({
                     sendcanvasdata: true,
@@ -334,11 +356,10 @@ class classroomManagerClass {
             MakeIcon(id, "canvas");
         }
 
-        $("#student_list").append(div);
-
+        document.getElementById("student_list").appendChild(span);
+        span.appendChild(img);
         this.studentListResize();
         canvasManager.canvas_array[id] = img;
-        $(div).append(img);
     };
 
     leftStudent(event) {

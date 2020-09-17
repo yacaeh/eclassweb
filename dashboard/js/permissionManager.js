@@ -237,7 +237,7 @@ class permissionManagerClass {
 
 
 function OnClickStudent(div) {
-  div.click(function (e) {
+  div.addEventListener("click", function (e) {
     var menu = document.getElementById('student-menu');
     var name = e.target.dataset.name;
 
