@@ -20,26 +20,28 @@ class attentionManagerClass{
             }
         }
 
-        if(connection.extra.roomOwner)
-        {
-            alertBox("<span>"+$.i18n( 'NOTIFICATION_WARNING' )+"</span>  ", $.i18n( 'NOTIFICATION' ), () => {
-                attentionManager.totalCount++;
-                attentionManager.teacherRequest[attentionManager.totalCount] = {
-                    name : $.i18n( 'ATTENTION_PLEASE' ),
-                }
-                callback();
-                connection.send ({
-                    alert : true
-                });
-            },() => {});    
+        if(document.getElementById("exam-board").style.display == "block"){
+            return;
         }
+
+
+        alertBox("<span>"+$.i18n( 'NOTIFICATION_WARNING' )+"</span>  ", $.i18n( 'NOTIFICATION' ), () => {
+            attentionManager.totalCount++;
+            attentionManager.teacherRequest[attentionManager.totalCount] = {
+                name : $.i18n( 'ATTENTION_PLEASE' ),
+            }
+            callback();
+            connection.send ({
+                alert : true
+            });
+        },() => {});    
     };
 
     submit(submitStudent){
         let userid = submitStudent.userid;
         let name = submitStudent.name;
-    
         let studentAnswerInfo = this.studentsAnswer[userid];
+        
         if(!studentAnswerInfo)
         {
             // studentAnswer가 없다면 새로 만들어 준다.

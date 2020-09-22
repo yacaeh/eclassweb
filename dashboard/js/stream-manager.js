@@ -376,7 +376,6 @@ class ScreenShareManagerClass{
     }
   }
   rejoin() {
-    console.debug("Rejoin Screensharing", event.data.showScreenShare)
     let interval = setInterval(function () {
       try {
         let stream = connection.streamEvents[classroomInfo.shareScreen.id];
@@ -400,11 +399,8 @@ class ScreenShareManagerClass{
 }
 class maincamManagerClass{
   get() {
-    var video = document.getElementById("main-video");
-    if (video) 
-      return video;
-    else 
-      return GetWidgetFrame().document.getElementById("main-video");
+    let video = document.getElementById("main-video");
+    return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
   show() {
     Show(this.get());
@@ -450,8 +446,6 @@ class maincamManagerClass{
       }
 
       let childern = document.getElementById("student_list").children;
-      console.log(childern)
-
       for (let i = 0; i < childern.length; i++) {
         let child = childern[i];
         if (child.dataset.id == event.userid) {

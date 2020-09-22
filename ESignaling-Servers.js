@@ -191,7 +191,6 @@ module.exports = exports = function (socket, config) {
             }
 
             if (message.clearLogs === true) {
-                // last callback parameter will force to clear logs
                 pushLogs(config, '', '', callback);
             }
 
@@ -200,14 +199,9 @@ module.exports = exports = function (socket, config) {
                     var user = listOfUsers[message.userid];
 
                     if (user) {
-                        if (user.socket.owner) {
-                            // delete listOfRooms[user.socket.owner];
-                        }
-
                         user.socket.disconnect();
                     }
 
-                    // delete listOfUsers[message.userid];
                     callback(true);
                 } catch (e) {
                     pushLogs(config, 'deleteUser', e);
@@ -1055,13 +1049,13 @@ module.exports = exports = function (socket, config) {
 
             closeOrShiftRoom();
             delete listOfUsers[socket.userid];
-            console.log(listOfRooms[socket.admininfo.sessionid].userlist);
-            delete listOfRooms[socket.admininfo.sessionid].userlist[socket.userid]
-
+            
+            if (socket.admininfo)
+                delete listOfRooms[socket.admininfo.sessionid].userlist[socket.userid]
+                
             if (socket.ondisconnect) {
                 console.error("if on disconnect", socket.userid);
                 try {
-                    // scalable-broadcast.js
                     socket.ondisconnect();
                 }
                 catch (e) {
@@ -1075,7 +1069,7 @@ module.exports = exports = function (socket, config) {
         /*
             Custom Code
         */
-
+       
         socket.on('get-room-info', function (success, error) {
             call_getRoom(room => {
                 success(room.info);
@@ -1111,8 +1105,9 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on("get-user-name", function(userid, callback){
-            callback(listOfRooms[getRoomId()].userlist[userid])
+            callback(listOfRooms[getRoomId()].userlist[userid]);
         })
+
         //--------------------------------------------------------------------------------//
 
         function call_getRoom(success, error) {
@@ -1128,13 +1123,8 @@ module.exports = exports = function (socket, config) {
         function getRoom() {
             const roomId = getRoomId();
             if (null == roomId) return { error: CONST_STRINGS.ROOM_NOT_AVAILABLE };
-            var room = listOfRooms[roomId];
-
-            if (!room) {
-                return { error: CONST_STRINGS.ROOM_NOT_AVAILABLE };
-            }
-
-            return room;
+            let room = listOfRooms[roomId];
+            return room ? room : { error: CONST_STRINGS.ROOM_NOT_AVAILABLE };
         };
 
         function getRoomId() {
@@ -1207,12 +1197,9 @@ module.exports = exports = function (socket, config) {
             let month = time.getMonth() + 1;
             let day = time.getDate();
 
-            let hours = time.getHours();
-            hours = ("00" + hours).slice(-2);
-            let min = time.getMinutes();
-            min = ("00" + min).slice(-2);
-            let sec = time.getSeconds();
-            sec = ("00" + sec).slice(-2);
+            let hours = ("00" + time.getHours()).slice(-2);
+            let min = ("00" + time.getMinutes()).slice(-2);
+            let sec = ("00" + time.getSeconds()).slice(-2);
 
             return {
                 date: year + "-" + month + "-" + day,

@@ -4340,7 +4340,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 eventObject.extra = connection.peersBackup[eventObject.userid].extra;
             }
 
-            connection.onleave(eventObject);
 
             if (!!connection.peers[remoteUserId]) {
                 connection.peers[remoteUserId].streams.forEach(function (stream) {
@@ -4359,6 +4358,9 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     delete connection.peers[remoteUserId];
                 }
             }
+
+            connection.onleave(eventObject);
+
         }
 
         connection.rejoin = function (connectionDescription) {
