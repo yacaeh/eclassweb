@@ -285,9 +285,6 @@ function Viewer( viewerPlugin, parameters ) {
 
         currentPage                                 = n;
         document.getElementById('pageNumber').value = parseInt(currentPage);
-
-        if(initialized)
-            window.top.showPage(n);
     };
 
     /**

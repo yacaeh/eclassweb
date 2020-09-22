@@ -97,10 +97,19 @@ class PointerSaver {
         this.nowIdx = 0;
     }
     get() {
-        connection.send({
-            getpointer: true,
-            idx: this.nowIdx
+
+        classroomInfo.canvasPermission.forEach((id) => {
+            connection.send({
+                getpointer: true,
+                idx: this.nowIdx
+            },id);
         });
+
+        if(!connection.extra.roomOwner)
+            connection.send({
+                getpointer: true,
+                idx: this.nowIdx
+            },GetOwnerId());
     }
     send(idx) {
         if (!(connection.extra.roomOwner ||
@@ -111,12 +120,13 @@ class PointerSaver {
         if (idx == this.nowIdx)
             this.save(idx);
 
-        if (this.container[idx])
+        if (this.container[idx]){
             connection.send({
                 setpointer: true,
                 idx: idx,
                 data: this.container[idx],
             })
+        }
         else {
             connection.send({
                 setpointer: true,
