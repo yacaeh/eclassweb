@@ -229,7 +229,8 @@ class permissionManagerClass {
 
   disableCanvasPermission(id) {
     console.debug("Lost canvas share permission");
-    Hide("student_canvas");
+    if(connection.userid == id)
+      Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
   };
 }
