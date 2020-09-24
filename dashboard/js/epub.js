@@ -133,7 +133,9 @@ class epubManagerClass {
     }
     unloadEpubViewer() {
         pointer_saver.save_container();
-
+        console.debug("Epub Off");
+        classroomInfo.epub.page = 0;
+        pointer_saver.nowIdx = 0;
         canvasManager.clear();
         pageNavigator.off();
 

@@ -83,7 +83,6 @@ function CanvasDesigner() {
             return;
         }
 
-
         if (!event.data || event.data.uid !== designer.uid) return;
 
         if (!!event.data.sdp) {
@@ -176,16 +175,6 @@ function CanvasDesigner() {
         }
     };
 
-    designer.toDataURL = function (format, callback) {
-        dataURLListener = callback;
-
-        if (!designer.iframe) return;
-        designer.postMessage({
-            genDataURL: true,
-            format: format
-        });
-    };
-
     designer.sync = function () {
         if (!designer.iframe) return;
         designer.postMessage({
@@ -225,14 +214,6 @@ function CanvasDesigner() {
 
         designer.postMessage({
             clearCanvas: true
-        });
-    };
-
-    designer.renderStream = function () {
-        if (!designer.iframe) return;
-
-        designer.postMessage({
-            renderStream: true
         });
     };
 

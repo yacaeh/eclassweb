@@ -467,8 +467,9 @@ mfileViewer.onclose = function () {
     isSharingFile = false;
     isFileViewer = false;
 
-    console.log('close');
+    console.debug('PDF close');
 
+    pointer_saver.nowIdx = 0;
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;
