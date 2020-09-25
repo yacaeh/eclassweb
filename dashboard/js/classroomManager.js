@@ -260,9 +260,9 @@ class classroomManagerClass {
     }
 
     joinStudent(event) {
-        connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
         console.debug('Connected with ', "[", event.extra.userFullName, "]", "[", event.userid, "]");
+        connection.send('plz-sync-points', event.userid);
 
         if (event.extra.roomOwner) {
             this.rejoinTeacher();

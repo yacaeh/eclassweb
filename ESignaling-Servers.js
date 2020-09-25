@@ -501,18 +501,10 @@ module.exports = exports = function (socket, config) {
 
         function onMessageCallback(message) {
             try {
-                if (!listOfUsers[message.sender]) {
-                    socket.emit('user-not-found', message.sender);
-                    return;
-                }
-
-                // we don't need "connectedWith" anymore
                 // todo: remove all these redundant codes
                 // fire "onUserStatusChanged" for room-participants instead of individual users
-                // rename "user-connected" to "user-status-changed"
                 if (!message.message.userLeft && !listOfUsers[message.sender].connectedWith[message.remoteUserId] && !!listOfUsers[message.remoteUserId]) {
                     listOfUsers[message.sender].connectedWith[message.remoteUserId] = listOfUsers[message.remoteUserId].socket;
-                    listOfUsers[message.sender].socket.emit('user-connected', message.remoteUserId);
 
                     if (!listOfUsers[message.remoteUserId]) {
                         listOfUsers[message.remoteUserId] = {
@@ -524,11 +516,6 @@ module.exports = exports = function (socket, config) {
                     }
 
                     listOfUsers[message.remoteUserId].connectedWith[message.sender] = socket;
-
-                    if (listOfUsers[message.remoteUserId].socket) {
-                        listOfUsers[message.remoteUserId].socket.emit('user-connected', message.sender);
-                    }
-
                     sendToAdmin();
                 }
 
@@ -678,8 +665,6 @@ module.exports = exports = function (socket, config) {
                             });
 
                             if (firstParticipant) {
-                                // listOfRooms[roomid].owner = "undefined";
-                                // firstParticipant.socket.emit('set-isInitiator-true', roomid);
                                 var newParticipantsList = [];
                                 listOfRooms[roomid].participants.forEach(function (pid) {
                                     if (pid != socket.userid) {
@@ -1033,10 +1018,10 @@ module.exports = exports = function (socket, config) {
                         listOfUsers[socket.userid].connectedWith[s].emit('user-disconnected', socket.userid, reason + "3");
 
                         // sending duplicate message to same socket?
-                        if (listOfUsers[s] && listOfUsers[s].connectedWith[socket.userid]) {
-                            delete listOfUsers[s].connectedWith[socket.userid];
-                            listOfUsers[s].socket.emit('user-disconnected', socket.userid, reason + "4");
-                        }
+                        // if (listOfUsers[s] && listOfUsers[s].connectedWith[socket.userid]) {
+                        //     delete listOfUsers[s].connectedWith[socket.userid];
+                        //     listOfUsers[s].socket.emit('user-disconnected', socket.userid, reason + "4");
+                        // }
                     }
                 }
             } catch (e) {

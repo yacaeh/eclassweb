@@ -26,17 +26,17 @@ let isFileViewer = false;
 const widgetContainer = document.getElementById("widget-container");
 const rightTab = document.getElementById("right-tab")
 
-var connection = new RTCMultiConnection();
-var screenRecorder = new screenRecorderClass();
-var screenshareManager = new ScreenShareManagerClass();
-var maincamManager = new maincamManagerClass();
-var canvasManager = new canvasManagerClass();
-var epubManager = new epubManagerClass();
-var mobileHelper = new mobileHelperClass();
-var pointer_saver = new PointerSaver();
-var classroomManager = new classroomManagerClass();
-var permissionManager = new permissionManagerClass();
-var attentionManager = new attentionManagerClass();
+var connection          = new RTCMultiConnection();
+var screenRecorder      = new screenRecorderClass();
+var screenshareManager  = new ScreenShareManagerClass();
+var maincamManager      = new maincamManagerClass();
+var canvasManager       = new canvasManagerClass();
+var epubManager         = new epubManagerClass();
+var mobileHelper        = new mobileHelperClass();
+var pointer_saver       = new PointerSaver();
+var classroomManager    = new classroomManagerClass();
+var permissionManager   = new permissionManagerClass();
+var attentionManager    = new attentionManagerClass();
 
 //=============================================================================================
 
@@ -57,13 +57,13 @@ const topButtonContents = {
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
-  'screen_share': screenshareManager.btn,
-  '3d_view': _3DCanvasOnOff,
-  'movie': Movie_Render_Button,
-  'file': LoadFile,
-  'epub': epubManager.loadEpub,
-  'callteacher': classroomManager.callTeacher,
-  'homework': HomeworkSubmit,
+  'screen_share'      : screenshareManager.btn,
+  '3d_view'           : _3DCanvasOnOff,
+  'movie'             : Movie_Render_Button,
+  'file'              : LoadFile,
+  'epub'              : epubManager.loadEpub,
+  'callteacher'       : classroomManager.callTeacher,
+  'homework'          : HomeworkSubmit,
 }
 
 // Alt + 단축키
@@ -88,7 +88,7 @@ const shortCut = [
 
 console.log('Connection!');
 connection.socketURL = '/';
-connection.chunkSize = 16000;
+connection.chunkSize = 64000;
 connection.enableFileSharing = false;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
 connection.extra.userFullName = params.userFullName;
@@ -133,7 +133,8 @@ connection.onopen = function (event) {
   classroomManager.joinStudent(event);
 };
 
-connection.onclose = connection.onerror = connection.onleave = function (event) {
+// connection.onclose = connection.onerror = 
+connection.onleave = function (event) {
   classroomManager.leftStudent(event);
 };
 
@@ -315,6 +316,7 @@ connection.onmessage = function (event) {
   if (event.data.pageidx == pointer_saver.nowIdx) {
     designer.syncData(event.data);
   }
+
 };
 
 function showstatus() {
