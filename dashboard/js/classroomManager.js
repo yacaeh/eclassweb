@@ -561,7 +561,7 @@ class classroomManagerClass {
         }
 
         if (event.data.roomBoom) {
-            connection.socket._callbacks.$disconnect.length = 0
+            connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
             alertBox($.i18n('TEACHER_LEFT'), $.i18n('NOTIFICATION'), classroomManager.gotoMain, $.i18n('CONFIRM'))
 

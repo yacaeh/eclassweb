@@ -88,14 +88,13 @@ const shortCut = [
 
 console.log('Connection!');
 connection.socketURL = '/';
+connection.password = params.password;
 connection.chunkSize = 64000;
-connection.enableFileSharing = false;
+connection.enableLogs = false;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
-connection.password = params.password;
-connection.enableLogs = false;
 
 screenshareManager.setFrameRate(1, 2);
 
@@ -149,9 +148,8 @@ connection.onstream = function (event) {
   if (event.share)
     return;
 
-  if (params.open === 'true' || params.open === true) {
+  if (params.open === 'true') {
     maincamManager.addStudentCam(event);
-    console.log("ADD STUDENT CAM")
   }
   else {
     if (event.type == "local" && event.stream.isVideo) {
@@ -165,17 +163,15 @@ connection.onstream = function (event) {
 };
 
 connection.onstreamended = function (event) {
-  console.warn('onstreameneded!', event);
+  console.log('onstreameneded!', event);
   screenshareManager.onclose(event);
 };
 
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  if (params.open === true || params.open === 'true')
-    classroomManager.createRoom();
-  else
-    classroomManager.joinRoom();
+  params.open === 'true' ? classroomManager.createRoom() :
+                           classroomManager.joinRoom();
   onWidgetLoaded();
 });
 
