@@ -528,8 +528,7 @@ gothicFont.load().then((font) => {
         selectedFontSize: '48',
         lastFillStyle: 'black',
         onShapeSelected: function () {
-            document.getElementById("temp-canvas").className = "";
-            document.getElementById("temp-canvas").classList.add("texti");
+            document.getElementById("temp-canvas").className = "texti";
             this.x = this.y = this.pageX = this.pageY = 0;
             this.text = '';
         },
@@ -732,12 +731,12 @@ gothicFont.load().then((font) => {
         eraserIcon: icons.eraser,
         textIcon: icons.text || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAWVJREFUeJzt28ENgzAQAEETpf+WSQfJA6xD2ZkCjCWv7mFgLQAAAKDimN4A69y8/tczfm1+OA8ngDgBxAkgTgBxAogTQJx7gOf7dU9w6QxNgDgBxAkgTgBxAogTQJwA4t43rLH7ffa/G72LMQHiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIu+N7gOl/C65+jzC9/1EmQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxx/QGWOfm9b+esQkQJ4A4AcQJIE4AcQKIEwAAAABAxAcVTAXjELyg1wAAAABJRU5ErkJggg==',
         undo: icons.undo || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABPxJREFUeNrsnVuIVVUYx9dpQiIdvOBtDGa8RILSQz4koWYvRZeXEkRztJd8ExGkSPBRSxDMB0ESxBBpSnyLMCGJChV6SSURpEkcZia8RjqpmTTT97HXYQYcZ87Za5+z917f7wd/BhT1eNZvfWutvdbeuzI0NOTALk/wFSAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAlBq9LyAkJeY5yWeSmabbz6gA70n6JX9LplkWwNoQME/yleSwZI7ktn6HzAFsoL3+R8kaBv5hnjTS63fR8DYrAL3eaAWg1xuuAPR6oxWAXm+4AtDrjVYA7fWfSNbSlPYqQLXX0/jGKgC93nAFoNcbrQD0esMVgF5vtALQ6w1XAHq90QqQR6//jwpgt9dXJE9LWqwKUAk91lWpVEI/Q4fkY0lnDv9/7f2/Sf5yyfEw/XlLck3SI+mT9PqfA0VswOD2y1mATt/4HQXuJPcl170oFyVnJeckl/zvIUDKsV4b/t2SVs5/Jb9Lzki+l/wg+aOMAuRxKniDL69DEUUrxDE/f5nWbAHKcix8ruTLyBp+tFyW7JY8jwDDrI+w14+Xu5IjkhctCzDPSK8fK/9IDrrkTiRTAmww2OvHii4tt/nrDlELoGP9FzT4Y6Mrh5diFaCTXl9T9KLShzEJMJexPlW6JDPKLsBGfxGEBk2XXyQL8xIgi82gQQchvCA5IVma27XkDIaADiZ+mawSXolhEniFxkydm5KVLANt56pkSQwXgqgG6dMtaY/hUjBzg/TR01ETY9kMWkc1SJW9sW0HUw3qiy6x34lFAOYG6aLf1eyYBGBuUH8OxCYAc4P6omcQl8UoQN5zg0G/M6enex8WXILv3Cj3cYS2XxHuCxh5gGRnrevfjPhT8qo/tTPJZ6pLnh/c7uXU4WqBZLrL/0aatyTHy34qeLxq0NXEXqWneVvH+UwtXoiXJZslR3M883DSJXczRTUEPG6l0Iwv+Ybv2fUyRfKGZJ9L7g9olgB6J9MKCwI0a26QVoCRTJa87ZL7AgaaIMEhKwJUWd/AlUIWAoxkkZ/HXG7wjmGbJQEaWQ2yFqCKHvPa6jd1GiHBRmsCNGpu0CgBqsxyydNL72UswNdWBci6GjRagCp6DPznDAXQW9jnWBUgy7lBswSorhz2ZyjBKusCZFENmilAlS2SBxkIsAcBwncY8xBAWe2G31eUNj/plUkECNthzEsA5U1/KTrkFPFMBAirBnkKoLwuuROwkbWc18Y9ilaBlX5PoejoDSHv++3euvfhXHL7fRCxvjSqx1eC6oMpioxeQv4g5Z99NvhfN/Dm0LFWCnkPASPZk2IY+Jw5QNjcoEgCTJB8W6cA3yBA2EqhSAIoz7j6NpJOI0D6atDnL8jMKNhne81PCmsR4FcESM98l7w+vq2An21HjQJ0I0A4RVwJPSU5VYMAvVwHCKeID7jQQ6qbXPIA67FoidF+SDjvkrME5sofDPOpS84RNKx6IUCx0aFgq1+tUAGMog+WPIAAttFl4ZVRfr2CADbQo+DbEcA2+iTW4whgF73w85HL+OVVCFAuLjh/GNQzIfQvLNLt4VAbrX4o0FfS9Ev7Lc5VACg3DAEIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgApeN/AQYAUjtq/Zx6jVYAAAAASUVORK5CYII=',
-        clearCanvas: icons.clearCanvas || '',
-        on: icons.on || '',
-        off: icons.off || '',
-        screenShare: icons.screenShare || '',
-        view3d: icons.view3d || '',
-        movie: icons.movie || '',
+        clearCanvas: icons.clearCanvas,
+        on: icons.on,
+        off: icons.off,
+        screenShare: icons.screenShare,
+        view3d: icons.view3d,
+        movie: icons.movie,
         file: icons.file,
         epub: icons.epub,
         callteacher: icons.callteacher,
@@ -745,12 +744,6 @@ gothicFont.load().then((font) => {
         fullon: icons.fullon,
         homework: icons.homework,
     };
-
-    var tools = JSON.parse(params.tools);
-
-    if (tools.code === true) {
-        document.querySelector('.preview-panel').style.display = 'block';
-    }
 
     function setSelection(element, prop) {
         
@@ -869,7 +862,7 @@ gothicFont.load().then((font) => {
                         pointHistory.pop();
                         drawHelper.redraw();
                     }
-                    syncPoints(true, "undo");
+                    syncPoints(false, "undo");
                 };
             };
             image.src = data_uris.undo;
@@ -934,7 +927,7 @@ gothicFont.load().then((font) => {
         }
 
         function decoratePencil() {
-            function hexToRGBA(h, alpha) {
+            function hexToRGBA(h) {
                 return 'rgba(' + hexToRGB(h).join(',') + ',1)';
             }
 
@@ -953,7 +946,7 @@ gothicFont.load().then((font) => {
                 canvas = context.canvas,
                 alpha = 0.2;
 
-            pencilStrokeStyle = hexToRGBA("#484848", alpha)
+            pencilStrokeStyle = hexToRGBA("#484848")
 
 
             addEvent(canvas, 'click', function () {
@@ -970,7 +963,7 @@ gothicFont.load().then((font) => {
             addEvent(btnPencilDone, 'click', () => {
                 pencilContainer.style.display = 'none';
                 pencilLineWidth = strokeStyleText.value;
-                pencilStrokeStyle = hexToRGBA(fillStyleText.value, alpha);
+                pencilStrokeStyle = hexToRGBA(fillStyleText.value);
             });
         }
 
@@ -1121,7 +1114,6 @@ gothicFont.load().then((font) => {
                 }
 
                 if (isOn) {
-
                     image.src = data_uris.on;
                     let icons = document.getElementById('tool-box').children;
                     for (let i = 0; i < icons.length; i++) {
@@ -1247,14 +1239,14 @@ gothicFont.load().then((font) => {
     });
 
     var keyCode;
+    var lastPointIndex = 0;
+    var uid;
 
-    function onkeydown(e) {
+    addEvent(document, 'keydown', (e) => {
         keyCode = e.which || e.keyCode || 0;
-    }
+    });
 
-    addEvent(document, 'keydown', onkeydown);
-
-    function onkeyup(e) {
+    addEvent(document, 'keyup', (e) => {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
         }
@@ -1271,23 +1263,17 @@ gothicFont.load().then((font) => {
                 pointHistory.pop();
                 drawHelper.redraw();
             }
-            syncPoints(true, "undo");
+            syncPoints(false, "undo");
         }
-    }
+    });
 
-    addEvent(document, 'keyup', onkeyup);
-
-    function onkeypress(e) {
+    addEvent(document, 'keypress', (e) => {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
         }
         keyCode = e.which || e.keyCode || 0;
-    }
+    });
 
-    addEvent(document, 'keypress', onkeypress);
-
-    var lastPointIndex = 0;
-    var uid;
 
     window.addEventListener('message', function (event) {
         if (!event.data) return;
@@ -1301,19 +1287,16 @@ gothicFont.load().then((font) => {
             return;
         }
 
-        if (event.data.clearCanvas) {
-            points = [];
-            drawHelper.redraw();
+        if (!event.data.canvasDesignerSyncData) 
             return;
-        }
-
-        if (!event.data.canvasDesignerSyncData) return;
 
         let data = event.data.canvasDesignerSyncData;
+
         if (data.isStudent) {
             let id = data.userid;
             if (id) {
-                if (!studentPoints[id]) studentPoints[id] = []
+                if (!studentPoints[id] || data.isSyncAll) 
+                    studentPoints[id] = []
                 PushPoints(data, studentPoints[id]);
             }
             else {
@@ -1323,6 +1306,9 @@ gothicFont.load().then((font) => {
             }
         }
         else {
+            if(data.isSyncAll){
+                teacherPoints = [];
+            }
             PushPoints(data, teacherPoints);
         }
 
@@ -1405,11 +1391,11 @@ gothicFont.load().then((font) => {
     }
 
     function syncData(data) {
-        data.pageidx = window.parent.pointer_saver.nowIdx;
-        data.userid = _uid;
-        data.history = pointHistory;
+        data.pageidx    = window.parent.pointer_saver.nowIdx;
+        data.userid     = _uid;
+        data.history    = pointHistory;
         data.startIndex = points.length;
-        lastPointIndex = points.length;
+        lastPointIndex  = points.length;
         window.parent.postMessage({
             canvasDesignerSyncData: data,
             uid: uid
@@ -1433,9 +1419,10 @@ gothicFont.load().then((font) => {
         }
 
         syncData({
-            points: pointsToShare || [],
-            command: command,
-            startIndex: lastPointIndex
+            isSyncAll        : isSyncAll,
+            points      : pointsToShare || [],
+            command     : command,
+            startIndex  : lastPointIndex
         });
 
         if (!pointsToShare.length && points.length) return;
@@ -1536,6 +1523,7 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
     let isClick = false;
 
     Set(defaultv);
+
     function Set(v) {
         slider.parentElement.style.display = "block";
         let ratio = (v - min) / max;
