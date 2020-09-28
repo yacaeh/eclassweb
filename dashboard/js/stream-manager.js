@@ -321,6 +321,7 @@ class ScreenShareManagerClass{
     function replaceScreenTrack(stream, btn) {
       canvasManager.clear();
       console.log("Stream Start", stream.id);
+      // screenshareManager.get().controls = false;
       screenshareManager.srcObject(stream);
       classroomInfo.shareScreen = {}
       classroomInfo.shareScreen.state = true
@@ -337,6 +338,8 @@ class ScreenShareManagerClass{
     let element = stream.mediaElement;
     element.setAttribute('id', "screen-viewer"); 
     element.volume = 0.3;
+    // element.controls = false;
+
     parent.appendChild(element);
     this.show();
     element.muted = true;
@@ -432,7 +435,8 @@ class maincamManagerClass{
   addStudentCam(event) {
     let isFind = false;
 
-    if(!event.stream.isVideo) return;
+    if(!event.stream.isVideo || event.extra.roomOwner) return;
+
 
     try {
       event.mediaElement.controls = false;
@@ -449,6 +453,7 @@ class maincamManagerClass{
       for (let i = 0; i < childern.length; i++) {
         let child = childern[i];
         if (child.dataset.id == event.userid) {
+          console.debug("Student's cam added [",event.extra.userFullName,'] [',event.userid,']');
           child.appendChild(event.mediaElement);
           isFind = true;
           break;

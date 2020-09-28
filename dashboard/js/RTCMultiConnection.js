@@ -349,7 +349,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         });
 
         connection.socket.on('disconnect', function (event) {
-            console.error("!!")
+            console.error("socket disconnected");
         });
 
         connection.socket.on('error', function (event) {
@@ -413,11 +413,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             send: function (data, remoteUserId) {
                 var that = this;
                 if (!isNull(data.size) && !isNull(data.type)) {
-                    if (connection.enableFileSharing) {
-                        self.shareFile(data, remoteUserId);
-                        return;
-                    }
-
                     if (typeof data !== 'string') {
                         data = JSON.stringify(data);
                     }
@@ -505,9 +500,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 },
                 remoteSdp: remoteSdp,
                 onDataChannelMessage: function (message) {
-                    if (!connection.fbr && connection.enableFileSharing) initFileBufferReader();
-
-                    if (typeof message == 'string' || !connection.enableFileSharing) {
+                    if (typeof message == 'string') {
                         self.onDataChannelMessage(message, remoteUserId);
                         return;
                     }
@@ -656,10 +649,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
             console.warn('RTPSender.replaceTrack is NOT supported.');
             this.renegotiatePeer(remoteUserId);
-        };
-
-        this.onNegotiationNeeded = function (message, remoteUserId) { 
-            console.error("not used");
         };
         
         this.addNegotiatedMessage = function (message, remoteUserId) {
@@ -2431,23 +2420,9 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         peer.onicecandidate = function (event) {
             if (!event.candidate) {
-                if (!connection.trickleIce) {
-                    var localSdp = peer.localDescription;
-                    config.onLocalSdp({
-                        type: localSdp.type,
-                        sdp: localSdp.sdp,
-                        remotePeerSdpConstraints: config.remotePeerSdpConstraints || false,
-                        renegotiatingPeer: !!config.renegotiatingPeer || false,
-                        connectionDescription: self.connectionDescription,
-                        dontGetRemoteStream: !!config.dontGetRemoteStream,
-                        extra: connection ? connection.extra : {},
-                        streamsToShare: streamsToShare
-                    });
-                }
                 return;
             }
 
-            if (!connection.trickleIce) return;
             config.onLocalCandidate({
                 candidate: event.candidate.candidate,
                 sdpMid: event.candidate.sdpMid,
@@ -2486,6 +2461,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         peer.oniceconnectionstatechange = function () {
 
             if (self.signalingState != "stable") {
+                if(connection.enableLogs)
                 console.log("Negotiation skipped in stable");
                 return;
             }
@@ -2726,9 +2702,8 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 if (DetectRTC.browser.name !== 'Safari') {
                     localSdp.sdp = connection.processSdp(localSdp.sdp);
                 }
-                peer.setLocalDescription(localSdp).then(function () {
-                    if (!connection.trickleIce) return;
 
+                peer.setLocalDescription(localSdp).then(function () {
                     config.onLocalSdp({
                         type: localSdp.type,
                         sdp: localSdp.sdp,
@@ -3923,7 +3898,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         mPeer.onGettingRemoteMedia = function (stream, remoteUserId) {
             try {
-                stream.type = 'remote';
+                straem.type = 'remote';
             } catch (e) { }
 
             connection.setStreamEndHandler(stream, 'remote-stream');
@@ -4505,8 +4480,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             audio: true,
             video: true
         };
-
-        connection.enableFileSharing = false;
 
         // all values in kbps
         // connection.bandwidth = {
@@ -5601,7 +5574,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             }
         };
 
-        connection.trickleIce = true;
         connection.version = '3.6.9';
         connection.autoCreateMediaElement = true;
         connection.password = null;

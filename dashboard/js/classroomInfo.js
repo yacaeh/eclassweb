@@ -35,7 +35,6 @@ classroomInfo = {
 classroomCommand = {
     joinRoom: function () {
         connection.socket.emit('get-room-info', (_info) => {
-            console.debug("Synced classroom info");
             classroomInfo = _info;
             updateClassTime();
             this.updateSyncRoom();
@@ -43,8 +42,7 @@ classroomCommand = {
     },
 
     updateSyncRoom: function () {
-        console.debug("Update Sync")
-        console.debug(classroomInfo)
+        console.debug("Classroominfo Sync")
 
         if (classroomInfo.allControl) {
             updateControlView(false);
