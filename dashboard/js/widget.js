@@ -60,6 +60,20 @@ gothicFont.load().then((font) => {
         }
     };
 
+    function orderHistoryChecker(){
+        if(orderHistory.length > 50)
+            orderHistory.splice(0,1);
+            let icons = document.getElementById('undo');
+        if(orderHistory.length == 0){
+            changeColor(icons, 0.3);
+        }
+        else if(orderHistory.length == 1){
+            returnColor(icons);
+        }
+
+    }
+
+
     function addEvent(element, eventType, callback) {
         if (eventType.split(' ').length > 1) {
             let events = eventType.split(' ');
@@ -337,8 +351,8 @@ gothicFont.load().then((font) => {
             points[points.length] = ['line', [-1, -1]];
             pointHistory.push(points.length);
             orderHistory.push('undo');
-            if(orderHistory.length > 50)
-                orderHistory.splice(0,1);
+            orderHistoryChecker();
+
             this.ismousedown = false;
         },
         mousemove: function (e) {
@@ -399,8 +413,7 @@ gothicFont.load().then((font) => {
             points[points.length] = ['marker', [-1, -1]];
             pointHistory.push(points.length);
             orderHistory.push('undo');
-            if(orderHistory.length > 50)
-            orderHistory.splice(0,1);
+            orderHistoryChecker();
             this.ismousedown = false;
         },
         mousemove: function (e) {
@@ -495,9 +508,10 @@ gothicFont.load().then((font) => {
                             pre = i == 0 ? 0 : pointHistory[i - 1];
                             _idx = i;
                             let numofpoint = pointHistory[i] - pre
-                            orderHistory.push(points.slice(pre, pre+numofpoint));
-                            if(orderHistory.length > 50)
-                            orderHistory.splice(0,1);
+                            let orderdata = {};
+                            orderdata[pre] = points.slice(pre, pre+numofpoint);
+                            orderHistory.push(orderdata);
+                            orderHistoryChecker();
                             points.splice(pre, numofpoint);
                             pointHistory.splice(i, 1);
 
@@ -576,8 +590,7 @@ gothicFont.load().then((font) => {
             points[points.length] = ['text', ['"' + textHandler.text + '"', normal[0], normal[1]], drawHelper.getOptions(options)];
             pointHistory.push(points.length);
             orderHistory.push('undo');
-            if(orderHistory.length > 50)
-            orderHistory.splice(0,1);
+            orderHistoryChecker();
             syncPoints(false, "text");
         },
         canvasInput: null,
@@ -778,6 +791,35 @@ gothicFont.load().then((font) => {
         element.className += ' selected-shape';
     }
 
+    function changeColor(id, alpha) {
+        var ctx = find(id.id).getContext('2d');
+        context.lineWidth = 2;
+        context.strokeStyle = '#6c96c8';
+        let nimage = new Image();
+
+        nimage.onload = () => {
+            ctx.globalAlpha = alpha;
+            ctx.clearRect(0, 0, 40, 40);
+            ctx.drawImage(nimage, 0, 0, 28, 28);
+        };
+        nimage.src = id.toDataURL();
+    }
+
+    function returnColor(id) {
+        if(!id)
+            return;
+
+        var ctx = find(id.id).getContext('2d');
+        context.lineWidth = 2;
+        context.strokeStyle = '#6c96c8';
+        let nimage = new Image();
+        nimage.onload = () => {
+            ctx.globalAlpha = 1;
+            ctx.clearRect(0, 0, 40, 40);
+            ctx.drawImage(nimage, 0, 0, 28, 28);
+        }
+        nimage.src = data_uris[id.id];
+    }
     /* Default: setting default selected shape!! */
     is.set(window.selectedIcon);
 
@@ -788,6 +830,9 @@ gothicFont.load().then((font) => {
     (function () {
         var cache = {};
         
+        
+
+
         decorateUndo();
         decorateFull();
         decorate3dview();
@@ -857,39 +902,16 @@ gothicFont.load().then((font) => {
             });
         }
 
+   
         function decorateUndo() {
             var context = getContext('undo');
             var image = new Image();
             image.onload = function () {
                 context.drawImage(image, 0, 0, 28, 28);
+                changeColor(document.getElementById('undo'), 0.3);
 
                 document.getElementById('undo').onclick = function () {
-                    if(orderHistory.length == 0)
-                        return;
-
-                    let command = orderHistory[orderHistory.length-1];
-                    if(command == 'undo'){
-                        if (points.length) {
-                            let idx = pointHistory.length - 2;
-                            idx == -1 ? points = [] : points.length = pointHistory[idx];
-                            pointHistory.pop();
-                            drawHelper.redraw();
-                        }
-                        syncPoints(false, "undo");
-                    }
-                    else{
-                        command.forEach(element => {
-                            points[points.length] = element;
-                        });
-
-                        let pre = pointHistory[pointHistory.length-1] || 0;
-                        pointHistory[pointHistory.length] =  pre + command.length;
-                        drawHelper.redraw();
-                        syncPoints(false, command[0][0]);
-                    }
-                    orderHistory.pop();
-
-               
+                    undo();
                 };
             };
             image.src = data_uris.undo;
@@ -900,6 +922,7 @@ gothicFont.load().then((font) => {
             image.onload = () => {
                 getContext('full').drawImage(image, 0, 0, 28, 28);
             };
+
             image.src = data_uris.fullon;
         }
 
@@ -1073,6 +1096,7 @@ gothicFont.load().then((font) => {
                     return false;
 
                 orderHistory = [];
+                orderHistoryChecker();
                 window.parent.currentPoints = []
                 window.parent.currentHistory = []
 
@@ -1118,28 +1142,6 @@ gothicFont.load().then((font) => {
                 this.classList.toggle("on");
                 let isOn = this.classList.contains("on");
 
-                function changeColor(id, alpha) {
-                    let ctx = getContext(id.id);
-                    let nimage = new Image();
-
-                    nimage.onload = () => {
-                        ctx.globalAlpha = alpha;
-                        ctx.clearRect(0, 0, 40, 40);
-                        ctx.drawImage(nimage, 0, 0, 28, 28);
-                    };
-                    nimage.src = id.toDataURL();
-                }
-
-                function returnColor(id) {
-                    let ctx = getContext(id.id);
-                    let nimage = new Image();
-                    nimage.onload = () => {
-                        ctx.globalAlpha = 1;
-                        ctx.clearRect(0, 0, 40, 40);
-                        ctx.drawImage(nimage, 0, 0, 28, 28);
-                    }
-                    nimage.src = data_uris[id.id];
-                }
 
                 if (isOn) {
                     image.src = data_uris.on;
@@ -1254,7 +1256,7 @@ gothicFont.load().then((font) => {
         preventStopEvent(e);
     });
 
-    addEvent(canvas, 'mousemove', function (e) {
+    addEvent(canvas, 'touchmove mousemove', function (e) {
         if (e.touches) {
             e = TouchConverter(e);
         }
@@ -1286,13 +1288,7 @@ gothicFont.load().then((font) => {
         }
 
         if (keyCode === 90 && e.ctrlKey) {
-            if (points.length) {
-                let idx = pointHistory.length - 2;
-                idx == -1 ? points = [] : points.length = pointHistory[idx];
-                pointHistory.pop();
-                drawHelper.redraw();
-            }
-            syncPoints(false, "undo");
+            undo();
         }
     });
 
@@ -1511,6 +1507,41 @@ gothicFont.load().then((font) => {
             })
         }
     }
+
+    function undo(){
+        if(orderHistory.length == 0)
+        return;
+    
+    let command = orderHistory[orderHistory.length-1];
+    if(command == 'undo'){
+        if (points.length) {
+            let idx = pointHistory.length - 2;
+            idx == -1 ? points = [] : points.length = pointHistory[idx];
+            pointHistory.pop();
+            drawHelper.redraw();
+        }
+        syncPoints(false, "undo");
+    }
+    else{
+        let idx = Object.keys(command)[0];
+        let newPoints = command[idx];
+        let position = -1;
+        
+        for(let i = 0; i < pointHistory.length; i++){
+            idx < pointHistory[i] ? pointHistory[i] += newPoints.length :
+                                    position = i;
+        }
+
+        let prenum = position == -1 ? 0 : pointHistory[position];
+        pointHistory.splice(position+1,0, prenum + newPoints.length);
+        points.splice.apply(points, [pointHistory[position],0].concat(newPoints));
+    
+        drawHelper.redraw();
+        syncPoints(false, newPoints[0][0]);
+    }
+    orderHistory.pop();
+    orderHistoryChecker();
+    }
 })();
 
 // -----------------------------------------------------------------------
@@ -1613,5 +1644,6 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
 function handleDragDropEvent(oEvent) {
     oEvent.preventDefault();
 }
+
 
 
