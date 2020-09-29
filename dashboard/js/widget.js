@@ -1149,7 +1149,10 @@ gothicFont.load().then((font) => {
                     for (let i = 0; i < icons.length; i++) {
                         if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
                             continue;
-                        returnColor(icons[i]);
+
+                        if(icons[i].id != "undo" || orderHistory.length != 0)
+                            returnColor(icons[i]);
+                        
                         icons[i].classList.remove("off");
                         icons[i].classList.add("on");
                     }
@@ -1165,7 +1168,10 @@ gothicFont.load().then((font) => {
                             continue;
 
                         if (icons[i].style.display == 'block') {
-                            changeColor(icons[i], 0.3);
+                            if(icons[i].id != "undo" || orderHistory.length != 0){
+                                changeColor(icons[i], 0.3);
+                            }
+
                             icons[i].classList.remove("on");
                             icons[i].classList.add("off");
                         }
@@ -1638,7 +1644,7 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
         back.style.width = (ratio * sliderWidth) + 'px';
         bar.style.left = (ratio * sliderWidth) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (max * ratio).toFixed(0) * 1 + min;
-    })
+    })  
 }
 
 function handleDragDropEvent(oEvent) {
