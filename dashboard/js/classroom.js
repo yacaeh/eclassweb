@@ -100,7 +100,7 @@ screenshareManager.setFrameRate(1, 2);
 
 connection.session = {
   audio: false,
-  video: true,
+  video: false,
   data: true,
   screen: false,
 };
@@ -322,3 +322,124 @@ function showstatus() {
     })
 }
 
+const log = msg =>
+  document.getElementById('logs').innerHTML += msg + '<br>'
+  
+const config = {
+  iceServers: [{
+    urls: [
+      'stun:stun.l.google.com:19302',
+      'stun:stun1.l.google.com:19302',
+      'stun:stun2.l.google.com:19302',
+      'stun:stun.l.google.com:19302?transport=udp',
+    ]
+  }]
+}
+const wsuri = `wss://192.168.124.41:7000/ws`
+const socket = new WebSocket(wsuri);
+const pc = new RTCPeerConnection(config)
+
+pc.ontrack = function ({ track, streams }) {
+  if (track.kind === "video") {
+    log("got track")
+    track.onunmute = () => {
+      let el = document.createElement(track.kind)
+      el.srcObject = streams[0]
+      el.autoplay = true
+
+      document.getElementById('remoteVideos').appendChild(el)
+    }
+  }
+}
+
+pc.oniceconnectionstatechange = e => log(`ICE connection state: ${pc.iceConnectionState}`)
+pc.onicecandidate = event => {
+  if (event.candidate !== null) {
+    socket.send(JSON.stringify({
+      method: "trickle",
+      params: {
+        candidate: event.candidate,
+      }
+    }))
+  }
+}
+
+socket.addEventListener('message', async (event) => {
+  const resp = JSON.parse(event.data)
+
+  // Listen for server renegotiation notifications
+  if (!resp.id && resp.method === "offer") {
+    log(`Got offer notification`)
+    await pc.setRemoteDescription(resp.params)
+    const answer = await pc.createAnswer()
+    await pc.setLocalDescription(answer)
+
+    const id = connection.userid;
+    log(`Sending answer`)
+    socket.send(JSON.stringify({
+      method: "answer",
+      params: { desc: answer },
+      id
+    }))
+  } else if (resp.method === "trickle") {
+    pc.addIceCandidate(resp.params).catch(log);
+  }
+})
+
+const join = async () => {
+  const offer = await pc.createOffer()
+  await pc.setLocalDescription(offer)
+  const id = connection.userid;
+  console.log("params.sessionid:"+params.sessionid);
+  console.log("connection.userid:"+connection.userid);
+  socket.send(JSON.stringify({
+    method: "join",
+    params: { sid: params.sessionid, offer: pc.localDescription },
+    id
+  }))
+
+
+  socket.addEventListener('message', (event) => {
+    const resp = JSON.parse(event.data)
+    if (resp.id === id) {
+      log(`Got publish answer`)
+
+      // Hook this here so it's not called before joining
+      pc.onnegotiationneeded = async function () {
+        log("Renegotiating")
+        const offer = await pc.createOffer()
+        await pc.setLocalDescription(offer)
+        const id = connection.userid;
+        socket.send(JSON.stringify({
+          method: "offer",
+          params: { desc: offer },
+          id
+        }))
+
+        socket.addEventListener('message', (event) => {
+          const resp = JSON.parse(event.data)
+          if (resp.id === id) {
+            log(`Got renegotiation answer`)
+            pc.setRemoteDescription(resp.result)
+          }
+        })
+      }
+
+      pc.setRemoteDescription(resp.result)
+    }
+  })
+}
+
+let localStream
+let screenStream
+navigator.mediaDevices.getUserMedia({
+  video: true,
+  audio: true
+}).then(stream => {
+  localStream = stream
+  localStream.getTracks().forEach((track) => {
+    pc.addTrack(track, localStream);
+  });
+  join()
+
+}).catch(log)

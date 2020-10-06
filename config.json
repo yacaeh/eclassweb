@@ -6,7 +6,7 @@
   "socketCustomEvent": "RTCMultiConnection-Custom-Message",
   "port": "9001",
   "enableLogs": "false",
-  "autoRebootServerOnFailure": "false",
+  "autoRebootServerOnFailure": "true",
   "isUseHTTPs": "true",
   "sslKey": "./fake-keys/privatekey.pem",
   "sslCert": "./fake-keys/certificate.pem",
