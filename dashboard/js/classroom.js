@@ -28,7 +28,8 @@ const rightTab = document.getElementById("right-tab")
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
-var screenshareManager  = new ScreenShareManagerClass();
+// var screenshareManager  = new ScreenShareManagerClass();
+var newscreenshareManager  = new NewScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
 var epubManager         = new epubManagerClass();
@@ -57,7 +58,7 @@ const topButtonContents = {
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
-  'screen_share'      : screenshareManager.btn,
+  'screen_share'      : newscreenshareManager.btn,
   '3d_view'           : _3DCanvasOnOff,
   'movie'             : Movie_Render_Button,
   'file'              : LoadFile,
@@ -96,7 +97,7 @@ connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
 
-screenshareManager.setFrameRate(1, 2);
+// newscreenshareManager.setFrameRate(1, 2);
 
 connection.session = {
   audio: false,
@@ -164,7 +165,7 @@ connection.onleave = function (event) {
 
 connection.onstreamended = function (event) {
   console.log('onstreameneded!', event);
-  screenshareManager.onclose(event);
+  newscreenshareManager.onclose(event);
 };
 
 designer.appendTo(widgetContainer, function () {
@@ -182,7 +183,7 @@ connection.onmessage = function (event) {
   if (permissionManager.eventListener(event))
     return;
 
-  if (screenshareManager.eventListener(event))
+  if (newscreenshareManager.eventListener(event))
     return;
 
   if (maincamManager.eventListener(event))
@@ -322,6 +323,7 @@ function showstatus() {
     })
 }
 
+// New WebRTC Functions
 const log = msg =>
   document.getElementById('logs').innerHTML += msg + '<br>'
   
@@ -340,16 +342,21 @@ const socket = new WebSocket(wsuri);
 const pc = new RTCPeerConnection(config)
 
 pc.ontrack = function ({ track, streams }) {
+  console.log("New track added!");
   if (track.kind === "video") {
-    log("got track")
     track.onunmute = () => {
-      let el = document.createElement(track.kind)
-      el.srcObject = streams[0]
-      el.autoplay = true
-
-      document.getElementById('remoteVideos').appendChild(el)
+      if(params.open == 'false') maincamManager.addNewTeacherCam(streams[0]);
+      else {
+        if(connection.peers.getAllParticipants().length > 0)
+          maincamManager.addNewStudentCam(connection.peers.getAllParticipants(),streams[0]);
+        }
     }
   }
+  console.log(classroomInfo.shareScreen.id);
+  if (classroomInfo.shareScreen.state ) {
+      newscreenshareManager.streamstart(streams[0]);
+  };
+  
 }
 
 pc.oniceconnectionstatechange = e => log(`ICE connection state: ${pc.iceConnectionState}`)
@@ -386,7 +393,8 @@ socket.addEventListener('message', async (event) => {
   }
 })
 
-const join = async () => {
+let join = async () => {
+  console.log("Join to stream new video");
   const offer = await pc.createOffer()
   await pc.setLocalDescription(offer)
   const id = connection.userid;
@@ -431,6 +439,7 @@ const join = async () => {
 }
 
 const VideoResolutions = {
+  thumb: { width: { ideal: 82 }, height: { ideal: 58 } },
   qvga: { width: { ideal: 320 }, height: { ideal: 180 } },
   vga: { width: { ideal: 640 }, height: { ideal: 360 } },
   shd: { width: { ideal: 960 }, height: { ideal: 540 } },
@@ -439,9 +448,12 @@ const VideoResolutions = {
   qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
 };
 
+let resolutionOption = 'hd';
+if (params.open === 'false') resolutionOption = 'thumb';
+
 let options = {
   codec: 'VP9',
-  resolution: 'hd',
+  resolution: resolutionOption,
   audio: true,
   video: true,
 };
@@ -460,11 +472,9 @@ navigator.mediaDevices.getUserMedia({
   audio: options.audio
 }).then(stream => {
   localStream = stream
-  maincamManager.addNewTeacherCam(stream)
   localStream.getTracks().forEach((track) => {
     pc.addTrack(track, localStream);
   });
   join()
 
 }).catch(log)
-

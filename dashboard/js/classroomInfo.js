@@ -68,7 +68,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.shareScreen.state) {
-            screenshareManager.rejoin();
+            newscreenshareManager.rejoin();
         }
 
         if (classroomInfo.movierender.state) {
