@@ -476,6 +476,11 @@ class maincamManagerClass{
     console.debug("Teacher's cam selected",event.userid, event.streamid);
     this.start();
   }
+  addNewTeacherCam (stream){
+    this.srcObject(stream);
+    this.start();
+  }
+
   eventListener(event) {
   }
 }

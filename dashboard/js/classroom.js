@@ -137,30 +137,30 @@ connection.onleave = function (event) {
   classroomManager.leftStudent(event);
 };
 
-connection.onstream = function (event) {
-  console.log('onstream!', event);
+// connection.onstream = function (event) {
+//   console.log('onstream!', event);
 
-  if (classroomInfo.shareScreen.state &&
-    (classroomInfo.shareScreen.id == event.streamid)) {
-    screenshareManager.streamstart(event);
-  };
+//   if (classroomInfo.shareScreen.state &&
+//     (classroomInfo.shareScreen.id == event.streamid)) {
+//     screenshareManager.streamstart(event);
+//   };
 
-  if (event.share)
-    return;
+//   if (event.share)
+//     return;
 
-  if (params.open === 'true') {
-    maincamManager.addStudentCam(event);
-  }
-  else {
-    if (event.type == "local" && event.stream.isVideo) {
-      event.mediaElement.pause();
-      event.stream.mute("audio");
-    }
-    else {
-      maincamManager.addTeacherCam(event);
-    }
-  }
-};
+//   if (params.open === 'true') {
+//     maincamManager.addStudentCam(event);
+//   }
+//   else {
+//     if (event.type == "local" && event.stream.isVideo) {
+//       event.mediaElement.pause();
+//       event.stream.mute("audio");
+//     }
+//     else {
+//       maincamManager.addTeacherCam(event);
+//     }
+//   }
+// };
 
 connection.onstreamended = function (event) {
   console.log('onstreameneded!', event);
@@ -430,16 +430,41 @@ const join = async () => {
   })
 }
 
+const VideoResolutions = {
+  qvga: { width: { ideal: 320 }, height: { ideal: 180 } },
+  vga: { width: { ideal: 640 }, height: { ideal: 360 } },
+  shd: { width: { ideal: 960 }, height: { ideal: 540 } },
+  hd: { width: { ideal: 1280 }, height: { ideal: 720 } },
+  fhd: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+  qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
+};
+
+let options = {
+  codec: 'VP9',
+  resolution: 'hd',
+  audio: true,
+  video: true,
+};
+
 let localStream
 let screenStream
 navigator.mediaDevices.getUserMedia({
-  video: true,
-  audio: true
+  video: options.video instanceof Object
+  ? {
+      ...VideoResolutions[options.resolution],
+      ...options.video,
+    }
+  : options.video
+  ? VideoResolutions[options.resolution]
+  : false,
+  audio: options.audio
 }).then(stream => {
   localStream = stream
+  maincamManager.addNewTeacherCam(stream)
   localStream.getTracks().forEach((track) => {
     pc.addTrack(track, localStream);
   });
   join()
 
 }).catch(log)
+
