@@ -800,21 +800,13 @@ class maincamManagerClass{
     this.start();
   }
   addNewTeacherCam (stream){
-    console.log("Addnew teacher!!!!!");
+    console.log("Addnew teacher",stream.id);
     this.srcObject(stream);
 
     this.start();
     classroomInfo.camshare = {};
-    classroomInfo.camshare.id = 'test';
-
-    classroomInfo.shareScreen = {};
-    classroomInfo.shareScreen.state = true
-    classroomInfo.shareScreen.id = 'testing'
-    classroomInfo.shareScreen.userid = 'test';
-
-    console.log("addnew teacher",stream.id,classroomInfo.camshare.id);
+    classroomInfo.camshare.id = stream.id;
     connection.socket.emit("update-room-info", classroomInfo, (e) => console.log(e));
-    console.log("callback?");
   }
 
   eventListener(event) {
