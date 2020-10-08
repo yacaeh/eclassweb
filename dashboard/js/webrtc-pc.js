@@ -213,4 +213,3 @@ async function webRTCPCInit() {
     console.err(err);
   }
 }
-webRTCPCInit();
