@@ -355,13 +355,14 @@ class ScreenShareManagerClass{
       classroomInfo.shareScreen.state = true;
       classroomInfo.shareScreen.id = event.data.showScreenShare;
       classroomInfo.shareScreen.userid = event.userid;
+      console.info("classroomInfo.shareScreen", classroomInfo.shareScreen.id)
 
-      try {
-        let stream = connection.streamEvents[event.data.showScreenShare].stream;
-        this.streamstart(stream);
-      }
-      catch (error) { 
-      }
+      // try {
+      //   let stream = connection.streamEvents[event.data.showScreenShare].stream;
+      //   this.streamstart(stream);
+      // }
+      // catch (error) { 
+      // }
 
       return true;
     }
@@ -407,10 +408,6 @@ class NewScreenShareManagerClass{
     this.lastStream = undefined;
     this.self = this;
     this.senders = [];
-    this.startChat = async () => {
-      userMediaStream.getTracks()
-        .forEach(track => senders.push(pc.addTrack(track, userMediaStream)));
-    };
   
     // this.minFrameRate = 5
     // this.maxFrameRate = 10;
@@ -438,9 +435,9 @@ class NewScreenShareManagerClass{
       return this.get().srcObject;
   }
   start(stream, btn) {
-    // connection.send({
-    //   showScreenShare: stream.id,
-    // });
+    connection.send({
+      showScreenShare: stream.id,
+    });
 
     window.shareStream = stream;
     newscreenshareManager.show();
@@ -539,12 +536,11 @@ class NewScreenShareManagerClass{
           replaceScreenTrack(stream, btn);
 
           console.log(screenStream);
-          screenStream.getTracks().forEach((track) => {
+          let track= screenStream.getVideoTracks()[0];
+          if (track) {
             pc.addTrack(track, screenStream);
-          });
-          join();
-          console.log("call join");
-
+          }
+        
         },
         (error) => {
           btn.classList.remove("on");
@@ -609,15 +605,17 @@ class NewScreenShareManagerClass{
     console.debug("Find Screenshare stream",stream.streamid);
     let parent = this.get().parentElement;
     parent.removeChild(this.get());
-    let element = stream.mediaElement;
-    element.setAttribute('id', "screen-viewer"); 
-    element.volume = 0.3;
+
+    let el = document.createElement("video")
+    el.srcObject = stream; 
+    el.setAttribute('id', "screen-viewer"); 
+    el.volume = 0.3;
     // element.controls = false;
 
-    parent.appendChild(element);
+    parent.appendChild(el);
     this.show();
-    element.muted = true;
-    element.play();
+    el.muted = true;
+    el.play();
   }
 
   eventListener(event) {
@@ -652,18 +650,22 @@ class NewScreenShareManagerClass{
       return true;
     }
   }
-  rejoin() {
-    let interval = setInterval(function () {
-      try {
-        let stream = connection.streamEvents[classroomInfo.shareScreen.id];
-        newscreenshareManager.streamstart(stream);
-        clearInterval(interval);
-      }
-      catch(error){
-        console.error(error)
-      }
-    }, 500);
-  }
+  // rejoin() {
+  //   console.log(classroomInfo.shareScreen.id);
+  //   let interval = setInterval(function () {
+  //     try {
+  //       let stream = pc.getReceivers();
+
+  //       console.log(stream);
+  //       console.log("classroomInfo.shareScreen.id",classroomInfo.shareScreen.id)
+  //       newscreenshareManager.streamstart(stream);
+  //       clearInterval(interval);
+  //     }
+  //     catch(error){
+  //       console.error(error)
+  //     }
+  //   }, 500);
+  // }
   onclose(event) {
     if (classroomInfo.shareScreen.id == event.streamid) {
       console.error("Streamer exit");
@@ -798,8 +800,21 @@ class maincamManagerClass{
     this.start();
   }
   addNewTeacherCam (stream){
+    console.log("Addnew teacher!!!!!");
     this.srcObject(stream);
+
     this.start();
+    classroomInfo.camshare = {};
+    classroomInfo.camshare.id = 'test';
+
+    classroomInfo.shareScreen = {};
+    classroomInfo.shareScreen.state = true
+    classroomInfo.shareScreen.id = 'testing'
+    classroomInfo.shareScreen.userid = 'test';
+
+    console.log("addnew teacher",stream.id,classroomInfo.camshare.id);
+    connection.socket.emit("update-room-info", classroomInfo, (e) => console.log(e));
+    console.log("callback?");
   }
 
   eventListener(event) {

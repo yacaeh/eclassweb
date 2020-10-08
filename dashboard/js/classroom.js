@@ -341,22 +341,36 @@ const wsuri = `wss://192.168.124.41:7000/ws`
 const socket = new WebSocket(wsuri);
 const pc = new RTCPeerConnection(config)
 
+async function checkScreenSharing(){
+  await classroomInfo.shareScreen.id;
+  console.log("Checking screen state!"+classroomInfo.shareScreen.id);
+}
+console.log("classroomInfo.shareScreen.id ",classroomInfo.shareScreen.id);
 pc.ontrack = function ({ track, streams }) {
   console.log("New track added!");
-  if (track.kind === "video") {
-    track.onunmute = () => {
-      if(params.open == 'false') maincamManager.addNewTeacherCam(streams[0]);
-      else {
-        if(connection.peers.getAllParticipants().length > 0)
-          maincamManager.addNewStudentCam(connection.peers.getAllParticipants(),streams[0]);
+  checkScreenSharing();
+  streams.forEach(stream =>{
+
+    if (track.kind === "video") {
+        console.log("classroomInfo.shareScreen.id",classroomInfo.shareScreen.id,"state:",classroomInfo.shareScreen.state)
+        if(classroomInfo.shareScreen.id !== undefined && (stream.id == classroomInfo.shareScreen.id) && classroomInfo.shareScreen.state){
+              console.log("Share Screen!");
+              newscreenshareManager.streamstart(stream);
         }
-    }
-  }
-  console.log(classroomInfo.shareScreen.id);
-  if (classroomInfo.shareScreen.state ) {
-      newscreenshareManager.streamstart(streams[0]);
-  };
-  
+        else{
+          track.onunmute = () => {
+            console.log("classroomInfo.camshare.id",classroomInfo.camshare.id);
+
+              if(params.open == 'false') maincamManager.addNewTeacherCam(streams[0]);
+              else {
+                if(connection.peers.getAllParticipants().length > 0)
+                  maincamManager.addNewStudentCam(connection.peers.getAllParticipants(),streams[0]);
+              }
+          }  
+        }
+    }  
+  })
+
 }
 
 pc.oniceconnectionstatechange = e => log(`ICE connection state: ${pc.iceConnectionState}`)
@@ -474,7 +488,17 @@ navigator.mediaDevices.getUserMedia({
   localStream = stream
   localStream.getTracks().forEach((track) => {
     pc.addTrack(track, localStream);
+    console.log("Add teacher!");
+    maincamManager.addNewTeacherCam(localStream); 
+    console.log("maincamManager.addNewTeacherCam(localStream)");
   });
+    pc.addTransceiver("video", {
+      direction: "sendrecv"
+    })
+    pc.addTransceiver("audio", {
+      direction: "sendrecv"
+    })
+
   join()
 
 }).catch(log)

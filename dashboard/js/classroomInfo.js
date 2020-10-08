@@ -6,6 +6,9 @@ classroomInfo = {
         state: false,
         id: undefined
     },
+    camshare:{
+        id: undefined
+    },
     share3D: {
         state: false,
         data: {}   // position, rotation 
@@ -68,7 +71,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.shareScreen.state) {
-            newscreenshareManager.rejoin();
+            // newscreenshareManager.rejoin();
         }
 
         if (classroomInfo.movierender.state) {
