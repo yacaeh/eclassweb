@@ -209,6 +209,6 @@ async function webRTCPCInit() {
       })
       .catch(log);
   } catch (err) {
-    console.err(err);
+    console.log(err);
   }
 }

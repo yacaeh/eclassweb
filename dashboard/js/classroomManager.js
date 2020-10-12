@@ -582,6 +582,6 @@ class classroomManagerClass {
     };
 
     updateClassroomInfo(callback) {
-        connection.socket.emit("update-room-info", classroomInfo, callback);
+        connection.socket.emit("update-room-info", Object.assign({}, classroomInfo), callback);
     };
 }

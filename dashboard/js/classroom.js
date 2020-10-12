@@ -19,7 +19,7 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
-
+let isClassroomInfoinit = false;
 let remainCams = {};
 let isFileViewer = false;
 
@@ -123,13 +123,17 @@ window.onWidgetLoaded = function () {
   mobileHelper.init();
 }
 
+window.onClassroominfoChanged = function(prop, value) {
+  console.log("ClassroomInfo changed",prop,' = ',value);
+  if(prop =='camshare' && value !== undefined && isClassroomInfoinit == false){console.log("call rtc init!");webRTCPCInit();isClassroomInfoinit=true;}
+}
+
 let isSync = false;
 
 connection.onopen = function (event) {
   if (!isSync) {
     classroomCommand.joinRoom();
     isSync = true;
-    webRTCPCInit();
   }
   classroomManager.joinStudent(event);
 };
