@@ -818,7 +818,7 @@ class maincamManagerClass{
     classroomInfo.camshare = {};
     classroomInfo.camshare.id = stream.id;
     console.log(connection.socket);
-    connection.socket.emit("update-room-info", classroomInfo, (e) => console.log(e));
+    classroomManager.updateClassroomInfo();
   }
 
   eventListener(event) {
