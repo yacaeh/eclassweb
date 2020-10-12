@@ -26,17 +26,17 @@ let isFileViewer = false;
 const widgetContainer = document.getElementById("widget-container");
 const rightTab = document.getElementById("right-tab")
 
-var connection = new RTCMultiConnection();
-var screenRecorder = new screenRecorderClass();
-var screenshareManager = new ScreenShareManagerClass();
-var maincamManager = new maincamManagerClass();
-var canvasManager = new canvasManagerClass();
-var epubManager = new epubManagerClass();
-var mobileHelper = new mobileHelperClass();
-var pointer_saver = new PointerSaver();
-var classroomManager = new classroomManagerClass();
-var permissionManager = new permissionManagerClass();
-var attentionManager = new attentionManagerClass();
+var connection          = new RTCMultiConnection();
+var screenRecorder      = new screenRecorderClass();
+var screenshareManager  = new ScreenShareManagerClass();
+var maincamManager      = new maincamManagerClass();
+var canvasManager       = new canvasManagerClass();
+var epubManager         = new epubManagerClass();
+var mobileHelper        = new mobileHelperClass();
+var pointer_saver       = new PointerSaver();
+var classroomManager    = new classroomManagerClass();
+var permissionManager   = new permissionManagerClass();
+var attentionManager    = new attentionManagerClass();
 
 //=============================================================================================
 
@@ -57,13 +57,13 @@ const topButtonContents = {
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
-  'screen_share': screenshareManager.btn,
-  '3d_view': _3DCanvasOnOff,
-  'movie': Movie_Render_Button,
-  'file': LoadFile,
-  'epub': epubManager.loadEpub,
-  'callteacher': classroomManager.callTeacher,
-  'homework': HomeworkSubmit,
+  'screen_share'      : screenshareManager.btn,
+  '3d_view'           : _3DCanvasOnOff,
+  'movie'             : Movie_Render_Button,
+  'file'              : LoadFile,
+  'epub'              : epubManager.loadEpub,
+  'callteacher'       : classroomManager.callTeacher,
+  'homework'          : HomeworkSubmit,
 }
 
 // Alt + 단축키
@@ -88,14 +88,13 @@ const shortCut = [
 
 console.log('Connection!');
 connection.socketURL = '/';
-connection.chunkSize = 16000;
-connection.enableFileSharing = false;
+connection.password = params.password;
+connection.chunkSize = 64000;
+connection.enableLogs = false;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
-connection.password = params.password;
-connection.enableLogs = false;
 
 screenshareManager.setFrameRate(1, 2);
 
@@ -137,7 +136,8 @@ connection.onopen = function (event) {
   classroomManager.joinStudent(event);
 };
 
-connection.onclose = connection.onerror = connection.onleave = function (event) {
+// connection.onclose = connection.onerror = 
+connection.onleave = function (event) {
   classroomManager.leftStudent(event);
 };
 
@@ -153,9 +153,8 @@ connection.onstream = function (event) {
   if (event.share)
     return;
 
-  if (params.open === 'true' || params.open === true) {
+  if (params.open === 'true') {
     maincamManager.addStudentCam(event);
-    console.log("ADD STUDENT CAM")
   }
   else {
     if (event.type == "local" && event.stream.isVideo) {
@@ -169,17 +168,15 @@ connection.onstream = function (event) {
 };
 
 connection.onstreamended = function (event) {
-  console.warn('onstreameneded!', event);
+  console.log('onstreameneded!', event);
   screenshareManager.onclose(event);
 };
 
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  if (params.open === true || params.open === 'true')
-    classroomManager.createRoom();
-  else
-    classroomManager.joinRoom();
+  params.open === 'true' ? classroomManager.createRoom() :
+                           classroomManager.joinRoom();
   onWidgetLoaded();
 });
 
@@ -320,6 +317,7 @@ connection.onmessage = function (event) {
   if (event.data.pageidx == pointer_saver.nowIdx) {
     designer.syncData(event.data);
   }
+
 };
 
 function showstatus() {

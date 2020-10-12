@@ -32,27 +32,25 @@ class ChattingManagerClass {
             notice.classList.toggle('off');
             notice.classList.toggle('on');
         });
-        $(window).bind("load", function () {
-
-            $('#txt-chat-message').emojioneArea({
-                pickerPosition: 'top',
-                filtersPosition: 'bottom',
-                tones: false,
-                autocomplete: true,
-                inline: true,
-                hidePickerOnBlur: true,
-                placeholder: $.i18n('CHAT_PLACEHOLDER'),
-                events: {
-                    focus: function () {
-                        $('.emojionearea-category')
-                            .unbind('click')
-                            .bind('click', function () {
-                                $('.emojionearea-button-close').click();
-                            });
-                    },
+        $('#txt-chat-message').emojioneArea({
+            pickerPosition: 'top',
+            filtersPosition: 'bottom',
+            tones: false,
+            autocomplete: true,
+            inline: true,
+            hidePickerOnBlur: true,
+            placeholder: $.i18n('CHAT_PLACEHOLDER'),
+            events: {
+                focus: function () {
+                    $('.emojionearea-category')
+                        .unbind('click')
+                        .bind('click', function () {
+                            $('.emojionearea-button-close').click();
+                        });
                 },
-            });
+            },
         });
+        
         window.onkeyup = function (e) {
             var code = e.keyCode || e.which;
             if (code == 13) {
