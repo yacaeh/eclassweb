@@ -41,7 +41,6 @@ video: true,
 let localStream;
 let screenStream;
 
-
 async function checkScreenSharing() {
   await classroomInfo.shareScreen.id;
   console.log('Checking screen state!' + classroomInfo.shareScreen.id);

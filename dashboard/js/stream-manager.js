@@ -710,6 +710,7 @@ class maincamManagerClass{
   }
   addStudentCam(event) {
     let isFind = false;
+    console.log(event.mediaElement);
 
     if(!event.stream.isVideo || event.extra.roomOwner) return;
 
@@ -761,7 +762,8 @@ class maincamManagerClass{
       el.style.height = "100%";
       el.style.pointerEvents = "none";
       el.style.position = "absolute";
-      el.srcObject = stream; 
+      el.style.id = stream.id;
+      el.srcObject = this.srcObject(stream);
 
       if (classroomInfo.showcanvas) {
         Hide(el)
@@ -773,11 +775,11 @@ class maincamManagerClass{
         console.log(child);
         userlist.forEach(user => {
           console.log(user);
-          //if (child.dataset.id == user) {
+          if (child.dataset.id == user) {
             console.log(child.dataset.id,user);
             child.appendChild(el);
             isFind = true;
-          //}
+          }
         })
       }
       console.log(isFind);

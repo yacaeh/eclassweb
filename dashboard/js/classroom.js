@@ -121,7 +121,6 @@ window.onWidgetLoaded = function () {
   canvasManager.setCanvasButtons(canvasButtonContents);
   classroomManager.init(shortCut, topButtonContents);
   mobileHelper.init();
-  webRTCPCInit();
 }
 
 let isSync = false;
@@ -130,6 +129,7 @@ connection.onopen = function (event) {
   if (!isSync) {
     classroomCommand.joinRoom();
     isSync = true;
+    webRTCPCInit();
   }
   classroomManager.joinStudent(event);
 };
