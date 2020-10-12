@@ -1,49 +1,37 @@
+var classroomInfo = new Proxy(function(){}, {
+    construct: function (target, argumentsList, newTarget) {
+        return { value: argumentsList[0] * 10 };
+    },
+    get(target, property) {
+        return target[property];
+    },
+    set(target, property, value) {
+        const oldValue = target[property];
+        if (value !== oldValue) {
+            onClassroominfoChanged(property,value);
+        }
+        target[property] = value;
+        return true;
+    }
+});
 
-classroomInfo = {
-    roomOpenTime: 0,       // 방을 처음 개설한 시간
-    allControl: true,
-    shareScreen: {
-        state: false,
-        id: undefined
-    },
-    share3D: {
-        state: false,
-        data: {}   // position, rotation 
-    },
-    epub: {
-        state: false,
-        page: 0,
-        data: {
-            src: undefined
-        }   // 어떤 pdf, 몇 페이지 등
-    },
-    viewer: {
-        state: false,  // on, off
-        type: 'none',  // pdf, video, jpg,
-        loaded: false,
-    },
-    exam: false,
-    movierender: {
-        state: false,
-        url: undefined
-    },
-    classPermission: undefined,
-    micPermission: undefined,
-    canvasPermission: [],
-};
+function SetClassroomInfo(newinfo){
+    for(let i in newinfo){
+        classroomInfo[i] = newinfo[i];
+    }
+}
 
 classroomCommand = {
     joinRoom: function () {
         connection.socket.emit('get-room-info', (_info) => {
-            classroomInfo = _info;
+            console.debug("Synced classroom info");
+            SetClassroomInfo(_info);
             updateClassTime();
             this.updateSyncRoom();
         });
     },
 
     updateSyncRoom: function () {
-        console.debug("Classroominfo Sync")
-
         if (classroomInfo.allControl) {
             updateControlView(false);
         }
@@ -82,30 +70,30 @@ classroomCommand = {
             }
         }
 
-        if (classroomInfo.exam.state){
+        if (classroomInfo.exam.state) {
             examObj.rejoin();
         }
 
-        if (connection.extra.roomOwner){
+        if (connection.extra.roomOwner) {
             let list = document.getElementById("student_list");
             let students = list.getElementsByClassName("student");
-            
 
-            for(let i = 0 ; i < students.length; i++){
+
+            for (let i = 0; i < students.length; i++) {
                 let student = students[i];
                 let id = student.dataset.id;
 
-                if(classroomInfo.classPermission == id){
+                if (classroomInfo.classPermission == id) {
                     FindInList(id).dataset.classPermission = true;
                     MakeIcon(id, "screen");
                 }
-                
-                if(classroomInfo.micPermission == id){
+
+                if (classroomInfo.micPermission == id) {
                     FindInList(id).dataset.micPermission = true;
                     MakeIcon(id, "mic");
                 }
-                
-                if(classroomInfo.canvasPermission.includes(id)){
+
+                if (classroomInfo.canvasPermission.includes(id)) {
                     FindInList(id).dataset.canvasPermission = true;
                     MakeIcon(id, "canvas");
                 }
@@ -114,14 +102,14 @@ classroomCommand = {
     },
 
     onSynchronizationClassRoom: function (_roomInfo) {
-        classroomInfo = _roomInfo;
+        SetClassroomInfo(_roomInfo);
         this.updateSyncRoom();
     },
 };
 
-function onBtn(id){
+function onBtn(id) {
     let btn = GetWidgetFrame().document.getElementById(id);
-    if(btn)
+    if (btn)
         btn.classList.add("selected-shape")
 }
 
