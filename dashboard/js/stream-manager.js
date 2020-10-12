@@ -762,8 +762,7 @@ class maincamManagerClass{
       el.style.height = "100%";
       el.style.pointerEvents = "none";
       el.style.position = "absolute";
-      el.id = stream.id;
-      el.srcObject = this.srcObject(stream);
+      el.autoplay = true;
 
       if (classroomInfo.showcanvas) {
         Hide(el)
@@ -777,6 +776,16 @@ class maincamManagerClass{
           console.log(user);
           if (child.dataset.id == user) {
             console.log(child.dataset.id,user);
+            
+            el.setAttribute("id",stream.id );
+            if ('srcObject' in el) {
+              console.log("srcobject exists");
+              el.srcObject = stream;
+            } else {
+              console.log("no srcobject exists");
+              el.src = URL.createObjectURL(stream);
+            }
+            
             child.appendChild(el);
             isFind = true;
           }
