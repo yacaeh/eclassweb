@@ -260,9 +260,9 @@ class classroomManagerClass {
     }
 
     joinStudent(event) {
-        connection.send('plz-sync-points', event.userid);
         document.getElementById("nos").innerHTML = connection.getAllParticipants().length;
         console.debug('Connected with ', "[", event.extra.userFullName, "]", "[", event.userid, "]");
+        connection.send('plz-sync-points', event.userid);
 
         if (event.extra.roomOwner) {
             this.rejoinTeacher();
@@ -341,22 +341,24 @@ class classroomManagerClass {
             canvasManager.showingCanvasId = undefined;
         })
 
-        if(classroomInfo.classPermission == id){
-            FindInList(id).dataset.classPermission = true;
+        document.getElementById("student_list").appendChild(span);
+
+        
+        if (classroomInfo.classPermission == id) {
+            span.dataset.classPermission = true;
             MakeIcon(id, "screen");
         }
-        
-        if(classroomInfo.micPermission == id){
-            FindInList(id).dataset.micPermission = true;
+
+        if (classroomInfo.micPermission == id) {
+            span.dataset.micPermission = true;
             MakeIcon(id, "mic");
         }
-        
-        if(classroomInfo.canvasPermission.includes(id)){
-            FindInList(id).dataset.canvasPermission = true;
+
+        if (classroomInfo.canvasPermission.includes(id)) {
+            span.dataset.canvasPermission = true;
             MakeIcon(id, "canvas");
         }
 
-        document.getElementById("student_list").appendChild(span);
         span.appendChild(img);
         this.studentListResize();
         canvasManager.canvas_array[id] = img;
@@ -559,7 +561,7 @@ class classroomManagerClass {
         }
 
         if (event.data.roomBoom) {
-            connection.socket._callbacks.$disconnect.length = 0
+            connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
             alertBox($.i18n('TEACHER_LEFT'), $.i18n('NOTIFICATION'), classroomManager.gotoMain, $.i18n('CONFIRM'))
 

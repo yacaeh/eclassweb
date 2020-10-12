@@ -165,8 +165,6 @@ class pdfViewer {
     }
 
     showPage(_page) {
-
-        //  현재 같은 페이지이면 바꾸지 않는다.
         if (this.checkSamePage(_page)) return;
 
         let fileViewer = this.getElementFileViewer();
@@ -469,8 +467,9 @@ mfileViewer.onclose = function () {
     isSharingFile = false;
     isFileViewer = false;
 
-    console.log('close');
+    console.debug('PDF close');
 
+    pointer_saver.nowIdx = 0;
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
     classroomInfo.viewer.loaded = false;

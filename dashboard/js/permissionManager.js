@@ -230,7 +230,8 @@ class permissionManagerClass {
 
   disableCanvasPermission(id) {
     console.debug("Lost canvas share permission");
-    Hide("student_canvas");
+    if(connection.userid == id)
+      Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
   };
 }
@@ -296,7 +297,8 @@ function button(t, c, on) {
 }
 
 function FindInList(id) {
-  return $("#student_list").find("span[data-id=" + id + "]")[0];
+  let finded = $("#student_list").find("span[data-id=" + id + "]")[0];
+  return finded ? finded : undefined;
 }
 
 function MakeIcon(id, type) {

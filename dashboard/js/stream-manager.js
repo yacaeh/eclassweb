@@ -321,6 +321,7 @@ class ScreenShareManagerClass{
     function replaceScreenTrack(stream, btn) {
       canvasManager.clear();
       console.log("Stream Start", stream.id);
+      // screenshareManager.get().controls = false;
       screenshareManager.srcObject(stream);
       classroomInfo.shareScreen = {}
       classroomInfo.shareScreen.state = true
@@ -337,6 +338,8 @@ class ScreenShareManagerClass{
     let element = stream.mediaElement;
     element.setAttribute('id', "screen-viewer"); 
     element.volume = 0.3;
+    // element.controls = false;
+
     parent.appendChild(element);
     this.show();
     element.muted = true;
@@ -376,7 +379,6 @@ class ScreenShareManagerClass{
     }
   }
   rejoin() {
-    console.debug("Rejoin Screensharing", event.data.showScreenShare)
     let interval = setInterval(function () {
       try {
         let stream = connection.streamEvents[classroomInfo.shareScreen.id];
@@ -400,11 +402,8 @@ class ScreenShareManagerClass{
 }
 class maincamManagerClass{
   get() {
-    var video = document.getElementById("main-video");
-    if (video) 
-      return video;
-    else 
-      return GetWidgetFrame().document.getElementById("main-video");
+    let video = document.getElementById("main-video");
+    return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
   show() {
     Show(this.get());
@@ -436,7 +435,8 @@ class maincamManagerClass{
   addStudentCam(event) {
     let isFind = false;
 
-    if(!event.stream.isVideo) return;
+    if(!event.stream.isVideo || event.extra.roomOwner) return;
+
 
     try {
       event.mediaElement.controls = false;
@@ -450,11 +450,10 @@ class maincamManagerClass{
       }
 
       let childern = document.getElementById("student_list").children;
-      console.log(childern)
-
       for (let i = 0; i < childern.length; i++) {
         let child = childern[i];
         if (child.dataset.id == event.userid) {
+          console.debug("Student's cam added [",event.extra.userFullName,'] [',event.userid,']');
           child.appendChild(event.mediaElement);
           isFind = true;
           break;

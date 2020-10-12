@@ -171,7 +171,6 @@ class mobileHelperClass {
                 }
                 else {
                     var promise = document.exitFullscreen();
-
                     image.src = "/dashboard/img/cam_max.png";
                 }
 
@@ -198,6 +197,7 @@ class mobileHelperClass {
             }
 
             if (typeof e.preventDefault === 'function') {
+                if(e.cancleable)
                 e.preventDefault();
             }
 
