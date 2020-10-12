@@ -762,7 +762,7 @@ class maincamManagerClass{
       el.style.height = "100%";
       el.style.pointerEvents = "none";
       el.style.position = "absolute";
-      el.style.id = stream.id;
+      el.id = stream.id;
       el.srcObject = this.srcObject(stream);
 
       if (classroomInfo.showcanvas) {
