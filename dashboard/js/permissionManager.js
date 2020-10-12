@@ -193,6 +193,7 @@ class permissionManagerClass {
   disableClassPermission() {
     console.debug("Lost Screen share permission");
     Hide("student_screenshare");
+    classroomInfo.classPermission = '';
 
     if (classroomInfo.shareScreen.state) {
       screenshareManager.isSharingScreen = false;
@@ -233,6 +234,7 @@ class permissionManagerClass {
 
   disableCanvasPermission(id) {
     console.debug("Lost canvas share permission");
+    classroomInfo.canvasPermission = [];
     if(connection.userid == id)
       Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
