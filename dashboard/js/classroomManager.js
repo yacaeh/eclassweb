@@ -354,7 +354,7 @@ class classroomManagerClass {
             MakeIcon(id, "mic");
         }
 
-        if (classroomInfo.canvasPermission) {
+        if (classroomInfo.canvasPermission.includes(id)) {
             span.dataset.canvasPermission = true;
             MakeIcon(id, "canvas");
         }

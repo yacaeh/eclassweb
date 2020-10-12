@@ -124,7 +124,8 @@ window.onWidgetLoaded = function () {
 }
 
 window.onClassroominfoChanged = function(prop, value) {
-  if(prop =='camshare' && value !== undefined && isClassroomInfoinit == false){console.log("call rtc init!");webRTCPCInit();isClassroomInfoinit=true;}
+  if(prop =='camshare' && value !== undefined && isClassroomInfoinit == false)
+  {console.log("call rtc init!");webRTCPCInit();isClassroomInfoinit=true;}
 }
 
 let isSync = false;
