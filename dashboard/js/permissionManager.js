@@ -61,7 +61,8 @@ class permissionManagerClass {
     }
 
     if (event.data.classPermissionChanged) {
-      event.data.on ? permissionManager.setClassPermission() : permissionManager.disableClassPermission();
+      event.data.on ? permissionManager.setClassPermission() : 
+                      permissionManager.disableClassPermission();
       return true;
     }
 
@@ -185,7 +186,7 @@ class permissionManagerClass {
   setClassPermission() {
     console.debug("Get Screen share permission");
     Show("student_screenshare");
-    // document.getElementById("class_permission").innerHTML = $.i18n('STUDENT_SCREEN_PERMISSION');
+    classroomInfo.classPermission = connection.userid;
     window.permission = true;
   };
 
@@ -218,6 +219,8 @@ class permissionManagerClass {
 
   setCanvasPermission(id) {
     console.debug("Get canvas share permission");
+    console.log(classroomInfo.canvasPermission)
+    classroomInfo.canvasPermission.push(id);
     Show("student_canvas");
     connection.send({
       sendStudentPoint: true,
