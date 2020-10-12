@@ -123,6 +123,10 @@ window.onWidgetLoaded = function () {
   mobileHelper.init();
 }
 
+window.onClassroominfoChanged = function(prop, value) {
+  console.log("ClassroomInfo changed",prop,' = ',value);
+}
+
 let isSync = false;
 
 connection.onopen = function (event) {
@@ -140,7 +144,8 @@ connection.onclose = connection.onerror = connection.onleave = function (event) 
 connection.onstream = function (event) {
   console.log('onstream!', event);
 
-  if (classroomInfo.shareScreen.state &&
+  if (classroomInfo.shareScreen &&
+    classroomInfo.shareScreen.state &&
     (classroomInfo.shareScreen.id == event.streamid)) {
     screenshareManager.streamstart(event);
   };
