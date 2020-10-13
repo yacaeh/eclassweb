@@ -4,14 +4,15 @@
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
-var httpServer = require('http');
+const db = require('./db');
+var httpServer = require('https');
 
 const ioServer = require('socket.io');
 const RTCMultiConnectionServer = require('rtcmulticonnection-server');
 const eclassSignalingServer = require('./ESignaling-Servers.js');
 
 var PORT = 9001;
-var isUseHTTPs = false;
+var httpApp;
 
 const jsonPath = {
     config: 'config.json',
@@ -34,18 +35,20 @@ const resolveURL = RTCMultiConnectionServer.resolveURL;
 var config = getValuesFromConfigJson(jsonPath);
 config = getBashParameters(config, BASH_COLORS_HELPER);
 
+
+db.construct();
+
+
 // if user didn't modifed "PORT" object
 // then read value from "config.json"
 if(PORT === 9001) {
     PORT = config.port;
 }
-if(isUseHTTPs === false) {
-    isUseHTTPs = config.isUseHTTPs;
-}
 
 function serverHandler(request, response) {
     // to make sure we always get valid info from json file
     // even if external codes are overriding it
+
     config = getValuesFromConfigJson(jsonPath);
     config = getBashParameters(config, BASH_COLORS_HELPER);
 
@@ -66,6 +69,22 @@ function serverHandler(request, response) {
 
         filename = (filename || '').toString();
 
+        if(request.method == "POST"){
+            let ret = undefined;
+            request.on('data', function(e){
+                let data = JSON.parse('' + e);
+                db.api(request.url, data).then((_ret) => {
+                    ret = _ret;
+                    console.log('ret:',ret);
+                    response.write(JSON.stringify(ret));
+                    response.end();
+                    return;
+                });
+            })
+
+            return;
+        }
+        
         if (request.method !== 'GET' || uri.indexOf('..') !== -1) {
             try {
                 response.writeHead(401, {
@@ -92,6 +111,8 @@ function serverHandler(request, response) {
             }
             return;
         }
+
+ 
 
         var matched = false;
         ['/dashboard/', '/logs/', '/dev/', '/dist/', '/socket.io/', '/node_modules/canvas-designer/', '/admin/', '/ViewerJS/'].forEach(function(item) {
@@ -227,52 +248,46 @@ function serverHandler(request, response) {
 
 }
 
-var httpApp;
 
-if (isUseHTTPs) {
-    httpServer = require('https');
 
-    // See how to use a valid certificate:
-    // https://github.com/muaz-khan/WebRTC-Experiment/issues/62
-    var options = {
-        key: null,
-        cert: null,
-        ca: null
-    };
+// See how to use a valid certificate:
+// https://github.com/muaz-khan/WebRTC-Experiment/issues/62
+var options = {
+    key: null,
+    cert: null,
+    ca: null
+};
 
-    var pfx = false;
+var pfx = false;
 
-    if (!fs.existsSync(config.sslKey)) {
-        console.log(BASH_COLORS_HELPER.getRedFG(), 'sslKey:\t ' + config.sslKey + ' does not exist.');
-    } else {
-        pfx = config.sslKey.indexOf('.pfx') !== -1;
-        options.key = fs.readFileSync(config.sslKey);
-    }
-
-    if (!fs.existsSync(config.sslCert)) {
-        console.log(BASH_COLORS_HELPER.getRedFG(), 'sslCert:\t ' + config.sslCert + ' does not exist.');
-    } else {
-        options.cert = fs.readFileSync(config.sslCert);
-    }
-
-    if (config.sslCabundle) {
-        if (!fs.existsSync(config.sslCabundle)) {
-            console.log(BASH_COLORS_HELPER.getRedFG(), 'sslCabundle:\t ' + config.sslCabundle + ' does not exist.');
-        }
-
-        options.ca = fs.readFileSync(config.sslCabundle);
-    }
-
-    if (pfx === true) {
-        options = {
-            pfx: sslKey
-        };
-    }
-
-    httpApp = httpServer.createServer(options, serverHandler);
+if (!fs.existsSync(config.sslKey)) {
+    console.log(BASH_COLORS_HELPER.getRedFG(), 'sslKey:\t ' + config.sslKey + ' does not exist.');
 } else {
-    httpApp = httpServer.createServer(serverHandler);
+    pfx = config.sslKey.indexOf('.pfx') !== -1;
+    options.key = fs.readFileSync(config.sslKey);
 }
+
+if (!fs.existsSync(config.sslCert)) {
+    console.log(BASH_COLORS_HELPER.getRedFG(), 'sslCert:\t ' + config.sslCert + ' does not exist.');
+} else {
+    options.cert = fs.readFileSync(config.sslCert);
+}
+
+if (config.sslCabundle) {
+    if (!fs.existsSync(config.sslCabundle)) {
+        console.log(BASH_COLORS_HELPER.getRedFG(), 'sslCabundle:\t ' + config.sslCabundle + ' does not exist.');
+    }
+
+    options.ca = fs.readFileSync(config.sslCabundle);
+}
+
+if (pfx === true) {
+    options = {
+        pfx: sslKey
+    };
+}
+
+httpApp = httpServer.createServer(options, serverHandler);
 
 RTCMultiConnectionServer.beforeHttpListen(httpApp, config);
 httpApp = httpApp.listen(process.env.PORT || PORT, process.env.IP || "0.0.0.0", function() {

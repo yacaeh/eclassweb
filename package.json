@@ -54,6 +54,7 @@
     "fbr": "latest",
     "getstats": "latest",
     "minify": "^5.1.1",
+    "mongo": "^0.1.0",
     "multistreamsmixer": "latest",
     "recordrtc": "latest",
     "rtcmulticonnection-server": "latest",

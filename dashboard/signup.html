@@ -1,0 +1,109 @@
+<!-- Demo version: 2018.12.11 -->
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Home Class</title>
+  <meta name="description"
+    content="WebRTC Dashboard including support for canvas drawing, canvas data syncing, video conferencing, screen sharing and video conferencing. Including chat and file sharing.">
+
+  <link href="/favicon.ico" rel="shortcut icon" />
+
+  <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/dashboard/css/index.css" rel="stylesheet">
+
+  <script src="/dashboard/js/config.js"></script>
+  <script src="/dashboard/js/lib/jquery-3.3.1.min.js"></script>
+  <script src="/dashboard/js/lib/popper.min.js"></script>
+  <script src="/dashboard/js/lib/bootstrap.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/dashboard/js/RTCMultiConnection.js"></script>
+
+  <script src="/dashboard/js/lib/CLDRPluralRuleParser.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.messagestore.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.fallbacks.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.language.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
+  <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
+	<script src="/dashboard/js/lib/updateLanguage.js"></script>
+</head>
+
+<body background="/dashboard/img/new_login_bg.png">
+  <header>
+    <div id="header-left-box">
+      <!-- <span class="top-span">Active rooms: <span id="active-rooms">0</span></span> -->
+    </div>
+  </header>
+  <div id="confirm-box-topper">
+  </div>
+
+  <!-- Section -->
+  <section>
+    <select class="language span3" onchange="saveLocale()">
+        <option value="en">English</option>
+        <option value="ko">한국어</option>
+        <option value="id">Bahasa Indonesia</option>
+      </select>
+      
+
+
+    <!-- Login Form -->
+    <div id="login_form" class="modal-dialog" style="max-width: 430px;">
+      <div class="modal-content" style="margin-top: 20vh;">
+
+
+
+        <div class="login-header login-text login-bottom-border" data-i18n="LOGIN">로그인</div>
+
+        <div class="login-body login-bottom-border">
+          <br>
+
+          <div style="display: inline-grid;"> 
+            <div>
+              <input id="radio-teacher" checked name='sign-type' type="radio" value="teacher">
+              <label for='radio-teacher'>선생</label> 
+              <input id="radio-student" name='sign-type' type="radio" value="student">
+              <label for='radio-student'>학생</label> 
+            </div>
+            <input id="sign-up-name" placeholder="이름">
+            <input id="sign-up-school" placeholder="학교명">
+            <input id="sign-up-id" placeholder="ID">
+            <input id="sign-up-pw" placeholder="PW">
+            <input id="sign-up-pw2" placeholder="PW">
+            <button id="sign-up-btn">회원가입</button>
+          </div>
+
+          <div style="display: inline-grid;"> 
+            <input id="sign-in-id" placeholder="ID">
+            <input id="sign-in-pw" placeholder="PW">
+            <button id="sign-in-btn">로그인</button>
+          </div>
+
+
+
+          <div>
+            <p><button type="button" class="btn btn-blue" id="btn-join-hidden-room" data-i18n="STUDENT">STUDENT</button></p>
+            <button type="button" class="btn btn-mint" id="btn-create-room" data-i18n="TEACHER">TEACHER</button>
+          </div>
+        </div>
+
+        
+        <div style="height: 10px;"></div>
+      </div>
+    </div>
+
+  </section>
+
+  </div>
+
+  <script src="/dashboard/js/lib.js"></script>
+  <script src="/dashboard/js/login.js"></script>
+
+</body>
+
+</html>
