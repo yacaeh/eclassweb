@@ -64,7 +64,7 @@
           <br>
 
 
-          <form style="display: inline-grid;"> 
+          <form action="javascript:void(0);" style="margin: 10px; display: inline-grid;"> 
             <div>
               <input id="radio-teacher" checked name='sign-type' type="radio" value="teacher">
               <label for='radio-teacher'>선생</label> 
@@ -80,19 +80,17 @@
             <button id="sign-up-btn">회원가입</button>
           </form>
 
-          <form style="display: inline-grid;"> 
+          <form action="javascript:void(0);" style="margin: 10px; display: inline-grid;"> 
             <input id="sign-in-id" placeholder="ID">
             <input autocomplete="off" type="password" id="sign-in-pw" placeholder="PW">
             <button id="sign-in-btn">로그인</button>
-            <button id="sign-out-btn">로그아웃</button>
             <button id="get-now-info">현재 로그인 정보</button>
           </form>
 
-
-
-          <div>
-            <p><button type="button" class="btn btn-blue" id="btn-join-hidden-room" data-i18n="STUDENT">STUDENT</button></p>
-            <button type="button" class="btn btn-mint" id="btn-create-room" data-i18n="TEACHER">TEACHER</button>
+          <div style="margin: 10px; display: inline-grid;">
+            <button>방 만들기</button>
+            <input id="room-number" placeholder="방 번호">
+            <button>방 접속</button>
           </div>
         </div>
 
@@ -105,6 +103,7 @@
 
   </div>
 
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/dashboard/js/lib.js"></script>
   <script src="/dashboard/js/login.js"></script>
 

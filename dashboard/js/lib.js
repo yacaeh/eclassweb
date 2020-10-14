@@ -99,13 +99,20 @@ function alertBox(message, title, callback_yes, callback_no) {
 
 function Post(url, data, callback) {
   let xml = new XMLHttpRequest();
-  xml.open("POST", url);
+  xml.open("POST", url, true);
   xml.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
   xml.send(JSON.stringify(data));
   xml.addEventListener("readystatechange", function (data) {
     if (xml.readyState == xml.DONE && xml.status == 200) {
-      callback(xml.responseText);
+      callback(JSON.parse(xml.responseText));
     }
+  })
+  return xml
+}
+
+function PostAsync(url, data) {
+  return axios.post(url, data).then(function (e) {
+    return e.data;
   })
 }
 
