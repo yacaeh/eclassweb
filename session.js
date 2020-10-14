@@ -33,8 +33,8 @@ module.exports = {
         const expires = new Date();
         expires.setMinutes(expires.getMinutes() + 5);
         this.session[sessionid] = {
-            uid,
-            expires,
+            uid : uid,
+            expires : expires,
         };
         console.log(this.session);
         return { code: 200, text: 'success' };

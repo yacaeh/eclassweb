@@ -78,7 +78,16 @@ module.exports = {
             case '/sign-out' : 
                 return session.logout(session.get(req));
 
+            case '/get-now-account' :
+                let sessiondata = session.session[session.get(req)];
+
+                if(!sessiondata)
+                    return {code: 400, text : 'not logined'};
                 
+                find = await this.db.collection('accounts-teacher').findOne({ uid: sessiondata.uid }) ||
+                await this.db.collection('accounts-student').findOne({ uid: sessiondata.uid });
+                return {code : 200 , find : 'success' , data : find};
+
         }
         return false;
     },

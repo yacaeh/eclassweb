@@ -2,6 +2,7 @@
 signup();
 signin();
 signout();
+getNowLoginInfo();
 
 function signup(){
     document.getElementById("sign-up-btn").addEventListener("click", (event) => {
@@ -34,9 +35,9 @@ function signup(){
         }
 
 
-        var passRule = /^[A-Za-z0-9]{6,12}$/
+        var passRule = /^[A-Za-z0-9]{6,16}$/
         if(!passRule.test(pw)){
-            alert("숫자와 문자 포함 형태의 6~12자리 이내의 비밀번호가 필요합니다");
+            alert("숫자와 문자 포함 형태의 6~16자리 이내의 비밀번호가 필요합니다");
             return;
         }
         
@@ -108,6 +109,16 @@ function signout(){
             else if(e.code == 400){
                 alert("이미 로그아웃 되어있습니다");
             }
+        })
+    })
+}
+
+function getNowLoginInfo(){
+    document.getElementById("get-now-info").addEventListener("click", (event) =>{
+        event.preventDefault();
+        Post('/get-now-account',{}, function(e) {
+            e = JSON.parse(e);
+            console.log(e)
         })
     })
 }
