@@ -143,31 +143,6 @@ connection.onleave = function (event) {
   classroomManager.leftStudent(event);
 };
 
-// connection.onstream = function (event) {
-//   console.log('onstream!', event);
-
-//   if (classroomInfo.shareScreen.state &&
-//     (classroomInfo.shareScreen.id == event.streamid)) {
-//     screenshareManager.streamstart(event);
-//   };
-
-//   if (event.share)
-//     return;
-
-//   if (params.open === 'true') {
-//     maincamManager.addStudentCam(event);
-//   }
-//   else {
-//     if (event.type == "local" && event.stream.isVideo) {
-//       event.mediaElement.pause();
-//       event.stream.mute("audio");
-//     }
-//     else {
-//       maincamManager.addTeacherCam(event);
-//     }
-//   }
-// };
-
 connection.onstreamended = function (event) {
   console.log('onstreameneded!', event);
   newscreenshareManager.onclose(event);

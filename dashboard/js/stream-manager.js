@@ -817,7 +817,6 @@ class maincamManagerClass{
     this.start();
     classroomInfo.camshare = {};
     classroomInfo.camshare.id = stream.id;
-    console.log(connection.socket);
     classroomManager.updateClassroomInfo();
   }
 

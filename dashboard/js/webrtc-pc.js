@@ -17,6 +17,7 @@ const config = {
 const wsuri = `wss://192.168.124.41:7000/ws`;
 const socket = new WebSocket(wsuri);
 const pc = new RTCPeerConnection(config);
+let teacherAdded = false;
 
 const VideoResolutions = {
     thumb: { width: { ideal: 82 }, height: { ideal: 58 } },
@@ -193,8 +194,9 @@ async function webRTCPCInit() {
         localStream = stream;
         localStream.getTracks().forEach((track) => {
           pc.addTrack(track, localStream);
-          if (params.open === 'true') {
+          if (params.open === 'true' && !teacherAdded) {
             console.log('Add teacher!');
+            teacherAdded = true;
             maincamManager.addNewTeacherCam(localStream);
           }
         });
