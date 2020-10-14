@@ -56,6 +56,7 @@
     "minify": "^5.1.1",
     "mongo": "^0.1.0",
     "multistreamsmixer": "latest",
+    "node-session": "^1.2.1",
     "recordrtc": "latest",
     "rtcmulticonnection-server": "latest",
     "socket.io": "latest",
