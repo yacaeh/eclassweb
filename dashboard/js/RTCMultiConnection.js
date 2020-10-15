@@ -349,7 +349,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         });
 
         connection.socket.on('disconnect', function (event) {
-            console.error("socket disconnected");
+            console.error("socket disconnected :",event);
         });
 
         connection.socket.on('error', function (event) {
@@ -4471,8 +4471,10 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             connection.closeBeforeUnload = false;
         }
 
+        console.log("userid change-->" + connection.userid)
         connection.userid = getRandomString();
-   
+        
+        console.log("userid change-->" + connection.userid)
         connection.extra = {};
         connection.attachStreams = [];
 

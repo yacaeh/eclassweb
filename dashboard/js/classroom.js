@@ -10,6 +10,10 @@
   while ((match = r.exec(search.substring(1))))
     params[d(match[1])] = d(match[2]);
   window.params = params;
+  if(!window.params.bylogin)
+    window.params.bylogin = 'false';
+
+  console.log(window.params);
 })();
 
 //=============================================================================================
@@ -96,6 +100,21 @@ connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
 
+if(params.uid)
+  connection.userid = params.uid;
+
+if(window.params.bylogin === "true"){
+  // logincheck();
+}
+
+async function logincheck(){
+  const info = await PostAsync("/get-now-account", {});
+  if(info.code == 400){
+    alert("로그인 정보가 없습니다.");
+  }else{
+  }
+}
+
 screenshareManager.setFrameRate(1, 2);
 
 connection.session = {
@@ -113,6 +132,7 @@ connection.sdpConstraints.mandatory = {
 ChattingManager.init();
 
 window.onWidgetLoaded = function () {
+  console.debug("On widget loaded");
   examObj.init();
   pageNavigator.init();
   canvasManager.init();
@@ -129,10 +149,7 @@ window.onClassroominfoChanged = function(prop, value) {
 let isSync = false;
 
 connection.onopen = function (event) {
-  if (!isSync) {
-    classroomCommand.joinRoom();
-    isSync = true;
-  }
+  console.log('on open', event);
   classroomManager.joinStudent(event);
 };
 
@@ -175,7 +192,8 @@ connection.onstreamended = function (event) {
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  params.open === 'true' ? classroomManager.createRoom() :
+  params.open === 'true'? 
+                           classroomManager.createRoom() :
                            classroomManager.joinRoom();
   onWidgetLoaded();
 });

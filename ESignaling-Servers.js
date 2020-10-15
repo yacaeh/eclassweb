@@ -4,6 +4,7 @@
 
 var listOfUsers = {};
 var listOfRooms = {};
+let teacherlist = {};
 
 var adminSocket;
 
@@ -17,6 +18,7 @@ var pushLogs = require('rtcmulticonnection-server/node_scripts/pushLogs.js');
 var CONST_STRINGS = require('rtcmulticonnection-server/node_scripts/CONST_STRINGS.js');
 
 var isAdminAuthorized = require('rtcmulticonnection-server/node_scripts/verify-admin.js');
+const { test } = require("./db");
 
 module.exports = exports = function (socket, config) {
     config = config || {};
@@ -30,7 +32,6 @@ module.exports = exports = function (socket, config) {
     function appendUser(socket, params) {
         try {
             var extra = params.extra;
-
             var params = socket.handshake.query;
 
             if (params.extra) {
@@ -234,6 +235,10 @@ module.exports = exports = function (socket, config) {
 
     function onConnection(socket) {
         var params = socket.handshake.query;
+        console.log("connected",params.userid);
+        Object.keys(listOfUsers).forEach((e)=>{
+            console.log(e);
+        })
 
         if (!params.userid) {
             params.userid = (Math.random() * 100).toString().replace('.', '');
@@ -266,7 +271,6 @@ module.exports = exports = function (socket, config) {
         if (enableScalableBroadcast === true) {
             try {
                 if (!ScalableBroadcast) {
-                    // path to scalable broadcast script must be accurate
                     ScalableBroadcast = require('rtcmulticonnection-server/node_scripts/Scalable-Broadcast.js');
                 }
                 ScalableBroadcast._ = ScalableBroadcast(config, socket, params.maxRelayLimitPerUser);
@@ -277,6 +281,8 @@ module.exports = exports = function (socket, config) {
 
         // do not allow to override userid
         if (!!listOfUsers[params.userid]) {
+            console.log("Alreay user id");
+
             var useridAlreadyTaken = params.userid;
             params.userid = (Math.random() * 1000).toString().replace('.', '');
             socket.emit('userid-already-taken', useridAlreadyTaken, params.userid);
@@ -365,8 +371,9 @@ module.exports = exports = function (socket, config) {
 
         socket.on('changed-uuid', function (newUserId, callback) {
             callback = callback || function () { };
-
             try {
+                console.log("CHANGE UID",socket.userid,'->',newUserId);
+                
                 if (listOfUsers[socket.userid] && listOfUsers[socket.userid].socket.userid == socket.userid) {
                     if (newUserId === socket.userid) return;
 
@@ -381,8 +388,7 @@ module.exports = exports = function (socket, config) {
 
                 socket.userid = newUserId;
                 appendUser(socket, params);
-
-                callback();
+                callback('ok');
             } catch (e) {
                 pushLogs(config, 'changed-uuid', e);
             }
@@ -556,9 +562,6 @@ module.exports = exports = function (socket, config) {
                     return;
                 }
 
-                // redundant?
-                // appendToRoom(roomid, socket.userid);
-
                 if (enableScalableBroadcast === false) {
                     // connect with all participants
                     listOfRooms[roomid].participants.forEach(function (pid) {
@@ -584,7 +587,7 @@ module.exports = exports = function (socket, config) {
                         maxParticipantsAllowed: parseInt(params.maxParticipantsAllowed || 1000) || 1000,
                         realowner: userid,
                         owner: userid, // this can change if owner leaves and if control shifts
-                        participants: [userid],
+                        participants: [],
                         userlist : {},
                         extra: {},
                         info: {
@@ -631,11 +634,17 @@ module.exports = exports = function (socket, config) {
                     };
 
                     listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
+
+                    console.log("┌───────────────────────────────────┐");
+                    console.log("│   Appended room", roomid, userid +"  │");
+                    console.log("└───────────────────────────────────┘");
+                    return;
                 }
 
-                if (listOfRooms[roomid].participants.indexOf(userid) !== -1) 
+                if (listOfRooms[roomid].participants.indexOf(userid) !== -1) {
                     return;
-                
+                }
+
                 listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
                 listOfRooms[roomid].participants.push(userid);
             } catch (e) {
@@ -680,7 +689,7 @@ module.exports = exports = function (socket, config) {
                         }
 
                         else {
-                            console.log("DELETED 2")
+                            console.log("Deleted room : maybe owner isn't in room");
                             delete listOfRooms[roomid];
                         }
                     }
@@ -822,7 +831,6 @@ module.exports = exports = function (socket, config) {
 
         socket.on('open-room', function (arg, callback) {
             callback = callback || function () { };
-
             try {
                 // if already joined a room, either leave or close it
                 if (listOfRooms[arg.sessionid] &&
@@ -925,7 +933,7 @@ module.exports = exports = function (socket, config) {
             callback = callback || function () { };
 
             try {
-                closeOrShiftRoom();
+                // closeOrShiftRoom();
 
                 if (enableScalableBroadcast === true) {
                     arg.session.scalable = true;
@@ -950,6 +958,7 @@ module.exports = exports = function (socket, config) {
 
             try {
                 if (!listOfRooms[arg.sessionid]) {
+                    console.log("There is Not room")
                     callback(false, CONST_STRINGS.ROOM_NOT_AVAILABLE);
                     return;
                 }
@@ -981,12 +990,12 @@ module.exports = exports = function (socket, config) {
             try {
                 // admin info are shared only with /admin/
                 listOfUsers[socket.userid].socket.admininfo = {
-                    sessionid: arg.sessionid,
-                    session: arg.session,
+                    sessionid       : arg.sessionid,
+                    session         : arg.session,
                     mediaConstraints: arg.mediaConstraints,
-                    sdpConstraints: arg.sdpConstraints,
-                    streams: arg.streams,
-                    extra: arg.extra
+                    sdpConstraints  : arg.sdpConstraints,
+                    streams         : arg.streams,
+                    extra           : arg.extra
                 };
             } catch (e) {
                 pushLogs(config, 'join-room', e);
@@ -1028,15 +1037,17 @@ module.exports = exports = function (socket, config) {
                 pushLogs(config, 'disconnect', e);
             }
 
-            // console.log("LEFT")
-            if (listOfRooms[getRoomId()])
+            if (listOfRooms[getRoomId()] &&  socket.userid in listOfRooms[getRoomId()].participants){
                 LeftClass();
+            }
 
             closeOrShiftRoom();
             delete listOfUsers[socket.userid];
             
-            if (socket.admininfo)
-                delete listOfRooms[socket.admininfo.sessionid].userlist[socket.userid]
+            if (socket.admininfo){
+                if(socket.admininfo.sessionid in listOfRooms && socket.userid in listOfRooms[socket.admininfo.sessionid].userlist)
+                    delete listOfRooms[socket.admininfo.sessionid].userlist[socket.userid]
+            }
                 
             if (socket.ondisconnect) {
                 console.error("if on disconnect", socket.userid);
@@ -1076,7 +1087,7 @@ module.exports = exports = function (socket, config) {
 
         socket.on("show-class-status", function (callback) {
             // callback(listOfRooms[getRoomId()].info)
-            callback(listOfRooms[getRoomId()])
+            callback(listOfRooms)
         })
 
         socket.on("screen-share-set", function(data, callback){
@@ -1092,6 +1103,50 @@ module.exports = exports = function (socket, config) {
         socket.on("get-user-name", function(userid, callback){
             callback(listOfRooms[getRoomId()].userlist[userid]);
         })
+
+
+
+        // Login -- 방을 새로 생성
+        socket.on('append-room', function(arg, callback){
+            appendToRoom(arg.sessionid, arg.userid);
+            teacherlist[arg.userid] = arg.sessionid;
+
+            socket.admininfo = {
+                    sessionid       : arg.sessionid,
+                    session         : arg.session,
+                    mediaConstraints: arg.mediaConstraints,
+                    sdpConstraints  : arg.sdpConstraints,
+                    streams         : arg.streams,
+                    extra           : arg.extra
+            };
+            OpenRoom(arg.userid);
+            callback({code : 200, text : 'appended room by key : ' + arg.sessionid});
+        })
+
+        socket.on('delete-room', function(roomid, callback){
+            console.log("┌───────────────────────────────────┐");
+            console.log("│   Deleted  room", roomid, listOfRooms[roomid].realowner +"  │");
+            console.log("└───────────────────────────────────┘");
+
+
+            delete teacherlist[listOfRooms[roomid].realowner]
+            delete listOfRooms[roomid]
+            callback({code : 200, text : 'deleted'});
+        })
+
+        socket.on('get-my-room', function(uid, callback){
+            callback(teacherlist[uid]);
+        })
+
+        socket.on('get-userlist', function(callback){
+            let list = []
+            Object.keys(listOfUsers).forEach((e) => {
+                list.push(e);
+            })
+            callback(list);
+        })
+
+
 
         //--------------------------------------------------------------------------------//
 
@@ -1117,17 +1172,20 @@ module.exports = exports = function (socket, config) {
                 return socket.admininfo.sessionid;
         };
 
-        function OpenRoom() {
-            let openTime = GetTime();
-            let user = GetUserData();
-            console.log("Create Room", user.userid);
+        function OpenRoom(userid) {
+            let openTime    = GetTime();
+            let user        = GetUserData();
+
+            if(userid)
+                user.userid = userid;
+
             getRoom().openTime = openTime.full;
 
             let data = {
-                roomOpenDate: openTime.date,
-                roomOpenTime: openTime.time,
-                roomOwner: user.userid,
-                userList: {}
+                roomOpenDate    : openTime.date,
+                roomOpenTime    : openTime.time,
+                roomOwner       : user.userid,
+                userList        : {}
             }
             data.userList[user.userid] = user;
             fs.writeFileSync("./logs/" + openTime.full + "_" + user.userid + ".json", JSON.stringify(data));
@@ -1169,9 +1227,9 @@ module.exports = exports = function (socket, config) {
 
         function GetUserData() {
             return {
-                userid: socket.userid,
-                username: socket.admininfo.extra.userFullName,
-                enterTime: GetTime().time
+                userid      : socket.userid,
+                username    : socket.admininfo.extra.userFullName,
+                enterTime   : GetTime().time
             }
         }
 
