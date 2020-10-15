@@ -256,7 +256,7 @@ class ScreenShareManagerClass{
 
           addStreamStopListener(stream, function () {
             screenshareManager.stop();            
-            connection.removeStream(stream.id)
+            // connection.removeStream(stream.id)
             connection.attachStreams.forEach(function (e) {
               if(e.id == stream.id){
                 var idx = connection.attachStreams.indexOf(e);
@@ -422,6 +422,7 @@ class NewScreenShareManagerClass{
     return GetWidgetFrame().document.getElementById("screen-viewer");
   }
   show() {
+    console.log("Show!");
     classroomManager.canvasResize();
     this.get().style.display = 'block';
   }
@@ -449,7 +450,9 @@ class NewScreenShareManagerClass{
     classroomInfo.shareScreen.state = false
     classroomInfo.shareScreen.id = undefined
     classroomInfo.shareScreen.userid = undefined;
-    connection.socket.emit("screen-share-set", classroomInfo.shareScreen);
+    classroomManager.updateClassroomInfo((result)=>console.log(result));
+    pc.removeTrack(screenSender);
+    
   }
   btn(btn) {
     if (!classroomInfo.shareScreen.state && checkSharing()) {
@@ -514,7 +517,7 @@ class NewScreenShareManagerClass{
           screenStream = stream;
           addStreamStopListener(stream, function () {
             newscreenshareManager.stop();            
-            connection.removeStream(stream.id)
+            // connection.removeStream(stream.id)
             connection.attachStreams.forEach(function (e) {
               if(e.id == stream.id){
                 var idx = connection.attachStreams.indexOf(e);
@@ -538,9 +541,8 @@ class NewScreenShareManagerClass{
           console.log(screenStream);
           let track= screenStream.getVideoTracks()[0];
           if (track) {
-            pc.addTrack(track, screenStream);
+            screenSender = pc.addTrack(track, screenStream);
           }
-        
         },
         (error) => {
           btn.classList.remove("on");
@@ -596,7 +598,7 @@ class NewScreenShareManagerClass{
       classroomInfo.shareScreen.state = true
       classroomInfo.shareScreen.id = stream.id
       classroomInfo.shareScreen.userid = connection.userid;
-      connection.socket.emit("screen-share-set", classroomInfo.shareScreen);
+      classroomManager.updateClassroomInfo((result)=>console.log(result));
       newscreenshareManager.start(stream, btn);
     }
   }
@@ -628,12 +630,12 @@ class NewScreenShareManagerClass{
       classroomInfo.shareScreen.id = event.data.showScreenShare;
       classroomInfo.shareScreen.userid = event.userid;
 
-      try {
-        let stream = connection.streamEvents[event.data.showScreenShare].stream;
-        this.streamstart(stream);
-      }
-      catch (error) { 
-      }
+      // try {
+      //   let stream = connection.streamEvents[event.data.showScreenShare].stream;
+      //   this.streamstart(stream);
+      // }
+      // catch (error) { 
+      // }
 
       return true;
     }
@@ -817,7 +819,7 @@ class maincamManagerClass{
     this.start();
     classroomInfo.camshare = {};
     classroomInfo.camshare.id = stream.id;
-    classroomManager.updateClassroomInfo();
+    classroomManager.updateClassroomInfo((result)=>console.log(result));
   }
 
   eventListener(event) {

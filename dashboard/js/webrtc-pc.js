@@ -41,18 +41,13 @@ video: true,
 
 let localStream;
 let screenStream;
-
-async function checkScreenSharing() {
-  await classroomInfo.shareScreen.id;
-  console.log('Checking screen state!' + classroomInfo.shareScreen.id);
-}
+let screenSender;
 
 async function webRTCPCInit() {
   try {
     console.log('classroomInfo.shareScreen.id ', classroomInfo.shareScreen.id);
     pc.ontrack = function ({ track, streams }) {
       console.log('New track added!');
-      checkScreenSharing();
       streams.forEach((stream) => {
         if (track.kind === 'video') {
           console.log(
@@ -111,6 +106,7 @@ async function webRTCPCInit() {
       // Listen for server renegotiation notifications
       if (!resp.id && resp.method === 'offer') {
         log(`Got offer notification`);
+        console.log("offer set remote description");
         await pc.setRemoteDescription(resp.params);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
@@ -147,19 +143,21 @@ async function webRTCPCInit() {
       socket.addEventListener('message', (event) => {
         const resp = JSON.parse(event.data);
         if (resp.id === id) {
+          console.log(resp.id);
           log(`Got publish answer`);
 
           // Hook this here so it's not called before joining
           pc.onnegotiationneeded = async function () {
             log('Renegotiating');
+            console.log("renegotiating!");
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            const id = connection.userid;
+            const id = Math.random().toString();
             socket.send(
               JSON.stringify({
                 method: 'offer',
                 params: { desc: offer },
-                id,
+                id
               })
             );
 
@@ -168,11 +166,15 @@ async function webRTCPCInit() {
               if (resp.id === id) {
                 log(`Got renegotiation answer`);
                 pc.setRemoteDescription(resp.result);
+                console.log("offer renegotiation set remote description");
+                console.log(resp.result);
               }
             });
           };
 
           pc.setRemoteDescription(resp.result);
+          console.log("join offer renegotiation set remote description");
+          console.log(resp.result);
         }
       });
     };
