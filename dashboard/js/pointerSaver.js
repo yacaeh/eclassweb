@@ -40,7 +40,7 @@ class PointerSaver {
             userId: name,
             point: this.container
         }
-        Post(url, JSON.stringify(data), function (e) {
+        Post(url, data, function (e) {
         })
         this.path = undefined;
     }
