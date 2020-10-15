@@ -51,13 +51,13 @@ async function webRTCPCInit() {
       streams.forEach((stream) => {
         if (track.kind === 'video') {
           console.log(
+            'stream.id:',stream.id,
             'classroomInfo.shareScreen.id',
             classroomInfo.shareScreen.id,
             'state:',
             classroomInfo.shareScreen.state
           );
           if (
-            classroomInfo.shareScreen.id !== undefined &&
             stream.id == classroomInfo.shareScreen.id &&
             classroomInfo.shareScreen.state
           ) {
@@ -130,8 +130,6 @@ async function webRTCPCInit() {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       const id = connection.userid;
-      console.log('params.sessionid:' + params.sessionid);
-      console.log('connection.userid:' + connection.userid);
       socket.send(
         JSON.stringify({
           method: 'join',
