@@ -131,3 +131,28 @@ function Get(url, callback) {
 
   })
 }
+
+
+async function SetNowLoginInfo(){
+  const info = await PostAsync("/get-now-account", {});
+  logininfo = info;
+  console.log(info);
+  
+  if(info.code == 200){
+    window.params.userFullName =  logininfo.data.name;
+  }
+  return info;
+}
+
+
+function ChangeUID(uid){
+  connection.socket.emit('changed-uuid', uid, (e) => {
+    console.log("UID Changed => " + uid);
+  })
+}
+
+function getuserlist(){
+  connection.socket.emit('get-userlist', (e) => {
+    console.log(e);
+  })
+}

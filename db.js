@@ -39,8 +39,6 @@ module.exports = {
 
     api: async function (req, data) {
         let route = req.url;
-        console.log(route);
-        console.log(data);
         let find = undefined;
 
         switch (route) {
@@ -71,8 +69,11 @@ module.exports = {
                     return { code: 400, text: 'failed' };
                 }
                 else {
-                    const sessionid = session.get(req);  
-                    return session.login(sessionid, find.uid);
+                    let logindata = session.login(session.get(req), find.uid);
+                    find = await this.db.collection('accounts-teacher').findOne({ uid: find.uid }) ||
+                            await this.db.collection('accounts-student').findOne({ uid: find.uid });
+                    logindata.data = find;
+                    return logindata;
                 }
 
             case '/sign-out' : 

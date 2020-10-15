@@ -475,10 +475,26 @@ class classroomManagerClass {
         console.log('Opening Class!');
         let isSync;
         classroomManager.setTeacher();
+
         connection.open(params.sessionid, function (isRoomOpened, roomid, command) {
-            if (command == "room already exist") {
+            console.log(isRoomOpened,roomid,command,params.bylogin);
+            //  params.bylogin === 'false'
+
+            if (command == "room already exist" && params.bylogin == 'false') {
+                console.log("EXISTING_ROOM_ERROR");
                 alert($.i18n('EXISTING_ROOM_ERROR'));
-                classroomManager.gotoMain();
+                // classroomManager.gotoMain();
+            }
+            else if(params.bylogin == 'true'){
+                console.log("join room teacher")
+                connection.join({
+                    sessionid: params.sessionid,
+                    userid: 'qweasdzxc',
+                    session: connection.session
+                }, function (a, b, c) {
+                    classroomCommand.joinRoom();
+                    connection.socket.on('disconnect', () => location.reload())
+                })
             }
             else if (command == "owner rejoin") {
                 connection.join({
@@ -495,22 +511,24 @@ class classroomManagerClass {
                 connection.socket.on('disconnect', () => location.reload())
             }
         });
+
     };
 
     joinRoom() {
         classroomManager.setStudent();
-        console.log('try joining!');
+        console.debug('try joining!');
         connection.join({
             sessionid: params.sessionid,
             userid: connection.channel,
             session: connection.session
         }, function (isRoomJoined, roomid, error) {
-            console.log('Joing Class!');
+            console.debug('Joing Class!');
 
             if (error) {
                 console.log('Joing Error!');
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
-                    location.reload();
+                    alert("방이 존재하지 않습니다");
+                    // location.reload();
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
@@ -538,6 +556,7 @@ class classroomManagerClass {
                 alert(error);
             }
 
+            classroomCommand.joinRoom();
             connection.socket.on('disconnect', function () {
                 console.log('disconnect Class!');
                 location.reload();
