@@ -1037,9 +1037,7 @@ module.exports = exports = function (socket, config) {
                 pushLogs(config, 'disconnect', e);
             }
 
-            if (listOfRooms[getRoomId()]){
-                console.log(socket.userid);
-
+            if (listOfRooms[getRoomId()] &&  socket.userid in listOfRooms[getRoomId()].participants){
                 LeftClass();
             }
 

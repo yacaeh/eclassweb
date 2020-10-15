@@ -29,6 +29,7 @@ function logined(){
     btn.innerHTML = "로그아웃";
     btn.removeEventListener("click", signin);
     btn.addEventListener("click", signout)
+    GetMyRoom(logininfo.data.uid);
     // ChangeUID(logininfo.data.uid);
 }
 
@@ -233,17 +234,11 @@ function makeroom(arg){
 
 function GetMyRoom(uid){
     connection.socket.emit('get-my-room', uid, (e) => {
-        console.log(e);
+        if(e){
+            MakeRoomBtn(e);
+        }
     })
 }
-
-
-
-connection.socket.emit('get-my-room', 'qweasdzxc', (e) => {
-    console.log(e);
-    if(e)
-        MakeRoomBtn(e);
-})
 
 function MakeRoomBtn(code){
     let btn = document.createElement("button");
