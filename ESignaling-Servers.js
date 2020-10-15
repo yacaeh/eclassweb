@@ -638,6 +638,7 @@ module.exports = exports = function (socket, config) {
                     console.log("┌───────────────────────────────────┐");
                     console.log("│   Appended room", roomid, userid +"  │");
                     console.log("└───────────────────────────────────┘");
+                    return;
                 }
 
                 if (listOfRooms[roomid].participants.indexOf(userid) !== -1) {
@@ -1036,9 +1037,11 @@ module.exports = exports = function (socket, config) {
                 pushLogs(config, 'disconnect', e);
             }
 
-            // console.log("LEFT")
-            if (listOfRooms[getRoomId()])
+            if (listOfRooms[getRoomId()]){
+                console.log(socket.userid);
+
                 LeftClass();
+            }
 
             closeOrShiftRoom();
             delete listOfUsers[socket.userid];
