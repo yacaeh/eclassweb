@@ -9,6 +9,7 @@ connection.sdpConstraints.mandatory = {
     OfferToReceiveAudio: false,
     OfferToReceiveVideo: false
 };
+var passRule = /^.*(?=^.{6,16}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
 
 let logininfo = SetNowLoginInfo() || undefined;
 
@@ -38,8 +39,8 @@ function logouted(){
     btn.innerHTML = "로그인";
     btn.removeEventListener("click", signout);
     btn.addEventListener("click", signin)
+    document.getElementById("my-room").innerHTML = '나의 방';
 }
-
 
 async function signup(){
     let type = 'teacher';
@@ -69,8 +70,6 @@ async function signup(){
         return false;
     }
 
-
-    var passRule = /^.*(?=^.{6,16}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
     if(!passRule.test(pw)){
         alert("하나의 특수문자,숫자, 문자 포함 형태의 6~16자리의 비밀번호가 필요합니다");
         return;
@@ -97,7 +96,10 @@ async function signup(){
         alert("회원가입이 완료되었습니다");
     }
     else if(ret.code == 400){
-        alert("이미 존재하는 아이디입니다");
+        alert("이미 등록된 아이디입니다");
+    }
+    else if(ret.code == 401){
+        alert("이미 등록된 이메일입니다")
     }
 }
 
@@ -136,17 +138,55 @@ async function signout(){
         alert("이미 로그아웃 되어있습니다");
 }
 
+async function findid(){
+    let name = document.getElementById("find-id-name").value;
+    let email = document.getElementById('find-id-email').value;
+
+    if(!name || !email){
+        alert("모든 정보를 입력해주세요");
+        return;
+    }
+
+    const ret = await PostAsync("/find-id", {name, email});
+    if(ret.code == 200){
+        alert("아이디는 " + ret.data + "입니다");
+    }
+    else if(ret.code == 400){
+        alert("일치하는 아이디가 없습니다");
+    }
+    console.log(ret);
+}
+
+async function findpw(){
+    let id = document.getElementById("find-pw-id").value;
+    let email = document.getElementById('find-pw-email').value;
+    let pw = document.getElementById('find-pw-pw').value;
+    let pw2 = document.getElementById('find-pw-pw2').value;
+    
+    if(!passRule.test(pw)){
+        alert("하나의 특수문자,숫자, 문자 포함 형태의 6~16자리의 비밀번호가 필요합니다");
+        return;
+    }
+    
+    if(pw != pw2){
+        alert("비밀번호가 서로 일치하지 않습니다.");
+        return;
+    }
+
+    const ret = await PostAsync("/find-pw", {id, email, pw});
+    if(ret.code == 200){
+        alert("비밀번호가 변경되었습니다.");
+    }
+    else{
+        alert("비밀번호 변경에 실패했습니다.")
+    }
 
 
-document.getElementById("sign-up-btn").addEventListener("click", (event) =>{
-    event.preventDefault();  
-    signup();
-})
+}
 
-document.getElementById("get-now-info").addEventListener("click", (event) =>{
-    event.preventDefault();
-    SetNowLoginInfo();
-})
+document.getElementById("sign-up-btn").addEventListener("click", signup)
+
+document.getElementById("get-now-info").addEventListener("click", SetNowLoginInfo)
 
 document.getElementById("make-room").addEventListener("click",() => {
     if(!logininfo || logininfo.code == 400){
@@ -156,11 +196,11 @@ document.getElementById("make-room").addEventListener("click",() => {
 
     const key = Math.floor(( 100000 + Math.random() * 900000));
 
-    connection.sessionid = key;
-    connection.isInitiator = true;
-    connection.session.oneway = true;
-    connection.userid = logininfo.data.uid;
-    connection.extra.userFullName = logininfo.data.name;
+    connection.userid               = logininfo.data.uid;
+    connection.sessionid            = key;
+    connection.isInitiator          = true;
+    connection.session.oneway       = true;
+    connection.extra.userFullName   = logininfo.data.name;
 
     connection.socket.emit('get-my-room', connection.userid, (e) => {
         if(e){
@@ -212,8 +252,12 @@ document.getElementById("join-room").addEventListener('click',() => {
     })
 })
 
+document.getElementById("find-id-btn").addEventListener('click', findid);
+
+document.getElementById('find-pw-btn').addEventListener('click', findpw);
+
 function openCanvasDesigner() {
-    var href = location.origin + '/dashboard/classroom.html?open=' + connection.isInitiator + '&sessionid=' + connection.sessionid + '&publicRoomIdentifier=' + connection.publicRoomIdentifier + '&userFullName=' + connection.extra.userFullName  + '&bylogin=true' + '&uid=' + logininfo.data.uid; 
+    var href = location.origin + '/dashboard/classroom.html?open=' + connection.isInitiator + '&sessionid=' + connection.sessionid; 
     if (!!connection.password) {
         href += '&password=' + connection.password;
     }
@@ -250,7 +294,9 @@ function MakeRoomBtn(code){
     document.getElementById("my-room").appendChild(deletebtn);
 
 
-    btn.addEventListener("click" ,openCanvasDesigner);
+    btn.addEventListener("click" , () => {
+        openCanvasDesigner();
+    });
 
     deletebtn.addEventListener("click" ,function(e){
         connection.socket.emit('delete-room', code, (e) => {

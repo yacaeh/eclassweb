@@ -477,15 +477,15 @@ class classroomManagerClass {
         classroomManager.setTeacher();
 
         connection.open(params.sessionid, function (isRoomOpened, roomid, command) {
-            console.log(isRoomOpened,roomid,command,params.bylogin);
+            console.log(isRoomOpened,roomid,command);
             //  params.bylogin === 'false'
 
-            if (command == "room already exist" && params.bylogin == 'false') {
+            if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
                 alert($.i18n('EXISTING_ROOM_ERROR'));
                 // classroomManager.gotoMain();
             }
-            else if(params.bylogin == 'true'){
+            else if(connection.byLogin == true){
                 console.log("join room teacher")
                 connection.join({
                     sessionid: params.sessionid,

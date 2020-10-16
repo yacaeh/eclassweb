@@ -23,9 +23,7 @@ function SetClassroomInfo(newinfo){
 
 classroomCommand = {
     joinRoom: function () {
-        console.log("GET ROOM INFO..?")
         connection.socket.emit('get-room-info', (_info) => {
-            console.log("GET ROOM INFO..? OK")
             console.debug("Synced classroom info");
             SetClassroomInfo(_info);
             updateClassTime();

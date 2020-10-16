@@ -236,10 +236,6 @@ module.exports = exports = function (socket, config) {
     function onConnection(socket) {
         var params = socket.handshake.query;
         console.log("connected",params.userid);
-        Object.keys(listOfUsers).forEach((e)=>{
-            console.log(e);
-        })
-
         if (!params.userid) {
             params.userid = (Math.random() * 100).toString().replace('.', '');
         }
@@ -282,7 +278,6 @@ module.exports = exports = function (socket, config) {
         // do not allow to override userid
         if (!!listOfUsers[params.userid]) {
             console.log("Alreay user id");
-
             var useridAlreadyTaken = params.userid;
             params.userid = (Math.random() * 1000).toString().replace('.', '');
             socket.emit('userid-already-taken', useridAlreadyTaken, params.userid);
@@ -464,8 +459,9 @@ module.exports = exports = function (socket, config) {
         });
 
         socket.on('check-presence', function (roomid, callback) {
+            console.log('check-presence')
             try {
-                if (!listOfRooms[roomid] || !listOfRooms[roomid].participants.length) {
+                if (!listOfRooms[roomid]) {
                     callback(false, roomid, {
                         _room: {
                             isFull: false,
@@ -475,8 +471,6 @@ module.exports = exports = function (socket, config) {
                 }
                 else {
                     console.log("Room already exist")
-
-
                     var extra = listOfRooms[roomid].extra;
                     if (typeof extra !== 'object' || !extra) {
                         extra = {
@@ -579,16 +573,16 @@ module.exports = exports = function (socket, config) {
             sendToAdmin();
         }
 
-        function appendToRoom(roomid, userid) {
+        function appendToRoom(roomid, userid, maintainRoom) {
             try {
                 if (!listOfRooms[roomid]) {
-                    
                     listOfRooms[roomid] = {
                         maxParticipantsAllowed: parseInt(params.maxParticipantsAllowed || 1000) || 1000,
                         realowner: userid,
                         owner: userid, // this can change if owner leaves and if control shifts
                         participants: [],
                         userlist : {},
+                        maintainRoom : maintainRoom || false,
                         extra: {},
                         info: {
                             roomOpenTime: new Date().getTime(),    // 현재 시간 저장
@@ -636,7 +630,7 @@ module.exports = exports = function (socket, config) {
                     listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
 
                     console.log("┌───────────────────────────────────┐");
-                    console.log("│   Appended room", roomid, userid +"  │");
+                    console.log("│   Appended room", roomid, userid +"   │");
                     console.log("└───────────────────────────────────┘");
                     return;
                 }
@@ -659,6 +653,9 @@ module.exports = exports = function (socket, config) {
                 }
 
                 var roomid = socket.admininfo.sessionid;
+                
+                if(!listOfRooms[roomid] || listOfRooms[roomid].maintainRoom)
+                    return;
 
                 if (roomid && listOfRooms[roomid]) {
 
@@ -689,6 +686,7 @@ module.exports = exports = function (socket, config) {
                         }
 
                         else {
+                            console.log(listOfRooms[roomid]);
                             console.log("Deleted room : maybe owner isn't in room");
                             delete listOfRooms[roomid];
                         }
@@ -1042,6 +1040,7 @@ module.exports = exports = function (socket, config) {
             }
 
             closeOrShiftRoom();
+
             delete listOfUsers[socket.userid];
             
             if (socket.admininfo){
@@ -1108,7 +1107,7 @@ module.exports = exports = function (socket, config) {
 
         // Login -- 방을 새로 생성
         socket.on('append-room', function(arg, callback){
-            appendToRoom(arg.sessionid, arg.userid);
+            appendToRoom(arg.sessionid, arg.userid, true);
             teacherlist[arg.userid] = arg.sessionid;
 
             socket.admininfo = {
@@ -1125,9 +1124,13 @@ module.exports = exports = function (socket, config) {
 
         socket.on('delete-room', function(roomid, callback){
             console.log("┌───────────────────────────────────┐");
-            console.log("│   Deleted  room", roomid, listOfRooms[roomid].realowner +"  │");
+            console.log("│   Deleted room ", roomid, listOfRooms[roomid].realowner +"   │");
             console.log("└───────────────────────────────────┘");
 
+            listOfRooms[roomid].participants.forEach((userid) => {
+                if(listOfUsers[userid])
+                    listOfUsers[userid].socket.emit('deleted-room');
+            })
 
             delete teacherlist[listOfRooms[roomid].realowner]
             delete listOfRooms[roomid]

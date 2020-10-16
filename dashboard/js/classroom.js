@@ -96,22 +96,28 @@ connection.password = params.password;
 connection.chunkSize = 64000;
 connection.enableLogs = false;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
-connection.extra.userFullName = params.userFullName;
-connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
 
-if(params.uid)
-  connection.userid = params.uid;
+connection.extra.userFullName = params.userFullName;
+connection.publicRoomIdentifier = params.publicRoomIdentifier;
 
-if(window.params.bylogin === "true"){
-  // logincheck();
-}
-
-async function logincheck(){
-  const info = await PostAsync("/get-now-account", {});
-  if(info.code == 400){
-    alert("로그인 정보가 없습니다.");
-  }else{
+if(!window.params.userFullName){
+  var request = new XMLHttpRequest();
+  request.open('POST', '/get-now-account', false); 
+  request.send(JSON.stringify({}));
+  if (request.status === 200) {
+    const ret = JSON.parse(request.responseText);
+    if(ret.code == 400){
+      console.error("no login info")
+      alert("로그인 정보가 없습니다");
+      location.href = '/dashboard/login.html';
+    }
+    else{
+      connection.userid = ret.data.uid;
+      connection.extra.userFullName = ret.data.name;
+      connection.byLogin = true;
+    }
+    console.log(ret);
   }
 }
 

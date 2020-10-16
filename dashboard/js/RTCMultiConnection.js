@@ -364,8 +364,17 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         });
 
         connection.socket.on('userid-already-taken', function (useridAlreadyTaken, yourNewUserId) {
+            alert("해당 계정으로 다른 수업에 참여 중 입니다");
+            location.href = '/dashboard/login.html';
             connection.onUserIdAlreadyTaken(useridAlreadyTaken, yourNewUserId);
         });
+
+        connection.socket.on('deleted-room', function(e){
+            connection.socket._callbacks.$disconnect.length = 0;
+            connection.socket.disconnect();
+            alertBox($.i18n('TEACHER_LEFT'), $.i18n('NOTIFICATION'), () => {location.href = '/dashboard/login.html'} , $.i18n('CONFIRM'))
+
+        })
 
         connection.socket.on('logs', function (log) {
             if (!connection.enableLogs) return;
@@ -4471,11 +4480,8 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             connection.closeBeforeUnload = false;
         }
 
-        console.log("userid change-->" + connection.userid)
-        connection.userid = getRandomString();
-        
-        console.log("userid change-->" + connection.userid)
         connection.extra = {};
+        connection.userid = getRandomString();
         connection.attachStreams = [];
 
         connection.session = {
