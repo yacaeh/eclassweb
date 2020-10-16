@@ -90,20 +90,18 @@ const shortCut = [
 
 //=============================================================================================
 
-
-
-
 console.log('Connection!');
 connection.socketURL = '/';
 connection.password = params.password;
 connection.chunkSize = 64000;
 connection.enableLogs = false;
 connection.socketMessageEvent = 'canvas-dashboard-demo';
-connection.extra.userFullName = params.userFullName;
-connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.maxParticipantsAllowed = 40;
 
-if(window.params.bylogin === "true"){
+connection.extra.userFullName = params.userFullName;
+connection.publicRoomIdentifier = params.publicRoomIdentifier;
+
+if(!window.params.userFullName){
   var request = new XMLHttpRequest();
   request.open('POST', '/get-now-account', false); 
   request.send(JSON.stringify({}));
@@ -117,11 +115,11 @@ if(window.params.bylogin === "true"){
     else{
       connection.userid = ret.data.uid;
       connection.extra.userFullName = ret.data.name;
+      connection.byLogin = true;
     }
     console.log(ret);
   }
 }
-
 
 screenshareManager.setFrameRate(1, 2);
 

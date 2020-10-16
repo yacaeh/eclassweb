@@ -34,35 +34,19 @@
 </head>
 
 <body background="/dashboard/img/new_login_bg.png">
-  <header>
-    <div id="header-left-box">
-      <!-- <span class="top-span">Active rooms: <span id="active-rooms">0</span></span> -->
-    </div>
-  </header>
-  <div id="confirm-box-topper">
-  </div>
-
-  <!-- Section -->
   <section>
     <select class="language span3" onchange="saveLocale()">
         <option value="en">English</option>
         <option value="ko">한국어</option>
         <option value="id">Bahasa Indonesia</option>
       </select>
-      
-
 
     <!-- Login Form -->
     <div id="login_form" class="modal-dialog" style="max-width: 430px;">
       <div class="modal-content" style="margin-top: 20vh;">
-
-
-
         <div class="login-header login-text login-bottom-border" data-i18n="LOGIN">로그인</div>
-
         <div class="login-body login-bottom-border">
           <br>
-
 
           <form action="javascript:void(0);" style="margin: 10px; display: inline-grid;"> 
             <div>
@@ -96,12 +80,26 @@
           <div id="my-room">
             나의 방
           </div>
+          
+          <div style="margin: 10px; display: inline-grid;">
+            아이디 찾기
+            <input id="find-id-name" placeholder="이름">
+            <input id="find-id-email" placeholder="email">
+            <button id="find-id-btn">찾기</button>
+          </div>
+          
+          <form action="javascript:void(0);" style="margin: 10px; display: inline-grid;">
+            비밀번호 찾기/변경
+            <input id="find-pw-id" placeholder="id">
+            <input id="find-pw-email" placeholder="email">
+            <input autocomplete="off" type="password" id="find-pw-pw" placeholder="pw1">
+            <input autocomplete="off" type="password" id="find-pw-pw2" placeholder="pw2">
+            <button id="find-pw-btn">변경</button>
+          </form>
         </div>
-
-        
-        <div style="height: 10px;"></div>
       </div>
     </div>
+
 
   </section>
 
