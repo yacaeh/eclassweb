@@ -156,11 +156,11 @@ document.getElementById("make-room").addEventListener("click",() => {
 
     const key = Math.floor(( 100000 + Math.random() * 900000));
 
-    connection.sessionid = key;
-    connection.isInitiator = true;
-    connection.session.oneway = true;
-    connection.userid = logininfo.data.uid;
-    connection.extra.userFullName = logininfo.data.name;
+    connection.userid               = logininfo.data.uid;
+    connection.sessionid            = key;
+    connection.isInitiator          = true;
+    connection.session.oneway       = true;
+    connection.extra.userFullName   = logininfo.data.name;
 
     connection.socket.emit('get-my-room', connection.userid, (e) => {
         if(e){
@@ -213,7 +213,7 @@ document.getElementById("join-room").addEventListener('click',() => {
 })
 
 function openCanvasDesigner() {
-    var href = location.origin + '/dashboard/classroom.html?open=' + connection.isInitiator + '&sessionid=' + connection.sessionid + '&publicRoomIdentifier=' + connection.publicRoomIdentifier + '&userFullName=' + connection.extra.userFullName  + '&bylogin=true' + '&uid=' + logininfo.data.uid; 
+    var href = location.origin + '/dashboard/classroom.html?open=' + connection.isInitiator + '&sessionid=' + connection.sessionid + '&bylogin=true'; 
     if (!!connection.password) {
         href += '&password=' + connection.password;
     }
@@ -250,7 +250,9 @@ function MakeRoomBtn(code){
     document.getElementById("my-room").appendChild(deletebtn);
 
 
-    btn.addEventListener("click" ,openCanvasDesigner);
+    btn.addEventListener("click" , () => {
+        openCanvasDesigner();
+    });
 
     deletebtn.addEventListener("click" ,function(e){
         connection.socket.emit('delete-room', code, (e) => {

@@ -4471,10 +4471,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             connection.closeBeforeUnload = false;
         }
 
-        console.log("userid change-->" + connection.userid)
         connection.userid = getRandomString();
-        
-        console.log("userid change-->" + connection.userid)
         connection.extra = {};
         connection.attachStreams = [];
 
