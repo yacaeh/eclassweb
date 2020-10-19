@@ -482,12 +482,13 @@ class classroomManagerClass {
             }
             else if(connection.byLogin == true){
                 console.log("join room teacher")
+                classroomCommand.joinRoom(_info);
+
                 connection.join({
                     sessionid: params.sessionid,
                     userid: connection.userid,
                     session: connection.session
                 }, function (a, b, c) {
-                    classroomCommand.joinRoom();
                     connection.socket.on('disconnect', () => location.reload())
                 })
             }
