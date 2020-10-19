@@ -4259,7 +4259,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 if (isRoomJoined === false) {
                     if (connection.enableLogs) {
                         console.error("return here?")
-
                         console.warn('isRoomJoined: ', error, ' roomid: ', connection.sessionid);
                     }
 
@@ -4269,7 +4268,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     }, 100);
                 }
 
-                cb(isRoomJoined, connection.sessionid, error);
+                cb(isRoomJoined, error, info);
             });
         }
 
@@ -4290,12 +4289,13 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 extra: connection.extra,
                 identifier: connection.publicRoomIdentifier,
                 password: typeof connection.password !== 'undefined' && typeof connection.password !== 'object' ? connection.password : ''
-            }, function (isRoomOpened, error) {
+            }, function (isRoomOpened, error, _info) {
+                
                 if (isRoomOpened === true) {
                     if (connection.enableLogs) {
                         console.log('isRoomOpened: ', isRoomOpened, ' roomid: ', connection.sessionid);
                     }
-                    callback(isRoomOpened, connection.sessionid);
+                    callback(isRoomOpened, connection.sessionid, undefined , _info);
                 }
 
                 if (isRoomOpened === false) {
@@ -4303,7 +4303,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                         console.warn('isRoomOpened: ', error, ' roomid: ', connection.sessionid);
                     }
 
-                    callback(isRoomOpened, connection.sessionid, error);
+                    callback(isRoomOpened, connection.sessionid, error , _info);
                 }
             });
         }

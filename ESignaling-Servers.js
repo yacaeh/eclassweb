@@ -814,7 +814,7 @@ module.exports = exports = function (socket, config) {
                     listOfRooms[arg.sessionid].participants.indexOf(listOfRooms[arg.sessionid].owner) == -1) {
                     console.log("owner rejoin");
                     listOfRooms[arg.sessionid].owner = socket.userid;
-                    callback(false, "owner rejoin");
+                    callback(false, "owner rejoin", listOfRooms[arg.sessionid].info);
                 }
 
                 closeOrShiftRoom();
@@ -898,7 +898,7 @@ module.exports = exports = function (socket, config) {
             sendToAdmin();
 
             try {
-                callback(true);
+                callback(true, '_', listOfRooms[arg.sessionid].info);
             } catch (e) {
                 pushLogs(config, 'open-room', e);
             }
@@ -982,7 +982,7 @@ module.exports = exports = function (socket, config) {
             sendToAdmin();
 
             try {
-                callback(true, listOfRooms[arg.sessionid]);
+                callback(true, undefined, listOfRooms[arg.sessionid].info);
             } catch (e) {
                 pushLogs(config, 'join-room', e);
             }
