@@ -1,6 +1,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const crypto = require('crypto');
 const session = require('./session');
+const email = require('./email');
 
 const dburl = 'mongodb://localhost:27017';
 const dbName = 'home-class';
@@ -22,7 +23,7 @@ module.exports = {
             console.log("[MongoDB] Connected successfully to server [", dburl, "]");
             _this.db = client.db(dbName);
             dblist.forEach(element => _this.collections[element] = _this.db.collection(element));
-            client.db('test').collection('test').insertOne()
+            client.db('test').collection('test').deleteOne
             client.db('test').collection('test').updateOne()
 
         });
@@ -58,7 +59,16 @@ module.exports = {
                 const key = await pbkdf2Async(data.pw, salt, 159236, 64, 'sha512');
                 data.salt = salt;
                 data.pw = key.toString('base64');
-                this.db.collection('accounts-' + data.type).insertOne(data);
+                data.certification = this.make_key(32);
+
+                const sendmailret = await email.sendmail(data.email, data.location, data.certification);
+
+                if(sendmailret.errcode == 402){
+                    return { code : 402 , text : '"You need enter your email data. [./emaildata.json]")'};
+                }
+
+
+                this.db.collection('accounts-wating').insertOne(data);
                 return { code: 200, text: 'sign up' };
 
             case '/sign-in':
@@ -104,7 +114,6 @@ module.exports = {
 
             case '/find-pw' :
                 try{
-
                     find = await this.db.collection('accounts-teacher').findOne({ id : data.id, email : data.email }) ||
                     await this.db.collection('accounts-student').findOne({ id : data.id, email : data.email });
 
@@ -128,7 +137,22 @@ module.exports = {
     },
 
     make_key(length) {
-        return crypto.randomBytes(256).toString('hex').substr(100, length)
+        return crypto.randomBytes(256).toString('hex').substr(100, length);
+    },
+
+    certification : async function (code) {
+        const find = await this.db.collection('accounts-wating').findOne({certification : code});
+
+        if(!find){
+            return {code : 400 , text : 'no data'};
+        }
+
+        delete find['location'];
+        delete find['certification'];
+
+        await this.db.collection('accounts-wating').deleteOne({certification : code});
+        await this.db.collection('accounts-' + find.type).insertOne(find);
+        return {code : 200 , text : 'success'};
     }
 }
 

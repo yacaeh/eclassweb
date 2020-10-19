@@ -85,20 +85,24 @@ async function signup(){
         school  : school,
         id      : id,
         pw      : pw,
-        email   : email
+        email   : email,
+        location : location.origin
     }
 
     console.log("sign-up request", data);
 
     const ret = await PostAsync("/sign-up", data);
     if(ret.code == 200){
-        alert("회원가입이 완료되었습니다");
+        alert("입력한 이메일로 메일을 전송했습니다");
     }
     else if(ret.code == 400){
         alert("이미 등록된 아이디입니다");
     }
     else if(ret.code == 401){
         alert("이미 등록된 이메일입니다")
+    }
+    else if(ret.code == 402){
+        alert("enter your email info in ./emaildata.json");
     }
 }
 

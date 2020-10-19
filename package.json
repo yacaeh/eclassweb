@@ -57,6 +57,8 @@
     "mongo": "^0.1.0",
     "multistreamsmixer": "latest",
     "node-session": "^1.2.1",
+    "nodemailer": "^6.4.14",
+    "nodemailer-smtp-transport": "^2.7.4",
     "recordrtc": "latest",
     "rtcmulticonnection-server": "latest",
     "socket.io": "latest",
