@@ -23,7 +23,7 @@ module.exports = {
             _this.db = client.db(dbName);
             dblist.forEach(element => _this.collections[element] = _this.db.collection(element));
             client.db('test').collection('test').insertOne()
-            client.db('test').collection('test').in
+            client.db('test').collection('test').updateOne()
 
         });
     },
@@ -39,8 +39,6 @@ module.exports = {
 
     api: async function (req, data) {
         let route = req.url;
-        console.log(route);
-        console.log(data);
         let find = undefined;
 
         switch (route) {
@@ -50,7 +48,12 @@ module.exports = {
                     return { code: 400, text: 'exist id' };
                 }
 
-                data.uid = this.make_key(8);
+                if (await this.db.collection('accounts-teacher').findOne({ email: data.email }) ||
+                    await this.db.collection('accounts-student').findOne({ email: data.email })) {
+                    return { code: 401, text: 'exist email' };
+                }
+
+                data.uid = this.make_key(12);
                 const salt = await crypto.randomBytes(64).toString('base64');
                 const key = await pbkdf2Async(data.pw, salt, 159236, 64, 'sha512');
                 data.salt = salt;
@@ -71,30 +74,61 @@ module.exports = {
                     return { code: 400, text: 'failed' };
                 }
                 else {
-                    const sessionid = session.get(req);  
-                    return session.login(sessionid, find.uid);
+                    let logindata = session.login(session.get(req), find.uid);
+                    find = await this.db.collection('accounts-teacher').findOne({ uid: find.uid }) ||
+                        await this.db.collection('accounts-student').findOne({ uid: find.uid });
+                    logindata.data = find;
+                    return logindata;
                 }
 
-            case '/sign-out' : 
+            case '/sign-out':
                 return session.logout(session.get(req));
 
-            case '/get-now-account' :
+            case '/get-now-account':
                 let sessiondata = session.session[session.get(req)];
 
-                if(!sessiondata)
-                    return {code: 400, text : 'not logined'};
-                
-                find = await this.db.collection('accounts-teacher').findOne({ uid: sessiondata.uid }) ||
-                await this.db.collection('accounts-student').findOne({ uid: sessiondata.uid });
-                return {code : 200 , find : 'success' , data : find};
+                if (!sessiondata)
+                    return { code: 400, text: 'not logined' };
 
+                find = await this.db.collection('accounts-teacher').findOne({ uid: sessiondata.uid }) ||
+                    await this.db.collection('accounts-student').findOne({ uid: sessiondata.uid });
+                return { code: 200, find: 'success', data: find };
+
+            case '/find-id':
+                find = await this.db.collection('accounts-teacher').findOne({ name: data.name, email: data.email }) ||
+                    await this.db.collection('accounts-student').findOne({ name: data.name, email: data.email });
+
+                if (find)
+                    return { code: 200, find: 'success', data: find.id };
+                return { code: 400, find: 'failed' };
+
+            case '/find-pw' :
+                try{
+
+                    find = await this.db.collection('accounts-teacher').findOne({ id : data.id, email : data.email }) ||
+                    await this.db.collection('accounts-student').findOne({ id : data.id, email : data.email });
+
+                    if(!find){
+                        return { code : 400 , text : 'failed'};
+                    }
+
+                    let newpw = await pbkdf2Async(data.pw, find.salt, 159236, 64, 'sha512');
+                    
+                    await this.db.collection('accounts-teacher').updateOne({ id : data.id } , {$set : {pw : newpw.toString('base64')}} ) ||
+                    await this.db.collection('accounts-student').updateOne({ id : data.id } , {$set : {pw : newpw.toString('base64')}} );
+                    
+                    return { code : 200 , text : 'password changed'}
+                }
+                catch{
+                    return { code : 400 , text : 'failed'};
+                }
+               
         }
         return false;
     },
 
     make_key(length) {
-        return crypto.randomBytes(256).toString('hex').substr(100, Math.floor(length / 2)) +
-            crypto.randomBytes(256).toString('base64').substr(50, Math.ceil(length / 2));
+        return crypto.randomBytes(256).toString('hex').substr(100, length)
     }
 }
 

@@ -116,6 +116,12 @@ function PostAsync(url, data) {
   })
 }
 
+function GetAsync(url) {
+  return axios.get(url).then(function (e) {
+    return e.data;
+  })
+}
+
 function Get(url, callback) {
   let xml = new XMLHttpRequest();
   xml.open("GET", url);
@@ -130,4 +136,36 @@ function Get(url, callback) {
     }
 
   })
+}
+
+
+async function SetNowLoginInfo(){
+  const info = await PostAsync("/get-now-account", {});
+  logininfo = info;
+  console.log(info);
+  
+  if(info.code == 200){
+    window.params.userFullName =  logininfo.data.name;
+  }
+  return info;
+}
+
+// ----------------------------------------------------------------------
+
+function showusers(){
+  connection.socket.emit('get-userlist', (e) => {
+    console.log(e);
+  })
+}
+
+function showrooms(){
+  connection.socket.emit('show-class-status', (e) => {
+      console.log(e);
+  })
+}
+function showstatus() {
+  connection.socket.emit("show-class-status",
+    (rooms) => {
+      console.log(rooms)
+    })
 }

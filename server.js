@@ -71,15 +71,12 @@ function serverHandler(request, response) {
                 
                 request.on('data', function (e) {
                     session.sessioncheck(request, response);
-                    console.log("New seession comp");
-
                     let data = JSON.parse('' + e);
                     
                     session.api(request, data).then((_ret) => {
                         if(!_ret) return;
 
                         ret = _ret;
-                        console.log('ret:', ret);
                         response.write(JSON.stringify(ret));
                         response.end();
                         return;
@@ -89,7 +86,6 @@ function serverHandler(request, response) {
                         if(!_ret) return;
 
                         ret = _ret;
-                        console.log('ret:', ret);
                         response.write(JSON.stringify(ret));
                         response.end();
                         return;
@@ -305,7 +301,6 @@ httpApp = httpApp.listen(process.env.PORT || PORT, process.env.IP || "0.0.0.0", 
 });
 
 ioServer(httpApp).on('connection', function(socket) {
-    console.log("Socket.io Connected");
     eclassSignalingServer(socket, config);
     const params = socket.handshake.query;
 
@@ -314,7 +309,6 @@ ioServer(httpApp).on('connection', function(socket) {
     }
 
     socket.on(params.socketCustomEvent, function(message) {
-        console.log(message);
         socket.broadcast.emit(params.socketCustomEvent, message);
     });
 });
