@@ -60,8 +60,17 @@ module.exports = {
                 data.salt = salt;
                 data.pw = key.toString('base64');
                 data.certification = this.make_key(32);
+                let sendmailret;
 
-                const sendmailret = await email.sendmail(data.email, data.location, data.certification);
+                try{
+                    sendmailret = await email.sendmail(data.email, data.location, data.certification);
+                }
+                catch(e){
+                    if(e.responseCode == 535){
+                        return {code : 403, text : "wrong email"};   
+                    }
+                }
+
 
                 if(sendmailret.errcode == 402){
                     return { code : 402 , text : '"You need enter your email data. [./emaildata.json]")'};

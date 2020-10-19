@@ -104,6 +104,9 @@ async function signup(){
     else if(ret.code == 402){
         alert("enter your email info in ./emaildata.json");
     }
+    else if(ret.code == 403){
+        alert("wrong email");
+    }
 }
 
 async function signin(){

@@ -39,6 +39,7 @@ module.exports = {
         }
 
         const ret = await smtpTransport.sendMail(data);
+        console.log(ret);
         return ret
     }
 }
