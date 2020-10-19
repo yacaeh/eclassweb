@@ -6,6 +6,7 @@ const path = require('path');
 const url = require('url');
 const db = require('./db');
 const session = require('./session');
+const email = require('./email');
 
 var httpServer = require('https');
 
@@ -33,7 +34,7 @@ const getValuesFromConfigJson   = RTCMultiConnectionServer.getValuesFromConfigJs
 var config = getBashParameters(getValuesFromConfigJson(jsonPath), BASH_COLORS_HELPER);
 
 db.construct();
-
+email.init();
 
 // if user didn't modifed "PORT" object
 // then read value from "config.json"
@@ -63,12 +64,8 @@ function serverHandler(request, response) {
 
             filename = (filename || '').toString();
 
-
-
             if (request.method == "POST") {
                 let ret = undefined;
-
-                
                 request.on('data', function (e) {
                     session.sessioncheck(request, response);
                     let data = JSON.parse('' + e);
@@ -93,6 +90,34 @@ function serverHandler(request, response) {
 
                 })
                 return;
+            }
+
+            if(request.method == 'GET'){
+                const split = uri.split('/');
+                if(split[1] == 'certification'){
+                    db.certification(split[2]).then((_ret) => {
+                        console.log(_ret);
+                        let msg = '';
+
+                        if(_ret.code == 400){
+                            msg += "이미 인증되었거나 만료된 인증 주소입니다";
+                        }
+
+                        else if(_ret.code == 200){
+                            msg += "인증되었습니다";
+                        }
+
+                        let code = "<script type='text/javascript'> \
+                        alert('" + msg  + "'); \
+                        location.href = location.origin + '/dashboard/login.html' \
+                        </script>"
+
+                        response.writeHead(200, {'Content-Type': 'text/html;charset=UTF-8'});
+                        response.write(code, "utf8");
+                        response.end();
+                    })
+                    return;
+                }
             }
 
             if (request.method !== 'GET' || uri.indexOf('..') !== -1) {
