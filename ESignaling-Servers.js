@@ -18,7 +18,6 @@ var pushLogs = require('rtcmulticonnection-server/node_scripts/pushLogs.js');
 var CONST_STRINGS = require('rtcmulticonnection-server/node_scripts/CONST_STRINGS.js');
 
 var isAdminAuthorized = require('rtcmulticonnection-server/node_scripts/verify-admin.js');
-const { test } = require("./db");
 
 module.exports = exports = function (socket, config) {
     config = config || {};
@@ -358,35 +357,12 @@ module.exports = exports = function (socket, config) {
             dontDuplicateListeners[customEvent] = customEvent;
 
             socket.on(customEvent, function (message) {
+                console.log(message);
                 try {
                     socket.broadcast.emit(customEvent, message);
-                } catch (e) { }
-            });
-        });
-
-        socket.on('changed-uuid', function (newUserId, callback) {
-            callback = callback || function () { };
-            try {
-                console.log("CHANGE UID",socket.userid,'->',newUserId);
-                
-                if (listOfUsers[socket.userid] && listOfUsers[socket.userid].socket.userid == socket.userid) {
-                    if (newUserId === socket.userid) return;
-
-                    var oldUserId = socket.userid;
-                    listOfUsers[newUserId] = listOfUsers[oldUserId];
-                    listOfUsers[newUserId].socket.userid = socket.userid = newUserId;
-                    delete listOfUsers[oldUserId];
-
-                    callback();
-                    return;
+                } catch (e) { 
                 }
-
-                socket.userid = newUserId;
-                appendUser(socket, params);
-                callback('ok');
-            } catch (e) {
-                pushLogs(config, 'changed-uuid', e);
-            }
+            });
         });
 
         socket.on('set-password', function (password, callback) {
@@ -627,6 +603,10 @@ module.exports = exports = function (socket, config) {
                         }
                     };
 
+
+                    if(!maintainRoom){
+                        listOfRooms[roomid].participants.push(userid);
+                    }
                     listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
 
                     console.log("┌───────────────────────────────────┐");
@@ -686,7 +666,6 @@ module.exports = exports = function (socket, config) {
                         }
 
                         else {
-                            console.log(listOfRooms[roomid]);
                             console.log("Deleted room : maybe owner isn't in room");
                             delete listOfRooms[roomid];
                         }
@@ -835,7 +814,7 @@ module.exports = exports = function (socket, config) {
                     listOfRooms[arg.sessionid].participants.indexOf(listOfRooms[arg.sessionid].owner) == -1) {
                     console.log("owner rejoin");
                     listOfRooms[arg.sessionid].owner = socket.userid;
-                    callback(false, "owner rejoin");
+                    callback(false, "owner rejoin", listOfRooms[arg.sessionid].info);
                 }
 
                 closeOrShiftRoom();
@@ -919,7 +898,7 @@ module.exports = exports = function (socket, config) {
             sendToAdmin();
 
             try {
-                callback(true);
+                callback(true, '_', listOfRooms[arg.sessionid].info);
             } catch (e) {
                 pushLogs(config, 'open-room', e);
             }
@@ -931,7 +910,7 @@ module.exports = exports = function (socket, config) {
             callback = callback || function () { };
 
             try {
-                // closeOrShiftRoom();
+                closeOrShiftRoom();
 
                 if (enableScalableBroadcast === true) {
                     arg.session.scalable = true;
@@ -1003,7 +982,7 @@ module.exports = exports = function (socket, config) {
             sendToAdmin();
 
             try {
-                callback(true);
+                callback(true, undefined, listOfRooms[arg.sessionid].info);
             } catch (e) {
                 pushLogs(config, 'join-room', e);
             }
@@ -1042,12 +1021,17 @@ module.exports = exports = function (socket, config) {
             closeOrShiftRoom();
 
             delete listOfUsers[socket.userid];
-            
-            if (socket.admininfo){
-                if(socket.admininfo.sessionid in listOfRooms && socket.userid in listOfRooms[socket.admininfo.sessionid].userlist)
+
+            if (socket.admininfo) {
+                if (socket.admininfo.sessionid in listOfRooms &&
+                    socket.userid in listOfRooms[socket.admininfo.sessionid].userlist) {
                     delete listOfRooms[socket.admininfo.sessionid].userlist[socket.userid]
+                    let idx = listOfRooms[socket.admininfo.sessionid].participants.indexOf(socket.userid);
+                    if(idx != -1)
+                        listOfRooms[socket.admininfo.sessionid].participants.splice(listOfRooms[socket.admininfo.sessionid].participants.indexOf(socket.userid), 1);
+                }
             }
-                
+
             if (socket.ondisconnect) {
                 console.error("if on disconnect", socket.userid);
                 try {
@@ -1085,8 +1069,7 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on("show-class-status", function (callback) {
-            // callback(listOfRooms[getRoomId()].info)
-            callback(listOfRooms)
+            callback(listOfRooms[getRoomId()])
         })
 
         socket.on("screen-share-set", function(data, callback){

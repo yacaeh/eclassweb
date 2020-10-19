@@ -146,8 +146,6 @@ class classroomManagerClass {
     };
 
     setTeacher() {
-        connection.extra.roomOwner = true;
-
         let frame = GetWidgetFrame();
         document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
         $("#my-name").remove();
@@ -473,30 +471,29 @@ class classroomManagerClass {
 
     createRoom() {
         console.log('Opening Class!');
-        let isSync;
         classroomManager.setTeacher();
 
-        connection.open(params.sessionid, function (isRoomOpened, roomid, command) {
-            console.log(isRoomOpened,roomid,command);
-            //  params.bylogin === 'false'
-
+        connection.open(params.sessionid, function (isRoomOpened, roomid, command, _info) {
+            console.log(isRoomOpened,roomid,command,_info);
             if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
                 alert($.i18n('EXISTING_ROOM_ERROR'));
-                // classroomManager.gotoMain();
+                classroomManager.gotoMain();
             }
             else if(connection.byLogin == true){
                 console.log("join room teacher")
+                classroomCommand.joinRoom(_info);
+
                 connection.join({
                     sessionid: params.sessionid,
-                    userid: 'qweasdzxc',
+                    userid: connection.userid,
                     session: connection.session
                 }, function (a, b, c) {
-                    classroomCommand.joinRoom();
                     connection.socket.on('disconnect', () => location.reload())
                 })
             }
             else if (command == "owner rejoin") {
+                classroomCommand.joinRoom(_info);
                 connection.join({
                     sessionid: params.sessionid,
                     userid: connection.channel,
@@ -506,8 +503,7 @@ class classroomManagerClass {
                 })
             }
             else {
-                classroomCommand.joinRoom();
-                isSync = true;
+                classroomCommand.joinRoom(_info);
                 connection.socket.on('disconnect', () => location.reload())
             }
         });
@@ -521,14 +517,14 @@ class classroomManagerClass {
             sessionid: params.sessionid,
             userid: connection.channel,
             session: connection.session
-        }, function (isRoomJoined, roomid, error) {
-            console.debug('Joing Class!');
+        }, function (isRoomJoined, error, roominfo) {
+            console.log(error,roominfo);
 
             if (error) {
-                console.log('Joing Error!');
+                console.log('Joing Error!', error);
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert("방이 존재하지 않습니다");
-                    // location.reload();
+                    location.reload();
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
@@ -542,21 +538,16 @@ class classroomManagerClass {
                         alert('Invalid password.');
                         return;
                     }
-                    connection.join(params.sessionid, function (
-                        isRoomJoined,
-                        roomid,
-                        error
-                    ) {
+                    connection.join(params.sessionid, function (isRoomJoined, roominfo,error) {
                         if (error) {
-                            alert(error);
+                            console.log(error);
                         }
                     });
                     return;
                 }
-                alert(error);
             }
 
-            classroomCommand.joinRoom();
+            classroomCommand.joinRoom(roominfo);
             connection.socket.on('disconnect', function () {
                 console.log('disconnect Class!');
                 location.reload();
