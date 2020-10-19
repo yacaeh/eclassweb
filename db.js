@@ -53,7 +53,7 @@ module.exports = {
                     return { code: 401, text: 'exist email' };
                 }
 
-                data.uid = this.make_key(8);
+                data.uid = this.make_key(12);
                 const salt = await crypto.randomBytes(64).toString('base64');
                 const key = await pbkdf2Async(data.pw, salt, 159236, 64, 'sha512');
                 data.salt = salt;

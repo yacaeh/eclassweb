@@ -478,7 +478,7 @@ class classroomManagerClass {
             if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
                 alert($.i18n('EXISTING_ROOM_ERROR'));
-                // classroomManager.gotoMain();
+                classroomManager.gotoMain();
             }
             else if(connection.byLogin == true){
                 console.log("join room teacher")
@@ -523,7 +523,7 @@ class classroomManagerClass {
                 console.log('Joing Error!', error);
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {
                     alert("방이 존재하지 않습니다");
-                    // location.reload();
+                    location.reload();
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
