@@ -146,8 +146,6 @@ class classroomManagerClass {
     };
 
     setTeacher() {
-        connection.extra.roomOwner = true;
-
         let frame = GetWidgetFrame();
         document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
         $("#my-name").remove();
@@ -473,7 +471,6 @@ class classroomManagerClass {
 
     createRoom() {
         console.log('Opening Class!');
-        let isSync;
         classroomManager.setTeacher();
 
         connection.open(params.sessionid, function (isRoomOpened, roomid, command) {
@@ -489,7 +486,7 @@ class classroomManagerClass {
                 console.log("join room teacher")
                 connection.join({
                     sessionid: params.sessionid,
-                    userid: 'qweasdzxc',
+                    userid: connection.userid,
                     session: connection.session
                 }, function (a, b, c) {
                     classroomCommand.joinRoom();
@@ -507,7 +504,6 @@ class classroomManagerClass {
             }
             else {
                 classroomCommand.joinRoom();
-                isSync = true;
                 connection.socket.on('disconnect', () => location.reload())
             }
         });
@@ -521,8 +517,8 @@ class classroomManagerClass {
             sessionid: params.sessionid,
             userid: connection.channel,
             session: connection.session
-        }, function (isRoomJoined, roomid, error) {
-            console.debug('Joing Class!');
+        }, function (isRoomJoined, roominfo, error) {
+            console.debug('Joing Class!',roominfo);
 
             if (error) {
                 console.log('Joing Error!');
@@ -544,16 +540,15 @@ class classroomManagerClass {
                     }
                     connection.join(params.sessionid, function (
                         isRoomJoined,
-                        roomid,
+                        roominfo,
                         error
                     ) {
                         if (error) {
-                            alert(error);
+                            console.log(error);
                         }
                     });
                     return;
                 }
-                alert(error);
             }
 
             classroomCommand.joinRoom();

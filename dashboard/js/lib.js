@@ -116,6 +116,12 @@ function PostAsync(url, data) {
   })
 }
 
+function GetAsync(url) {
+  return axios.get(url).then(function (e) {
+    return e.data;
+  })
+}
+
 function Get(url, callback) {
   let xml = new XMLHttpRequest();
   xml.open("GET", url);
@@ -144,15 +150,22 @@ async function SetNowLoginInfo(){
   return info;
 }
 
+// ----------------------------------------------------------------------
 
-function ChangeUID(uid){
-  connection.socket.emit('changed-uuid', uid, (e) => {
-    console.log("UID Changed => " + uid);
-  })
-}
-
-function getuserlist(){
+function showusers(){
   connection.socket.emit('get-userlist', (e) => {
     console.log(e);
   })
+}
+
+function showrooms(){
+  connection.socket.emit('show-class-status', (e) => {
+      console.log(e);
+  })
+}
+function showstatus() {
+  connection.socket.emit("show-class-status",
+    (rooms) => {
+      console.log(rooms)
+    })
 }

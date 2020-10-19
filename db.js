@@ -128,8 +128,7 @@ module.exports = {
     },
 
     make_key(length) {
-        return crypto.randomBytes(256).toString('hex').substr(100, Math.floor(length / 2)) +
-            crypto.randomBytes(256).toString('base64').substr(50, Math.ceil(length / 2));
+        return crypto.randomBytes(256).toString('hex').substr(100, length)
     }
 }
 

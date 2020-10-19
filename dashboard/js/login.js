@@ -31,7 +31,6 @@ function logined(){
     btn.removeEventListener("click", signin);
     btn.addEventListener("click", signout)
     GetMyRoom(logininfo.data.uid);
-    // ChangeUID(logininfo.data.uid);
 }
 
 function logouted(){
@@ -262,12 +261,6 @@ function openCanvasDesigner() {
         href += '&password=' + connection.password;
     }
     window.open(href,'');
-}
-
-function showrooms(){
-    connection.socket.emit('show-class-status', (e) => {
-        console.log(e);
-    })
 }
 
 function makeroom(arg){

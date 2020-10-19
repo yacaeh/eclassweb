@@ -85,7 +85,7 @@ function engineInit(canvas) {
     light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(20, 20, 100), scene);
 
     function SendStateData(_position, _rotation) {
-        if (params.open == "true") {
+        if (connection.extra.roomOwner) {
             updateShared3DData(_position, _rotation);
             connection.send({
                 ModelState: {

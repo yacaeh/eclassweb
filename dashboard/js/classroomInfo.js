@@ -22,7 +22,7 @@ function SetClassroomInfo(newinfo){
 }
 
 classroomCommand = {
-    joinRoom: function () {
+    joinRoom: function (info) {
         connection.socket.emit('get-room-info', (_info) => {
             console.debug("Synced classroom info");
             SetClassroomInfo(_info);
@@ -356,7 +356,6 @@ classroomCommand.syncEpub = function () {
 
 
 function updateClassTime() {
-    console.log("UPDATE?");
     let currentTime = document.getElementById("current-time");
     setTimeout(() => { Hide("loading-screen") }, 1000)
     classTimeIntervalHandle = setInterval(Sec, 1000);
