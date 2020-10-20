@@ -174,16 +174,6 @@ function serverHandler(request, response) {
                 }
             }
 
-            ['Video-Broadcasting', 'Screen-Sharing', 'Switch-Cameras'].forEach(function (fname) {
-                try {
-                    if (filename.indexOf(fname + '.html') !== -1) {
-                        filename = filename.replace(fname + '.html', fname.toLowerCase() + '.html');
-                    }
-                } catch (e) {
-                    pushLogs(config, 'forEach', e);
-                }
-            });
-
             var stats;
 
             try {
