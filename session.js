@@ -1,7 +1,6 @@
 module.exports = {
     session : {},
     parseCookies : (cookie = '') => {
-        console.log("cookie : ", cookie);
         return cookie
             .split(';')
             .map(v => v.split('='))
@@ -16,7 +15,6 @@ module.exports = {
         if(!this.get(req)){
             const randomInt = + new Date();
             res.writeHead(200, {'Set-Cookie': 'session=' + randomInt})
-            console.log("New seession");
         }
     },
 
@@ -36,7 +34,6 @@ module.exports = {
             uid : uid,
             expires : expires,
         };
-        console.log(this.session);
         return { code: 200, text: 'success' };
     },
 

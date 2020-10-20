@@ -92,28 +92,38 @@ connection.socketURL = '/';
 connection.password = params.password;
 connection.chunkSize = 64000;
 connection.enableLogs = false;
-connection.socketMessageEvent = 'canvas-dashboard-demo';
+connection.socketMessageEvent = 'home-class-socket';
+connection.maxParticipantsAllowed = 100;
+connection.extra.roomOwner = params.open == 'true';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
-connection.maxParticipantsAllowed = 40;
+connection.session = {audio: false,video: false,data: true,screen: false,};
+connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
-// newscreenshareManager.setFrameRate(1, 2);
+if(!window.params.userFullName){
+  var request = new XMLHttpRequest();
+  request.open('POST', '/get-now-account', false); 
+  request.send(JSON.stringify({}));
 
-connection.session = {
-  audio: false,
-  video: false,
-  data: true,
-  screen: false,
-};
-
-connection.sdpConstraints.mandatory = {
-  OfferToReceiveAudio: false,
-  OfferToReceiveVideo: false,
-};
+  if (request.status === 200) {
+    const ret = JSON.parse(request.responseText);
+    if(ret.code == 400){
+      console.error("no login info")
+      alert("로그인 정보가 없습니다");
+      location.href = '/dashboard/login.html';
+    }
+    else{
+      connection.userid = ret.data.uid;
+      connection.byLogin = true;
+      connection.extra.userFullName = ret.data.name;
+    }
+  }
+}
 
 ChattingManager.init();
 
 window.onWidgetLoaded = function () {
+  console.debug("On widget loaded");
   examObj.init();
   pageNavigator.init();
   canvasManager.init();
@@ -128,20 +138,40 @@ window.onClassroominfoChanged = function(prop, value) {
   {console.log("call rtc init!");webRTCPCInit();isClassroomInfoinit=true;}
 }
 
-let isSync = false;
-
 connection.onopen = function (event) {
-  if (!isSync) {
-    classroomCommand.joinRoom();
-    isSync = true;
-  }
+  console.log('on open', event);
   classroomManager.joinStudent(event);
 };
 
-// connection.onclose = connection.onerror = 
-connection.onleave = function (event) {
+connection.onclose = connection.onerror = connection.onleave = function (event) {
   classroomManager.leftStudent(event);
 };
+
+// connection.onstream = function (event) {
+//   console.log('onstream!', event);
+
+//   if (classroomInfo.shareScreen &&
+//     classroomInfo.shareScreen.state &&
+//     (classroomInfo.shareScreen.id == event.streamid)) {
+//     screenshareManager.streamstart(event);
+//   };
+
+//   if (event.share)
+//     return;
+
+//   if (connection.extra.roomOwner) {
+//     maincamManager.addStudentCam(event);
+//   }
+//   else {
+//     if (event.type == "local" && event.stream.isVideo) {
+//       event.mediaElement.pause();
+//       event.stream.mute("audio");
+//     }
+//     else {
+//       maincamManager.addTeacherCam(event);
+//     }
+//   }
+// };
 
 connection.onstreamended = function (event) {
   console.log('onstreameneded!', event);
@@ -151,8 +181,8 @@ connection.onstreamended = function (event) {
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  params.open === 'true' ? classroomManager.createRoom() :
-                           classroomManager.joinRoom();
+  connection.extra.roomOwner ? classroomManager.createRoom() :
+                               classroomManager.joinRoom();
   onWidgetLoaded();
 });
 
@@ -295,10 +325,3 @@ connection.onmessage = function (event) {
   }
 
 };
-
-function showstatus() {
-  connection.socket.emit("show-class-status",
-    (rooms) => {
-      console.log(rooms)
-    })
-}

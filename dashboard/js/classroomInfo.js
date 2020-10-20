@@ -22,15 +22,14 @@ function SetClassroomInfo(newinfo){
 }
 
 classroomCommand = {
-    joinRoom: function () {
-        console.log("JoinRoom");
-        connection.socket.emit('get-room-info', (_info) => {
+    joinRoom: function (_info) {
+        // connection.socket.emit('get-room-info', (_info) => {
             console.debug("Synced classroom info");
             console.log(_info);
             SetClassroomInfo(_info); 
             updateClassTime();
             this.updateSyncRoom();
-        });
+        // });
     },
 
     updateSyncRoom: function () {
