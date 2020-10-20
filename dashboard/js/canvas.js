@@ -154,7 +154,7 @@ function removeOnSelect(btn) {
         return;
     }
 
-    if(connection.userid != classroomInfo.shareScreen.userid){
+    if(classroomInfo.shareScreen.state && connection.userid != classroomInfo.shareScreen.userid){
         alert($.i18n('SOMEONE_USING_SCREEN'));
         btn.classList.remove("on");
         btn.classList.remove("selected-shape");
