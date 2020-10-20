@@ -91,6 +91,9 @@ class permissionManagerClass {
   }
 
   IsCanvasPermission(id) {
+    if(classroomInfo.canvasPermission == undefined){
+      return false;
+    }
     if (classroomInfo.canvasPermission.indexOf(id) == -1)
       return false;
     return true

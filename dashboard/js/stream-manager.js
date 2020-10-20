@@ -377,7 +377,7 @@ class NewScreenShareManagerClass{
         // Automatic playback started!
         // Show playing UI.
         // We can now safely pause video...
-        el.pause();
+        el.play();
       })
       .catch(error => {
         // Auto-play was prevented
