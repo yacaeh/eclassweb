@@ -1,0 +1,88 @@
+<title>
+    비밀번호 변경
+</title>
+
+<div id="form">
+    이메일로 수신한 인증코드를 입력해주세요
+    <input id="code">
+    <button onclick="codecheck();">입력</button>
+</div>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="/dashboard/js/lib.js"></script>
+<script>
+    let uid = location.href.split('=');
+    uid = uid[uid.length-1];
+
+    let type = undefined;
+
+    idcheck();
+
+    async function idcheck(){
+        const ret = await PostAsync('/change-pw-check', {uid});
+        console.log(ret);
+        type = ret.data.type;
+        if(ret.code == 501){
+            alert("잘못된 접근입니다.");
+            self.close();
+            location.href = location.origin + '/dashboard/login.html'
+        }
+    }
+    
+    async function codecheck(){
+        let code = document.getElementById('code').value;
+        const ret = await PostAsync("/change-pw-code-check", {uid, code});
+        console.log(ret);
+        if(ret.code == 501){
+            alert("인증 코드가 틀렸습니다");
+        }
+        else if(ret.code == 200){
+            document.body.removeChild(document.getElementById('form'));
+
+            let form = document.createElement("form");
+            form.style.display = 'inline-grid';
+            form.action = 'javascript:void(0)';
+
+            let newpw1 = document.createElement('input');
+            let newpw2 = document.createElement('input');
+
+            newpw1.setAttribute('type','password');
+            newpw2.setAttribute('type','password');
+            
+            form.appendChild(newpw1);
+            form.appendChild(newpw2);
+
+            let btn = document.createElement('button');
+            btn.innerHTML = '변경하기';
+
+            btn.addEventListener('click', async function(e){
+                var passRule = /^.*(?=^.{6,16}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+                let pw1 = newpw1.value;
+                let pw2 = newpw2.value;
+
+                if(!passRule.test(pw1)){
+                    alert("하나의 특수문자,숫자, 문자 포함 형태의 6~16자리의 비밀번호가 필요합니다");
+                    return;
+                }
+
+                if(pw1 != pw2){
+                    alert("비밀번호가 서로 다릅니다");
+                    return;
+                }
+
+                const ret = await PostAsync('/change-pw', {uid, pw1, type});
+                if(ret.code == 200){
+                    alert("변경되었습니다.");
+                    self.close();
+                }
+
+                console.log(ret);
+            })
+
+            form.appendChild(btn);
+            document.body.appendChild(form);
+            console.log('code ok');
+        }
+    }
+
+</script>

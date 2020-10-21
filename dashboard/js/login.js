@@ -129,6 +129,10 @@ async function signin(){
     else if(ret.code == 401){
         alert("이미 로그인 되어있습니다");
     }
+    else if(ret.code == 402){
+        console.log(ret);
+        alert("인증 필요");
+    }
     console.log(ret);
 }
 
@@ -166,26 +170,36 @@ async function findid(){
 async function findpw(){
     let id = document.getElementById("find-pw-id").value;
     let email = document.getElementById('find-pw-email').value;
-    let pw = document.getElementById('find-pw-pw').value;
-    let pw2 = document.getElementById('find-pw-pw2').value;
+    // let pw = document.getElementById('find-pw-pw').value;
+    // let pw2 = document.getElementById('find-pw-pw2').value;
     
-    if(!passRule.test(pw)){
-        alert("하나의 특수문자,숫자, 문자 포함 형태의 6~16자리의 비밀번호가 필요합니다");
-        return;
-    }
+    // if(!passRule.test(pw)){
+        // alert("하나의 특수문자,숫자, 문자 포함 형태의 6~16자리의 비밀번호가 필요합니다");
+        // return;
+    // }
     
-    if(pw != pw2){
-        alert("비밀번호가 서로 일치하지 않습니다.");
-        return;
-    }
+    // if(pw != pw2){
+        // alert("비밀번호가 서로 일치하지 않습니다.");
+        // return;
+    // }
 
-    const ret = await PostAsync("/find-pw", {id, email, pw});
+    const ret = await PostAsync("/find-pw", {id, email, location : location.origin});
+    console.log(ret);
+    
     if(ret.code == 200){
-        alert("비밀번호가 변경되었습니다.");
+        var name = "popup test";
+        var option = "width = 500, height = 500, top = 100, left = 200, location = no"
+        window.open('/changepw?uid=' + ret.uid,name, option);
     }
-    else{
-        alert("비밀번호 변경에 실패했습니다.")
+    else if(ret.code == 400){
+        alert("일치하는 정보가 없습니다");
     }
+    // if(ret.code == 200){
+    //     alert("비밀번호가 변경되었습니다.");
+    // }
+    // else{
+    //     alert("비밀번호 변경에 실패했습니다.")
+    // }
 
 
 }
