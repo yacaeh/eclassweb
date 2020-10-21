@@ -568,7 +568,7 @@ module.exports = exports = function (socket, config) {
                                 url: undefined,
                             },
                             shareScreen: {
-                                state: undefined,
+                                state: false,
                                 id: undefined,
                             },
                             camshare:{
@@ -1205,7 +1205,10 @@ module.exports = exports = function (socket, config) {
             let user = GetUserData();
 
             if(socket.userid == getRoom().info.shareScreen.userid){
-                getRoom().info.shareScreen = {};
+                getRoom().info.shareScreen = {
+                    state: false,
+                    id: undefined,
+                }
             }
 
             if (room.owner != socket.userid) {

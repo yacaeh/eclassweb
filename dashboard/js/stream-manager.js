@@ -267,6 +267,8 @@ class NewScreenShareManagerClass{
           stream.isScreenShare = true;
           newscreenshareManager.get().volume = 0;
           screenStream = stream;
+
+          
           addStreamStopListener(stream, function () {
             newscreenshareManager.stop();            
             // connection.removeStream(stream.id)
@@ -377,7 +379,7 @@ class NewScreenShareManagerClass{
         // Automatic playback started!
         // Show playing UI.
         // We can now safely pause video...
-        el.pause();
+        el.play();
       })
       .catch(error => {
         // Auto-play was prevented
@@ -439,11 +441,10 @@ class NewScreenShareManagerClass{
   //     }
   //   }, 500);
   // }
-  onclose(event) {
-    if (classroomInfo.shareScreen.id == event.streamid) {
+  onclose() {
+    if (classroomInfo.shareScreen.id) {
       console.error("Streamer exit");
       this.stop();
-      event.stream.getTracks().forEach((track) => track.stop());
       connection.send({ hideScreenShare: true });
     }
   }

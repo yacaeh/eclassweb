@@ -93,11 +93,11 @@ connection.password = params.password;
 connection.chunkSize = 64000;
 connection.enableLogs = false;
 connection.socketMessageEvent = 'home-class-socket';
-connection.maxParticipantsAllowed = 40;
+connection.maxParticipantsAllowed = 100;
 connection.extra.roomOwner = params.open == 'true';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
-connection.session = {audio: false,video: true,data: true,screen: false,};
+connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
 if(!window.params.userFullName){
@@ -124,7 +124,6 @@ ChattingManager.init();
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
-  screenshareManager.setFrameRate(1, 2);
   examObj.init();
   pageNavigator.init();
   canvasManager.init();
@@ -300,10 +299,3 @@ connection.onmessage = function (event) {
   }
 
 };
-
-function showstatus() {
-  connection.socket.emit("show-class-status",
-    (rooms) => {
-      console.log(rooms)
-    })
-}
