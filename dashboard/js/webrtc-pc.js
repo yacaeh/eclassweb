@@ -50,19 +50,19 @@ async function webRTCPCInit() {
       console.log('New track added!');
       streams.forEach((stream) => {
         if (track.kind === 'video') {
-          console.log(
-            'stream.id:',stream.id,
-            'classroomInfo.shareScreen.id',
-            classroomInfo.shareScreen.id,
-            'state:',
-            classroomInfo.shareScreen.state
-          );
           if (
             stream.id == classroomInfo.shareScreen.id &&
             classroomInfo.shareScreen.state
           ) {
             console.log('Share Screen!');
+            screenStream = stream;
             newscreenshareManager.streamstart(stream);
+
+            track.onended = function(event) {
+              console.log("On ended!");
+              newscreenshareManager.onclose();
+            };
+                
           } else {
             track.onunmute = () => {
               console.log(
@@ -82,11 +82,27 @@ async function webRTCPCInit() {
             };
           }
         }
+
+      
       });
+
+
+
     };
 
-    pc.oniceconnectionstatechange = (e) =>
-      log(`ICE connection state: ${pc.iceConnectionState}`);
+    pc.oniceconnectionstatechange = function() {
+      console.log("on iceconnectionstatechange!");
+      if(pc.iceConnectionState == 'disconnected') {
+          console.log('Disconnected');
+      }
+    }
+  
+    // pc.oniceconnectionstatechange = function(e) {
+    //   log(`ICE connection state: ${pc.iceConnectionState}`);
+    //   if(pc.iceConnectionState == 'disconnected') {
+    //     console.log('Disconnected');
+    //   }
+    // }
     pc.onicecandidate = (event) => {
       if (event.candidate !== null) {
         socket.send(
@@ -177,7 +193,7 @@ async function webRTCPCInit() {
       });
     };
 
-    navigator.mediaDevices
+    await navigator.mediaDevices
       .getUserMedia({
         video:
           options.video instanceof Object

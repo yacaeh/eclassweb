@@ -173,10 +173,6 @@ connection.onclose = connection.onerror = connection.onleave = function (event) 
 //   }
 // };
 
-connection.onstreamended = function (event) {
-  console.log('onstreameneded!', event);
-  newscreenshareManager.onclose(event);
-};
 
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
