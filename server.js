@@ -118,6 +118,20 @@ function serverHandler(request, response) {
                     })
                     return;
                 }
+                else if(split[1] == 'changepw'){
+                    fs.readFile('./dashboard/changepw.html', 'utf8', function (err, file) {
+
+                    // })
+                    // db.changepw(split[2]).then((_ret) => {
+                        // response.writeHead(200, {'Content-Type': 'text/html;charset=UTF-8'});
+                        response.writeHead(200, {
+                            'Content-Type': 'text/html;charset=utf8'
+                        });
+                        response.write(file, "utf8");
+                        response.end();
+                    })
+                    return;
+                }
             }
 
             if (request.method !== 'GET' || uri.indexOf('..') !== -1) {
