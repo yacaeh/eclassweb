@@ -213,11 +213,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 return;
             }
 
-            if (message.message === 'dropPeerConnection') {
-                connection.deletePeer(message.sender);
-                return;
-            }
-
             if (message.message.allParticipants) {
                 if (message.message.allParticipants.indexOf(message.sender) === -1) {
                     message.message.allParticipants.push(message.sender);
@@ -294,27 +289,20 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     dontGetRemoteStream: typeof message.message.isOneWay !== 'undefined' ? message.message.isOneWay : !!connection.session.oneway || connection.direction === 'one-way',
                     dontAttachLocalStream: !!message.message.dontGetRemoteStream,
                     connectionDescription: message,
-                    successCallback: function () { }
+                    successCallback: function () {} 
                 };
 
                 connection.onNewParticipant(message.sender, userPreferences);
                 return;
             }
 
-            if (message.message.changedUUID) {
-                if (connection.peers[message.message.oldUUID]) {
-                    connection.peers[message.message.newUUID] = connection.peers[message.message.oldUUID];
-                    delete connection.peers[message.message.oldUUID];
-                }
-            }
-
             if (message.message.userLeft) {
+                delete connection.peersBackup[message.sender];
+                mPeer.disconnectWith(message.sender);
                 mPeer.onUserLeft(message.sender);
-
                 if (!!message.message.autoCloseEntireSession) {
                     connection.leave();
                 }
-
                 return;
             }
 
@@ -692,6 +680,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             }
 
             if (message.enableMedia) {
+                console.log("")
                 connection.session = message.userPreferences.session || connection.session;
 
                 if (connection.session.oneway && connection.attachStreams.length) {
@@ -3367,7 +3356,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 return;
             }
 
-            if (params.open == "true") {
+            if (connection.extra.roomOwner) {
                 options.localMediaConstraints.video.mandatory = {
                     "minWidth": 32,
                     "maxWidth": 160,
@@ -3958,7 +3947,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         mPeer.onNegotiationNeeded = function (message, remoteUserId, callback) {
             callback = callback || function () { };
-
             remoteUserId = remoteUserId || message.remoteUserId;
             message = message || '';
 
@@ -3995,7 +3983,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         connection.socketOptions = {
             // 'force new connection': true, // For SocketIO version < 1.0
             // 'forceNew': true, // For SocketIO version >= 1.0
-            'transport': 'polling' // fixing transport:unknown issues
+            'transport': 'true' // fixing transport:unknown issues
         };
 
         function connectSocket(connectCallback) {
@@ -4250,10 +4238,11 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 streams: getStreamInfoForAdmin(),
                 extra: connection.extra,
                 password: typeof connection.password !== 'undefined' && typeof connection.password !== 'object' ? connection.password : ''
-            }, function (isRoomJoined, error) {
+            }, function (isRoomJoined, error, info) {
                 if (error) {
                     console.log(error);
                 }
+
                 if (isRoomJoined === true) {
                     if (connection.enableLogs) {
                         console.log('isRoomJoined: ', isRoomJoined, ' roomid: ', connection.sessionid);
@@ -4269,6 +4258,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
                 if (isRoomJoined === false) {
                     if (connection.enableLogs) {
+                        console.error("return here?")
                         console.warn('isRoomJoined: ', error, ' roomid: ', connection.sessionid);
                     }
 
@@ -4278,7 +4268,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     }, 100);
                 }
 
-                cb(isRoomJoined, connection.sessionid, error);
+                cb(isRoomJoined, error, info);
             });
         }
 
@@ -4299,12 +4289,13 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 extra: connection.extra,
                 identifier: connection.publicRoomIdentifier,
                 password: typeof connection.password !== 'undefined' && typeof connection.password !== 'object' ? connection.password : ''
-            }, function (isRoomOpened, error) {
+            }, function (isRoomOpened, error, _info) {
+                
                 if (isRoomOpened === true) {
                     if (connection.enableLogs) {
                         console.log('isRoomOpened: ', isRoomOpened, ' roomid: ', connection.sessionid);
                     }
-                    callback(isRoomOpened, connection.sessionid);
+                    callback(isRoomOpened, connection.sessionid, undefined , _info);
                 }
 
                 if (isRoomOpened === false) {
@@ -4312,7 +4303,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                         console.warn('isRoomOpened: ', error, ' roomid: ', connection.sessionid);
                     }
 
-                    callback(isRoomOpened, connection.sessionid, error);
+                    callback(isRoomOpened, connection.sessionid, error , _info);
                 }
             });
         }

@@ -10,19 +10,15 @@
   while ((match = r.exec(search.substring(1))))
     params[d(match[1])] = d(match[2]);
   window.params = params;
-  if(!window.params.bylogin)
-    window.params.bylogin = 'false';
-
-  console.log(window.params);
 })();
 
 //=============================================================================================
 
 var debug = false;
-var isSharing3D = false;
-var isSharingMovie = false;
-var isSharingFile = false;
-var isSharingEpub = false;
+var isSharing3D     = false;
+var isSharingMovie  = false;
+var isSharingFile   = false;
+var isSharingEpub   = false;
 
 let remainCams = {};
 let isFileViewer = false;
@@ -95,16 +91,19 @@ connection.socketURL = '/';
 connection.password = params.password;
 connection.chunkSize = 64000;
 connection.enableLogs = false;
-connection.socketMessageEvent = 'canvas-dashboard-demo';
+connection.socketMessageEvent = 'home-class-socket';
 connection.maxParticipantsAllowed = 40;
-
+connection.extra.roomOwner = params.open == 'true';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
+connection.session = {audio: false,video: true,data: true,screen: false,};
+connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
 if(!window.params.userFullName){
   var request = new XMLHttpRequest();
   request.open('POST', '/get-now-account', false); 
   request.send(JSON.stringify({}));
+
   if (request.status === 200) {
     const ret = JSON.parse(request.responseText);
     if(ret.code == 400){
@@ -114,31 +113,17 @@ if(!window.params.userFullName){
     }
     else{
       connection.userid = ret.data.uid;
-      connection.extra.userFullName = ret.data.name;
       connection.byLogin = true;
+      connection.extra.userFullName = ret.data.name;
     }
-    console.log(ret);
   }
 }
-
-screenshareManager.setFrameRate(1, 2);
-
-connection.session = {
-  audio: false,
-  video: true,
-  data: true,
-  screen: false,
-};
-
-connection.sdpConstraints.mandatory = {
-  OfferToReceiveAudio: false,
-  OfferToReceiveVideo: false,
-};
 
 ChattingManager.init();
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
+  screenshareManager.setFrameRate(1, 2);
   examObj.init();
   pageNavigator.init();
   canvasManager.init();
@@ -152,15 +137,12 @@ window.onClassroominfoChanged = function(prop, value) {
   console.log("ClassroomInfo changed",prop,' = ',value);
 }
 
-let isSync = false;
-
 connection.onopen = function (event) {
   console.log('on open', event);
   classroomManager.joinStudent(event);
 };
 
-// connection.onclose = connection.onerror = 
-connection.onleave = function (event) {
+connection.onclose = connection.onerror = connection.onleave = function (event) {
   classroomManager.leftStudent(event);
 };
 
@@ -176,7 +158,7 @@ connection.onstream = function (event) {
   if (event.share)
     return;
 
-  if (params.open === 'true') {
+  if (connection.extra.roomOwner) {
     maincamManager.addStudentCam(event);
   }
   else {
@@ -198,9 +180,8 @@ connection.onstreamended = function (event) {
 designer.appendTo(widgetContainer, function () {
   console.log('designer append');
 
-  params.open === 'true'? 
-                           classroomManager.createRoom() :
-                           classroomManager.joinRoom();
+  connection.extra.roomOwner ? classroomManager.createRoom() :
+                               classroomManager.joinRoom();
   onWidgetLoaded();
 });
 
@@ -343,11 +324,3 @@ connection.onmessage = function (event) {
   }
 
 };
-
-function showstatus() {
-  connection.socket.emit("show-class-status",
-    (rooms) => {
-      console.log(rooms)
-    })
-}
-
