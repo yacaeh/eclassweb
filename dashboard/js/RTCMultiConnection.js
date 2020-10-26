@@ -4085,7 +4085,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
             connectSocket(function () {
                 if (isData(connection.session)) {
-                    console.log("2")
                     openRoom(callback);
                     return;
                 }

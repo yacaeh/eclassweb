@@ -159,6 +159,7 @@ class NewScreenShareManagerClass{
     this.lastStream = undefined;
     this.self = this;
     this.senders = [];
+    this.sender = undefined;
   
     // this.minFrameRate = 5
     // this.maxFrameRate = 10;
@@ -263,19 +264,29 @@ class NewScreenShareManagerClass{
           newscreenshareManager.get().volume = 0;
           newscreenshareManager.isSharingScreen = true;
           newscreenshareManager.lastStream = stream;
-          console.log(screenStream);
-          stream.getTracks().forEach(track => pc.addTrack(track, stream));
-          
+
+          let track = stream.getVideoTracks()[0];
+          this.sender = pc.addTrack(track, stream);
+          pc.getSenders()[2].replaceTrack(newscreenshareManager.lastStream.getVideoTracks()[0])
+
           replaceScreenTrack(stream, btn);
           addStreamStopListener(stream, function () {
             newscreenshareManager.stop();            
+
             stream.getTracks().forEach(function(track){
               console.log("REMOVE TRACK --- ", track)
+              pc.getSenders().forEach((sender) => { 
+                if(sender.track && sender.track.id == track.id){
+                  pc.removeTrack(sender);
+                }
+              })
+
               track.stop();
               stream.removeTrack(track);
             })
 
             connection.send({ hideScreenShare: true });
+
             if (btn != undefined) {
               btn.classList.remove("on");
               btn.classList.remove("selected-shape")
@@ -460,50 +471,9 @@ class maincamManagerClass{
       return this.get().srcObject;
     }
   }
-  addStudentCam(event) {
-    let isFind = false;
-    console.log(event.mediaElement);
 
-    if(!event.stream.isVideo || event.extra.roomOwner) return;
-
-
-    try {
-      event.mediaElement.controls = false;
-      event.mediaElement.style.width = "100%";
-      event.mediaElement.style.height = "100%";
-      event.mediaElement.style.pointerEvents = "none";
-      event.mediaElement.style.position = "absolute";
-
-      if (classroomInfo.showcanvas) {
-        Hide(event.mediaElement)
-      }
-
-      let childern = document.getElementById("student_list").children;
-      for (let i = 0; i < childern.length; i++) {
-        let child = childern[i];
-        console.log(child);
-        console.log(child.dataset.id);
-        console.log(event.userid);
-        if (child.dataset.id == event.userid) {
-          console.debug("Student's cam added [",event.extra.userFullName,'] [',event.userid,']');
-          child.appendChild(event.mediaElement);
-          isFind = true;
-          break;
-        }
-      }
-
-      if(!isFind){
-        remainCams[event.userid] =  event.mediaElement;
-      }
-    }
-
-    catch{
-      console.log("No Cam")
-    }
-
-  }
-
-  addNewStudentCam(userlist,stream) {
+  addNewStudentCam(stream) {
+    let userlist = connection.peers.getAllParticipants();
     let isFind = false;
 
     let el = document.createElement("video")
@@ -524,8 +494,8 @@ class maincamManagerClass{
         let child = childern[i];
         userlist.forEach(user => {
           if (child.dataset.id == user) {
+            el.setAttribute("id",stream.id);
             
-            el.setAttribute("id",stream.id );
             if ('srcObject' in el) {
               el.srcObject = stream;
             } else {
@@ -550,12 +520,6 @@ class maincamManagerClass{
 
   }
 
-  addTeacherCam (event){
-    if (!event.extra.roomOwner || !event.stream.isVideo) return;      
-    this.srcObject(event.stream);
-    console.debug("Teacher's cam selected",event.userid, event.streamid);
-    this.start();
-  }
   addNewTeacherCam (stream){
     console.log("Addnew teacher",stream.id);
     this.srcObject(stream);
