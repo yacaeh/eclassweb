@@ -23,9 +23,7 @@ class classroomManagerClass {
         AddEvent("icon_exit", "click", () =>
             alertBox($.i18n('EXIT_CONFIRM'), $.i18n('WARNING'), () => {
                 if (connection.extra.roomOwner) {
-                    connection.send({
-                        roomBoom: true
-                    })
+                    connection.send({roomBoom: true})
                 }
                 classroomManager.gotoMain();
             },
@@ -470,11 +468,10 @@ class classroomManagerClass {
     };
 
     createRoom() {
-        console.log('Opening Class!');
+        console.debug('Opening Class!');
         classroomManager.setTeacher();
 
         connection.open(params.sessionid, function (isRoomOpened, roomid, command, _info) {
-            console.log(isRoomOpened,roomid,command,_info);
             if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
                 alert($.i18n('EXISTING_ROOM_ERROR'));
@@ -512,14 +509,11 @@ class classroomManagerClass {
 
     joinRoom() {
         classroomManager.setStudent();
-        console.debug('try joining!');
         connection.join({
             sessionid: params.sessionid,
             userid: connection.channel,
             session: connection.session
         }, function (isRoomJoined, error, roominfo) {
-            console.log(error,roominfo);
-
             if (error) {
                 console.log('Joing Error!', error);
                 if (error === connection.errors.ROOM_NOT_AVAILABLE) {

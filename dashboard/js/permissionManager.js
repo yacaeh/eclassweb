@@ -17,7 +17,7 @@ class permissionManagerClass {
       switch (this.id) {
         case "classP":
           if (this.classList.contains("off")) {
-            if (classroomInfo.classPermission != undefined) {
+            if (classroomInfo.classPermission) {
               alert($.i18n('STUDENT_PERMISSION_ALREADY'));
               return false;
             }
@@ -29,7 +29,7 @@ class permissionManagerClass {
           break;
         case "micP":
           if (this.classList.contains("off")) {
-            if (classroomInfo.micPermission != undefined) {
+            if (classroomInfo.micPermission) {
               alert($.i18n('STUDENT_PERMISSION_ALREADY'));
               return false;
             }
@@ -56,7 +56,7 @@ class permissionManagerClass {
   eventListener(event) {
     if (event.data.permissionChanged) {
       console.log(event.data.permissionChanged);
-      SetClassroomInfo(event.data.permissionChanged);
+      classroomInfo = event.data.permissionChanged;
       return true;
     }
 

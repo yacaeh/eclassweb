@@ -3242,8 +3242,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             return;
         }
         currentUserMediaRequest.mutex = true;
-        console.log("getusermedia");
-        // easy way to match
         var idInstance = JSON.stringify(options.localMediaConstraints);
 
         function streaming(stream, returnBack) {
@@ -4075,8 +4073,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         connection.waitingForLocalMedia = false;
 
         connection.open = function (roomid, callback) {
-            console.log(roomid, "open");
-
             callback = callback || function () { };
             connection.waitingForLocalMedia = true;
             connection.isInitiator = true;
@@ -4085,7 +4081,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
             connectSocket(function () {
                 if (isData(connection.session)) {
-                    console.log("2")
                     openRoom(callback);
                     return;
                 }

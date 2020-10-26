@@ -217,12 +217,9 @@ module.exports = {
 
     createRoom : function(room, id){
         room.id = id;
-        this.db.collection('rooms').insertOne(room);
-        console.log("DB - create room");
     },
 
     deleteRoom : function(){
-        console.log("DB - delete room");
     }
 
 }
