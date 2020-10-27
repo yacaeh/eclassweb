@@ -14,7 +14,6 @@ const config = {
     },
   ],
 };
-const wsuri = `wss://192.168.124.41:7000/ws`;
 const socket = new WebSocket(wsuri);
 const pc = new RTCPeerConnection(config);
 let teacherAdded = false;
