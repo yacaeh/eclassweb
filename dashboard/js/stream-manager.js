@@ -471,7 +471,7 @@ class maincamManagerClass{
     }
   }
 
-  addNewStudentCam(stream) {
+  async addNewStudentCam(stream,track) {
     let userlist = connection.peers.getAllParticipants();
     let isFind = false;
 
@@ -511,6 +511,25 @@ class maincamManagerClass{
       if(!isFind){
         remainCams[userid] =  el;
       }
+
+
+    var playPromise = el.play();
+ 
+    if (playPromise !== undefined) {
+      playPromise.then(_ => {
+        track.paused = false;
+        // Automatic playback started!
+        // Show playing UI.
+        // We can now safely pause video...
+        el.play();
+      })
+      .catch(error => {
+        console.log(error);
+        // Auto-play was prevented
+        // Show paused UI.
+      });
+    }
+
     }
 
     catch{

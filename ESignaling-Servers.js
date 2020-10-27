@@ -846,6 +846,7 @@ module.exports = exports = function (socket, config) {
                     console.log("owner rejoin");
                     listOfRooms[arg.sessionid].owner = socket.userid;
                     callback(false, "owner rejoin", listOfRooms[arg.sessionid].info);
+                    return;
                 }
 
                 closeOrShiftRoom();
