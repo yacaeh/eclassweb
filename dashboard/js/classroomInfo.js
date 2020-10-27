@@ -4,8 +4,7 @@ classroomCommand = {
     joinRoom: function (_info) {
         console.debug("Synced classroom info");
         classroomInfo = _info;
-        updateClassTime();
-        this.updateSyncRoom();
+        onSocketConnected();
     },
 
     updateSyncRoom: function () {
@@ -33,7 +32,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.shareScreen.state) {
-            screenshareManager.rejoin();
+            // newscreenshareManager.rejoin();
         }
 
         if (classroomInfo.movierender.state) {

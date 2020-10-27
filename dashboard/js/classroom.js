@@ -15,20 +15,20 @@
 //=============================================================================================
 
 var debug = false;
-var isSharing3D     = false;
-var isSharingMovie  = false;
-var isSharingFile   = false;
-var isSharingEpub   = false;
-var isFileViewer    = false;
-
-var remainCams = {};
+var isSharing3D = false;
+var isSharingMovie = false;
+var isSharingFile = false;
+var isSharingEpub = false;
+let remainCams = {};
+let isFileViewer = false;
 
 const widgetContainer = document.getElementById("widget-container");
 const rightTab = document.getElementById("right-tab")
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
-var screenshareManager  = new ScreenShareManagerClass();
+// var screenshareManager  = new ScreenShareManagerClass();
+var newscreenshareManager  = new NewScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
 var epubManager         = new epubManagerClass();
@@ -45,7 +45,7 @@ const topButtonContents = {};
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
-  'screen_share'      : screenshareManager.btn,
+  'screen_share'      : newscreenshareManager.btn,
   '3d_view'           : _3DCanvasOnOff,
   'movie'             : Movie_Render_Button,
   'file'              : LoadFile,
@@ -80,11 +80,11 @@ connection.password = params.password;
 connection.chunkSize = 64000;
 connection.enableLogs = false;
 connection.socketMessageEvent = 'home-class-socket';
-connection.maxParticipantsAllowed = 40;
+connection.maxParticipantsAllowed = 100;
 connection.extra.roomOwner = params.open == 'true';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
-connection.session = {audio: false,video: true,data: true,screen: false,};
+connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
 if(!window.params.userFullName){
@@ -112,7 +112,6 @@ ChattingManager.init();
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
-  screenshareManager.setFrameRate(1, 2);
   examObj.init();
   pageNavigator.init();
   canvasManager.init();
@@ -122,6 +121,12 @@ window.onWidgetLoaded = function () {
   mobileHelper.init();
 }
 
+window.onSocketConnected = function () {
+  updateClassTime();
+  classroomCommand.updateSyncRoom();
+  webRTCPCInit();
+};
+
 connection.onopen = function (event) {
   classroomManager.joinStudent(event);
 };
@@ -130,30 +135,9 @@ connection.onclose = connection.onerror = connection.onleave = function (event) 
   classroomManager.leftStudent(event);
 };
 
-connection.onstream = function (event) {
-  console.log('onstream!', event);
-
-  if (classroomInfo.shareScreen.state && classroomInfo.shareScreen.id == event.streamid) {
-    screenshareManager.streamstart(event);
-  };
-
-  if (connection.extra.roomOwner) {
-    maincamManager.addStudentCam(event);
-  }
-  else {
-    if (event.type == "local" && event.stream.isVideo) {
-      event.mediaElement.pause();
-      event.stream.mute("audio");
-    }
-    else {
-      maincamManager.addTeacherCam(event);
-    }
-  }
-};
-
 connection.onstreamended = function (event) {
   console.log('onstreameneded!', event);
-  screenshareManager.onclose(event);
+  newscreenshareManager.onclose(event);
 };
 
 designer.appendTo(widgetContainer, () => {
@@ -170,7 +154,7 @@ connection.onmessage = function (event) {
   if (permissionManager.eventListener(event))
     return;
 
-  if (screenshareManager.eventListener(event))
+  if (newscreenshareManager.eventListener(event))
     return;
 
   if (maincamManager.eventListener(event))

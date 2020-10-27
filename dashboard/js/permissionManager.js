@@ -55,7 +55,6 @@ class permissionManagerClass {
   }
   eventListener(event) {
     if (event.data.permissionChanged) {
-      console.log(event.data.permissionChanged);
       classroomInfo = event.data.permissionChanged;
       return true;
     }
@@ -91,6 +90,9 @@ class permissionManagerClass {
   }
 
   IsCanvasPermission(id) {
+    if(classroomInfo.canvasPermission == undefined){
+      return false;
+    }
     if (classroomInfo.canvasPermission.indexOf(id) == -1)
       return false;
     return true

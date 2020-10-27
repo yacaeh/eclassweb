@@ -599,6 +599,9 @@ module.exports = exports = function (socket, config) {
                                 state: false,
                                 id: undefined,
                             },
+                            camshare:{
+                                id: undefined
+                            },
                             epub: {
                                 state: false,
                                 page: 0,
@@ -843,6 +846,7 @@ module.exports = exports = function (socket, config) {
                     console.log("owner rejoin");
                     listOfRooms[arg.sessionid].owner = socket.userid;
                     callback(false, "owner rejoin", listOfRooms[arg.sessionid].info);
+                    return;
                 }
 
                 closeOrShiftRoom();
@@ -1103,6 +1107,16 @@ module.exports = exports = function (socket, config) {
         socket.on("screen-share-set", function(data, callback){
             call_getRoom(room => {
                 room.info.shareScreen = data;
+                if (callback)
+                    callback('ok');
+            }, e => {
+                console.log(e)
+            })
+        })
+
+        socket.on("cam-share-set", function(data, callback){
+            call_getRoom(room => {
+                room.info.camshare = data;
                 if (callback)
                     callback('ok');
             }, e => {
