@@ -23,7 +23,7 @@ module.exports = {
             console.log("[MongoDB] Connected successfully to server [", dburl, "]");
             _this.db = client.db(dbName);
             dblist.forEach(element => _this.collections[element] = _this.db.collection(element));
-            client.db('test').collection('test').deleteOne
+            client.db('test').collection('test').findOneAndUpdate()
             client.db('test').collection('test').updateOne()
 
         });
@@ -45,12 +45,14 @@ module.exports = {
         switch (route) {
             case '/sign-up':
                 if (await this.db.collection('accounts-teacher').findOne({ id: data.id }) ||
-                    await this.db.collection('accounts-student').findOne({ id: data.id })) {
+                    await this.db.collection('accounts-student').findOne({ id: data.id }) || 
+                    await this.db.collection('accounts-wating').findOne({ id: data.id })) {
                     return { code: 400, text: 'exist id' };
                 }
 
                 if (await this.db.collection('accounts-teacher').findOne({ email: data.email }) ||
-                    await this.db.collection('accounts-student').findOne({ email: data.email })) {
+                    await this.db.collection('accounts-student').findOne({ email: data.email }) ||
+                    await this.db.collection('accounts-wating').findOne({ email: data.email })) {
                     return { code: 401, text: 'exist email' };
                 }
 
@@ -62,37 +64,40 @@ module.exports = {
                 data.certification = this.make_key(32);
                 let sendmailret;
 
-                try{
-                    sendmailret = await email.sendmail(data.email, data.location, data.certification);
+                try {
+                    sendmailret = await email.sendmail(data.email, data.location + '/certification', data.certification);
                 }
-                catch(e){
-                    if(e.responseCode == 535){
-                        return {code : 403, text : "wrong email"};   
+                catch (e) {
+                    if (e.responseCode == 535) {
+                        return { code: 403, text: "wrong email" };
                     }
                 }
 
-
-                if(sendmailret.errcode == 402){
-                    return { code : 402 , text : '"You need enter your email data. [./emaildata.json]")'};
+                if (sendmailret.errcode == 402) {
+                    return { code: 402, text: '"You need enter your email data. [./emaildata.json]")' };
                 }
-
 
                 this.db.collection('accounts-wating').insertOne(data);
                 return { code: 200, text: 'sign up' };
 
             case '/sign-in':
                 find = await this.db.collection('accounts-teacher').findOne({ id: data.id }) ||
-                    await this.db.collection('accounts-student').findOne({ id: data.id });
-                if (!find)
+                    await this.db.collection('accounts-student').findOne({ id: data.id }) || 
+                    await this.db.collection('accounts-wating').findOne({ id: data.id });
+                if (!find){
                     return { code: 400, text: 'failed' };
-
+                }
+                
                 let pw = await pbkdf2Async(data.pw, find.salt, 159236, 64, 'sha512');
                 pw = pw.toString('base64');
-
+                
                 if (find.pw != pw) {
                     return { code: 400, text: 'failed' };
                 }
                 else {
+                    if(find.certification)
+                        return { code: 402, text: 'no certification', email : find.email};
+
                     let logindata = session.login(session.get(req), find.uid);
                     find = await this.db.collection('accounts-teacher').findOne({ uid: find.uid }) ||
                         await this.db.collection('accounts-student').findOne({ uid: find.uid });
@@ -121,26 +126,68 @@ module.exports = {
                     return { code: 200, find: 'success', data: find.id };
                 return { code: 400, find: 'failed' };
 
-            case '/find-pw' :
-                try{
-                    find = await this.db.collection('accounts-teacher').findOne({ id : data.id, email : data.email }) ||
-                    await this.db.collection('accounts-student').findOne({ id : data.id, email : data.email });
+            case '/find-pw':
+                try {
+                    let code = Math.round((Math.random() * 900000) +100000);
+                    find = await this.db.collection('accounts-teacher').findOne({ id: data.id, email: data.email }) ||
+                            await this.db.collection('accounts-student').findOne({ id: data.id, email: data.email });
 
-                    if(!find){
-                        return { code : 400 , text : 'failed'};
+                    if (!find) {
+                        return { code: 400, text: 'failed' };
                     }
 
-                    let newpw = await pbkdf2Async(data.pw, find.salt, 159236, 64, 'sha512');
-                    
-                    await this.db.collection('accounts-teacher').updateOne({ id : data.id } , {$set : {pw : newpw.toString('base64')}} ) ||
-                    await this.db.collection('accounts-student').updateOne({ id : data.id } , {$set : {pw : newpw.toString('base64')}} );
-                    
-                    return { code : 200 , text : 'password changed'}
+                    await this.db.collection('accounts-' + find.type).updateOne({id: data.id, email: data.email}, {$set : {cpwcode : code}})
+
+                    let sendmailret;
+
+                    try {
+                        sendmailret = await email.sendpwmail(data.email, code);
+                    }
+                    catch (e) {
+                        if (e.responseCode == 535) {
+                            return { code: 403, text: "wrong email" };
+                        }
+                    }
+    
+                    if (sendmailret.errcode == 402) {
+                        return { code: 402, text: '"You need enter your email data. [./emaildata.json]")' };
+                    }
+
+                
+                    return { code: 200, text: 'sent mail' , uid : find.uid};
                 }
-                catch{
-                    return { code : 400 , text : 'failed'};
+                catch(e) {
+                    console.log(e);
+
+                    return { code: 400, text: 'failed' };
                 }
-               
+            
+            case '/change-pw' :
+                console.log(data);
+                find = await this.db.collection('accounts-' + data.type).findOne({uid : data.uid});
+                console.log(find);
+                let newpw = await pbkdf2Async(data.pw1, find.salt, 159236, 64, 'sha512');
+                await this.db.collection('accounts-' + data.type).updateOne({ uid: data.uid }, { $set: { pw: newpw.toString('base64') } });
+                return {code : 200, data : 'ok'};
+
+            case '/change-pw-check' :
+                find = await this.db.collection('accounts-teacher').findOne({ uid: data.uid }) ||
+                        await this.db.collection('accounts-student').findOne({ uid: data.uid }); 
+
+                if(!find || !find.cpwcode){
+                    return {code : 501, data : 'failed'};
+                }
+
+                return {code : 200, data : find};
+            case '/change-pw-code-check' :
+                find = await this.db.collection('accounts-teacher').findOne({ uid: data.uid , cpwcode : data.code * 1 }) ||
+                       await this.db.collection('accounts-student').findOne({ uid: data.uid , cpwcode : data.code * 1 });
+                if(find){
+                    await this.db.collection('accounts-' + find.type).updateOne({uid: data.uid}, { $set : {cpwcode : undefined}});
+                    return {code : 200, data : find};
+                }
+
+                return {code : 501, text : 'failed', find : find}
         }
         return false;
     },
@@ -149,20 +196,32 @@ module.exports = {
         return crypto.randomBytes(256).toString('hex').substr(100, length);
     },
 
-    certification : async function (code) {
-        const find = await this.db.collection('accounts-wating').findOne({certification : code});
+    certification: async function (code) {
+        const find = await this.db.collection('accounts-wating').findOne({ certification: code });
 
-        if(!find){
-            return {code : 400 , text : 'no data'};
+        if (!find) {
+            return { code: 400, text: 'no data' };
         }
 
         delete find['location'];
         delete find['certification'];
 
-        await this.db.collection('accounts-wating').deleteOne({certification : code});
+        await this.db.collection('accounts-wating').deleteOne({ certification: code });
         await this.db.collection('accounts-' + find.type).insertOne(find);
-        return {code : 200 , text : 'success'};
+        return { code: 200, text: 'success' };
+    },
+
+    changepw : async function (code) {
+        return {code : 200};
+    },
+
+    createRoom : function(room, id){
+        room.id = id;
+    },
+
+    deleteRoom : function(){
     }
+
 }
 
 function pbkdf2Async(password, salt, iterations, keylen, digest) {

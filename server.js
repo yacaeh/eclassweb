@@ -81,7 +81,6 @@ function serverHandler(request, response) {
 
                     db.api(request, data).then((_ret) => {
                         if(!_ret) return;
-
                         ret = _ret;
                         response.write(JSON.stringify(ret));
                         response.end();
@@ -114,6 +113,20 @@ function serverHandler(request, response) {
 
                         response.writeHead(200, {'Content-Type': 'text/html;charset=UTF-8'});
                         response.write(code, "utf8");
+                        response.end();
+                    })
+                    return;
+                }
+                else if(split[1] == 'changepw'){
+                    fs.readFile('./dashboard/changepw.html', 'utf8', function (err, file) {
+
+                    // })
+                    // db.changepw(split[2]).then((_ret) => {
+                        // response.writeHead(200, {'Content-Type': 'text/html;charset=UTF-8'});
+                        response.writeHead(200, {
+                            'Content-Type': 'text/html;charset=utf8'
+                        });
+                        response.write(file, "utf8");
                         response.end();
                     })
                     return;
