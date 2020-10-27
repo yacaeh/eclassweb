@@ -2,16 +2,8 @@ var nodemailer = require('nodemailer');
 var smtpTransporter = require('nodemailer-smtp-transport');
 const fs = require('fs')
 
-let jsondata = JSON.parse(fs.readFileSync('./emaildata.json'));
-    
-let smtpTransport = nodemailer.createTransport(smtpTransporter({
-    service: 'Gmail',
-    host:'smtp.gmail.com',
-    auth: {
-        user: jsondata.email.id,
-        pass: jsondata.email.pw
-    }
-}));
+let jsondata;
+let smtpTransport;
 
 module.exports = {
     init(){
@@ -20,6 +12,15 @@ module.exports = {
             console.log("You need enter your email data. [./emaildata.json]");
             fs.writeFileSync('./emaildata.json', '{"email":{"id":"", "pw":""}}');
         }
+        jsondata = JSON.parse(fs.readFileSync('./emaildata.json'));
+        smtpTransport = nodemailer.createTransport(smtpTransporter({
+            service: 'Gmail',
+            host:'smtp.gmail.com',
+            auth: {
+                user: jsondata.email.id,
+                pass: jsondata.email.pw
+            }
+        }));
     },
     
     sendmail : async function(to , location, code){

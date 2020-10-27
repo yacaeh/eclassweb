@@ -1,35 +1,11 @@
-var classroomInfo = new Proxy(function(){}, {
-    construct: function (target, argumentsList, newTarget) {
-        return { value: argumentsList[0] * 10 };
-    },
-    get(target, property) {
-        return target[property];
-    },
-    set(target, property, value) {
-        const oldValue = target[property];
-        if (value !== oldValue) {
-            onClassroominfoChanged(property,value);
-        }
-        target[property] = value;
-        return true;
-    }
-});
-
-function SetClassroomInfo(newinfo){
-    for(let i in newinfo){
-        classroomInfo[i] = newinfo[i];
-    }
-}
+var classroomInfo = {};
 
 classroomCommand = {
     joinRoom: function (_info) {
-        // connection.socket.emit('get-room-info', (_info) => {
-            console.debug("Synced classroom info");
-            console.log(_info);
-            SetClassroomInfo(_info); 
-            updateClassTime();
-            this.updateSyncRoom();
-        // });
+        console.debug("Synced classroom info");
+        classroomInfo = _info;
+        updateClassTime();
+        this.updateSyncRoom();
     },
 
     updateSyncRoom: function () {
@@ -103,7 +79,7 @@ classroomCommand = {
     },
 
     onSynchronizationClassRoom: function (_roomInfo) {
-        SetClassroomInfo(_roomInfo);
+        classroomInfo = _roomInfo;
         this.updateSyncRoom();
     },
 };

@@ -1,11 +1,11 @@
 (function () {
-  var params = {},
+  let params = {},
     r = /([^&=]+)=?([^&]*)/g;
 
   function d(s) {
     return decodeURIComponent(s.replace(/\+/g, ' '));
   }
-  var match,
+  let match,
     search = window.location.search;
   while ((match = r.exec(search.substring(1))))
     params[d(match[1])] = d(match[2]);
@@ -42,19 +42,7 @@ var attentionManager    = new attentionManagerClass();
 //=============================================================================================
 
 // 상단 버튼 도움말
-const topButtonContents = {
-  top_all_controll      : "전체 제어",
-  top_test              : "시험",
-  top_alert             : "알림",
-  top_student           : "학생 판서",
-  top_camera            : "학생 카메라",
-  top_save_alert        : "알림 기록 저장",
-  top_record_video      : "화면 녹화",
-  student_isallcontrol  : "선생님이 전체 제어 중 입니다",
-  student_screenshare   : "화면 공유 권한을 획득한 상태입니다",
-  student_canvas        : "나의 판서를 공유 중 입니다.",
-  student_mic           : "마이크 권한을 획득한 상태입니다"
-}
+const topButtonContents = {};
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
@@ -87,7 +75,7 @@ const shortCut = [
 
 //=============================================================================================
 
-console.log('Connection!');
+console.debug('Connection!');
 connection.socketURL = '/';
 connection.password = params.password;
 connection.chunkSize = 64000;
@@ -101,12 +89,13 @@ connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
 if(!window.params.userFullName){
-  var request = new XMLHttpRequest();
+  let request = new XMLHttpRequest();
   request.open('POST', '/get-now-account', false); 
-  request.send(JSON.stringify({}));
+  request.send(JSON.stringify({id : params.sessionid}));
 
   if (request.status === 200) {
     const ret = JSON.parse(request.responseText);
+    console.log(ret)
     if(ret.code == 400){
       console.error("no login info")
       alert("로그인 정보가 없습니다");
@@ -133,13 +122,7 @@ window.onWidgetLoaded = function () {
   mobileHelper.init();
 }
 
-window.onClassroominfoChanged = function(prop, value) {
-  if(prop =='camshare' && value !== undefined && isClassroomInfoinit == false)
-  {console.log("call rtc init!");webRTCPCInit();isClassroomInfoinit=true;}
-}
-
 connection.onopen = function (event) {
-  console.log('on open', event);
   classroomManager.joinStudent(event);
 };
 
@@ -152,9 +135,8 @@ connection.onstreamended = function (event) {
   newscreenshareManager.onclose(event);
 };
 
-designer.appendTo(widgetContainer, function () {
-  console.log('designer append');
-
+designer.appendTo(widgetContainer, () => {
+  console.debug('Designer append');
   connection.extra.roomOwner ? classroomManager.createRoom() :
                                classroomManager.joinRoom();
   onWidgetLoaded();
@@ -208,29 +190,6 @@ connection.onmessage = function (event) {
     return;
   }
 
-  if (event.data.getpointer) {
-    pointer_saver.send(event.data.idx);
-    return;
-  }
-
-  if (event.data.setpointer) {
-    if (event.data.idx == "empty")
-      return;
-
-    event.data.data.command = "load";
-
-    if (event.extra.roomOwner && !connection.extra.roomOwner) {
-      if (pointer_saver.nowIdx == event.data.idx)
-        designer.syncData(event.data.data);
-    }
-    else {
-      event.data.data.isStudent = true;
-      if (pointer_saver.nowIdx == event.data.idx)
-        designer.syncData(event.data.data);
-    }
-    return;
-  }
-
   if (event.data.exam) {
     examObj.receiveExamData(event.data.exam);
     return;
@@ -277,8 +236,8 @@ connection.onmessage = function (event) {
 
   //동영상 공유
   if (event.data.MoiveURL) {
-    isSharingMovie = event.data.MoiveURL.enable;
     let moveURL = event.data.MoiveURL;
+    isSharingMovie = moveURL.enable;
     OnMovieRender(moveURL.enable, moveURL.type, moveURL.url);
     return;
   }

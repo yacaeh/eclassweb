@@ -188,23 +188,19 @@ class NewScreenShareManagerClass{
       return this.get().srcObject;
   }
   start(stream, btn) {
-    connection.send({
-      showScreenShare: stream.id,
-    });
-
+    connection.send({showScreenShare: stream.id});
     window.shareStream = stream;
     newscreenshareManager.show();
   }
   stop() {
     console.log("Stop screen sharing")
     this.hide();
-    classroomInfo.shareScreen = {};
-    classroomInfo.shareScreen.state = false
-    classroomInfo.shareScreen.id = undefined
-    classroomInfo.shareScreen.userid = undefined;
-    classroomManager.updateClassroomInfo((result)=>console.log(result));
-    pc.removeTrack(screenSender);
-    
+    classroomInfo.shareScreen = {
+      id      : undefined,
+      state   : false,
+      userid  : undefined
+    };
+    connection.socket.emit("screen-share-set", classroomInfo.shareScreen);
   }
   btn(btn) {
     if (!classroomInfo.shareScreen.state && checkSharing()) {
@@ -346,14 +342,14 @@ class NewScreenShareManagerClass{
     function replaceScreenTrack(stream, btn) {
       canvasManager.clear();
       console.log("Stream Start", stream.id);
-      // screenshareManager.get().controls = false;
-      newscreenshareManager.srcObject(stream);
-      classroomInfo.shareScreen = {}
-      classroomInfo.shareScreen.state = true
-      classroomInfo.shareScreen.id = stream.id
-      classroomInfo.shareScreen.userid = connection.userid;
-      classroomManager.updateClassroomInfo((result)=>console.log(result));
-      newscreenshareManager.start(stream, btn);
+      screenshareManager.srcObject(stream);
+      classroomInfo.shareScreen = {
+        id      : stream.id,
+        state   : true,
+        userid  : connection.userid,
+      };
+      connection.socket.emit("screen-share-set", classroomInfo.shareScreen);
+      screenshareManager.start(stream, btn);
     }
   }
   streamstart(stream){
@@ -394,10 +390,11 @@ class NewScreenShareManagerClass{
       console.debug("Start Screensharing", event.data.showScreenShare)
 
       canvasManager.clear();
-      classroomInfo.shareScreen = {}
-      classroomInfo.shareScreen.state = true;
-      classroomInfo.shareScreen.id = event.data.showScreenShare;
-      classroomInfo.shareScreen.userid = event.userid;
+      classroomInfo.shareScreen = {
+        id      : event.data.showScreenShare,
+        state   : true,
+        userid  : event.userid
+      };
 
       // try {
       //   let stream = connection.streamEvents[event.data.showScreenShare].stream;

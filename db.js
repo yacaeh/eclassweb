@@ -213,7 +213,15 @@ module.exports = {
 
     changepw : async function (code) {
         return {code : 200};
+    },
+
+    createRoom : function(room, id){
+        room.id = id;
+    },
+
+    deleteRoom : function(){
     }
+
 }
 
 function pbkdf2Async(password, salt, iterations, keylen, digest) {
