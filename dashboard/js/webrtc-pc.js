@@ -72,6 +72,7 @@ async function webRTCPCInit() {
               if (classroomInfo.camshare.id == stream.id) {
                 if (!connection.extra.roomOwner)
                   maincamManager.addNewTeacherCam(stream);
+                  maincamManager.show();
               } else {
                 if (connection.peers.getAllParticipants().length > 0)
                   maincamManager.addNewStudentCam(stream);
@@ -212,6 +213,8 @@ async function webRTCPCInit() {
             console.log('Add teacher!');
             teacherAdded = true;
             maincamManager.addNewTeacherCam(localStream);
+            maincamManager.hide();
+            console.log('hide');
           }
         });
         pc.addTransceiver('video', {

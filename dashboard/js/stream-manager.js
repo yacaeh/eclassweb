@@ -453,7 +453,6 @@ class maincamManagerClass{
   start(callback) {
     var inter = setInterval(function () {
       if (maincamManager.get().readyState == 4) {
-        maincamManager.show();
         maincamManager.get().muted = true;
         maincamManager.get().play();
         clearInterval(inter);
@@ -524,8 +523,9 @@ class maincamManagerClass{
     console.log("Addnew teacher",stream.id);
     this.srcObject(stream);
     this.start();
-    classroomInfo.camshare = {};
-    classroomInfo.camshare.id = stream.id;
+    classroomInfo.camshare = {
+      id : stream.id
+    };
     classroomManager.updateClassroomInfo();
   }
 

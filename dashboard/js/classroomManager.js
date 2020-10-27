@@ -435,13 +435,14 @@ class classroomManagerClass {
     };
 
     toggleViewType() {
-        $('.view_type').click(function () {
+        $('.view_type').click(function (e) {
             $('.view_type').removeClass('view_type-on');
             this.classList.add("view_type-on");
             let childern = document.getElementById("student_list").children;
 
             switch (this.id) {
                 case 'top_student':
+                    $('.view_type').removeClass('vstudent');
                     classroomInfo.showcanvas = true;
                     for (let i = 0; i < childern.length; i++) {
                         Show(childern[i].getElementsByTagName("img")[0]);
@@ -455,14 +456,31 @@ class classroomManagerClass {
                     break;
                 case 'top_camera':
                     classroomInfo.showcanvas = false;
-                    for (let i = 0; i < childern.length; i++) {
-                        Show(childern[i].getElementsByTagName("video")[0]);
-                        Hide(childern[i].getElementsByTagName("img")[0]);
+
+                    if(e.target.classList.contains('view_type-on')){
+                        e.target.classList.toggle('vstudent');
                     }
-                    connection.send({
-                        sendcanvasdata: true,
-                        state: false
-                    })
+                    
+                    if(!e.target.classList.contains('vstudent')){
+                        for (let i = 0; i < childern.length; i++) {
+                            Show(childern[i].getElementsByTagName("video")[0]);
+                            Hide(childern[i].getElementsByTagName("img")[0]);
+                        }
+                        connection.send({
+                            sendcanvasdata: true,
+                            state: false
+                        })
+                        maincamManager.hide();
+                    }
+                    else{
+                        for (let i = 0; i < childern.length; i++) {
+                            Hide(childern[i].getElementsByTagName("video")[0]);
+                        }
+                        maincamManager.show();
+                    }
+
+
+
                     break;
             }
             classroomManager.updateClassroomInfo();
