@@ -55,8 +55,7 @@ class permissionManagerClass {
   }
   eventListener(event) {
     if (event.data.permissionChanged) {
-      console.log(event.data.permissionChanged);
-      SetClassroomInfo(event.data.permissionChanged);
+      classroomInfo = event.data.permissionChanged;
       return true;
     }
 
