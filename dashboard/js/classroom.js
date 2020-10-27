@@ -19,7 +19,6 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
-let isClassroomInfoinit = false;
 let remainCams = {};
 let isFileViewer = false;
 
@@ -121,6 +120,12 @@ window.onWidgetLoaded = function () {
   classroomManager.init(shortCut, topButtonContents);
   mobileHelper.init();
 }
+
+window.onSocketConnected = function () {
+  updateClassTime();
+  classroomCommand.updateSyncRoom();
+  webRTCPCInit();
+};
 
 connection.onopen = function (event) {
   classroomManager.joinStudent(event);

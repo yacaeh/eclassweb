@@ -142,15 +142,14 @@ class screenRecorderClass {
   };
 
   makeName() {
-    var date = new Date();
-    var year = date.getFullYear();
-    var month = date.getMonth() + 1;
-    var day = date.getDate();
-    var hour = date.getHours();
-    var min = date.getMinutes();
-    var sec = date.getSeconds();
-    var name = year + "/" + month + "/" + day + "/ " + hour + "/" + min + "/" + sec + '-'+$.i18n('RECORD') +'.webm';
-    return name;
+    const date  = new Date();
+    const year  = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day   = date.getDate();
+    const hour  = date.getHours();
+    const min   = date.getMinutes();
+    const sec   = date.getSeconds();
+    return year + "/" + month + "/" + day + "/ " + hour + "/" + min + "/" + sec + '-'+$.i18n('RECORD') +'.webm';
   }
 }
 
@@ -160,6 +159,7 @@ class NewScreenShareManagerClass{
     this.lastStream = undefined;
     this.self = this;
     this.senders = [];
+    this.sender = undefined;
   
     // this.minFrameRate = 5
     // this.maxFrameRate = 10;
@@ -196,11 +196,11 @@ class NewScreenShareManagerClass{
     console.log("Stop screen sharing")
     this.hide();
     classroomInfo.shareScreen = {
-      id      : undefined,
       state   : false,
+      id      : undefined,
       userid  : undefined
     };
-    connection.socket.emit("screen-share-set", classroomInfo.shareScreen);
+    classroomManager.updateClassroomInfo((result)=>console.log(result));
   }
   btn(btn) {
     if (!classroomInfo.shareScreen.state && checkSharing()) {
@@ -256,26 +256,37 @@ class NewScreenShareManagerClass{
 
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
-        
         (stream) => {
           btn.classList.toggle("selected-shape");
           btn.classList.toggle("on");
           stream.isScreenShare = true;
-          newscreenshareManager.get().volume = 0;
           screenStream = stream;
+          newscreenshareManager.get().volume = 0;
+          newscreenshareManager.isSharingScreen = true;
+          newscreenshareManager.lastStream = stream;
 
-          
+          let track = stream.getVideoTracks()[0];
+          this.sender = pc.addTrack(track, stream);
+          pc.getSenders()[2].replaceTrack(newscreenshareManager.lastStream.getVideoTracks()[0])
+
+          replaceScreenTrack(stream, btn);
           addStreamStopListener(stream, function () {
             newscreenshareManager.stop();            
-            // connection.removeStream(stream.id)
-            connection.attachStreams.forEach(function (e) {
-              if(e.id == stream.id){
-                var idx = connection.attachStreams.indexOf(e);
-                connection.attachStreams.splice(idx,1);
-              }
+
+            stream.getTracks().forEach(function(track){
+              console.log("REMOVE TRACK --- ", track)
+              pc.getSenders().forEach((sender) => { 
+                if(sender.track && sender.track.id == track.id){
+                  pc.removeTrack(sender);
+                }
+              })
+
+              track.stop();
+              stream.removeTrack(track);
             })
 
             connection.send({ hideScreenShare: true });
+
             if (btn != undefined) {
               btn.classList.remove("on");
               btn.classList.remove("selected-shape")
@@ -283,24 +294,11 @@ class NewScreenShareManagerClass{
             newscreenshareManager.hide();
 
           })
-
-          newscreenshareManager.isSharingScreen = true;
-          newscreenshareManager.lastStream = stream;
-          replaceScreenTrack(stream, btn);
-
-          console.log(screenStream);
-          let track= screenStream.getVideoTracks()[0];
-          if (track) {
-            screenSender = pc.addTrack(track, screenStream);
-          }
         },
         (error) => {
           btn.classList.remove("on");
           btn.classList.remove("selected-shape");
         },
-        
-  
-        
       );
 
     } else if (navigator.getDisplayMedia) {
@@ -342,77 +340,71 @@ class NewScreenShareManagerClass{
     function replaceScreenTrack(stream, btn) {
       canvasManager.clear();
       console.log("Stream Start", stream.id);
-      screenshareManager.srcObject(stream);
+      newscreenshareManager.srcObject(stream);
       classroomInfo.shareScreen = {
-        id      : stream.id,
-        state   : true,
-        userid  : connection.userid,
+        state  : true,
+        id     : stream.id,
+        userid : connection.userid
       };
-      connection.socket.emit("screen-share-set", classroomInfo.shareScreen);
-      screenshareManager.start(stream, btn);
+      classroomManager.updateClassroomInfo((result)=>console.log(result));
+      newscreenshareManager.start(stream, btn);
     }
   }
   streamstart(stream){
     console.info("Stream start!");
-    let parent = this.get().parentElement;
-    parent.removeChild(this.get());
+    this.srcObject(stream);
+    this.show();
 
-    let el = document.createElement("video")
-    el.srcObject = stream; 
-    el.setAttribute('id', "screen-viewer"); 
-    el.controls = true;
-    el.volume = 0.3;
+    // let parent = this.get().parentElement;
+    // parent.removeChild(this.get());
+
+    // let el = document.createElement("video")
+    // el.srcObject = stream; 
+    // el.setAttribute('id', "screen-viewer"); 
+    // el.controls = true;
+    // el.volume = 0.3;
     // element.controls = false;
 
-    parent.appendChild(el);
-    this.show();
-    el.muted = true;
+    // parent.appendChild(el);
+    // el.muted = true;
 
-    var playPromise = el.play();
+    // var playPromise = el.play();
  
-    if (playPromise !== undefined) {
-      playPromise.then(_ => {
-        // Automatic playback started!
-        // Show playing UI.
-        // We can now safely pause video...
-        el.play();
-      })
-      .catch(error => {
-        // Auto-play was prevented
-        // Show paused UI.
-      });
-    }
+    // if (playPromise !== undefined) {
+    //   playPromise.then(_ => {
+    //     // Automatic playback started!
+    //     // Show playing UI.
+    //     // We can now safely pause video...
+    //     el.play();
+    //   })
+    //   .catch(error => {
+    //     // Auto-play was prevented
+    //     // Show paused UI.
+    //   });
+    // }
   
   }
 
   eventListener(event) {
     if (event.data.showScreenShare) {
       console.debug("Start Screensharing", event.data.showScreenShare)
-
       canvasManager.clear();
       classroomInfo.shareScreen = {
-        id      : event.data.showScreenShare,
         state   : true,
+        id      : event.data.showScreenShare,
         userid  : event.userid
-      };
-
-      // try {
-      //   let stream = connection.streamEvents[event.data.showScreenShare].stream;
-      //   this.streamstart(stream);
-      // }
-      // catch (error) { 
-      // }
-
+      }
       return true;
     }
 
     if (event.data.hideScreenShare) {
       console.log("SCREEN SHARE STOPED", event.userid)
       newscreenshareManager.hide();
-      classroomInfo.shareScreen = {}
-      classroomInfo.shareScreen.state = false;
-      classroomInfo.shareScreen.id = undefined;
-      classroomInfo.shareScreen.userid = undefined;
+      classroomInfo.shareScreen = {
+        state  : false,
+        id     : undefined,
+        userid : undefined
+      }
       return true;
     }
 
@@ -461,7 +453,6 @@ class maincamManagerClass{
   start(callback) {
     var inter = setInterval(function () {
       if (maincamManager.get().readyState == 4) {
-        maincamManager.show();
         maincamManager.get().muted = true;
         maincamManager.get().play();
         clearInterval(inter);
@@ -479,50 +470,9 @@ class maincamManagerClass{
       return this.get().srcObject;
     }
   }
-  addStudentCam(event) {
-    let isFind = false;
-    console.log(event.mediaElement);
 
-    if(!event.stream.isVideo || event.extra.roomOwner) return;
-
-
-    try {
-      event.mediaElement.controls = false;
-      event.mediaElement.style.width = "100%";
-      event.mediaElement.style.height = "100%";
-      event.mediaElement.style.pointerEvents = "none";
-      event.mediaElement.style.position = "absolute";
-
-      if (classroomInfo.showcanvas) {
-        Hide(event.mediaElement)
-      }
-
-      let childern = document.getElementById("student_list").children;
-      for (let i = 0; i < childern.length; i++) {
-        let child = childern[i];
-        console.log(child);
-        console.log(child.dataset.id);
-        console.log(event.userid);
-        if (child.dataset.id == event.userid) {
-          console.debug("Student's cam added [",event.extra.userFullName,'] [',event.userid,']');
-          child.appendChild(event.mediaElement);
-          isFind = true;
-          break;
-        }
-      }
-
-      if(!isFind){
-        remainCams[event.userid] =  event.mediaElement;
-      }
-    }
-
-    catch{
-      console.log("No Cam")
-    }
-
-  }
-
-  addNewStudentCam(userlist,stream) {
+  addNewStudentCam(stream) {
+    let userlist = connection.peers.getAllParticipants();
     let isFind = false;
 
     let el = document.createElement("video")
@@ -543,8 +493,8 @@ class maincamManagerClass{
         let child = childern[i];
         userlist.forEach(user => {
           if (child.dataset.id == user) {
+            el.setAttribute("id",stream.id);
             
-            el.setAttribute("id",stream.id );
             if ('srcObject' in el) {
               el.srcObject = stream;
             } else {
@@ -569,20 +519,14 @@ class maincamManagerClass{
 
   }
 
-  addTeacherCam (event){
-    if (!event.extra.roomOwner || !event.stream.isVideo) return;      
-    this.srcObject(event.stream);
-    console.debug("Teacher's cam selected",event.userid, event.streamid);
-    this.start();
-  }
   addNewTeacherCam (stream){
     console.log("Addnew teacher",stream.id);
     this.srcObject(stream);
-
     this.start();
-    classroomInfo.camshare = {};
-    classroomInfo.camshare.id = stream.id;
-    classroomManager.updateClassroomInfo((result)=>console.log(result));
+    classroomInfo.camshare = {
+      id : stream.id
+    };
+    classroomManager.updateClassroomInfo();
   }
 
   eventListener(event) {

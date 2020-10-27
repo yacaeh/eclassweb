@@ -4,8 +4,7 @@ classroomCommand = {
     joinRoom: function (_info) {
         console.debug("Synced classroom info");
         classroomInfo = _info;
-        updateClassTime();
-        this.updateSyncRoom();
+        onSocketConnected();
     },
 
     updateSyncRoom: function () {

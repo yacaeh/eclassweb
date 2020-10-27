@@ -14,7 +14,7 @@ const config = {
     },
   ],
 };
-const wsuri = `wss://192.168.124.41:7000/ws`;
+const wsuri = `wss://192.168.124.24:7000/ws`;
 const socket = new WebSocket(wsuri);
 const pc = new RTCPeerConnection(config);
 let teacherAdded = false;
@@ -29,32 +29,34 @@ const VideoResolutions = {
     qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
   };
 
-let resolutionOption = 'hd';
-if (params.open === 'false') resolutionOption = 'thumb';
+let resolutionOption = connection.extra.roomOwner ? 'hd' : 'thumb';
 
 let options = {
-codec: 'VP9',
-resolution: resolutionOption,
-audio: true,
-video: true,
+  codec: 'VP9',
+  resolution: resolutionOption,
+  audio: true,
+  video: true,
 };
 
 let localStream;
 let screenStream;
 let screenSender;
+let nego = false;
+let currentid = undefined;
 
 async function webRTCPCInit() {
   try {
     console.log('classroomInfo.shareScreen.id ', classroomInfo.shareScreen.id);
+    
     pc.ontrack = function ({ track, streams }) {
-      console.log('New track added!');
+      console.log('New track added!',streams);
       streams.forEach((stream) => {
         if (track.kind === 'video') {
           if (
             stream.id == classroomInfo.shareScreen.id &&
             classroomInfo.shareScreen.state
           ) {
-            console.log('Share Screen!');
+            console.log('Share Screen!', stream.id);
             screenStream = stream;
             newscreenshareManager.streamstart(stream);
 
@@ -65,29 +67,20 @@ async function webRTCPCInit() {
                 
           } else {
             track.onunmute = () => {
-              console.log(
-                'classroomInfo.camshare.id',
-                classroomInfo.camshare.id
+              console.log('classroomInfo.camshare.id',classroomInfo.camshare.id
               );
               if (classroomInfo.camshare.id == stream.id) {
-                if (params.open == 'false')
+                if (!connection.extra.roomOwner)
                   maincamManager.addNewTeacherCam(stream);
+                  maincamManager.show();
               } else {
                 if (connection.peers.getAllParticipants().length > 0)
-                  maincamManager.addNewStudentCam(
-                    connection.peers.getAllParticipants(),
-                    stream
-                  );
+                  maincamManager.addNewStudentCam(stream);
               }
             };
           }
         }
-
-      
       });
-
-
-
     };
 
     pc.oniceconnectionstatechange = function() {
@@ -139,6 +132,11 @@ async function webRTCPCInit() {
       } else if (resp.method === 'trickle') {
         pc.addIceCandidate(resp.params).catch(log);
       }
+
+      /////////////////////////////////////////////////
+
+
+      
     });
 
     let join = async () => {
@@ -164,33 +162,34 @@ async function webRTCPCInit() {
           pc.onnegotiationneeded = async function () {
             log('Renegotiating');
             console.log("renegotiating!");
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            const id = Math.random().toString();
+            await pc.setLocalDescription(await pc.createOffer());
+            currentid = Math.random().toString();
             socket.send(
               JSON.stringify({
                 method: 'offer',
-                params: { desc: offer },
-                id
+                params: { desc: pc.localDescription },
+                id : currentid
               })
             );
-
-            socket.addEventListener('message', (event) => {
-              const resp = JSON.parse(event.data);
-              if (resp.id === id) {
-                log(`Got renegotiation answer`);
-                pc.setRemoteDescription(resp.result);
-                console.log("offer renegotiation set remote description");
-                console.log(resp.result);
-              }
-            });
+            nego = true;
           };
 
           pc.setRemoteDescription(resp.result);
           console.log("join offer renegotiation set remote description");
           console.log(resp.result);
         }
+
+        if(nego){
+          console.error("MEWSSAGE")
+          if (resp.id === currentid) {
+            log(`Got renegotiation answer`);
+            pc.setRemoteDescription(resp.result);
+            console.log("offer renegotiation set remote description");
+            console.log(resp.result);
+          }
+        }
       });
+      
     };
 
     await navigator.mediaDevices
@@ -210,10 +209,12 @@ async function webRTCPCInit() {
         localStream = stream;
         localStream.getTracks().forEach((track) => {
           pc.addTrack(track, localStream);
-          if (params.open === 'true' && !teacherAdded) {
+          if (connection.extra.roomOwner && !teacherAdded) {
             console.log('Add teacher!');
             teacherAdded = true;
             maincamManager.addNewTeacherCam(localStream);
+            maincamManager.hide();
+            console.log('hide');
           }
         });
         pc.addTransceiver('video', {
