@@ -81,7 +81,6 @@ function serverHandler(request, response) {
 
                     db.api(request, data).then((_ret) => {
                         if(!_ret) return;
-
                         ret = _ret;
                         response.write(JSON.stringify(ret));
                         response.end();

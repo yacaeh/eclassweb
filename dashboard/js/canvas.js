@@ -74,6 +74,29 @@ class canvasManagerClass {
             return true;
         };
 
+        if (event.data.getpointer) {
+            pointer_saver.send(event.data.idx);
+            return true;
+          }
+        
+          if (event.data.setpointer) {
+            if (event.data.idx == "empty")
+              return true;
+        
+            event.data.data.command = "load";
+        
+            if (event.extra.roomOwner && !connection.extra.roomOwner) {
+              if (pointer_saver.nowIdx == event.data.idx)
+                designer.syncData(event.data.data);
+            }
+            else {
+              event.data.data.isStudent = true;
+              if (pointer_saver.nowIdx == event.data.idx)
+                designer.syncData(event.data.data);
+            }
+            return true;
+          }
+
     };
     sendCanvasDataToOwner() {
         if (connection.extra.roomOwner) return;

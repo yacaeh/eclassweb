@@ -13,6 +13,8 @@ var ScalableBroadcast;
 
 // pushLogs is used to write error logs into logs.json
 const fs = require("fs")
+const db = require('./db');
+
 var pushLogs = require('rtcmulticonnection-server/node_scripts/pushLogs.js');
 // const strings
 var CONST_STRINGS = require('rtcmulticonnection-server/node_scripts/CONST_STRINGS.js');
@@ -27,6 +29,32 @@ module.exports = exports = function (socket, config) {
 
     // to secure your socket.io usage: (via: docs/tips-tricks.md)
     // io.set('origins', 'https://domain.com');
+
+    function alertbox(...params){                 
+        let top = "┌";
+        let mid = "│  ";
+        let bot = "└";   
+        
+        let length = 0;
+        length += params.length + 2;
+        params.forEach((e) => {
+            mid += String(e) + " ";
+            length += String(e).length;
+        })
+
+        for(let i = 0 ; i < length; i++){
+            top += '─';
+            bot += '─';
+        }
+
+        top += '┐';
+        mid += '│';
+        bot += '┘';
+
+        console.log(top);
+        console.log(mid);
+        console.log(bot);
+    }
 
     function appendUser(socket, params) {
         try {
@@ -543,7 +571,7 @@ module.exports = exports = function (socket, config) {
                     });
                 }
             } catch (e) {
-                pushLogs(config, 'joinARoom', e);
+                pushLogs(config, 'joinARoom',    e);
             }
 
             sendToAdmin();
@@ -609,9 +637,9 @@ module.exports = exports = function (socket, config) {
                     }
                     listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
 
-                    console.log("┌───────────────────────────────────┐");
-                    console.log("│   Appended room", roomid, userid +"   │");
-                    console.log("└───────────────────────────────────┘");
+                    db.createRoom(listOfRooms[roomid], roomid);
+                    alertbox("Appended room", roomid, userid);
+
                     return;
                 }
 
@@ -1106,9 +1134,7 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on('delete-room', function(roomid, callback){
-            console.log("┌───────────────────────────────────┐");
-            console.log("│   Deleted room ", roomid, listOfRooms[roomid].realowner +"   │");
-            console.log("└───────────────────────────────────┘");
+            alertbox("Deleted room", roomid, listOfRooms[roomid].realowner);
 
             listOfRooms[roomid].participants.forEach((userid) => {
                 if(listOfUsers[userid])

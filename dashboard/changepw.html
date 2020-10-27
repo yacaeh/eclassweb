@@ -20,7 +20,6 @@
 
     async function idcheck(){
         const ret = await PostAsync('/change-pw-check', {uid});
-        console.log(ret);
         type = ret.data.type;
         if(ret.code == 501){
             alert("잘못된 접근입니다.");
@@ -32,7 +31,6 @@
     async function codecheck(){
         let code = document.getElementById('code').value;
         const ret = await PostAsync("/change-pw-code-check", {uid, code});
-        console.log(ret);
         if(ret.code == 501){
             alert("인증 코드가 틀렸습니다");
         }
@@ -75,13 +73,10 @@
                     alert("변경되었습니다.");
                     self.close();
                 }
-
-                console.log(ret);
             })
 
             form.appendChild(btn);
             document.body.appendChild(form);
-            console.log('code ok');
         }
     }
 
