@@ -15,13 +15,12 @@
 //=============================================================================================
 
 var debug = false;
-var isSharing3D     = false;
-var isSharingMovie  = false;
-var isSharingFile   = false;
-var isSharingEpub   = false;
-var isFileViewer    = false;
-
-var remainCams = {};
+var isSharing3D = false;
+var isSharingMovie = false;
+var isSharingFile = false;
+var isSharingEpub = false;
+let remainCams = {};
+let isFileViewer = false;
 
 const widgetContainer = document.getElementById("widget-container");
 const rightTab = document.getElementById("right-tab")
