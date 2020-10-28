@@ -171,16 +171,6 @@ module.exports = exports = function (socket, config) {
 
         adminSocket = socket;
 
-        socket.on('get-log-list', function (e) {
-            let filelist = fs.readdirSync('./logs')
-            filelist = filelist.reverse();
-            e(filelist);
-        })
-
-        socket.on('delete-log-file', function (name, callback) {
-            fs.unlinkSync('./logs/' + name);
-            callback(200);
-        })
 
         socket.on('admin', function (message, callback) {
             if (!isAdminAuthorized(params, config)) {
@@ -582,7 +572,7 @@ module.exports = exports = function (socket, config) {
                 if (!listOfRooms[roomid]) {
                     listOfRooms[roomid] = {
                         maxParticipantsAllowed: parseInt(params.maxParticipantsAllowed || 1000) || 1000,
-                        realowner: userid,
+                        origin: userid,
                         owner: userid, // this can change if owner leaves and if control shifts
                         participants: [],
                         userlist : {},
@@ -846,6 +836,7 @@ module.exports = exports = function (socket, config) {
                     console.log("owner rejoin");
                     listOfRooms[arg.sessionid].owner = socket.userid;
                     callback(false, "owner rejoin", listOfRooms[arg.sessionid].info);
+                    return;
                 }
 
                 closeOrShiftRoom();
@@ -1045,7 +1036,7 @@ module.exports = exports = function (socket, config) {
                 pushLogs(config, 'disconnect', e);
             }
 
-            if (listOfRooms[getRoomId()] &&  socket.userid in listOfRooms[getRoomId()].participants){
+            if (listOfRooms[getRoomId()] && listOfRooms[getRoomId()].participants.includes(socket.userid)){
                 LeftClass();
             }
 
@@ -1147,14 +1138,14 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on('delete-room', function(roomid, callback){
-            alertbox("Deleted room", roomid, listOfRooms[roomid].realowner);
+            alertbox("Deleted room", roomid, listOfRooms[roomid].origin);
 
             listOfRooms[roomid].participants.forEach((userid) => {
                 if(listOfUsers[userid])
                     listOfUsers[userid].socket.emit('deleted-room');
             })
 
-            delete teacherlist[listOfRooms[roomid].realowner]
+            delete teacherlist[listOfRooms[roomid].origin]
             delete listOfRooms[roomid]
             callback({code : 200, text : 'deleted'});
         })
@@ -1213,44 +1204,44 @@ module.exports = exports = function (socket, config) {
                 userList        : {}
             }
             data.userList[user.userid] = user;
-            fs.writeFileSync("./logs/" + openTime.full + "_" + user.userid + ".json", JSON.stringify(data));
+            db.log.appendRoom(openTime.full + "_" + user.userid, data);
         }
 
-        function JoinStudent() {
-            let json = fs.readFileSync(GetLogFilePath());
-            json = JSON.parse(json);
+        async function JoinStudent() {
             let user = GetUserData();
-            json.userList[user.userid] = user;
-            fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
+            let data = await db.log.get(GetLogDBID());
+            data.userList[user.userid] = user;
+            db.log.set(GetLogDBID(), data);
             console.log("Join Student", socket.userid);
         }
 
-        function LeftClass() {
+        async function LeftClass() {
+            let roomid = GetLogDBID();
             let room = listOfRooms[getRoomId()];
-            let json = JSON.parse(fs.readFileSync(GetLogFilePath()));
             let user = GetUserData();
-
+            
             if(socket.userid == getRoom().info.shareScreen.userid){
                 getRoom().info.shareScreen = {
                     state: false,
                     id: undefined,
                 }
             }
-
+            
+            let data = await db.log.get(roomid);
             if (room.owner != socket.userid) {
-                json.userList[user.userid].leftTime = GetTime().time;
+                data.userList[user.userid].leftTime = GetTime().time;
                 console.log("Left student", socket.userid);
             }
             else if (room.owner == socket.userid) {
-                json.userList[user.userid].leftTime = GetTime().time;
-                json.roomCloseTime = GetTime().time;
+                data.userList[user.userid].leftTime = GetTime().time;
+                data.roomCloseTime = GetTime().time;
                 console.log("Teacher Left Class", socket.userid);
             }
-            fs.writeFileSync(GetLogFilePath(), JSON.stringify(json));
+            db.log.set(roomid, data);
         }
 
-        function GetLogFilePath() {
-            return "./logs/" + getRoom().openTime + "_" + getRoom().realowner + ".json";
+        function GetLogDBID() {
+            return getRoom().openTime + "_" + getRoom().origin;
         }
 
         function GetUserData() {
