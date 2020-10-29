@@ -22,8 +22,8 @@ const jsonPath = {
     logs    : 'logs.json'
 };
 
-if (!fs.existsSync('./logs')) {
-    fs.mkdirSync('./logs');   
+if (fs.existsSync('./logs')) {
+    fs.rmdirSync('./logs');   
 }
 
 const resolveURL                = RTCMultiConnectionServer.resolveURL;

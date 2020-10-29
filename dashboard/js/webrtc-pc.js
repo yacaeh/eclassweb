@@ -43,14 +43,19 @@ let screenSender;
 let nego = false;
 let currentid = undefined;
 
+let streamlist = {};
+
 async function webRTCPCInit() {
   try {
     console.log('classroomInfo.shareScreen.id ', classroomInfo.shareScreen.id);
-    
+
     pc.ontrack = function ({ track, streams }) {
-      console.log('New track added!',streams);
+      console.log('New track added!', streams);
       streams.forEach((stream) => {
+        streamlist[stream.id] = stream;
         track.paused = true;
+
+        // screen share
         if (track.kind === 'video') {
           if (
             stream.id == classroomInfo.shareScreen.id &&
@@ -61,24 +66,26 @@ async function webRTCPCInit() {
             newscreenshareManager.streamstart(stream);
             track.paused = false;
 
-            track.onended = function(event) {
+            track.onended = function (event) {
               console.log("On ended!");
               newscreenshareManager.onclose();
             };
-                
-          } else {
+
+          } 
+          
+          // webcam
+          else {
             track.onunmute = () => {
-              console.log('classroomInfo.camshare.id',classroomInfo.camshare.id
-              );
               if (classroomInfo.camshare.id == stream.id) {
-                if (!connection.extra.roomOwner)
+                if (!connection.extra.roomOwner) {
                   maincamManager.addNewTeacherCam(stream);
                   maincamManager.show();
                   track.paused = false;
-                } else {
-                if (connection.peers.getAllParticipants().length > 0)
-                    maincamManager.addNewStudentCam(stream,track)
                 }
+              } else {
+                if(connection.extra.roomOwner)
+                maincamManager.addNewStudentCam(stream, track)
+              }
             };
           }
         }
@@ -240,7 +247,20 @@ async function webRTCPCInit() {
             maincamManager.hide();
             console.log('hide');
             track.paused = false;
+            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {
+              console.log('updated teacher cam');
+            });
           }
+
+          if (!connection.extra.roomOwner)
+            connection.socket.emit("update-student-cam", Object.assign({}, {
+              id: connection.userid,
+              streamid: stream.id
+            }), function (e) {
+              console.log('updated teacher cam');
+            });
+
+
         });
         pc.addTransceiver('video', {
           direction: 'sendrecv',

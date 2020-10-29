@@ -364,6 +364,10 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         })
 
+        connection.socket.on('update-teacher-cam', function(e){
+            classroomInfo.camshare.id = e.id;
+        })
+
         connection.socket.on('logs', function (log) {
             if (!connection.enableLogs) return;
             console.debug('server-logs', log);
