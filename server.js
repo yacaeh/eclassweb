@@ -23,7 +23,7 @@ const jsonPath = {
 };
 
 if (fs.existsSync('./logs')) {
-    fs.rmdirSync('./logs');   
+    fs.rmdirSync('./logs', { recursive: true });   
 }
 
 const resolveURL                = RTCMultiConnectionServer.resolveURL;

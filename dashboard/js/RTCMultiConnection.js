@@ -368,6 +368,11 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             classroomInfo.camshare.id = e.id;
         })
 
+        connection.socket.on('updated-classroomInfo', function(e){
+            classroomInfo = e;
+            newscreenshareManager.hide();
+        })
+
         connection.socket.on('logs', function (log) {
             if (!connection.enableLogs) return;
             console.debug('server-logs', log);

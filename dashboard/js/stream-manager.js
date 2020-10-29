@@ -222,8 +222,7 @@ class NewScreenShareManagerClass {
 
       if (typeof (newscreenshareManager.lastStream) !== "undefined")
       console.log("SCreenshare stop on ");
-      // newscreenshareManager.lastStream.getTracks().forEach((track) => track.stop());
-
+      newscreenshareManager.lastStream.getTracks().forEach((track) => track.stop());
       btn.classList.remove("on");
       return false;
     }
