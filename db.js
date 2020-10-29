@@ -229,7 +229,6 @@ module.exports = {
         },
         appendRoom : function(origin, data){
             data.key = origin;
-            console.log('log => appned room');
             db.collection('log').insertOne(data);
         },
     }
