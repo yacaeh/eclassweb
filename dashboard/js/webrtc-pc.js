@@ -5,13 +5,14 @@ const log = (msg) =>
 const config = {
   iceServers: [
     {
-      urls: [
-        'stun:stun.l.google.com:19302',
-        'stun:stun1.l.google.com:19302',
-        'stun:stun2.l.google.com:19302',
-        'stun:stun.l.google.com:19302?transport=udp',
+      urls: ["turn:turn.primom.co.kr:443",
+      "turn:turn.primom.co.kr:443?transport=udp",
+      "turn:turn.primom.co.kr:443?transport=tcp"
       ],
-    },
+      username: "primomceo",
+      credential: "webrtc"
+
+    }
   ],
 };
 const socket = new WebSocket(wsuri);
@@ -31,7 +32,6 @@ const VideoResolutions = {
 let resolutionOption = connection.extra.roomOwner ? 'hd' : 'thumb';
 
 let options = {
-  codec: 'VP9',
   resolution: resolutionOption,
   audio: true,
   video: true,
@@ -61,8 +61,9 @@ async function webRTCPCInit() {
             newscreenshareManager.streamstart(stream);
             track.paused = false;
 
+            
             track.onended = function(event) {
-              console.log("On ended!");
+              console.log("Screen On ended!");
               newscreenshareManager.onclose();
             };
                 
@@ -93,6 +94,7 @@ async function webRTCPCInit() {
     }
 
     pc.onicecandidate = (event) => {
+      console.log("on onicecandidate!",event);
       if (event.candidate !== null) {
         socket.send(
           JSON.stringify({
@@ -110,8 +112,7 @@ async function webRTCPCInit() {
 
       // Listen for server renegotiation notifications
       if (!resp.id && resp.method === 'offer') {
-        log(`Got offer notification`);
-        console.log("offer set remote description");
+        console.log("Got offer set remote description");
         await pc.setRemoteDescription(resp.params)
         .catch(function(e) {
           console.log(e)});
@@ -127,7 +128,6 @@ async function webRTCPCInit() {
       
 
         const id = connection.userid;
-        log(`Sending answer`);
         socket.send(
           JSON.stringify({
             method: 'answer',
@@ -136,6 +136,7 @@ async function webRTCPCInit() {
           })
         );
       } else if (resp.method === 'trickle') {
+        console.log("Add Ice Candidate");
         pc.addIceCandidate(resp.params).catch(log);
       }
 
@@ -164,33 +165,36 @@ async function webRTCPCInit() {
         const resp = JSON.parse(event.data);
         if (resp.id === id) {
           console.log(resp.id);
-          log(`Got publish answer`);
 
           // Hook this here so it's not called before joining
           pc.onnegotiationneeded = async function () {
-            try{
               log('Renegotiating');
               console.log("renegotiating!");
               const offer = await pc.createOffer()
               .catch(function(e) {
                 console.error(e)});
+              console.log(offer);
               await pc.setLocalDescription(offer)
               .catch(function(e) {
                 console.error(e)});
   
-              currentid = Math.random().toString();
+              const id = Math.random().toString();
               socket.send(
                 JSON.stringify({
                   method: 'offer',
                   params: { desc: pc.localDescription },
-                  id : currentid
+                  id : id
                 })
               );
               nego = true;  
-            }
-            catch(err) {
-              console.error(err);
-            }
+
+              socket.addEventListener("message", (event) => {
+                const resp = JSON.parse(event.data);
+                if (resp.id === id) {
+                  console.log(`Got renegotiation answer`);
+                  pc.setRemoteDescription(resp.result);
+                }
+              });
           };
 
           pc.setRemoteDescription(resp.result)
@@ -200,16 +204,6 @@ async function webRTCPCInit() {
           console.log("join offer renegotiation set remote description");
         }
 
-        if(nego){
-          console.error("MEWSSAGE")
-          if (resp.id === currentid) {
-            log(`Got renegotiation answer`);
-           async()=>{ await pc.setRemoteDescription(resp.result)
-            .catch(function(e) {
-              console.error(e)});
-            }
-          }
-        }
       });
       
     };
