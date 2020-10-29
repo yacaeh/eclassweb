@@ -1261,10 +1261,22 @@ module.exports = exports = function (socket, config) {
             let user = GetUserData();
             
             if(socket.userid == getRoom().info.shareScreen.userid){
-                getRoom().info.shareScreen = {
-                    state: false,
-                    id: undefined,
-                }
+                let info = getRoom().info;
+
+                call_getRoom(room => {
+                    room.info.shareScreen = {
+                        state: false,
+                        id: undefined,
+                    };
+
+                    room.participants.forEach((userid) => {
+                        if(listOfUsers[userid])
+                            listOfUsers[userid].socket.emit('updated-classroomInfo', room.info);
+                    })
+                }, e => {
+                    console.log(e)
+                })
+
             }
             
             let data = await db.log.get(roomid);
