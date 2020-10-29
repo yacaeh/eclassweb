@@ -221,7 +221,8 @@ class NewScreenShareManagerClass {
       newscreenshareManager.isSharingScreen = false;
 
       if (typeof (newscreenshareManager.lastStream) !== "undefined")
-        newscreenshareManager.lastStream.getTracks().forEach((track) => track.stop());
+      console.log("SCreenshare stop on ");
+      // newscreenshareManager.lastStream.getTracks().forEach((track) => track.stop());
 
       btn.classList.remove("on");
       return false;
@@ -253,7 +254,7 @@ class NewScreenShareManagerClass {
           ? VideoResolutions[options.resolution]
           : false,
     }
-
+  
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
@@ -267,11 +268,19 @@ class NewScreenShareManagerClass {
 
           let track = stream.getVideoTracks()[0];
           this.sender = pc.addTrack(track, stream);
-          pc.getSenders()[2].replaceTrack(newscreenshareManager.lastStream.getVideoTracks()[0])
+
+          track.onended = () => { // Click on browser UI stop sharing button
+            console.info("Sharing has ended");
+            newscreenshareManager.onclose();
+            pc.removeTrack(this.sender);
+            this.sender = undefined;
+          };
+          
+          // pc.getSenders()[2].replaceTrack(newscreenshareManager.lastStream.getVideoTracks()[0]);
 
           replaceScreenTrack(stream, btn);
           addStreamStopListener(stream, function () {
-            newscreenshareManager.stop();
+            console.log("Stream stop listner stop");
 
             stream.getTracks().forEach(function (track) {
               console.log("REMOVE TRACK --- ", track)
@@ -434,6 +443,7 @@ class NewScreenShareManagerClass {
     if (classroomInfo.shareScreen.id) {
       console.error("Streamer exit");
       this.stop();
+      console.log("onclose stop");
       connection.send({ hideScreenShare: true });
     }
   }
@@ -453,7 +463,7 @@ class maincamManagerClass {
   start(callback) {
     var inter = setInterval(function () {
       if (maincamManager.get().readyState == 4) {
-        maincamManager.get().muted = true;
+        maincamManager.get().muted = false;
         maincamManager.get().play();
         clearInterval(inter);
         if (callback)
