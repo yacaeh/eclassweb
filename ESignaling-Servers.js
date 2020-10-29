@@ -628,7 +628,9 @@ module.exports = exports = function (socket, config) {
                     if(!maintainRoom){
                         listOfRooms[roomid].participants.push(userid);
                     }
-                    listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
+                    listOfRooms[roomid].userlist[userid] = {
+                        name : listOfUsers[socket.userid].extra.userFullName,
+                    };
 
                     db.createRoom(listOfRooms[roomid], roomid);
                     alertbox("Appended room", roomid, userid);
@@ -640,7 +642,9 @@ module.exports = exports = function (socket, config) {
                     return;
                 }
 
-                listOfRooms[roomid].userlist[userid] = listOfUsers[socket.userid].extra.userFullName;
+                listOfRooms[roomid].userlist[userid] = {
+                    name : listOfUsers[socket.userid].extra.userFullName,
+                };
                 listOfRooms[roomid].participants.push(userid);
             } catch (e) {
                 pushLogs(config, 'appendToRoom', e);
@@ -1089,6 +1093,44 @@ module.exports = exports = function (socket, config) {
                 console.log(e)
             })
         })
+        
+        socket.on('update-teacher-cam', function (data, callback) {
+            call_getRoom(room => {
+                room.info = data;
+                room.participants.forEach((userid) => {
+                    if(listOfUsers[userid])
+                        listOfUsers[userid].socket.emit('update-teacher-cam', data.camshare);
+                })
+                
+                if (callback)
+                    callback('ok');
+            }, e => {
+                console.log(e)
+            })
+        })
+
+        socket.on('update-student-cam', function (data, callback) {
+            call_getRoom(room => {
+                room.userlist[data.id].streamid = data.streamid;
+                if (callback)
+                    callback('ok');
+            }, e => {
+                console.log(e)
+            })
+        })
+
+        socket.on('get-student-cam', function (data, callback) {
+            call_getRoom(room => {
+                Object.keys(room.userlist).forEach(e => {
+                    if(room.userlist[e].streamid == data.streamid){
+                        callback(e)
+                    }
+                })
+                // callback(room.userlist[data.id].streamid);
+            }, e => {
+                console.log(e)
+            })
+        })
 
         socket.on("show-class-status", function (callback) {
             callback(listOfRooms[getRoomId()])
@@ -1115,7 +1157,7 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on("get-user-name", function(userid, callback){
-            callback(listOfRooms[getRoomId()].userlist[userid]);
+            callback(listOfRooms[getRoomId()].userlist[userid].name);
         })
 
 
@@ -1161,8 +1203,6 @@ module.exports = exports = function (socket, config) {
             })
             callback(list);
         })
-
-
 
         //--------------------------------------------------------------------------------//
 
