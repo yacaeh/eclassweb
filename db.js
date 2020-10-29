@@ -6,35 +6,21 @@ const email = require('./email');
 const dburl = 'mongodb://localhost:27017';
 const dbName = 'home-class';
 
-var collections = {};
-
-const dblist = [
-    "accounts-teacher",
-    "accounts-student"
-]
-
-
+let db = undefined;
 
 module.exports = {
-    db: undefined,
-    _this: undefined,
     test() {
         MongoClient.connect(dburl, function (err, client) {
             console.log("[MongoDB] Connected successfully to server [", dburl, "]");
-            _this.db = client.db(dbName);
-            dblist.forEach(element => _this.collections[element] = _this.db.collection(element));
             client.db('test').collection('test').findOneAndUpdate()
             client.db('test').collection('test').updateOne()
-
         });
     },
 
     construct() {
-        let _this = this;
-        MongoClient.connect(dburl, function (err, client) {
+        MongoClient.connect(dburl, {useUnifiedTopology: true }, function (err, client) {
             console.log("[MongoDB] Connected successfully to server [", dburl, "]");
-            _this.db = client.db(dbName);
-            dblist.forEach(element => collections[element] = _this.db.collection(element));
+            db = client.db(dbName);
         });
     },
 
@@ -44,15 +30,15 @@ module.exports = {
 
         switch (route) {
             case '/sign-up':
-                if (await this.db.collection('accounts-teacher').findOne({ id: data.id }) ||
-                    await this.db.collection('accounts-student').findOne({ id: data.id }) || 
-                    await this.db.collection('accounts-wating').findOne({ id: data.id })) {
+                if (await db.collection('accounts-teacher').findOne({ id: data.id }) ||
+                    await db.collection('accounts-student').findOne({ id: data.id }) || 
+                    await db.collection('accounts-wating').findOne({ id: data.id })) {
                     return { code: 400, text: 'exist id' };
                 }
 
-                if (await this.db.collection('accounts-teacher').findOne({ email: data.email }) ||
-                    await this.db.collection('accounts-student').findOne({ email: data.email }) ||
-                    await this.db.collection('accounts-wating').findOne({ email: data.email })) {
+                if (await db.collection('accounts-teacher').findOne({ email: data.email }) ||
+                    await db.collection('accounts-student').findOne({ email: data.email }) ||
+                    await db.collection('accounts-wating').findOne({ email: data.email })) {
                     return { code: 401, text: 'exist email' };
                 }
 
@@ -77,13 +63,13 @@ module.exports = {
                     return { code: 402, text: '"You need enter your email data. [./emaildata.json]")' };
                 }
 
-                this.db.collection('accounts-wating').insertOne(data);
+                db.collection('accounts-wating').insertOne(data);
                 return { code: 200, text: 'sign up' };
 
             case '/sign-in':
-                find = await this.db.collection('accounts-teacher').findOne({ id: data.id }) ||
-                    await this.db.collection('accounts-student').findOne({ id: data.id }) || 
-                    await this.db.collection('accounts-wating').findOne({ id: data.id });
+                find = await db.collection('accounts-teacher').findOne({ id: data.id }) ||
+                    await db.collection('accounts-student').findOne({ id: data.id }) || 
+                    await db.collection('accounts-wating').findOne({ id: data.id });
                 if (!find){
                     return { code: 400, text: 'failed' };
                 }
@@ -99,8 +85,8 @@ module.exports = {
                         return { code: 402, text: 'no certification', email : find.email};
 
                     let logindata = session.login(session.get(req), find.uid);
-                    find = await this.db.collection('accounts-teacher').findOne({ uid: find.uid }) ||
-                        await this.db.collection('accounts-student').findOne({ uid: find.uid });
+                    find = await db.collection('accounts-teacher').findOne({ uid: find.uid }) ||
+                        await db.collection('accounts-student').findOne({ uid: find.uid });
                     logindata.data = find;
                     return logindata;
                 }
@@ -114,13 +100,13 @@ module.exports = {
                 if (!sessiondata)
                     return { code: 400, text: 'not logined' };
 
-                find = await this.db.collection('accounts-teacher').findOne({ uid: sessiondata.uid }) ||
-                    await this.db.collection('accounts-student').findOne({ uid: sessiondata.uid });
+                find = await db.collection('accounts-teacher').findOne({ uid: sessiondata.uid }) ||
+                    await db.collection('accounts-student').findOne({ uid: sessiondata.uid });
                 return { code: 200, find: 'success', data: find };
 
             case '/find-id':
-                find = await this.db.collection('accounts-teacher').findOne({ name: data.name, email: data.email }) ||
-                    await this.db.collection('accounts-student').findOne({ name: data.name, email: data.email });
+                find = await db.collection('accounts-teacher').findOne({ name: data.name, email: data.email }) ||
+                    await db.collection('accounts-student').findOne({ name: data.name, email: data.email });
 
                 if (find)
                     return { code: 200, find: 'success', data: find.id };
@@ -129,14 +115,14 @@ module.exports = {
             case '/find-pw':
                 try {
                     let code = Math.round((Math.random() * 900000) +100000);
-                    find = await this.db.collection('accounts-teacher').findOne({ id: data.id, email: data.email }) ||
-                            await this.db.collection('accounts-student').findOne({ id: data.id, email: data.email });
+                    find = await db.collection('accounts-teacher').findOne({ id: data.id, email: data.email }) ||
+                            await db.collection('accounts-student').findOne({ id: data.id, email: data.email });
 
                     if (!find) {
                         return { code: 400, text: 'failed' };
                     }
 
-                    await this.db.collection('accounts-' + find.type).updateOne({id: data.id, email: data.email}, {$set : {cpwcode : code}})
+                    await db.collection('accounts-' + find.type).updateOne({id: data.id, email: data.email}, {$set : {cpwcode : code}})
 
                     let sendmailret;
 
@@ -164,15 +150,15 @@ module.exports = {
             
             case '/change-pw' :
                 console.log(data);
-                find = await this.db.collection('accounts-' + data.type).findOne({uid : data.uid});
+                find = await db.collection('accounts-' + data.type).findOne({uid : data.uid});
                 console.log(find);
                 let newpw = await pbkdf2Async(data.pw1, find.salt, 159236, 64, 'sha512');
-                await this.db.collection('accounts-' + data.type).updateOne({ uid: data.uid }, { $set: { pw: newpw.toString('base64') } });
+                await db.collection('accounts-' + data.type).updateOne({ uid: data.uid }, { $set: { pw: newpw.toString('base64') } });
                 return {code : 200, data : 'ok'};
 
             case '/change-pw-check' :
-                find = await this.db.collection('accounts-teacher').findOne({ uid: data.uid }) ||
-                        await this.db.collection('accounts-student').findOne({ uid: data.uid }); 
+                find = await db.collection('accounts-teacher').findOne({ uid: data.uid }) ||
+                        await db.collection('accounts-student').findOne({ uid: data.uid }); 
 
                 if(!find || !find.cpwcode){
                     return {code : 501, data : 'failed'};
@@ -180,14 +166,23 @@ module.exports = {
 
                 return {code : 200, data : find};
             case '/change-pw-code-check' :
-                find = await this.db.collection('accounts-teacher').findOne({ uid: data.uid , cpwcode : data.code * 1 }) ||
-                       await this.db.collection('accounts-student').findOne({ uid: data.uid , cpwcode : data.code * 1 });
+                find = await db.collection('accounts-teacher').findOne({ uid: data.uid , cpwcode : data.code * 1 }) ||
+                       await db.collection('accounts-student').findOne({ uid: data.uid , cpwcode : data.code * 1 });
                 if(find){
-                    await this.db.collection('accounts-' + find.type).updateOne({uid: data.uid}, { $set : {cpwcode : undefined}});
+                    await db.collection('accounts-' + find.type).updateOne({uid: data.uid}, { $set : {cpwcode : undefined}});
                     return {code : 200, data : find};
                 }
-
                 return {code : 501, text : 'failed', find : find}
+
+            case '/get-log-list' :
+                find = await db.collection('log').find({}).toArray();
+                return find;
+            case '/get-log-data' : 
+                find = await db.collection('log').findOne({key : data.key})
+                return find;
+            case '/delete-log-data' :
+                db.collection('log').deleteOne({key : data.key})
+                return {code : 200};
         }
         return false;
     },
@@ -197,7 +192,7 @@ module.exports = {
     },
 
     certification: async function (code) {
-        const find = await this.db.collection('accounts-wating').findOne({ certification: code });
+        const find = await db.collection('accounts-wating').findOne({ certification: code });
 
         if (!find) {
             return { code: 400, text: 'no data' };
@@ -206,8 +201,8 @@ module.exports = {
         delete find['location'];
         delete find['certification'];
 
-        await this.db.collection('accounts-wating').deleteOne({ certification: code });
-        await this.db.collection('accounts-' + find.type).insertOne(find);
+        await db.collection('accounts-wating').deleteOne({ certification: code });
+        await db.collection('accounts-' + find.type).insertOne(find);
         return { code: 200, text: 'success' };
     },
 
@@ -220,6 +215,22 @@ module.exports = {
     },
 
     deleteRoom : function(){
+    },
+
+    log : {
+
+        get : async function(origin){
+            let data = await db.collection('log').findOne({ key: origin }); 
+            return data
+        },
+        set : function(origin, data){
+            delete data._id;
+            db.collection('log').updateOne({ key: origin }, {$set : data} , {upsert : true});
+        },
+        appendRoom : function(origin, data){
+            data.key = origin;
+            db.collection('log').insertOne(data);
+        },
     }
 
 }
