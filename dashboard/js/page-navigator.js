@@ -146,6 +146,10 @@ pageNavigator = {
     box.addEventListener("click", clickevent);
     this.list.appendChild(box);
     this.idx++;
+
+    if(!connection.extra.roomOwner && classroomInfo.allControl)
+      box.style.pointerEvents = 'none';
+
   },
   select: function (idx) {
     if(this.list.children[idx].classList.contains("selected")){

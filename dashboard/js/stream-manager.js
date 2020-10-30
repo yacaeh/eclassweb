@@ -517,11 +517,6 @@ class maincamManagerClass {
           Hide(el)
         }
 
-        if (!isFind) {
-          remainCams[userid] = el;
-        }
-
-
         var playPromise = el.play();
 
         if (playPromise !== undefined) {
