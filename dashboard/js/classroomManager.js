@@ -306,10 +306,6 @@ class classroomManagerClass {
             ChattingManager.enterStudent(e);
         })
 
-        if(remainCams.hasOwnProperty(id)){
-            span.appendChild(remainCams[id])
-        };
-
         OnClickStudent(span, id, name);
 
         span.addEventListener("mouseover", function () {

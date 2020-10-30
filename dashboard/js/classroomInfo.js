@@ -263,7 +263,10 @@ classroomCommand.openEpub = function () {
                 Hide('prev')
                 Hide('lnext')
                 Hide('lprev')
-                $(".thumbnail").css("pointer-events", "none")
+                let thumbnails = document.getElementsByClassName('thumbnail');
+                for(let i = 0 ; i < thumbnails.length; i++){
+                    thumbnails[i].style.pointerEvents = 'none';
+                }
             }
         }
         else {
@@ -272,7 +275,10 @@ classroomCommand.openEpub = function () {
                 Show('prev')
                 Show('lnext')
                 Show('lprev')
-                $(".thumbnail").css("pointer-events", "");
+                let thumbnails = document.getElementsByClassName('thumbnail');
+                for(let i = 0 ; i < thumbnails.length; i++){
+                    thumbnails[i].style.pointerEvents = '';
+                }
             }
         }
 

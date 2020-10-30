@@ -73,17 +73,17 @@ class ChattingManagerClass {
     append(event) {
         let div = document.createElement('div');
         let color = "#000000"
+        let id;
 
         div.className = 'message';
 
-        if (typeof event.extra.roomOwner != "undefined") {
+        if (event.extra.roomOwner) {
             this.notice(event.data.msg);
         }
 
-        let id;
         if (event.data) {
             id = event.extra.userFullName || event.userid;
-            if (event.extra.roomOwner == true) {
+            if (event.extra.roomOwner) {
                 id += '(' + $.i18n('TEACHER') + ')';
                 color = "#C63EE8"
             }

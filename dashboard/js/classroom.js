@@ -19,7 +19,6 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
-let remainCams = {};
 let isFileViewer = false;
 
 const widgetContainer = document.getElementById("widget-container");
