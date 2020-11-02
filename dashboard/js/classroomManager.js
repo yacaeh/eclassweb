@@ -17,20 +17,7 @@ class classroomManagerClass {
             }
         });
 
-        _AllCantrallFunc();
-        AddEvent("confirm-title", "click", ViewUploadList);
-        AddEvent("confirm-title2", "click", ViewHomeworkList);
-        AddEvent("icon_exit", "click", () =>
-            alertBox($.i18n('EXIT_CONFIRM'), $.i18n('WARNING'), () => {
-                if (connection.extra.roomOwner) {
-                    connection.send({roomBoom: true})
-                }
-                classroomManager.gotoMain();
-            },
-                function () { }
-            ))
         AddEvent("top_save_alert", "click", attentionManager.exportAttention);
-        AddEvent("top_alert", "click", attentionManager.callAttend);
         AddEvent("top_record_video", "click", (self) => {
             if (!self.classList.contains("on")) {
                 screenRecorder._startCapturing();
@@ -64,22 +51,7 @@ class classroomManagerClass {
             })
             self.classList.toggle("on");
         })
-        AddEvent("right-tab-collapse", "click", (self) => {
-            self.classList.toggle("off");
 
-            if (self.classList.contains("off")) {
-                self.style.transform = "rotate(90deg)";
-                $(rightTab).animate({ width: "0%" })
-                $(widgetContainer).animate({ right: "0%" },
-                    classroomManager.canvasResize)
-            }
-            else {
-                self.style.transform = "rotate(-90deg)";
-                $(rightTab).animate({ width: "17.7%" })
-                $(widgetContainer).animate({ right: "17.7%" },
-                    classroomManager.canvasResize)
-            }
-        })
     }
 
     callTeacher() {
@@ -175,17 +147,17 @@ class classroomManagerClass {
     };
 
     setTopToolTip(data) {
+        let tooltip = document.getElementById("toptooltip");
         Object.keys(data).forEach(function (id) {
             let element = document.getElementById(id);
             if (element)
                 element.addEventListener("mouseover", function (e) {
-                    document.getElementById("toptooltip").style.display = 'block';
-                    let tooltip = document.getElementById("toptooltip")
+                    tooltip.style.display = 'block';
                     tooltip.children[0].innerHTML = data[id];
                     let width = tooltip.getBoundingClientRect().width / 2;
                     tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width / 2) - width + "px";
                     element.addEventListener("mouseleave", function () {
-                        document.getElementById("toptooltip").style.display = 'none';
+                        tooltip.style.display = 'none';
                     })
                 })
         });

@@ -85,7 +85,6 @@ pageNavigator = {
     this.self = this;
     let self = this.self;
 
-
     this.obj = document.getElementById("epub-navi");
     this.list = document.getElementById("thumbnail-list");
     this.maxidx = document.getElementById("epubmaxidx");
@@ -164,10 +163,12 @@ pageNavigator = {
     this.list.children[idx].scrollIntoView({ block: "center" });
     document.getElementById("epubidx").value = idx + 1;
   },
+
   removethumbnail: function () {
     this.idx = 0;
     while (this.list.children.length) {
       this.list.removeChild(this.list.children[0]);
     }
   }
+  
 }

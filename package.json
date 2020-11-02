@@ -49,6 +49,7 @@
     "muaz-khan"
   ],
   "dependencies": {
+    "babel-plugin-syntax-jsx": "^6.18.0",
     "canvas-designer": "latest",
     "detectrtc": "latest",
     "fbr": "latest",

@@ -184,18 +184,6 @@ button[disabled] {
   text-shadow: 1px 1px white;
 }
 
-#other-videos {
-  margin-top: 5px;
-}
-
-#other-videos video {
-  width: 45%;
-  margin: 5px;
-  border: 1px solid black;
-  padding: 1px;
-  border-radius: 3px;
-}
-
 #txt-chat-message {
   width: 100%;
   resize: vertical;
@@ -598,17 +586,6 @@ hr {
   height: 50px;
 }
 
-#student_permission{
-  color: green;
-  font-size: 14px;
-  font-family: roboto;
-  vertical-align: middle;
-  display: inline-grid;
-  height: 50px;
-  margin-left: 5px;
-  line-height: 25px;
-}
-
 .student-menu {
   position: absolute;
   width: 126px;
@@ -782,24 +759,6 @@ hr {
   position: absolute;
 }
 
-.nos > .now_selected_student {
-  position: absolute;
-}
-
-.nos > .now_selected_student > .name {
-  position: absolute;
-  width: 70px;
-  height: 19px;
-  left: 13px;
-  top: 9px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 16px;
-  line-height: 19px;
-  color: #000000;
-}
-
 .nos_student_icon {
   position: absolute;
   top: calc(50% - 14px);
@@ -833,28 +792,6 @@ hr {
   display: none;
 }
 
-.nos > .now_selected_student > .status_img {
-  border-radius: 10px;
-  height: 9px;
-  width: 9px;
-  left: 14.5px;
-  background-color: #67ef1d;
-  position: absolute;
-  top: 34px;
-}
-.nos > .now_selected_student > .status_text {
-  position: absolute;
-  width: 60px;
-  height: 14px;
-  left: 30px;
-  top: 32px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 12px;
-  line-height: 14px;
-  color: #707070;
-}
 
 #student_list {
   float: left;

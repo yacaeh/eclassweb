@@ -5,14 +5,12 @@
 */
 
 class fileViewerLoader {
-
     constructor() {
         this.bOpen = false;
         this.type = 'none';
         this.ext = 'none';   // 확장자
         this.url = '';
         this.bLock = false;
-
     }
 
     setOpenState(_open = Boolean) {
@@ -112,10 +110,6 @@ class fileViewerLoader {
         frame.document
             .getElementsByClassName('design-surface')[0]
             .appendChild(fileViewer);
-        // console.log(frame.document
-        //   .getElementsByClassName('design-surface')[0]
-        //   .appendChild(fileViewer));
-
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
         frame.document.getElementById('tool-box').style.zIndex = '3';
@@ -698,23 +692,6 @@ function fileUploadModal(message, btn, callback) {
 
     loadFileInput();
 
-}
-
-function ViewHomeworkList(btn) {
-    btn.classList.add("selected");
-    document.getElementById("confirm-title").classList.remove("selected");
-    $("form[name=upload]").hide();
-    getUploadFileList("/homework");
-}
-
-function ViewUploadList(btn) {
-    if (!connection.extra.roomOwner)
-        return;
-
-    btn.classList.add("selected");
-    document.getElementById("confirm-title2").classList.remove("selected");
-    $("form[name=upload]").show();
-    getUploadFileList();
 }
 
 function getUploadFileList(extraPath) {

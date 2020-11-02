@@ -26,7 +26,6 @@ const rightTab = document.getElementById("right-tab")
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
-// var screenshareManager  = new ScreenShareManagerClass();
 var newscreenshareManager  = new NewScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
@@ -107,7 +106,6 @@ if(!window.params.userFullName){
   }
 }
 
-ChattingManager.init();
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");

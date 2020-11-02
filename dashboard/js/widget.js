@@ -7,7 +7,7 @@
 
 'use strict';
 $(window).bind("load", function () {
-    updateLanguage();
+    // updateLanguage();
 });
 
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/fonts/NanumPen.ttf)');

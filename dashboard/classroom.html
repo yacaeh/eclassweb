@@ -23,6 +23,10 @@
 
   <!-- ================================================================================ -->
   
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+  
   <script src="/dashboard/js/RTCMultiConnection.js"></script>
    
   <script src="/dashboard/js/lib/pep.js"></script>
@@ -68,7 +72,6 @@
   <script src="/dashboard/js/page-navigator.js" ></script>
   <script src="/dashboard/js/epub.js" ></script>
   <script src="/dashboard/js/classroomManager.js" ></script>
-  <script defer src="/dashboard/js/classroom.js"></script>
   <script src="/dashboard/js/chatting.js" ></script>
   <script src="/dashboard/js/permissionManager.js"></script>
   <script src=/dashboard/js/3d_render.js></script>
@@ -82,222 +85,21 @@
   <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
   <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
   <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
-	<script src="/dashboard/js/lib/updateLanguage.js"></script>
-  <script defer src="/dashboard/js/webrtc-pc.js"></script>
+
+  <script type="text/babel" src="/dashboard/Components/LanguageSelector.js"></script>
+  <script type="text/babel" src="/dashboard/Components/Chatting.js"></script>
+  <script type="text/babel" src="/dashboard/js/react.js"></script>
+
+  <script type="text/babel" defer src="/dashboard/js/classroom.js"></script>
+  <script type="text/babel" defer src="/dashboard/js/webrtc-pc.js"></script>
 </head>
 
 <body ondragstart="return false" style="height: 1080px;">
-<a id="downloadLink" type="video/webm" style="display: none"></a>
-
   <div id="loading-screen">
     <img src="/dashboard/img/loading.gif">
   </div>
-
-  <div id="toptooltip">
-    <span class="text"></span>
-    <span class="sq"> </span>
-  </div>
-
-<div id="confirm-box" class="modal fade">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirm-title"></h5>
-        <h5 class="modal-title" id="confirm-title2"></h5>
-        <button type="button" class="close btn-confirm-close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div id="confirm-message" class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-danger" id="btn-confirm-file-close">현재 파일 닫기</button>
-        <button class="btn btn-confirm-close" id="btn-confirm-close">취소</button>
-        <button class="btn btn-primary" id="btn-confirm-action">확인</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-  <div id="urlform" style="display: none;">
-    <span class="name" data-i18n="FOOTAGE">동영상</span>
-    <span class="back"></span>
-    <input id="urlinput" onkeyup="_Movie_Render_key_event();" type="text" placeholder="URL을 입력하세요">
-  </div>
-
-    <header id="header">
-      <img id="icon_exit">
-      <img style="display: none;" id="top_logo">
-      <span id="my-name"></span>
-      <span id="session-id"></span>
-      <img id="student_isallcontrol" class="permission-icon" src="/dashboard/img/lock.png">
-      <img id="student_screenshare" class="permission-icon" src="/dashboard/img/get_screenshare.png">
-      <img id="student_canvas" class="permission-icon" src="/dashboard/img/get_canvas.png">
-      <img id="student_mic" class="permission-icon" src="/dashboard/img/get_mic.png">
-
-
-        <div class="icons">
-          <span class="controll">
-            <img class="top_icon top_all_controll_off" id="top_all_controll">
-            <img class="top_icon" id="top_test" >
-            <img class="top_icon" id="top_alert">
-            <img style="display: none;" class="top_icon" id="top_attach-file">
-          </span>
-
-          <span class="feature">
-            <img class="divide">
-            <img class="top_icon view_type-on view_type" id="top_camera">
-            <img class="top_icon view_type" id="top_student">
-            <img class="top_icon" id="top_save_alert">
-            <img class="top_icon" id="top_record_video">
-          </span>
-          <span>
-            <select class="language span3" onchange="saveLocale()">
-              <option value="en">English</option>
-              <option value="ko">한국어</option>
-              <option value="id">Bahasa Indonesia</option>
-            </select>
-          </span>
-
-          <span class="time">
-              <span id="current-time"></span>
-              <span id="recording-time">
-                <img src="/dashboard/img/recording.png" style="margin-right: 7px; margin-bottom: 2px;">
-                <span class="text">0:00:00</span>
-          </span>
-        </div>
-
-    </header>
-
-    <article id="article">
-        <div id="widget-container">
-          <div id="epub-navi" style="display: none;" class="shadow-5">
-            <span id="navi-top">
-              <input id="epubidx" autocomplete="off">
-              <span id="epubmaxidx"></span>
-              <img id="epub-collapse">
-            </span>
-            <span class="scroll2" id="thumbnail-list"></span>
-            <span id="navi-control">
-              <img id="lprev">
-              <img id="prev">
-              <img id="next">
-              <img id="lnext">
-            </span>
-          </div>
-
-          <!-- 시험 Window -->
-          <div id="exam-board" class="scroll">
-            <div id="exam-teacher-menu" style="display: none;">
-              <div id="exam-setting-bar">
-                <div id="exam-title" class="exam-border-bottom" data-i18n="QUIZ_CREATE">문제출제</div>
-                <div style="display: flex; width: 100%; height: 37px; background: #EFF1F0;" class="exam-border-bottom">
-                  <label id="exam-question-count-label" for="exam-question-count" data-i18n="QUIZ_NUM">문항수</label>
-                  <input id="exam-question-count" type="number">
-                  <label id="exam-time-label" for="exam-time" data-i18n="QUIZ_TIME">시간</label>
-                  <input id="exam-time" type="text" placeholder="(분)">
-                  <button id="exam-setting-apply" class="btn btn-exam" data-i18n="QUIZ_SETTING"><b>설정</b></button>
-                </div>
-                <div id="exam-question-list" class="exam-border-bottom exam-overflow" style="text-align: center;">
-                </div>
-                <button id="exam-start" class="btn btn-exam exam-80-button" data-i18n="QUIZ_START">시험 시작</button>
-              </div>
-              <div id="exam-state" style="display: none;">
-              </div>
-            </div>
-            <div id="exam-omr" style="display: none;">
-            </div>
-          </div>
-          
-          <!-- 알림 Window -->
-          <div id="alert-box" class="modal" style="background-color: rgba(0, 0, 0, 0.5);">
-            <div id="alert-dialog">
-              <div id="alert-header"><span id="alert-title" data-i18n="NOTIFICATION">알림</span></div>
-              <div id="alert-body">
-                <div id="alert-content">
-                  
-                </div>
-                <div id="alert-btns">
-                  <button class="btn btn-alert-yes" style="padding-top: 0;" data-i18n="YES">예</button>
-                  <button class="btn btn-alert-no" style="padding-top: 0;" data-i18n="NO">아니요</button>
-                </div>
-              </div>
-              <div id="alert-footer"></div>
-            </div>
-          </div>
-        
-          <div id="edunetContent"></div>
-        </div>
-
-        <!-- 학생 권한 Window -->
-        <div onmousedown="return false" id="student-menu"  style="display: none;" class="student-menu shadow-5"> 
-            <div class="stuname" data-i18n="NAME">이름</div>
-            <div class="line1" ></div>
-            <div class="permission"><label data-i18n="STUDENT_SHARE_SCREEN">화면 공유</label><span id="classP" class="perbtn off"><span class="circle"></span> </span> </div>
-            <div class="mic" ><label data-i18n="STUDENT_SHARE_MIC">마이크</label> <span id="micP" class="perbtn off"><span class="circle"></span> </span> </div>
-            <div class="canper"><label data-i18n="STUDENT_SHARE_CANVAS">판서 공유</label><span id="canP" class="perbtn off"><span class="circle"></span> </span> </div>
-        </div>
-        
-
-    </article>
-
-    <div id="other-videos"></div>
-    <div id="right-tab" class="right-tab">
-      <div id="right-tab-collapse">
-        <img src="/dashboard/img/openchat.png" >
-      </div>
-    
-      <span class="nos">
-        <!-- <button id="showcam" >캠</button> -->
-        <!-- <button id="showcanvas">판서</button> -->
-        <span class="now_selected_student"></span>
-          <span id="student_permission">
-            <div id='class_permission'>
-            </div>
-            <div id="mic_permission">
-            </div>
-          </span>
-              <span class="nos_student_text" id="nos">0</span>
-              <img class="nos_student_icon" src="/dashboard/img/student2.png">
-            </span>
-     
-            <div class="for_teacher" style="display: none;"></div>
-
-            <div id="student_list">
-              <div id="student_list_button">
-            </div>
-        </div>
-        <video style="display: none; z-index: 5;"  id="main-video" playsinline autoplay></video>
-    
-    
-    
-    <div class="chatting">
-    <div id="notice" class="on">
-      <span class="text" data-i18n="TEACHER_CHAT">선생님 채팅</h1></span>
-      <div class="scroll" id="noticewindow">
-        Logs<br />
-        <div id="logs"></div>
-    
-  
-      </div>
-      <div id="collapse">
-        <img class="btn" src="/dashboard/img/openchat.png">
-      </div>
-    </div>
-    
-    <div class="conversation-panel">
-      <div class="chatbackground"></div>
-        <div class="scroll" id="conversation-panel"></div>
-        <textarea id="txt-chat-message"></textarea>
-    </div>
-    </div>
-    </div>
-
-<!-- Channel Plugin Scripts -->
-
-
-
-
+  <div style="width: 100%; height: 100%;" id="app"></div>
+  <a id="downloadLink" type="video/webm" style="display: none"></a>
 
 <script>
   (function() {
@@ -340,7 +142,6 @@
     "pluginKey": "4be5f71d-2246-4f5c-971d-2d2080f36fa2"
   });
 </script>
-<!-- End Channel Plugin -->
 </body>
 
 

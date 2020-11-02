@@ -8,34 +8,7 @@ class attentionManagerClass{
         this.teacherRequest = {};
     }
 
-    callAttend(){
-        let callback = function () {
-            let chilldren = document.getElementById('student_list').children;
-            for (let i = 0; i < chilldren.length; i++) {
-                let al = chilldren[i].getElementsByClassName('bor')[0];
-                if (!al)
-                    continue;
-                al.className = "bor";
-                al.classList.add('alert_wait');
-            }
-        }
 
-        if(document.getElementById("exam-board").style.display == "block"){
-            return;
-        }
-
-
-        alertBox("<span>"+$.i18n( 'NOTIFICATION_WARNING' )+"</span>  ", $.i18n( 'NOTIFICATION' ), () => {
-            attentionManager.totalCount++;
-            attentionManager.teacherRequest[attentionManager.totalCount] = {
-                name : $.i18n( 'ATTENTION_PLEASE' ),
-            }
-            callback();
-            connection.send ({
-                alert : true
-            });
-        },() => {});    
-    };
 
     submit(submitStudent){
         let userid = submitStudent.userid;
