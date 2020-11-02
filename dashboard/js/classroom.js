@@ -246,7 +246,6 @@ connection.onmessage = function (event) {
     return;
   }
 
-
   if (event.data.closeTesting) {
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);

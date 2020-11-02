@@ -21,11 +21,11 @@ gothicFont.load().then((font) => {
 });
 
 (function () {
-    paper.setup(document.getElementById("main-canvas"));
-    var group = new paper.Group();
-
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
+
+    paper.setup(document.getElementById("main-canvas"));
+    var group = new paper.Group();
 
     var _uid = window.parent.connection.userid;
     let penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
