@@ -177,7 +177,6 @@ gothicFont.load().then((font) => {
         marking: false,
 
         redraw: function () {
-            console.error("redraw")
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
             
@@ -202,6 +201,7 @@ gothicFont.load().then((font) => {
             drawpoint(points);
 
             paper.view.draw();
+
             function drawpoint(points) {
                 let end = true;
                 points.forEach(function (point) {
@@ -229,7 +229,19 @@ gothicFont.load().then((font) => {
                         path.lineTo(resizePoint(point[1]));  
                     }
                     else {
-                        _this[point[0]](context, point[1], point[2], path, start);
+                        let size = point[2][4].split(' ')[0];
+                        let font = point[2][4].split(' ')[1];
+
+
+                        let text = new paper.PointText({
+                            point:resizePoint([point[1][1], point[1][2]]),
+                            justification : 'center',
+                            content: point[1][0].substr(1, point[1][0].length - 2),
+                            fillColor: point[2][2],
+                            fontFamily: font,
+                            fontSize: size
+                        });
+                        group.addChild(text);
                     }
 
                 });
@@ -258,7 +270,7 @@ gothicFont.load().then((font) => {
 
             if (!isNoFillStroke) {
                 context.stroke();
-                context.fill();
+                // context.fill();
             }
         },
         line: function (context, point, options, nopre = false) {
@@ -301,13 +313,6 @@ gothicFont.load().then((font) => {
                 pre[1] = p[1];
             }
             this.handleOptions(context, options);
-        },
-        text: function (context, point, options) {
-            const normal = resizePoint([point[1], point[2]]);
-            this.handleOptions(context, options);
-            context.font = options[4];
-            context.fillStyle = textHandler.getFillColor(options[2]);
-            context.fillText(point[0].substr(1, point[0].length - 2), normal[0], normal[1]);
         },
     };
 
@@ -573,7 +578,6 @@ gothicFont.load().then((font) => {
             return options;
         },
         appendPoints: function () {
-            console.error("appended");
             let options = textHandler.getOptions();
             const normal = normalizePoint(textHandler.x, textHandler.y)
             points[points.length] = ['text', ['"' + textHandler.text + '"', normal[0], normal[1]], drawHelper.getOptions(options)];
@@ -1202,10 +1206,6 @@ gothicFont.load().then((font) => {
         else if (cache.isEraser)    eraserHandler.mousedown(e);
         else if (cache.isText)      textHandler.mousedown(e);
         else if (cache.isMarker)    markerHandler.mousedown(e);
-
-        if (!cache.isMarker){
-            // drawHelper.redraw();
-        }
 
         preventStopEvent(e);
     });
