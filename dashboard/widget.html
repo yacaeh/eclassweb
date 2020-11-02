@@ -34,8 +34,8 @@ ondragover="handleDragDropEvent(event)"
 ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
 
     <section id="design-surface" class="design-surface">
-        <canvas id="temp-canvas" style="z-index: 1;" class="pen"></canvas>
-        <canvas id="main-canvas"></canvas>
+        <canvas id="temp-canvas" style="z-index: 3;" class="pen"></canvas>
+        <canvas id="main-canvas" style="z-index: 2;"></canvas>
         <video id="screen-viewer" controls playsinline autoplay></video>
 
     </section>
