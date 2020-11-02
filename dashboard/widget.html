@@ -14,6 +14,7 @@
     <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
     <script src="/dashboard/js/lib/updateLanguage_widget.js"></script>
     <script src="/dashboard/js/lib.js" ></script>
+    <script type="text/javascript"  src="/dashboard/js/lib/paper-full.min.js" ></script>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
@@ -186,7 +187,9 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         }
 
         var script = document.createElement('script');
-        script.src = params.widgetJsURL || 'https://cdn.webrtc-experiment.com/Canvas-Designer/widget.min.js';
+        // script.type = 'text/paperscript';
+        // script.setAttribute('canvas', 'temp-canvas');
+        script.src = params.widgetJsURL;
         (document.body || document.documentElement).appendChild(script);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>

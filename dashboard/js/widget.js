@@ -21,6 +21,9 @@ gothicFont.load().then((font) => {
 });
 
 (function () {
+    paper.setup(document.getElementById("main-canvas"));
+    var group = new paper.Group();
+
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
 
@@ -122,6 +125,7 @@ gothicFont.load().then((font) => {
     window.resize = function () {
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
+        paper.view.update();
         drawHelper.redraw();
     }
 
@@ -173,11 +177,16 @@ gothicFont.load().then((font) => {
         marking: false,
 
         redraw: function () {
+            console.error("redraw")
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
+            
+            var path = undefined;
+            var start = undefined;
+
             context.lineCap = "round";
             context.lineJoin = "round";
-
+            group.removeChildren();
             let _this = this;
 
             Object.keys(studentPoints).forEach(function (e) {
@@ -192,59 +201,38 @@ gothicFont.load().then((font) => {
 
             drawpoint(points);
 
+            paper.view.draw();
             function drawpoint(points) {
+                let end = true;
                 points.forEach(function (point) {
-                    if (point == null) return false;
-
-                    if (point[0] == "marker") {
-
-                        if (!_this.marking) {
-                            context.beginPath();
-                            _this.marking = true;
-
-                            if (point[1][0] != -1) {
-                                let opt = point[2];
-                                context.lineWidth = opt[0];
-                                context.strokeStyle = opt[1];
-                            }
+                    if (point[0] == "marker" || point[0] == "line") {
+                        if(point[1][0] == -1){
+                            path.smooth();
+                            path.simplify();
+                            end = true;
+                            group.addChild(path);
+                            return true;
                         }
 
-                        if (point[1][0] == -1) {
-                            context.stroke();
-                            _this.marking = false;
-                            _this.prepoint = [];
-                            return;
+                        if(end){
+                            path = new paper.Path();
+                            start = new paper.Point(resizePoint(point[1]));
+                            path.moveTo(start);
+                            path.strokeColor = point[2][1];
+                            path.strokeWidth = point[2][0]
+                            path.strokeCap = 'round';
+
+                            end = false;
+                            return true;
                         }
 
-                        const resizeP = resizePoint(point[1]);
-
-                        if (!_this.prepoint) _this.prepoint = [resizeP[0], resizeP[1]];
-                        if (_this.prepoint[0] == resizeP[0] && _this.prepoint[1] == resizeP[1]) {
-                            context.beginPath();
-                        }
-
-                        context.moveTo(_this.prepoint[0], _this.prepoint[1]);
-                        context.lineTo(resizeP[0], resizeP[1]);
-                        _this.prepoint = [resizeP[0], resizeP[1]];
+                        path.lineTo(resizePoint(point[1]));  
                     }
                     else {
-                        if (_this.marking) {
-                            _this.marking = !_this.marking;
-                            context.stroke();
-                        }
-
-                        if (point && point.length && _this[point[0]]) {
-                            context.beginPath();
-                            _this[point[0]](context, point[1], point[2]);
-                        }
+                        _this[point[0]](context, point[1], point[2], path, start);
                     }
 
                 });
-
-                if (_this.marking) {
-                    _this.marking = !_this.marking;
-                    context.stroke();
-                }
                 _this.prepoint = [];
 
             }
@@ -273,20 +261,21 @@ gothicFont.load().then((font) => {
                 context.fill();
             }
         },
-        line: function (context, point, options) {
+        line: function (context, point, options, nopre = false) {
             if (point[0] == -1) {
+                context.stroke();
                 context.beginPath();
                 this.prepoint = [];
                 return;
             }
-
+            
             const p = resizePoint(point);
             context.beginPath();
 
             let x, y;
 
-            x = this.prepoint[0] || p[0];
-            y = this.prepoint[1] || p[1];
+            x = !nopre ? this.prepoint[0] || p[0] : p[0];
+            y = !nopre ? this.prepoint[1] || p[1] : p[1];
 
             context.moveTo(x, y);
             context.lineTo(p[0], p[1]);
@@ -343,7 +332,7 @@ gothicFont.load().then((font) => {
 
             tempContext.lineCap = 'round';
             let opt = pencilDrawHelper.getOptions();
-            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, [x, y]);
+            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, true);
             points[points.length] = ['line', [t.prevX, t.prevY], opt];
             document.getElementById("pencil-container").style.display = 'none';
         },
@@ -368,7 +357,7 @@ gothicFont.load().then((font) => {
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
                 let opt = pencilDrawHelper.getOptions()
-                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, [x, y]);
+                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt);
                 points[points.length] = ['line', [t.prevX, t.prevY], opt];
                 t.prevX = nx;
                 t.prevY = ny;
@@ -1214,8 +1203,9 @@ gothicFont.load().then((font) => {
         else if (cache.isText)      textHandler.mousedown(e);
         else if (cache.isMarker)    markerHandler.mousedown(e);
 
-        if (!cache.isMarker)
-            drawHelper.redraw();
+        if (!cache.isMarker){
+            // drawHelper.redraw();
+        }
 
         preventStopEvent(e);
     });
@@ -1251,7 +1241,6 @@ gothicFont.load().then((font) => {
             command = "marker";
             markerHandler.mouseup(e);
         }
-
 
         !cache.isPdf && drawHelper.redraw();
 
