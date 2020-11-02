@@ -123,7 +123,7 @@ window.onWidgetLoaded = function () {
 window.onSocketConnected = function () {
   updateClassTime();
   classroomCommand.updateSyncRoom();
-  // webRTCPCInit();
+  webRTCPCInit();
 };
 
 connection.onopen = function (event) {
