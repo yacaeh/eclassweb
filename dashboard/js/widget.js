@@ -125,7 +125,7 @@ gothicFont.load().then((font) => {
     window.resize = function () {
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-        paper.view.update();
+        paper.view.viewSize = new paper.Size(innerWidth,innerHeight);
         drawHelper.redraw();
     }
 
