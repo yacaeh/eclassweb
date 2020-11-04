@@ -12,7 +12,6 @@ class fileViewerLoader {
         this.ext = 'none';   // 확장자
         this.url = '';
         this.bLock = false;
-
     }
 
     setOpenState(_open = Boolean) {
@@ -73,10 +72,11 @@ class fileViewerLoader {
     }
 
     openViewer(_url) {
-
         if (this.IsOpen()) {
             this.closeViewer();
         }
+
+        console.log(_url);
 
         this.setOpenState(true);
         this.setUrl(_url);
@@ -84,84 +84,47 @@ class fileViewerLoader {
         this.createElementViewer(_url);
     }
 
-
     closeViewer() {
         this.setOpenState(false);
         this.removeElementViewer();
     }
 
-    /*
-        Element Viewer
-    */
     createElementViewer(url) {
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
 
         let fileViewer = document.createElement('iframe');
         fileViewer.setAttribute('id', 'file-viewer');
-
-        let src = 'https://' + window.location.host + '/ViewerJS/#' + url;
-        fileViewer.setAttribute('src', src);
+        fileViewer.setAttribute('src', 'https://' + window.location.host + '/ViewerJS/#' + url);
 
         if (mobileHelper.isMobile)
             fileViewer.style.width = "calc(100% - 52px)";
 
         fileViewer.setAttribute('allowFullScreen', '');
-        let frame = GetWidgetFrame();
-
-        frame.document
-            .getElementsByClassName('design-surface')[0]
-            .appendChild(fileViewer);
-        // console.log(frame.document
-        //   .getElementsByClassName('design-surface')[0]
-        //   .appendChild(fileViewer));
-
-        frame.document.getElementById('main-canvas').style.zIndex = '1';
-        frame.document.getElementById('temp-canvas').style.zIndex = '2';
-        frame.document.getElementById('tool-box').style.zIndex = '3';
+        GetWidgetFrame().document.getElementsByClassName('design-surface')[0].appendChild(fileViewer);
     }
 
     removeElementViewer() {
-        let frame = GetWidgetFrame();
-        frame.document.getElementById('main-canvas').style.zIndex = '1';
-        frame.document.getElementById('temp-canvas').style.zIndex = '2';
-        frame.document.getElementById('tool-box').style.zIndex = '3';
-        let fileViewer = frame.document.getElementById('file-viewer');
-        fileViewer.remove();
+        GetWidgetFrame().document.getElementById('file-viewer').remove();
         document.getElementById("btn-confirm-file-close").style.display = "none";
     }
 
     LockViewer(_lock) {
         this.bLock = _lock;
-
-        let frame = GetWidgetFrame();
-        let fileViewer = frame.document.getElementById('file-viewer');
-        let viewer = fileViewer.contentWindow.document.getElementById("viewer")
-        if (!viewer)
-            return;
-
-        if (_lock) {
-            viewer.style.pointerEvents = 'none';
-        }
-        else {
-            viewer.style.pointerEvents = '';
-        }
+        let viewer = GetWidgetFrame().document.getElementById('file-viewer')
+                        .contentWindow.document.getElementById("viewer")
+        if (viewer)
+            viewer.style.pointerEvents = _lock ? 'none' : '';
     }
 }
 class pdfViewer {
-
     constructor() {
         this.onpage = function (_page) { }
         this.page = 1;
     }
 
-    /*
-        interface method 다른 viewer도 같이 구현을 해야 함.
-    */
     getElementFileViewer() {
-        let frame = GetWidgetFrame();
-        let fileViewer = frame.document.getElementById('file-viewer');
-        return fileViewer;
+        return GetWidgetFrame().document.getElementById('file-viewer');
     }
 
     showPage(_page) {
@@ -197,37 +160,24 @@ class mediaViewer {
         this.ontimeupdate = null;
     }
 
-
-
     setMediaPlayer(_player) {
         this.cacheMediaPlayer = _player;
-
         _player.on('play', () => this.setPlay());
         _player.on('pause', () => this.setPause());
         _player.on('ready', () => this.setReady());
         _player.on('ended', () => this.setEnded());
-        // _player.on('seeked', () => {
-        //     console.log('time');
-        // });
-        // _player.on('playing', () => {
-        //     console.log('playing');
-        // })
-
         _player.on('timeupdate', () => {
             if (null != ontimeupdate)
                 this.ontimeupdate(this.getCurrentTime());
         })
     }
 
-
     hasMediaPlayer() {
         return null != this.cacheMediaPlayer;
     }
 
-
     getCurrentTime() {
         if (!this.hasMediaPlayer()) return 0;
-
         return this.cacheMediaPlayer.currentTime();
     }
 
@@ -238,26 +188,14 @@ class mediaViewer {
 
     play(_time) {
         if (!this.hasMediaPlayer()) return;
-
         this.setCurrentTime(_time);
         this.cacheMediaPlayer.play();
     }
 
     pause(_time) {
         if (!this.hasMediaPlayer()) return;
-
         this.setCurrentTime(_time);
         this.cacheMediaPlayer.pause();
-    }
-
-    ended() {
-        // if(!this.hasMediaPlayer())  return;        
-
-        // this.setCurrentTime(_time);
-        // this.cacheMediaPlayer.ended ();        
-    }
-
-    seeked() {
     }
 
     setPlay() {
@@ -362,11 +300,9 @@ class fileViewer {
         if (state) {
             if (this.mViewerLoader.IsOpen()) {
                 if (state) {
-                    ``
                     if (this.onsync)
                         this.onsync();
 
-                    //  현재 타입에 따라 동기화
                     if (this.onsynceachtype[this.getCurrentViewerType()])
                         this.onsynceachtype[this.getCurrentViewerType()]();
                 }
@@ -376,7 +312,6 @@ class fileViewer {
             }
             else {
                 if (state) {
-                    // open                    
                     this.openFile(classroomInfo.viewer.url);
                 }
             }
@@ -406,11 +341,7 @@ class fileViewer {
     }
 
     onShowPage(_page) {
-
-        //  showPage      
         if (!this.hasLoadViewer()) return;
-        //if(connection.extra.roomOwner)         
-
         const viewerType = this.getCurrentViewerType();
         if (this.onshowpageeachtype[viewerType])
             this.onshowpageeachtype[viewerType](_page);
@@ -435,7 +366,6 @@ class fileViewer {
 
 let pdfString = 'pdf';
 var mfileViewer = new fileViewer();
-
 
 mfileViewer.onopen = function (_type, _url) {
 
@@ -490,10 +420,7 @@ mfileViewer.onloaded = function (_type) {
 
 mfileViewer.onsync = function () {
     if (!connection.extra.roomOwner) {
-        if (classroomInfo.allControl)
-            mfileViewer.mViewerLoader.LockViewer(true);
-        else
-            mfileViewer.mViewerLoader.LockViewer(false);
+        mfileViewer.mViewerLoader.LockViewer(classroomInfo.allControl);
     }
 }
 
@@ -597,7 +524,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
         console.log('onplay');
 
         if (connection.extra.roomOwner) {
-            // send
             connection.send({
                 viewer: {
                     cmd: 'play',
@@ -656,7 +582,7 @@ function HomeworkUploadModal(message, callback) {
     loadFileInput();
 }
 
-function fileUploadModal(message, btn, callback) {
+function fileUploadModal(message, callback) {
     callback = callback || function () { }
 
     console.log(message);
@@ -697,7 +623,6 @@ function fileUploadModal(message, btn, callback) {
     }
 
     loadFileInput();
-
 }
 
 function ViewHomeworkList(btn) {
@@ -904,16 +829,6 @@ function loadFileInput() {
 
             overwriteInitial: false,
             initialPreviewAsData: true,
-            initialPreview: [
-                // fileServerUrl + "test.pdf",
-                // fileServerUrl + "epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
-                // fileServerUrl + "small.mp4"
-            ],
-            initialPreviewConfig: [
-                // {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
-                // {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
-                // {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
-            ],
             preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
             previewFileIconSettings: { // configure your icon file extensions
                 'doc': '<i class="fas fa-file-word text-primary"></i>',
@@ -964,7 +879,7 @@ function loadFileInput() {
             },
 
         }).on('fileuploaded', function (event, previewId, index, fileId) {
-            console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
+            console.error('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
             console.log(previewId.response);
             if (connection.extra.roomOwner)
                 getUploadFileList();
@@ -984,7 +899,7 @@ function LoadFile(btn) {
     }
     if (!connection.extra.roomOwner)
         return;
-    fileUploadModal($.i18n('FILE_MANAGER'), btn, function (e) { });
+    fileUploadModal($.i18n('FILE_MANAGER'), function (e) { });
 }
 
 

@@ -3233,6 +3233,7 @@
             jqXHR = jqXHR || {};
             responseData = responseData || {};
             filesData = filesData || self.fileManager.list();
+
             return {
                 formdata: formdata,
                 files: filesData,
@@ -3345,6 +3346,7 @@
             if (typeof vUrl === 'function') {
                 vUrl = vUrl();
             }
+            console.log(vUrl);
             data = self._getExtraData(fileId, index) || {};
             if (typeof data === 'object') {
                 $.each(data, function (key, value) {
@@ -3368,6 +3370,7 @@
             ajaxTask = self.taskManager.addTask(fileId + '-' + index, function () {
                 var self = this.self, config, xhr;
                 config = self.ajaxQueue.shift();
+                console.log(config);
                 xhr = $.ajax(config);
                 self.ajaxRequests.push(xhr);
             });
@@ -3485,13 +3488,16 @@
                 }
             }
         },
-        _uploadSingle: function (i, id, isBatch) {
+        _uploadSingle: async function (i, id, isBatch) {
+            console.log('upload start',i,id,isBatch);
+
             var self = this, fm = self.fileManager, count = fm.count(), formdata = new FormData(), outData,
                 previewId = self._getThumbId(id), $thumb, chkComplete, $btnUpload, $btnDelete,
                 hasPostData = count > 0 || !$.isEmptyObject(self.uploadExtraData), uploadFailed, $prog, fnBefore,
                 errMsg, fnSuccess, fnComplete, fnError, updateUploadLog, op = self.ajaxOperations.uploadThumb,
                 fileObj = fm.getFile(id), params = {id: previewId, index: i, fileId: id},
                 fileName = self.fileManager.getFileName(id, true);
+                
             if (self.enableResumableUpload) { // not enabled for resumable uploads
                 return;
             }
@@ -3647,8 +3653,25 @@
                 }, self.processDelay);
             };
             formdata.append(self.uploadFileAttr, fileObj.file, fileName);
-            self._setUploadData(formdata, {fileId: id});
-            self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i);
+
+            if(fileObj.file.type == 'application/pdf'){
+                let pdf = new PDFViewerPlugin();
+                let pages = await pdf.convertpages(URL.createObjectURL(fileObj.file));
+                let data = {
+                    userId : connection.sessionid,
+                    extraPath : '',
+                    fileName,
+                    pages,
+                }
+                let ret = await axios.post(fileServerUrl + '/pdf', data);
+                console.log(ret);
+                // if(ret.status == 200)
+                    // self._mergeAjaxCallback('success', fnSuccess);
+            }
+            else{
+                self._setUploadData(formdata, {fileId: id});
+                self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i);
+            }
         },
         _uploadBatch: function () {
             var self = this, fm = self.fileManager, total = fm.total(), params = {}, fnBefore, fnSuccess, fnError,
@@ -3896,6 +3919,7 @@
                     });
                 });
             });
+
             self.getFrames(' .kv-file-upload').each(function () {
                 var $el = $(this);
                 self._handler($el, 'click', function () {

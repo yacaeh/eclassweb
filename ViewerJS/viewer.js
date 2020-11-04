@@ -77,8 +77,6 @@ function Viewer( viewerPlugin, parameters ) {
         pageSwitcher       = document.getElementById('toolbarLeft'),
         zoomWidget         = document.getElementById('toolbarMiddleContainer'),
         scaleSelector      = document.getElementById('scaleSelect'),
-        dialogOverlay      = document.getElementById('dialogOverlay'),
-        toolbarRight       = document.getElementById('toolbarRight'),
         pages              = [],
         currentPage,
         scaleChangeTimer,
@@ -516,7 +514,6 @@ function Viewer( viewerPlugin, parameters ) {
     }
 
     function init() {
-
         if ( viewerPlugin ) {
             self.initialize();
 
@@ -675,7 +672,7 @@ function Viewer( viewerPlugin, parameters ) {
  * @source: http://github.com/kogmbh/ViewerJS
  */
 
-/*global document, window, Viewer, ODFViewerPlugin, PDFViewerPlugin*/
+/*global document, window, Viewer, ODFViewerPlugin*/
 
 (function () {
     "use strict";
@@ -725,9 +722,7 @@ function Viewer( viewerPlugin, parameters ) {
                     return (extension === 'pdf');
                 },
                 path:                  "./PDFViewerPlugin.js",
-                getClass:              function () {
-                    return PDFViewerPlugin;
-                }
+                getClass: function () {return PDFViewerPlugin;}
             },
             (function () {
                 var imageMimetypes      = [
@@ -816,6 +811,7 @@ function Viewer( viewerPlugin, parameters ) {
             var mimetype, matchingPluginData;
             if ( xhr.readyState === 4 ) {
                 if ( (xhr.status >= 200 && xhr.status < 300) || xhr.status === 0 ) {
+                    console.log(xhr);
                     mimetype = xhr.getResponseHeader('content-type');
 
                     if ( mimetype ) {

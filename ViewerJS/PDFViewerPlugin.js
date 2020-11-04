@@ -22,41 +22,31 @@
  * @source: http://github.com/kogmbh/ViewerJS
  */
 
-/*global document, PDFJS, console, TextLayerBuilder*/
+/*global document, PDFJS, console */
 
 function PDFViewerPlugin() {
     "use strict";
 
-    function loadScript( path, callback ) {
-        var script    = document.createElement('script');
-        script.async  = false;
-        script.src    = path;
-        script.type   = 'text/javascript';
-        script.onload = callback || script.onload;
-        document.getElementsByTagName('head')[0].appendChild(script);
+    async function loadScript(path) {
+        return new Promise(function(resolve, reject){
+            var script    = document.createElement('script');
+            script.async  = false;
+            script.src    = path;
+            script.type   = 'text/javascript';
+            script.onload = () => resolve(script);
+            document.getElementsByTagName('head')[0].appendChild(script);
+        })
     }
 
-    function init( callback ) {
-
-        loadScript('./compatibility.js', function () {
-            loadScript('./pdf.js', callback);
-            loadScript('./ui_utils.js');
-            loadScript('./text_layer_builder.js');
-        });
-
-        //var pluginCSS;
-        //pluginCSS = /**@type{!HTMLStyleElement}*/(document.createElementNS(document.head.namespaceURI, 'style'));
-        //pluginCSS.setAttribute('media', 'screen, print, handheld, projection');
-        //pluginCSS.setAttribute('type', 'text/css');
-        //pluginCSS.appendChild(document.createTextNode(PDFViewerPlugin_css));
-        //document.head.appendChild(pluginCSS);
-
+    async function init() {
+        await loadScript('/ViewerJS/compatibility.js');
+        await loadScript('/ViewerJS/pdf.js');
+        await loadScript('/ViewerJS/ui_utils.js');
     }
 
     var self                    = this,
         pages                   = [],
         domPages                = [],
-        pageText                = [],
         renderingStates         = [],
         RENDERING               = {
             BLANK:           0,
@@ -64,27 +54,20 @@ function PDFViewerPlugin() {
             FINISHED:        2,
             RUNNINGOUTDATED: 3
         },
-        TEXT_LAYER_RENDER_DELAY = 200, // ms
         container               = null,
         pdfDocument             = null,
-        pageViewScroll          = null,
         isGuessedSlideshow      = true, // assume true as default, any non-matching page will unset this
-        isPresentationMode      = false,
         scale                   = 1,
         currentPage             = 1,
         maxPageWidth            = 0,
         maxPageHeight           = 0,
         createdPageCount        = 0;
 
-    function scrollIntoView( elem ) {
-        elem.parentNode.scrollTop = elem.offsetTop;
-    }
-
     function isScrolledIntoView( elem ) {
         if ( elem.style.display === "none" ) {
             return false;
         }
-
+   
         var docViewTop    = container.scrollTop,
             docViewBottom = docViewTop + container.clientHeight,
             elemTop       = elem.offsetTop,
@@ -102,10 +85,6 @@ function PDFViewerPlugin() {
         return domPages[page.pageIndex];
     }
 
-    function getPageText( page ) {
-        return pageText[page.pageIndex];
-    }
-
     function getRenderingStatus( page ) {
         return renderingStates[page.pageIndex];
     }
@@ -116,21 +95,13 @@ function PDFViewerPlugin() {
 
     function updatePageDimensions( page, width, height ) {
         var domPage   = getDomPage(page),
-            canvas    = domPage.getElementsByTagName('canvas')[0],
-            textLayer = domPage.getElementsByTagName('div')[0],
-            cssScale  = 'scale(' + scale + ', ' + scale + ')';
+            canvas    = domPage.getElementsByTagName('canvas')[0];
 
         domPage.style.width  = width + "px";
         domPage.style.height = height + "px";
 
         canvas.width  = width;
         canvas.height = height;
-
-        textLayer.style.width  = width + "px";
-        textLayer.style.height = height + "px";
-
-        // CustomStyle.setProp('transform', textLayer, cssScale);
-        // CustomStyle.setProp('transformOrigin', textLayer, '0% 0%');
 
         if ( getRenderingStatus(page) === RENDERING.RUNNING ) {
             // TODO: should be able to cancel that rendering
@@ -142,18 +113,16 @@ function PDFViewerPlugin() {
     }
 
     function ensurePageRendered( page ) {
-        var domPage, textLayer, canvas;
+        var domPage, canvas;
 
         if ( getRenderingStatus(page) === RENDERING.BLANK ) {
             setRenderingStatus(page, RENDERING.RUNNING);
 
             domPage   = getDomPage(page);
-            textLayer = getPageText(page);
             canvas    = domPage.getElementsByTagName('canvas')[0];
 
             page.render({
                 canvasContext: canvas.getContext('2d'),
-                textLayer:     textLayer,
                 viewport:      page.getViewport(scale)
             }).promise.then(function () {
                 if ( getRenderingStatus(page) === RENDERING.RUNNINGOUTDATED ) {
@@ -168,23 +137,37 @@ function PDFViewerPlugin() {
     }
 
     function completeLoading() {
-        var allPagesVisible = !self.isSlideshow();
-        domPages.forEach(function ( domPage ) {
-            // if ( allPagesVisible ) {
-            //     domPage.style.display = "block";
-            // }
+        domPages.forEach((domPage) => {
             container.appendChild(domPage);
         });
         domPages[0].style.display = "block";
-
         self.showPage(1);
         self.onLoad();
     }
 
+    async function convertPage(page){
+        let canvas = document.createElement('canvas');
+        let pageNumber = page.pageIndex + 1;
+        canvas.id = 'canvas' + pageNumber;  
+        let viewport = page.getViewport(scale);
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({
+            canvasContext: canvas.getContext('2d'),
+            viewport:      page.getViewport(1)
+        });
+
+        let thumbnail = document.createElement("canvas");
+        let thumbnailContext = thumbnail.getContext('2d');
+        thumbnail.width = '200';
+        thumbnail.height = '200';
+        thumbnailContext.drawImage(canvas, 0,0,200,200);
+        return [canvas.toDataURL('image/png'), canvas.toDataURL('image/png', 0.1)];
+    }
+
     function createPage( page ) {
         var pageNumber,
-            textLayerDiv,
-            textLayer,
             canvas,
             domPage,
             viewport;
@@ -201,14 +184,7 @@ function PDFViewerPlugin() {
         canvas    = document.createElement('canvas');
         canvas.id = 'canvas' + pageNumber;
 
-        textLayerDiv           = document.createElement('div');
-        textLayerDiv.className = 'textLayer';
-        textLayerDiv.id        = 'textLayer' + pageNumber;
-
-
-
         domPage.appendChild(canvas);
-        domPage.appendChild(textLayerDiv);
 
         pages[page.pageIndex]           = page;
         domPages[page.pageIndex]        = domPage;
@@ -221,22 +197,9 @@ function PDFViewerPlugin() {
         if ( maxPageHeight < viewport.height ) {
             maxPageHeight = viewport.height;
         }
-        // A very simple but generally true guess - if any page has the height greater than the width, treat it no
-        // longer as a slideshow
         if ( viewport.width < viewport.height ) {
             isGuessedSlideshow = false;
         }
-
-        textLayer = new TextLayerBuilder({
-            textLayerDiv: textLayerDiv,
-            viewport:     viewport,
-            pageIndex:    pageNumber - 1
-        });
-        page.getTextContent().then(function ( textContent ) {
-            textLayer.setTextContent(textContent);
-            textLayer.render(TEXT_LAYER_RENDER_DELAY);
-        });
-        pageText[page.pageIndex] = textLayer;
 
         var thumbnail = canvas.cloneNode(true);  
         thumbnail.style.width = "100%"
@@ -245,14 +208,12 @@ function PDFViewerPlugin() {
             viewport:      page.getViewport(1)
         }).promise.then(function () {
             if ( getRenderingStatus(page) === RENDERING.RUNNINGOUTDATED ) {
-                console.error
                 ensurePageRendered(page);
             }
         });
         window.parent.parent.pageNavigator.push(thumbnail, function(){
             var idx = (this.getAttribute("idx") * 1) + 1;
             self.showPage(idx)
-
         })
 
         createdPageCount += 1;
@@ -262,49 +223,32 @@ function PDFViewerPlugin() {
 
     }
 
-    function passwordCallback( providePassword, reasonCode ) {
-        switch ( reasonCode ) {
-            case PDFJS.PasswordResponses.NEED_PASSWORD:
-                // PDF is password protected, ask the user to provide a password
-                promptForPassword(false, providePassword);
+    this.initialize = async function ( viewContainer, location ) {
+        var i;
 
-                break;
-            case PDFJS.PasswordResponses.INCORRECT_PASSWORD:
-                // Wrong password was provided, ask the user again
-                promptForPassword(true, providePassword);
-                break;
+        await init();
+        let doc = await PDFJS.getDocument(location)
+        pdfDocument = doc;
+        container   = viewContainer;
+        window.parent.parent.pageNavigator.removethumbnail();
+        for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
+            pdfDocument.getPage(i + 1).then(createPage);
         }
-    }
-
-    function promptForPassword( wrongPasswordEntered, providePassword ) {
-        var text     = wrongPasswordEntered ? "Wrong password entered. Please retry." : "Password protected PDF. Enter password.";
-        var password = prompt(text, "");
-        if ( password != null ) {
-            providePassword(password);
-        }
-    }
-
-    this.initialize = function ( viewContainer, location ) {
-        var self = this,
-            i,
-            pluginCSS;
-
-        init(function () {
-            PDFJS.workerSrc = "./pdf.worker.js";
-            PDFJS.getDocument(location, null, passwordCallback).then(function loadPDF( doc ) {
-                pdfDocument = doc;
-                container   = viewContainer;
-                window.parent.parent.pageNavigator.removethumbnail();
-
-                for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
-                    pdfDocument.getPage(i + 1).then(createPage);
-                }
-
-                window.parent.parent.pageNavigator.set(pdfDocument.numPages);
-                window.parent.parent.pageNavigator.pdfsetting();
-            });
-        });
+        window.parent.parent.pageNavigator.set(pdfDocument.numPages);
+        window.parent.parent.pageNavigator.pdfsetting();
     };
+
+    this.convertpages = async function (pdf_url) {
+        let pages = [];
+
+        await init();
+        let doc = await PDFJS.getDocument({ url: pdf_url });
+        for (let i = 0; i < doc.numPages; i += 1 ) {
+            let page = await doc.getPage(i + 1);
+            pages.push(await convertPage(page));
+        }
+        return pages;
+    }
 
     this.isSlideshow = function () {
         return isGuessedSlideshow;
