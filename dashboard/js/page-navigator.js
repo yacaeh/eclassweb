@@ -106,20 +106,24 @@ pageNavigator = {
       }
     })
   },
+
   set: function (max) {
     this.maxidx.value = max;
     this.maxidx.innerHTML = " / " + max;
   },
+
   on: function () {
     this.obj.style.display = 'block';
     document.getElementById("epubidx").value = 1;
   },
+
   off: function () {
     this.obj.style.display = 'none';
     this.idx = 0;
     this.obj.value = 1;
     this.removethumbnail();
   },
+
   push: function (element, clickevent) {
     var box = document.createElement("div");
     box.appendChild(element);
@@ -135,16 +139,10 @@ pageNavigator = {
   },
 
   button : function(page){
-
     this.list.children[page].click();
   },
 
   select: function (idx) {
-    console.debug("Selected page : ", idx);
-    if(connection.extra.roomOwner && classroomInfo.allControl){
-      console.debug('please show this page  : ', idx);
-    }
-
     if(this.currentidx == (idx == -1 ? 0 : idx)) 
       return;
 
@@ -153,8 +151,6 @@ pageNavigator = {
     if(!this.list.children[this.currentidx]){
       return;
     }
-    
-
 
     var pre = this.list.getElementsByClassName("selected")[0];
     if (pre)
@@ -163,10 +159,36 @@ pageNavigator = {
     this.list.children[this.currentidx].scrollIntoView({ block: "center" });
     document.getElementById("epubidx").value = this.currentidx + 1;
   },
+
   removethumbnail: function () {
     this.idx = 0;
     while (this.list.children.length) {
       this.list.removeChild(this.list.children[0]);
+    }
+  },
+
+  allControl : function(bool) {
+    if (!connection.extra.roomOwner) {
+        if (bool) {
+                Hide('next')
+                Hide('prev')
+                Hide('lnext')
+                Hide('lprev')
+                let thumbnails = document.getElementsByClassName('thumbnail');
+                for(let i = 0 ; i < thumbnails.length; i++){
+                    thumbnails[i].style.pointerEvents = 'none';
+            }
+        }
+        else {
+                Show('next')
+                Show('prev')
+                Show('lnext')
+                Show('lprev')
+                let thumbnails = document.getElementsByClassName('thumbnail');
+                for(let i = 0 ; i < thumbnails.length; i++){
+                    thumbnails[i].style.pointerEvents = '';
+                }
+        }
     }
   }
 }
