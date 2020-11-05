@@ -262,14 +262,18 @@ function PDFViewerPlugin() {
 
     this.convertpages = async function (pdf_url) {
         let pages = [];
+        let thumbnails = [];
+
 
         await init();
         let doc = await PDFJS.getDocument({ url: pdf_url });
         for (let i = 0; i < doc.numPages; i += 1 ) {
             let page = await doc.getPage(i + 1);
-            pages.push(await convertPage(page));
+            let data = await convertPage(page);
+            pages.push(data[0]);
+            thumbnails.push(data[1]);
         }
-        return pages;
+        return [pages,thumbnails];
     }
 
     this.isSlideshow = function () {

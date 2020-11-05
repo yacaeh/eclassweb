@@ -3585,6 +3585,7 @@
                 }
             };
             fnSuccess = function (data, textStatus, jqXHR) {
+                console.log('suc')
                 var pid = self.showPreview && $thumb.attr('id') ? $thumb.attr('id') : previewId;
                 outData = self._getOutData(formdata, jqXHR, data);
                 $.extend(true, params, outData);
@@ -3619,6 +3620,8 @@
                 }, self.processDelay);
             };
             fnComplete = function () {
+                console.log('comp')
+
                 if (self.showPreview) {
                     $btnUpload.removeAttr('disabled');
                     $btnDelete.removeAttr('disabled');
@@ -3654,24 +3657,33 @@
             };
             formdata.append(self.uploadFileAttr, fileObj.file, fileName);
 
+            let url = '';
+
             if(fileObj.file.type == 'application/pdf'){
                 let pdf = new PDFViewerPlugin();
                 let pages = await pdf.convertpages(URL.createObjectURL(fileObj.file));
-                let data = {
-                    userId : connection.sessionid,
-                    extraPath : '',
-                    fileName,
-                    pages,
-                }
-                let ret = await axios.post(fileServerUrl + '/pdf', data);
-                console.log(ret);
-                // if(ret.status == 200)
-                    // self._mergeAjaxCallback('success', fnSuccess);
+                formdata.append('extraPath', '');
+                formdata.append('fileName', fileName);
+                formdata.append('pages', pages[0]);
+                formdata.append('thumbnails', pages[1]);
+                console.log(pages);
+                url = fileServerUrl + '/pdf'
+                // let ret = await axios.post(fileServerUrl + '/pdf', data);
+                // console.log(ret);
+                
+                
+                // self._setThumbStatus($thumb, 'Success');
+                // self._setProgress(101, $prog);
+                // $btnUpload.hide();
+
+                // chkComplete();
+                // fnComplete();
             }
-            else{
-                self._setUploadData(formdata, {fileId: id});
-                self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i);
-            }
+            let asd = '';
+            asd.replace()
+
+            self._setUploadData(formdata, {fileId: id});
+            self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i, url);
         },
         _uploadBatch: function () {
             var self = this, fm = self.fileManager, total = fm.total(), params = {}, fnBefore, fnSuccess, fnError,
