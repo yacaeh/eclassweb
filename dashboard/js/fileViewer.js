@@ -430,12 +430,11 @@ mfileViewer.onshowpageeachtype[pdfString] = function (_page) {
 }
 
 mfileViewer.onupdateeachtype[pdfString] = function (_data) {
-    console.log('onupdate pdf');
+    console.log('onupdate pdf',_data);
     const cmd = _data.cmd;
     switch (cmd) {
         case 'page':
-            const page = _data.page;
-            mfileViewer.getCurrentViewer().showPage(page);
+            pageNavigator.button(_data.page-1);
             break;
     }
 }
@@ -452,7 +451,7 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
     mfileViewer.getCurrentViewer().onpage = (page) => {
         classroomInfo.viewer.pdf.page = page;
         if (connection.extra.roomOwner && classroomInfo.allControl) 
-            connection.send({viewer: { cmd: 'page', page: page}
+            connection.send({viewer: { cmd: 'page', page}
         });
     }
 }

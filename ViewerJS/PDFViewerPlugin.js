@@ -386,10 +386,7 @@ function PDFViewerPlugin() {
     };
 
     this.showPage = function ( n ) {
-        if(currentPage == n)
-            return;
         n = n < 1 ? 1 : n ;
-
         this.image.src = this.url + this.images[n-1];
         window.parent.parent.showPage(n);     
         currentPage                             = n;

@@ -68,7 +68,6 @@ pageNavigator = {
     this.self = this;
     let self = this.self;
 
-
     this.obj = document.getElementById("epub-navi");
     this.list = document.getElementById("thumbnail-list");
     this.maxidx = document.getElementById("epubmaxidx");
@@ -135,19 +134,27 @@ pageNavigator = {
 
   },
 
-  button : function(idx){
-    this.list.children[idx].click();
+  button : function(page){
+
+    this.list.children[page].click();
   },
 
   select: function (idx) {
+    console.debug("Selected page : ", idx);
+    if(connection.extra.roomOwner && classroomInfo.allControl){
+      console.debug('please show this page  : ', idx);
+    }
+
     if(this.currentidx == (idx == -1 ? 0 : idx)) 
       return;
 
-    this.currentidx = idx == -1 ? 0 : idx;
+      this.currentidx = idx == -1 ? 0 : idx;
 
     if(!this.list.children[this.currentidx]){
       return;
     }
+    
+
 
     var pre = this.list.getElementsByClassName("selected")[0];
     if (pre)
