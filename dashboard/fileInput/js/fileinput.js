@@ -3366,6 +3366,7 @@
                 processData: false,
                 contentType: false
             };
+
             settings = $.extend(true, {}, defaults, self._ajaxSettings);
             ajaxTask = self.taskManager.addTask(fileId + '-' + index, function () {
                 var self = this.self, config, xhr;
@@ -3655,34 +3656,35 @@
                     self._showFileError(errMsg, params);
                 }, self.processDelay);
             };
-            formdata.append(self.uploadFileAttr, fileObj.file, fileName);
 
             let url = '';
 
+            let uplodedata = {fileId : id};
             if(fileObj.file.type == 'application/pdf'){
                 let pdf = new PDFViewerPlugin();
                 let pages = await pdf.convertpages(URL.createObjectURL(fileObj.file));
+                console.log(pages);
+                console.log(pages[0][0]);
+
                 formdata.append('extraPath', '');
                 formdata.append('fileName', fileName);
-                formdata.append('pages', pages[0]);
-                formdata.append('thumbnails', pages[1]);
-                console.log(pages);
-                url = fileServerUrl + '/pdf'
-                // let ret = await axios.post(fileServerUrl + '/pdf', data);
-                // console.log(ret);
-                
-                
-                // self._setThumbStatus($thumb, 'Success');
-                // self._setProgress(101, $prog);
-                // $btnUpload.hide();
+                formdata.append('page', pages[0][0]);
 
-                // chkComplete();
-                // fnComplete();
+
+                pages[0].forEach(element => {
+                    formdata.append('pages[]', element);
+                });
+
+                pages[1].forEach(element => {
+                    formdata.append('thumbnails[]', element);
+                });
+            url = fileServerUrl + '/pdf'
+            }else{
+                formdata.append(self.uploadFileAttr, fileObj.file, fileName);
             }
             let asd = '';
             asd.replace()
-
-            self._setUploadData(formdata, {fileId: id});
+            self._setUploadData(formdata, uplodedata);
             self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i, url);
         },
         _uploadBatch: function () {
