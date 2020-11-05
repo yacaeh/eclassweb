@@ -76,8 +76,6 @@ class fileViewerLoader {
             this.closeViewer();
         }
 
-        console.log(_url);
-
         this.setOpenState(true);
         this.setUrl(_url);
         this.setExtentionToType(this.getFileNameToExtention(_url));
@@ -379,12 +377,7 @@ mfileViewer.onopen = function (_type, _url) {
     classroomManager.updateClassroomInfo();
 
     if (connection.extra.roomOwner) {
-        connection.send({
-            viewer: {
-                cmd: 'open',
-                url: _url
-            }
-        });
+        connection.send({viewer: {cmd: 'open', url: _url}});
     }
     else {
         if (classroomInfo.allControl)
@@ -457,21 +450,10 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
     console.log('onloaded pdf');
     mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);
     mfileViewer.getCurrentViewer().onpage = (page) => {
-
         classroomInfo.viewer.pdf.page = page;
-        if (connection.extra.roomOwner) {
-
-            // 선생님
-            if (!classroomInfo.allControl) return;
-            connection.send({
-                viewer: {
-                    cmd: 'page',
-                    page: page
-                }
-            });
-        }
-        else {
-        }
+        if (connection.extra.roomOwner && classroomInfo.allControl) 
+            connection.send({viewer: { cmd: 'page', page: page}
+        });
     }
 }
 /*
@@ -633,39 +615,25 @@ function ViewHomeworkList(btn) {
 }
 
 function ViewUploadList(btn) {
-    if (!connection.extra.roomOwner)
-        return;
-
     btn.classList.add("selected");
     document.getElementById("confirm-title2").classList.remove("selected");
     $("form[name=upload]").show();
     getUploadFileList();
 }
 
-function getUploadFileList(extraPath) {
+async function getUploadFileList(extraPath) {
     if (typeof extraPath === "undefined")
         extraPath = "";
 
-    var xhr = new XMLHttpRequest();
-    var url = fileServerUrl + '/list';
-    var data = { "userId": params.sessionid, "extraPath": extraPath };
-
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == xhr.DONE) {
-            if (xhr.status == 200) {
-                updateFileList(JSON.parse(xhr.responseText), extraPath);
-            }
-            else {
-                console.error("directory doesn't exist!", xhr.status);
-                updateFileList([], extraPath);
-            }
-        }
-    };
-
-    data = JSON.stringify(data);
-    xhr.send(data);
+    let data = { "userId": params.sessionid, "extraPath": extraPath };
+    let ret = await axios.post(fileServerUrl + '/list', data);
+    if(ret.status == 200){
+        updateFileList(ret.data, extraPath);
+    }
+    else{
+        console.error("directory doesn't exist!", ret.status);
+        updateFileList([], extraPath);
+    }
 }
 
 function updateFileList(list, extraPath) {
@@ -679,7 +647,7 @@ function updateFileList(list, extraPath) {
     }
     else {
         list.files.forEach(file => {
-            if (file.name == "homework" || re.exec(file.name)[1] == "json")
+            if (file.name == "homework" || re.exec(file.name)[1] == "json" || !re.exec(file.name)[1])
                 return;
 
             var buttons = "";
@@ -769,7 +737,7 @@ function downloadUploadedFile(url, name) {
         .catch(() => alert('oh no!'));
 }
 
-function deleteUploadedFile(filename, extraPath) {
+async function deleteUploadedFile(filename, extraPath) {
     if (mfileViewer.nowPath) {
         var nowName = mfileViewer.nowPath.split('/');
         nowName = nowName[nowName.length - 1];
@@ -779,24 +747,15 @@ function deleteUploadedFile(filename, extraPath) {
         }
     }
 
-    var xhr = new XMLHttpRequest();
-    var url = fileServerUrl + '/delete';
-    var data = {
+    let data = {
         "userId": params.sessionid,
         "name": filename,
         "extraPath": extraPath
     };
-
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // do something with response
-            getUploadFileList(extraPath);
-        }
-    };
-    data = JSON.stringify(data);
-    xhr.send(data);
+    let ret = await axios.post(fileServerUrl + '/delete', data);
+    if(ret.status == 200){
+        getUploadFileList(extraPath);
+    }
 }
 
 function loadFileInput() {

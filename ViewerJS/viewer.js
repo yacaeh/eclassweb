@@ -222,14 +222,10 @@ function Viewer( viewerPlugin, parameters ) {
         viewerPlugin.onLoad = function () {
 
             if ( viewerPlugin.isSlideshow() ) {
-                // Slideshow pages should be centered
                 canvasContainer.classList.add("slideshow");
-                // Show page nav controls only for presentations
                 pageSwitcher.style.visibility = 'visible';
             } else {
-                // For text documents, show the zoom widget.
                 zoomWidget.style.visibility = 'visible';
-                // Only show the page switcher widget if the plugin supports page numbers
                 if ( viewerPlugin.getPageInView ) {
                     pageSwitcher.style.visibility = 'visible';
                 }
@@ -240,13 +236,9 @@ function Viewer( viewerPlugin, parameters ) {
             document.getElementById('numPages').innerHTML = 'of ' + pages.length;
 
             self.showPage(readStartPageParameter(parameters.startpage));
-
-            // Set default scale
             parseScale(initialScale);
-
             canvasContainer.onscroll = onScroll;
             delayedRefresh();
-            // Doesn't work in older browsers: document.getElementById('loading-document').remove();
             var loading = document.getElementById('loading-document');
             loading.parentNode.removeChild(loading);
             
@@ -255,7 +247,6 @@ function Viewer( viewerPlugin, parameters ) {
             }
             else if(mimetype == "application/pdf"){
                 window.top.pageNavigator.on();
-                // window.top.pageNavigator.pdfsetting();
                 window.top.pageNavigator.select(0);
             }else{
                 window.top.pageNavigator.off();
@@ -805,36 +796,30 @@ function Viewer( viewerPlugin, parameters ) {
             }
         };
 
-    function estimateTypeByHeaderContentType( documentUrl, cb ) {
-        var xhr                = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            var mimetype, matchingPluginData;
-            if ( xhr.readyState === 4 ) {
-                if ( (xhr.status >= 200 && xhr.status < 300) || xhr.status === 0 ) {
-                    console.log(xhr);
-                    mimetype = xhr.getResponseHeader('content-type');
+    async function estimateTypeByHeaderContentType( documentUrl, cb ) {
+        let ret = await axios.head(documentUrl);
+        var mimetype, matchingPluginData;
 
-                    if ( mimetype ) {
-                        pluginRegistry.some(function ( pluginData ) {
-                            if ( pluginData.supportsMimetype(mimetype) ) {
-                                matchingPluginData = pluginData;
-                                console.log('Found plugin by mimetype and xhr head: ' + mimetype);
-                                window.mimetype = mimetype;
-                                return true;
-                            }
-                            return false;
-                        });
-                    }
+        console.log(ret);
+
+        mimetype = ret.headers['content-type'];
+
+        if ( mimetype ) {
+            pluginRegistry.some(function ( pluginData ) {
+                if ( pluginData.supportsMimetype(mimetype) ) {
+                    matchingPluginData = pluginData;
+                    console.log('Found plugin by mimetype and xhr head: ' + mimetype);
+                    window.mimetype = mimetype;
                 }
-                if ( !matchingPluginData ) {
-                    matchingPluginData = unknownFileType;
-                }
-                cb(matchingPluginData);
-            }
-        };
+            });
+        }
+        
+        if ( !matchingPluginData ) {
+            matchingPluginData = unknownFileType;
+        }
+
         console.log("docuemntURL",documentUrl);
-        xhr.open("HEAD", documentUrl, true);
-        xhr.send();
+        cb(matchingPluginData);
     }
 
     function doEstimateTypeByFileExtension( extension ) {
@@ -856,8 +841,6 @@ function Viewer( viewerPlugin, parameters ) {
 
         if ( matchingPluginData ) {
             console.log('Found plugin by parameter type: ' + extension);
-
-            // this is needed for the Multimedia Plugin
             window.mimetype = getMimeByExtension(extension);
         }
 
@@ -932,14 +915,13 @@ function Viewer( viewerPlugin, parameters ) {
             }
 
             parameters.documentUrl = documentUrl;
-
+            
             // trust the server most
             estimateTypeByHeaderContentType(documentUrl, function ( pluginData ) {
                 if ( !pluginData ) {
                     if ( parameters.type ) {
                         pluginData = estimateTypeByFileExtension(parameters.type);
                     } else {
-                        // last ressort: try to guess from path
                         pluginData = estimateTypeByFileExtensionFromPath(documentUrl);
                     }
                 }
@@ -957,23 +939,10 @@ function Viewer( viewerPlugin, parameters ) {
                 } else {
                     viewer = new Viewer();
                 }
+
             });
         } else {
             viewer = new Viewer();
         }
     };
-
-    /*css = (document.createElementNS(document.head.namespaceURI, 'style'));
-     css.setAttribute('media', 'screen');
-     css.setAttribute('type', 'text/css');
-     css.appendChild(document.createTextNode(viewer_css));
-     document.head.appendChild(css);
-
-     css = (document.createElementNS(document.head.namespaceURI, 'style'));
-     css.setAttribute('media', 'only screen and (max-device-width: 800px) and (max-device-height: 800px)');
-     css.setAttribute('type', 'text/css');
-     css.setAttribute('viewerTouch', '1');
-     css.appendChild(document.createTextNode(viewerTouch_css));
-     document.head.appendChild(css);
-     */
 }());

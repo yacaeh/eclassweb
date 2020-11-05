@@ -5,6 +5,7 @@ pageNavigator = {
   list: undefined,
   maxidx: undefined,
   inputwindow: undefined,
+  currentidx : -1,
   idx: 0,
 
   leftbtn: undefined,
@@ -41,43 +42,25 @@ pageNavigator = {
     let self = this.self;
 
     this.leftbtn = function () {
-      self.inputwindow.value = Math.max(1, --self.inputwindow.value);
-      mfileViewer.updateViewer({
-        cmd: "page",
-        page: self.inputwindow.value
-      })
+      this.button(Math.max(0, this.currentidx-1));
     }
 
     this.rightbtn = function () {
-      self.inputwindow.value = Math.min(this.maxidx.value, ++self.inputwindow.value);
-      mfileViewer.updateViewer({
-        cmd: "page",
-        page: self.inputwindow.value
-      })
+      this.button(Math.min(this.maxidx.value-1, this.currentidx+1));
     };
 
     this.lastleftbtn = function () {
-      mfileViewer.updateViewer({
-        cmd: "page",
-        page: 0
-      })
+      this.button(0);
     }
 
     this.lastrightbtn = function () {
-      mfileViewer.updateViewer({
-        cmd: "page",
-        page: this.maxidx.value
-      })
+      this.button(this.maxidx.value-1);
     }
 
     this.inputevent = function () {
-      console.log("humm?")
-      var idx = Math.max(1, Math.min(self.maxidx.value, this.inputwindow.value));
+      var idx = Math.max(1, Math.min(self.maxidx.value, this.inputwindow.value)) - 1;
       this.inputwindow.value = idx;
-      mfileViewer.updateViewer({
-        cmd: "page",
-        page: idx
-      })
+      this.button(idx);
     }
   },
 
@@ -151,18 +134,27 @@ pageNavigator = {
       box.style.pointerEvents = 'none';
 
   },
+
+  button : function(idx){
+    this.list.children[idx].click();
+  },
+
   select: function (idx) {
-    if(this.list.children[idx].classList.contains("selected")){
+    if(this.currentidx == (idx == -1 ? 0 : idx)) 
+      return;
+
+    this.currentidx = idx == -1 ? 0 : idx;
+
+    if(!this.list.children[this.currentidx]){
       return;
     }
 
     var pre = this.list.getElementsByClassName("selected")[0];
     if (pre)
       pre.classList.remove("selected");
-
-    this.list.children[idx].classList.add("selected");
-    this.list.children[idx].scrollIntoView({ block: "center" });
-    document.getElementById("epubidx").value = idx + 1;
+    this.list.children[this.currentidx].classList.add("selected");
+    this.list.children[this.currentidx].scrollIntoView({ block: "center" });
+    document.getElementById("epubidx").value = this.currentidx + 1;
   },
   removethumbnail: function () {
     this.idx = 0;

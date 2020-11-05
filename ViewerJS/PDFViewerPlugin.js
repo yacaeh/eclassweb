@@ -61,7 +61,8 @@ function PDFViewerPlugin() {
         currentPage             = 1,
         maxPageWidth            = 0,
         maxPageHeight           = 0,
-        createdPageCount        = 0;
+        createdPageCount        = 0,
+        url                     = undefined;
 
     function isScrolledIntoView( elem ) {
         if ( elem.style.display === "none" ) {
@@ -137,10 +138,10 @@ function PDFViewerPlugin() {
     }
 
     function completeLoading() {
-        domPages.forEach((domPage) => {
-            container.appendChild(domPage);
-        });
-        domPages[0].style.display = "block";
+        // domPages.forEach((domPage) => {
+        //     container.appendChild(domPage);
+        // });
+        // domPages[0].style.display = "block";
         self.showPage(1);
         self.onLoad();
     }
@@ -223,19 +224,40 @@ function PDFViewerPlugin() {
 
     }
 
-    this.initialize = async function ( viewContainer, location ) {
-        var i;
+    this.createThumbanil = function (thumbnails){
+        let url = this.url;
+        thumbnails.forEach((e) => {
+            let image = new Image();
+            image.style.width = '100%';
+            image.style.height = '100%';
+            image.src = url + e ;
+            window.parent.parent.pageNavigator.push(image, function(){
+                var idx = (this.getAttribute("idx") * 1) + 1;
+                self.showPage(idx)
+            })
+        })
+    }
 
-        await init();
-        let doc = await PDFJS.getDocument(location)
-        pdfDocument = doc;
-        container   = viewContainer;
+    this.createCanvas = function (container){
+        let image = document.createElement('img');
+        this.image = image; 
+        container.appendChild(image);
+    }
+
+    this.initialize = async function ( viewContainer, location ) {
         window.parent.parent.pageNavigator.removethumbnail();
-        for ( i = 0; i < pdfDocument.numPages; i += 1 ) {
-            pdfDocument.getPage(i + 1).then(createPage);
+        let ret = await axios.get(location);
+        
+        if(ret.status == 200){
+            console.log(ret.data);
+            this.images = ret.data.images;
+            this.url = location.slice(0,location.lastIndexOf('/') + 1) + ret.data.folderName +'/';
+            this.createThumbanil(ret.data.thumbnails);
+            this.createCanvas(viewContainer);
+            window.parent.parent.pageNavigator.set(ret.data.thumbnails.length);
+            window.parent.parent.pageNavigator.pdfsetting();
+            completeLoading();
         }
-        window.parent.parent.pageNavigator.set(pdfDocument.numPages);
-        window.parent.parent.pageNavigator.pdfsetting();
     };
 
     this.convertpages = async function (pdf_url) {
@@ -342,12 +364,11 @@ function PDFViewerPlugin() {
     this.showPage = function ( n ) {
         if(currentPage == n)
             return;
+        n = n < 1 ? 1 : n ;
 
+        this.image.src = this.url + this.images[n-1];
         window.parent.parent.showPage(n);     
-        domPages[currentPage - 1].style.display = "none";
         currentPage                             = n;
-        ensurePageRendered(pages[n - 1]);
-        domPages[n - 1].style.display = "block";
     };
 
     this.getPluginName = function () {
