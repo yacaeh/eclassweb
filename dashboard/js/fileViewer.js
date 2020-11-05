@@ -71,7 +71,6 @@ class fileViewerLoader {
     }
 
     openViewer(_url) {
-
         if (this.IsOpen()) {
             this.closeViewer();
         }
@@ -82,80 +81,47 @@ class fileViewerLoader {
         this.createElementViewer(_url);
     }
 
-
     closeViewer() {
         this.setOpenState(false);
         this.removeElementViewer();
     }
 
-    /*
-        Element Viewer
-    */
     createElementViewer(url) {
         $('#confirm-box').modal('hide');
         $('#confirm-box-topper').hide();
 
         let fileViewer = document.createElement('iframe');
         fileViewer.setAttribute('id', 'file-viewer');
-
-        let src = 'https://' + window.location.host + '/ViewerJS/#' + url;
-        fileViewer.setAttribute('src', src);
+        fileViewer.setAttribute('src', 'https://' + window.location.host + '/ViewerJS/#' + url);
 
         if (mobileHelper.isMobile)
             fileViewer.style.width = "calc(100% - 52px)";
 
         fileViewer.setAttribute('allowFullScreen', '');
-        let frame = GetWidgetFrame();
-
-        frame.document
-            .getElementsByClassName('design-surface')[0]
-            .appendChild(fileViewer);
-        frame.document.getElementById('main-canvas').style.zIndex = '1';
-        frame.document.getElementById('temp-canvas').style.zIndex = '2';
-        frame.document.getElementById('tool-box').style.zIndex = '3';
+        GetWidgetFrame().document.getElementsByClassName('design-surface')[0].appendChild(fileViewer);
     }
 
     removeElementViewer() {
-        let frame = GetWidgetFrame();
-        frame.document.getElementById('main-canvas').style.zIndex = '1';
-        frame.document.getElementById('temp-canvas').style.zIndex = '2';
-        frame.document.getElementById('tool-box').style.zIndex = '3';
-        let fileViewer = frame.document.getElementById('file-viewer');
-        fileViewer.remove();
+        GetWidgetFrame().document.getElementById('file-viewer').remove();
         document.getElementById("btn-confirm-file-close").style.display = "none";
     }
 
     LockViewer(_lock) {
         this.bLock = _lock;
-
-        let frame = GetWidgetFrame();
-        let fileViewer = frame.document.getElementById('file-viewer');
-        let viewer = fileViewer.contentWindow.document.getElementById("viewer")
-        if (!viewer)
-            return;
-
-        if (_lock) {
-            viewer.style.pointerEvents = 'none';
-        }
-        else {
-            viewer.style.pointerEvents = '';
-        }
+        let viewer = GetWidgetFrame().document.getElementById('file-viewer')
+                        .contentWindow.document.getElementById("viewer")
+        if (viewer)
+            viewer.style.pointerEvents = _lock ? 'none' : '';
     }
 }
 class pdfViewer {
-
     constructor() {
         this.onpage = function (_page) { }
         this.page = 1;
     }
 
-    /*
-        interface method 다른 viewer도 같이 구현을 해야 함.
-    */
     getElementFileViewer() {
-        let frame = GetWidgetFrame();
-        let fileViewer = frame.document.getElementById('file-viewer');
-        return fileViewer;
+        return GetWidgetFrame().document.getElementById('file-viewer');
     }
 
     showPage(_page) {
@@ -191,37 +157,24 @@ class mediaViewer {
         this.ontimeupdate = null;
     }
 
-
-
     setMediaPlayer(_player) {
         this.cacheMediaPlayer = _player;
-
         _player.on('play', () => this.setPlay());
         _player.on('pause', () => this.setPause());
         _player.on('ready', () => this.setReady());
         _player.on('ended', () => this.setEnded());
-        // _player.on('seeked', () => {
-        //     console.log('time');
-        // });
-        // _player.on('playing', () => {
-        //     console.log('playing');
-        // })
-
         _player.on('timeupdate', () => {
             if (null != ontimeupdate)
                 this.ontimeupdate(this.getCurrentTime());
         })
     }
 
-
     hasMediaPlayer() {
         return null != this.cacheMediaPlayer;
     }
 
-
     getCurrentTime() {
         if (!this.hasMediaPlayer()) return 0;
-
         return this.cacheMediaPlayer.currentTime();
     }
 
@@ -232,26 +185,14 @@ class mediaViewer {
 
     play(_time) {
         if (!this.hasMediaPlayer()) return;
-
         this.setCurrentTime(_time);
         this.cacheMediaPlayer.play();
     }
 
     pause(_time) {
         if (!this.hasMediaPlayer()) return;
-
         this.setCurrentTime(_time);
         this.cacheMediaPlayer.pause();
-    }
-
-    ended() {
-        // if(!this.hasMediaPlayer())  return;        
-
-        // this.setCurrentTime(_time);
-        // this.cacheMediaPlayer.ended ();        
-    }
-
-    seeked() {
     }
 
     setPlay() {
@@ -356,11 +297,9 @@ class fileViewer {
         if (state) {
             if (this.mViewerLoader.IsOpen()) {
                 if (state) {
-                    ``
                     if (this.onsync)
                         this.onsync();
 
-                    //  현재 타입에 따라 동기화
                     if (this.onsynceachtype[this.getCurrentViewerType()])
                         this.onsynceachtype[this.getCurrentViewerType()]();
                 }
@@ -370,7 +309,6 @@ class fileViewer {
             }
             else {
                 if (state) {
-                    // open                    
                     this.openFile(classroomInfo.viewer.url);
                 }
             }
@@ -400,11 +338,7 @@ class fileViewer {
     }
 
     onShowPage(_page) {
-
-        //  showPage      
         if (!this.hasLoadViewer()) return;
-        //if(connection.extra.roomOwner)         
-
         const viewerType = this.getCurrentViewerType();
         if (this.onshowpageeachtype[viewerType])
             this.onshowpageeachtype[viewerType](_page);
@@ -430,7 +364,6 @@ class fileViewer {
 let pdfString = 'pdf';
 var mfileViewer = new fileViewer();
 
-
 mfileViewer.onopen = function (_type, _url) {
 
     isSharingFile = true;
@@ -443,12 +376,7 @@ mfileViewer.onopen = function (_type, _url) {
     classroomManager.updateClassroomInfo();
 
     if (connection.extra.roomOwner) {
-        connection.send({
-            viewer: {
-                cmd: 'open',
-                url: _url
-            }
-        });
+        connection.send({viewer: {cmd: 'open', url: _url}});
     }
     else {
         if (classroomInfo.allControl)
@@ -484,10 +412,7 @@ mfileViewer.onloaded = function (_type) {
 
 mfileViewer.onsync = function () {
     if (!connection.extra.roomOwner) {
-        if (classroomInfo.allControl)
-            mfileViewer.mViewerLoader.LockViewer(true);
-        else
-            mfileViewer.mViewerLoader.LockViewer(false);
+        mfileViewer.mViewerLoader.LockViewer(classroomInfo.allControl);
     }
 }
 
@@ -504,12 +429,11 @@ mfileViewer.onshowpageeachtype[pdfString] = function (_page) {
 }
 
 mfileViewer.onupdateeachtype[pdfString] = function (_data) {
-    console.log('onupdate pdf');
+    console.log('onupdate pdf',_data);
     const cmd = _data.cmd;
     switch (cmd) {
         case 'page':
-            const page = _data.page;
-            mfileViewer.getCurrentViewer().showPage(page);
+            pageNavigator.button(_data.page-1);
             break;
     }
 }
@@ -524,21 +448,10 @@ mfileViewer.onloadedeachtype[pdfString] = function () {
     console.log('onloaded pdf');
     mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);
     mfileViewer.getCurrentViewer().onpage = (page) => {
-
         classroomInfo.viewer.pdf.page = page;
-        if (connection.extra.roomOwner) {
-
-            // 선생님
-            if (!classroomInfo.allControl) return;
-            connection.send({
-                viewer: {
-                    cmd: 'page',
-                    page: page
-                }
-            });
-        }
-        else {
-        }
+        if (connection.extra.roomOwner && classroomInfo.allControl) 
+            connection.send({viewer: { cmd: 'page', page}
+        });
     }
 }
 /*
@@ -591,7 +504,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
         console.log('onplay');
 
         if (connection.extra.roomOwner) {
-            // send
             connection.send({
                 viewer: {
                     cmd: 'play',
@@ -650,7 +562,7 @@ function HomeworkUploadModal(message, callback) {
     loadFileInput();
 }
 
-function fileUploadModal(message, btn, callback) {
+function fileUploadModal(message, callback) {
     callback = callback || function () { }
 
     console.log(message);
@@ -691,33 +603,35 @@ function fileUploadModal(message, btn, callback) {
     }
 
     loadFileInput();
-
 }
 
-function getUploadFileList(extraPath) {
+function ViewHomeworkList(btn) {
+    btn.classList.add("selected");
+    document.getElementById("confirm-title").classList.remove("selected");
+    $("form[name=upload]").hide();
+    getUploadFileList("/homework");
+}
+
+function ViewUploadList(btn) {
+    btn.classList.add("selected");
+    document.getElementById("confirm-title2").classList.remove("selected");
+    $("form[name=upload]").show();
+    getUploadFileList();
+}
+
+async function getUploadFileList(extraPath) {
     if (typeof extraPath === "undefined")
         extraPath = "";
 
-    var xhr = new XMLHttpRequest();
-    var url = fileServerUrl + '/list';
-    var data = { "userId": params.sessionid, "extraPath": extraPath };
-
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == xhr.DONE) {
-            if (xhr.status == 200) {
-                updateFileList(JSON.parse(xhr.responseText), extraPath);
-            }
-            else {
-                console.error("directory doesn't exist!", xhr.status);
-                updateFileList([], extraPath);
-            }
-        }
-    };
-
-    data = JSON.stringify(data);
-    xhr.send(data);
+    let data = { "userId": params.sessionid, "extraPath": extraPath };
+    let ret = await axios.post(fileServerUrl + '/list', data);
+    if(ret.status == 200){
+        updateFileList(ret.data, extraPath);
+    }
+    else{
+        console.error("directory doesn't exist!", ret.status);
+        updateFileList([], extraPath);
+    }
 }
 
 function updateFileList(list, extraPath) {
@@ -731,7 +645,7 @@ function updateFileList(list, extraPath) {
     }
     else {
         list.files.forEach(file => {
-            if (file.name == "homework" || re.exec(file.name)[1] == "json")
+            if (file.name == "homework" || re.exec(file.name)[1] == "json" || !re.exec(file.name)[1])
                 return;
 
             var buttons = "";
@@ -821,7 +735,7 @@ function downloadUploadedFile(url, name) {
         .catch(() => alert('oh no!'));
 }
 
-function deleteUploadedFile(filename, extraPath) {
+async function deleteUploadedFile(filename, extraPath) {
     if (mfileViewer.nowPath) {
         var nowName = mfileViewer.nowPath.split('/');
         nowName = nowName[nowName.length - 1];
@@ -831,24 +745,15 @@ function deleteUploadedFile(filename, extraPath) {
         }
     }
 
-    var xhr = new XMLHttpRequest();
-    var url = fileServerUrl + '/delete';
-    var data = {
+    let data = {
         "userId": params.sessionid,
         "name": filename,
         "extraPath": extraPath
     };
-
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // do something with response
-            getUploadFileList(extraPath);
-        }
-    };
-    data = JSON.stringify(data);
-    xhr.send(data);
+    let ret = await axios.post(fileServerUrl + '/delete', data);
+    if(ret.status == 200){
+        getUploadFileList(extraPath);
+    }
 }
 
 function loadFileInput() {
@@ -881,16 +786,6 @@ function loadFileInput() {
 
             overwriteInitial: false,
             initialPreviewAsData: true,
-            initialPreview: [
-                // fileServerUrl + "test.pdf",
-                // fileServerUrl + "epub/fca2229a-860a-6148-96fb-35eef8b43306/Lesson07.epub/ops/content.opf",
-                // fileServerUrl + "small.mp4"
-            ],
-            initialPreviewConfig: [
-                // {caption: "test.pdf", size: 329892, width: "120px", url: "{$url}", key: 1},
-                // {caption: "Lesson1.epub", size: 872378, width: "120px", url: "{$url}", key: 2},
-                // {caption: "small.mp4", size: 632762, width: "120px", url: "{$url}", key: 3}
-            ],
             preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
             previewFileIconSettings: { // configure your icon file extensions
                 'doc': '<i class="fas fa-file-word text-primary"></i>',
@@ -941,7 +836,7 @@ function loadFileInput() {
             },
 
         }).on('fileuploaded', function (event, previewId, index, fileId) {
-            console.log('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
+            console.error('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
             console.log(previewId.response);
             if (connection.extra.roomOwner)
                 getUploadFileList();
@@ -961,7 +856,7 @@ function LoadFile(btn) {
     }
     if (!connection.extra.roomOwner)
         return;
-    fileUploadModal($.i18n('FILE_MANAGER'), btn, function (e) { });
+    fileUploadModal($.i18n('FILE_MANAGER'), function (e) { });
 }
 
 

@@ -403,11 +403,6 @@ hr {
   width: 96%;
 }
 
-.for_teacher {
-  width: 100%;
-  height: 30%;
-}
-
 .onUserStatusChanged {
   padding: 5px 10px;
 }
@@ -479,6 +474,7 @@ hr {
 #top_student {
   content: url(/dashboard/img/student.png);
 }
+
 #top_camera {
   content: url(/dashboard/img/cam.png);
 }

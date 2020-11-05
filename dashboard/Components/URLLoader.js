@@ -1,3 +1,58 @@
+class URLLoader extends React.Component {
+    state = {
+        url: undefined
+    }
+
+    constructor(props) {
+        super(props);
+    };
+
+    render() {
+        return (<>
+            <div id="urlform" style={{ display: 'none' }}>
+                <span className="name" data-i18n="FOOTAGE" />
+                <span className="back" />
+                <input id="urlinput"
+                    onChange={this.handleChange}
+                    onKeyUp={this.keyHandler}
+                    type="text"
+                    placeholder="URL을 입력하세요">
+                </input>
+            </div>
+        </>)
+    };
+
+    handleChange = (e) => {
+        this.setState({ url: e.target.value })
+    };
+
+    keyHandler = (e) => {
+        if (window.event.keyCode == 13) {
+            this.moveRenderFuction(this.state.url);
+            e.target.value = '';
+        }
+    };
+
+    moveRenderFuction(url) {
+        const movie_type = getMovieType(url);
+
+        if (movie_type == "YOUTUBE") {
+            embedYoutubeContent(true, setURLString(url), true);
+        }
+        else if (movie_type == "ESTUDY" || movie_type == "MOVIE" || url.indexOf("mp4") !== -1) {
+            VideoEdunetContent(true, setURLString(url), true);
+        }
+        else if (movie_type == "GOOGLE_DOC_PRESENTATION") {
+            iframeGoogleDoc_Presentation(true, setURLString(url), true);
+        }
+        else {
+            iframeEdunetContent(true, url, true);
+        }
+    }
+}
+
+
+
 
 function Movie_Render_Button(btn) {
     if (!isSharingMovie && checkSharing()) {

@@ -234,12 +234,8 @@ class mobileHelperClass {
             return GetWidgetFrame().document;
         }
         function ChatSetting() {
-            let widget = widgetContainer;
             let chatinput = document.getElementsByClassName("emojionearea-inline")[0]
-            console.log(chatinput);
-            console.log(widget.firstChild);
-            console.log(widget);
-            widget.insertBefore(chatinput, widget.firstChild)
+            widgetContainer.insertBefore(chatinput, widgetContainer.firstChild)
             AppendInFrame(mobileHelper.conversationPanel);
             let div = document.createElement("div");
             div.className = "chatonoff";
@@ -248,7 +244,7 @@ class mobileHelperClass {
             img.src = "/dashboard/img/openchat.png";
             div.appendChild(img);
 
-            widget.insertBefore(div, widget.firstChild)
+            widgetContainer.insertBefore(div, widgetContainer.firstChild)
 
             div.addEventListener("click", function () {
                 this.classList.toggle("off");

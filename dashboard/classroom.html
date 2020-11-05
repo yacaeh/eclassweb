@@ -17,8 +17,6 @@
   <link href="/dashboard/fileInput/css/fileinput.css" media="all" rel="stylesheet" type="text/css"/>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" crossorigin="anonymous">
   <link href="/dashboard/fileInput/themes/explorer-fas/theme.css" media="all" rel="stylesheet" type="text/css"/>
-
-
   <script src="/dashboard/js/config.js" ></script>
 
   <!-- ================================================================================ -->
@@ -38,6 +36,7 @@
   <script src="/dashboard/js/lib/bootstrap.min.js"></script>
   <script src="/dashboard/js/lib/epub.min.js"></script>
   <script src="/dashboard/js/lib/FileSaver.min.js"></script>
+  <script src="/ViewerJS/PDFViewerPlugin.js"></script>
   
   <script src="/node_modules/fbr/FileBufferReader.js"></script>
   <script src="/node_modules/canvas-designer/dev/webrtc-handler.js"></script>
@@ -63,9 +62,7 @@
   <script src="/dashboard/js/examObj.js"></script>
   <script src="/dashboard/js/attention.js"></script>
   <script src="/dashboard/js/classroomInfo.js"></script>
-  <script src="/dashboard/js/all_controll.js"></script>
   <script src="/dashboard/js/canvas.js"></script>
-  <script src="/dashboard/js/movie_render.js"></script>
   <script src="/dashboard/js/stream-manager.js"></script>
   <script src="/dashboard/js/mobileHelper.js"></script>
   <script src="/dashboard/js/pointerSaver.js" ></script>
@@ -86,62 +83,32 @@
   <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
   <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
 
+  <!-- React -->
   <script type="text/babel" src="/dashboard/Components/LanguageSelector.js"></script>
+  <script type="text/babel" src="/dashboard/Components/PageNavigation.js"></script>
   <script type="text/babel" src="/dashboard/Components/Chatting.js"></script>
+  <script type="text/babel" src="/dashboard/Components/Header.js"></script>
+  <script type="text/babel" src="/dashboard/Components/AllControll.js"></script>
+  <script type="text/babel" src="/dashboard/Components/URLLoader.js"></script>
+  <script type="text/babel" src="/dashboard/Components/URLViewer.js"></script>
+  <script type="text/babel" src="/dashboard/Components/FileViewer.js"></script>
+  <script type="text/babel" src="/dashboard/Components/AlertBox.js"></script>
+  <script type="text/babel" src="/dashboard/Components/Authorization.js"></script>
+  <script type="text/babel" src="/dashboard/Components/Article.js"></script>
+  <script type="text/babel" src="/dashboard/Components/ScreenRecorder.js"></script>
+  <script type="text/babel" src="/dashboard/Components/Attention.js"></script>
+  <script type="text/babel" src="/dashboard/Components/Exam.js"></script>
   <script type="text/babel" src="/dashboard/js/react.js"></script>
+  <!-- React End -->
 
   <script type="text/babel" defer src="/dashboard/js/classroom.js"></script>
   <script type="text/babel" defer src="/dashboard/js/webrtc-pc.js"></script>
+  <script type="text/babel" defer src="/dashboard/js/ChannelIO.js"></script>
 </head>
 
 <body ondragstart="return false" style="height: 1080px;">
-  <div id="loading-screen">
-    <img src="/dashboard/img/loading.gif">
-  </div>
+  <div id="loading-screen"><img src="/dashboard/img/loading.gif"></div>
   <div style="width: 100%; height: 100%;" id="app"></div>
-  <a id="downloadLink" type="video/webm" style="display: none"></a>
-
-<script>
-  (function() {
-    var w = window;
-    if (w.ChannelIO) {
-      return (window.console.error || window.console.log || function(){})('ChannelIO script included twice.');
-    }
-    var d = window.document;
-    var ch = function() {
-      ch.c(arguments);
-    };
-    ch.q = [];
-    ch.c = function(args) {
-      ch.q.push(args);
-    };
-    w.ChannelIO = ch;
-    function l() {
-      if (w.ChannelIOInitialized) {
-        return;
-      }
-      w.ChannelIOInitialized = true;
-      var s = document.createElement('script');
-      s.type = 'text/javascript';
-      s.async = true;
-      s.src = 'https://cdn.channel.io/plugin/ch-plugin-web.js';
-      s.charset = 'UTF-8';
-      var x = document.getElementsByTagName('script')[0];
-      x.parentNode.insertBefore(s, x);
-    }
-    if (document.readyState === 'complete') {
-      l();
-    } else if (window.attachEvent) {
-      window.attachEvent('onload', l);
-    } else {
-      window.addEventListener('DOMContentLoaded', l, false);
-      window.addEventListener('load', l, false);
-    }
-  })();
-  ChannelIO('boot', {
-    "pluginKey": "4be5f71d-2246-4f5c-971d-2d2080f36fa2"
-  });
-</script>
 </body>
 
 

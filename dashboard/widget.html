@@ -14,17 +14,9 @@
     <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
     <script src="/dashboard/js/lib/updateLanguage_widget.js"></script>
     <script src="/dashboard/js/lib.js" ></script>
-
+    <script type="text/javascript"  src="/dashboard/js/lib/paper-full.min.js" ></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
-
-    <title>Canvas Designer | Muaz Khan</title>
-    <meta name="description" content="HTML5 Canvas Designer | Muaz Khan – A tool aimed to give you a full-fledged drawing surface and also auto generate appropriate code for you in different formats! Generator/Tool/Editor – 2D API/Context">
-
-    <meta name="author" content="Muaz Khan">
-    <link rel="author" type="text/html" href="https://plus.google.com/+MuazKhan">
     <link href="/dashboard/css/widget.css" rel="stylesheet">
 </head>
 
@@ -33,8 +25,8 @@ ondragover="handleDragDropEvent(event)"
 ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
 
     <section id="design-surface" class="design-surface">
-        <canvas id="temp-canvas" style="z-index: 1;" class="pen"></canvas>
-        <canvas id="main-canvas"></canvas>
+        <canvas id="temp-canvas" style="z-index: 3;" class="pen"></canvas>
+        <canvas id="main-canvas" style="z-index: 2;"></canvas>
         <video id="screen-viewer" controls playsinline autoplay></video>
 
     </section>
@@ -186,7 +178,7 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         }
 
         var script = document.createElement('script');
-        script.src = params.widgetJsURL || 'https://cdn.webrtc-experiment.com/Canvas-Designer/widget.min.js';
+        script.src = params.widgetJsURL;
         (document.body || document.documentElement).appendChild(script);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>

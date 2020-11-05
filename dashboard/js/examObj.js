@@ -14,18 +14,6 @@ var examObj = {
     endTime : 0
 };
 
-examObj.init = function () {
-    SettingForExam();
-    AddEvent("top_test", "click", function () {
-        if ($('#exam-board').is(':visible')) {
-            examObj.closeTesting() ? examObj.closeBoard() : alert($.i18n('QUIZ_END_WARNING'));
-        }
-        else {
-            examObj.showBoard();
-        }
-    })
-}
-
 examObj.closeBoard = function() {
     widgetContainer.removeAttribute("style")
     $('#exam-board').hide(300, function () {
@@ -390,22 +378,15 @@ examObj.receiveSelectExamAnswerFromStudent = function (selectAnswer) {
 };
 
 examObj.receiveSubmit = function (submit) {
-    // 학생 정답 확인.
     if (connection.extra.roomOwner) {
-        // examObj.updateStudentAnswers(submit);  // 최신 기록 저장,     
         examObj.updateSubmitStudent(submit);
         examObj.updateExamAnswerStatistics();
         examObj.submitCount += 1;
-
-        // sendResult        
         examObj.sendResultToStudent(submit.userid);
     }
 };
 
 examObj.receiveSubmitResult = function (_examResult) {
-    // 시험 정답 제출 후, callback
-    //  console.log(_examResult);
-
     if (connection.userid == _examResult.userid) {
         const len = _examResult.examAnswers.length;
         for (let i = 0; i < len; ++i) {
@@ -684,53 +665,6 @@ function showExamStateForm(quesCount, endTime) {
             finishExam();
     }, 1000);
 }
-
-function SettingForExam() {
-    AddEvent("exam-setting-apply", "click", function () {
-        m_QuesCount = $('#exam-question-count').val();
-        if (m_QuesCount > 200) {
-            alert($.i18n('QUIZ_MAX_ERROR'));
-            m_QuesCount = 200;
-            $('#exam-question-count').val(m_QuesCount);
-        }
-        var answerList = getQuestionAnswerList();
-        $('#exam-question-list').html('');
-        for (var i = 1; i <= m_QuesCount; i++) {
-            apeendQuestion(i);
-        }
-
-        setQuestionAnswer(answerList);
-    })
-
-    AddEvent("exam-start", "click", function () {
-        if (m_QuesCount <= 0) {
-            alert($.i18n('QUIZ_FILL_ERROR'));
-            return;
-        }
-
-        if (!examObj.checkAnswerChecked(m_QuesCount)) {
-            alert($.i18n('QUIZ_ANSWER_ERROR'));
-            return;
-        }
-
-        const examTime = document.getElementById("exam-time").value;
-
-        if (examTime <= 0 || isNaN(examTime)) {
-            alert($.i18n('QUIZ_TIME_ERROR'));
-            return;
-        }
-
-        m_ExamTime = document.getElementById("exam-time").value;
-        let endTime = (new Date().getTime() + (m_ExamTime * 60 * 1000)) / 1000;
-        var answerList = getQuestionAnswerList();
-        examObj.examAnswer = answerList;
-        examObj.sendExamStart(m_QuesCount, endTime);
-
-        $('#exam-setting-bar').hide();
-        showExamStateForm(m_QuesCount, endTime);
-    })
-}
-
 
 function getFormatmmss(sec) {
     let min = ("00" + Math.floor(sec / 60)).slice(-2);

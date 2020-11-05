@@ -3233,6 +3233,7 @@
             jqXHR = jqXHR || {};
             responseData = responseData || {};
             filesData = filesData || self.fileManager.list();
+
             return {
                 formdata: formdata,
                 files: filesData,
@@ -3345,6 +3346,7 @@
             if (typeof vUrl === 'function') {
                 vUrl = vUrl();
             }
+            console.log(vUrl);
             data = self._getExtraData(fileId, index) || {};
             if (typeof data === 'object') {
                 $.each(data, function (key, value) {
@@ -3364,10 +3366,12 @@
                 processData: false,
                 contentType: false
             };
+
             settings = $.extend(true, {}, defaults, self._ajaxSettings);
             ajaxTask = self.taskManager.addTask(fileId + '-' + index, function () {
                 var self = this.self, config, xhr;
                 config = self.ajaxQueue.shift();
+                console.log(config);
                 xhr = $.ajax(config);
                 self.ajaxRequests.push(xhr);
             });
@@ -3485,13 +3489,16 @@
                 }
             }
         },
-        _uploadSingle: function (i, id, isBatch) {
+        _uploadSingle: async function (i, id, isBatch) {
+            console.log('upload start',i,id,isBatch);
+
             var self = this, fm = self.fileManager, count = fm.count(), formdata = new FormData(), outData,
                 previewId = self._getThumbId(id), $thumb, chkComplete, $btnUpload, $btnDelete,
                 hasPostData = count > 0 || !$.isEmptyObject(self.uploadExtraData), uploadFailed, $prog, fnBefore,
                 errMsg, fnSuccess, fnComplete, fnError, updateUploadLog, op = self.ajaxOperations.uploadThumb,
                 fileObj = fm.getFile(id), params = {id: previewId, index: i, fileId: id},
                 fileName = self.fileManager.getFileName(id, true);
+                
             if (self.enableResumableUpload) { // not enabled for resumable uploads
                 return;
             }
@@ -3579,6 +3586,7 @@
                 }
             };
             fnSuccess = function (data, textStatus, jqXHR) {
+                console.log('suc')
                 var pid = self.showPreview && $thumb.attr('id') ? $thumb.attr('id') : previewId;
                 outData = self._getOutData(formdata, jqXHR, data);
                 $.extend(true, params, outData);
@@ -3613,6 +3621,8 @@
                 }, self.processDelay);
             };
             fnComplete = function () {
+                console.log('comp')
+
                 if (self.showPreview) {
                     $btnUpload.removeAttr('disabled');
                     $btnDelete.removeAttr('disabled');
@@ -3646,9 +3656,36 @@
                     self._showFileError(errMsg, params);
                 }, self.processDelay);
             };
-            formdata.append(self.uploadFileAttr, fileObj.file, fileName);
-            self._setUploadData(formdata, {fileId: id});
-            self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i);
+
+            let url = '';
+
+            let uplodedata = {fileId : id};
+            if(fileObj.file.type == 'application/pdf'){
+                let pdf = new PDFViewerPlugin();
+                let pages = await pdf.convertpages(URL.createObjectURL(fileObj.file));
+                console.log(pages);
+                console.log(pages[0][0]);
+
+                formdata.append('extraPath', '');
+                formdata.append('fileName', fileName);
+                formdata.append('page', pages[0][0]);
+
+
+                pages[0].forEach(element => {
+                    formdata.append('pages[]', element);
+                });
+
+                pages[1].forEach(element => {
+                    formdata.append('thumbnails[]', element);
+                });
+            url = fileServerUrl + '/pdf'
+            }else{
+                formdata.append(self.uploadFileAttr, fileObj.file, fileName);
+            }
+            let asd = '';
+            asd.replace()
+            self._setUploadData(formdata, uplodedata);
+            self._ajaxSubmit(fnBefore, fnSuccess, fnComplete, fnError, formdata, id, i, url);
         },
         _uploadBatch: function () {
             var self = this, fm = self.fileManager, total = fm.total(), params = {}, fnBefore, fnSuccess, fnError,
@@ -3896,6 +3933,7 @@
                     });
                 });
             });
+
             self.getFrames(' .kv-file-upload').each(function () {
                 var $el = $(this);
                 self._handler($el, 'click', function () {

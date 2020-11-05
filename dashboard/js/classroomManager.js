@@ -17,16 +17,6 @@ class classroomManagerClass {
             }
         });
 
-        AddEvent("top_save_alert", "click", attentionManager.exportAttention);
-        AddEvent("top_record_video", "click", (self) => {
-            if (!self.classList.contains("on")) {
-                screenRecorder._startCapturing();
-            }
-            else {
-                screenRecorder._stopCapturing();
-                self.classList.remove("on");
-            }
-        })
 
         AddEvent("student_list_button", "click", (self) => {
             let on = self.classList.contains("on");
@@ -121,7 +111,6 @@ class classroomManagerClass {
         $("#my-name").remove();
         $(".feature").show();
         $(".controll").show();
-        $(".for_teacher").show();
         $(frame.document.getElementById("callteacher")).remove();
         $(frame.document.getElementById("homework")).remove();
     };
@@ -132,7 +121,6 @@ class classroomManagerClass {
         $("#showcam").remove();
         $(".controll").remove();
         $("#showcanvas").remove();
-        $(".for_teacher").remove();
         $("#student_list").remove();
 
         let frame = GetWidgetFrame();

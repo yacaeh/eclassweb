@@ -787,7 +787,7 @@ input:focus {
     left: 52px !important;
     width: calc(100% - 52px);
     height: 100%;
-    z-index: 99998;
+    z-index: 1;
     display: none;
   }
 

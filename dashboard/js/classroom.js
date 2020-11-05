@@ -12,6 +12,15 @@
   window.params = params;
 })();
 
+
+ReactDOM.render(
+  <App connection={connection}/>,
+  document.getElementById('app')
+)
+
+
+var connection          = new RTCMultiConnection();
+
 //=============================================================================================
 
 var debug = false;
@@ -24,7 +33,6 @@ let isFileViewer = false;
 const widgetContainer = document.getElementById("widget-container");
 const rightTab = document.getElementById("right-tab")
 
-var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
 var newscreenshareManager  = new NewScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
@@ -35,6 +43,9 @@ var pointer_saver       = new PointerSaver();
 var classroomManager    = new classroomManagerClass();
 var permissionManager   = new permissionManagerClass();
 var attentionManager    = new attentionManagerClass();
+
+
+
 
 //=============================================================================================
 
@@ -109,7 +120,6 @@ if(!window.params.userFullName){
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
-  examObj.init();
   pageNavigator.init();
   canvasManager.init();
   permissionManager.init();
@@ -243,7 +253,6 @@ connection.onmessage = function (event) {
     OnMovieRender(moveURL.enable, moveURL.type, moveURL.url);
     return;
   }
-
 
   if (event.data.closeTesting) {
     if (!connection.extra.roomOwner) {
