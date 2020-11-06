@@ -29,7 +29,7 @@ const VideoResolutions = {
     qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
   };
 
-let resolutionOption = connection.extra.roomOwner ? 'hd' : 'thumb';
+let resolutionOption = connection.extra.roomOwner ? 'qvga' : 'thumb';
 
 let options = {
   resolution: resolutionOption,
@@ -50,6 +50,7 @@ async function webRTCPCInit() {
     console.log('classroomInfo.shareScreen.id ', classroomInfo.shareScreen.id);
 
     pc.ontrack = function ({ track, streams }) {
+      console.log("on track called!");
       console.log('New track added!', streams);
       streams.forEach((stream) => {
         streamlist[stream.id] = stream;
@@ -265,7 +266,16 @@ async function webRTCPCInit() {
 
         join();
       })
-      .catch(log);
+      .catch((err)=>{
+        pc.addTransceiver('video', {
+          direction: 'recvonly',
+        });
+        pc.addTransceiver('audio', {
+          direction: 'recvonly',
+        });
+
+        join();
+        });
   } catch (err) {
     console.log(err);
   }
