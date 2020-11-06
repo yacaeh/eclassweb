@@ -24,7 +24,8 @@ gothicFont.load().then((font) => {
     var context = getContext('main-canvas'),
         tempContext = getContext('temp-canvas');
 
-    paper.setup(document.getElementById("main-canvas"));
+    paper.setup(find("main-canvas"));
+
     var group = new paper.Group();
 
     var _uid = window.parent.connection.userid;
@@ -35,6 +36,10 @@ gothicFont.load().then((font) => {
     var pointHistory = [];
     var orderHistory = [];
     var markerpoint = [];
+
+    var pencilContainer = find('pencil-container');
+    var markerContainer = find('marker-container');
+    var tempCanvas = find("temp-canvas");
 
     var points = [],
         lineWidth = 2,
@@ -62,18 +67,17 @@ gothicFont.load().then((font) => {
             cache['is' + shape] = true;
         }
     };
+    let undoicon = find('undo');
 
     function orderHistoryChecker(){
         if(orderHistory.length > 50)
             orderHistory.splice(0,1);
-            let icons = document.getElementById('undo');
         if(orderHistory.length == 0){
-            changeColor(icons, 0.3);
+            changeColor(undoicon, 0.3);
         }
         else if(orderHistory.length == 1){
-            returnColor(icons);
+            returnColor(undoicon);
         }
-
     }
 
 
@@ -97,7 +101,11 @@ gothicFont.load().then((font) => {
     }
 
     function find(selector) {
-        return document.getElementById(selector);
+        let ret = document.getElementById(selector) || window.parent.document.getElementById(selector);;
+        if(!ret)
+            console.log(selector);
+
+        return ret;
     }
 
     function getContext(id) {
@@ -339,14 +347,13 @@ gothicFont.load().then((font) => {
             let opt = pencilDrawHelper.getOptions();
             pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, true);
             points[points.length] = ['line', [t.prevX, t.prevY], opt];
-            document.getElementById("pencil-container").style.display = 'none';
+            pencilContainer.style.display = 'none';
         },
         mouseup: function () {
             points[points.length] = ['line', [-1, -1]];
             pointHistory.push(points.length);
             orderHistory.push('undo');
             orderHistoryChecker();
-
             this.ismousedown = false;
         },
         mousemove: function (e) {
@@ -370,7 +377,7 @@ gothicFont.load().then((font) => {
         }
     }
 
-    var pencilLineWidth = document.getElementById('pencil-stroke-style').value,
+    var pencilLineWidth = find('pencil-stroke-style').value,
         pencilStrokeStyle = '#484848';
 
     var pencilDrawHelper = clone(drawHelper);
@@ -401,7 +408,7 @@ gothicFont.load().then((font) => {
             let opt = markerDrawHelper.getOptions();
             points[points.length] = ['marker', [t.prevX, t.prevY], opt];
 
-            document.getElementById("marker-container").style.display = 'none';
+            markerContainer.style.display = 'none';
         },
         mouseup: function (e) {
             points[points.length] = ['marker', [-1, -1]];
@@ -433,7 +440,7 @@ gothicFont.load().then((font) => {
         }
     }
 
-    var markerLineWidth = document.getElementById('marker-stroke-style').value,
+    var markerLineWidth = find('marker-stroke-style').value,
         markerStrokeStyle = '#F12A2A';
 
     var markerDrawHelper = clone(drawHelper);
@@ -548,7 +555,7 @@ gothicFont.load().then((font) => {
         selectedFontSize: '48',
         lastFillStyle: 'black',
         onShapeSelected: function () {
-            document.getElementById("temp-canvas").className = "texti";
+            tempCanvas.className = "texti";
             this.x = this.y = this.pageX = this.pageY = 0;
             this.text = '';
         },
@@ -679,9 +686,9 @@ gothicFont.load().then((font) => {
             document.getElementsByClassName("textInputUI")[0].focus();
 
         },
-        //textStrokeStyle : '#' + document.getElementById('text-fill-style').value,
+        //textStrokeStyle : '#' + find('text-fill-style').value,
         eachFontColor: function (callback) {
-            var container = document.getElementById('textInputContainer');
+            var container = find('textInputContainer');
             var template = container.getElementsByClassName("color_template_text")[0];
             var divs = [];
             template.innerHTML = '';
@@ -741,8 +748,8 @@ gothicFont.load().then((font) => {
         textInputBox: document.querySelector('.textInputUI'),
         fontFamilyBox: document.querySelector('.fontSelectUl'),
         fontSizeBox: document.querySelector('.fontSizeUl'),
-        fontColorBox: document.getElementById('textInputContainer').querySelector('.color_template_text'),
-        textInputContainer: document.getElementById('textInputContainer')
+        fontColorBox: find('textInputContainer').querySelector('.color_template_text'),
+        textInputContainer: find('textInputContainer')
     };
 
     var icons = JSON.parse(params.icons);
@@ -817,14 +824,11 @@ gothicFont.load().then((font) => {
     is.set(window.selectedIcon);
 
     window.addEventListener('load', function () {
-        setSelection(document.getElementById('pencilIcon'), window.selectedIcon);
+        setSelection(find('pencilIcon'), window.selectedIcon);
     }, false);
 
     (function () {
         var cache = {};
-        
-        
-
 
         decorateUndo();
         decorateFull();
@@ -841,21 +845,6 @@ gothicFont.load().then((font) => {
         decorateScreenShare();            
         decoratEpub();            
         decorateonoff();
-
-        document.getElementById('onoff-icon').style.display = 'block';
-        document.getElementById('epub').style.display = 'block';
-        document.getElementById('screen_share').style.display = 'block';
-        document.getElementById('clearCanvas').style.display = 'block';
-        document.getElementById('textIcon').style.display = 'block';
-        document.getElementById('eraserIcon').style.display = 'block';
-        document.getElementById('markerIcon').style.display = 'block';
-        document.getElementById('pencilIcon').style.display = 'block';
-        document.getElementById('undo').style.display = 'block';
-        document.getElementById('movie').style.display = 'block';
-        document.getElementById('callteacher').style.display = 'block';
-        document.getElementById('file').style.display = 'block';
-        document.getElementById('3d_view').style.display = 'block';
-        document.getElementById('homework').style.display = 'block';
 
         function getContext(id) {
             var context = find(id).getContext('2d');
@@ -878,8 +867,8 @@ gothicFont.load().then((font) => {
 
                 if (this.id === 'eraserIcon') {
                     if (this.classList.contains('off')) return false;
-                    document.getElementById("temp-canvas").className = "";
-                    document.getElementById("temp-canvas").classList.add("eraser");
+                    tempCanvas.className = "";
+                    tempCanvas.classList.add("eraser");
                     cache.strokeStyle = strokeStyle;
                     cache.fillStyle = fillStyle;
                     cache.lineWidth = lineWidth;
@@ -901,9 +890,8 @@ gothicFont.load().then((font) => {
             var image = new Image();
             image.onload = function () {
                 context.drawImage(image, 0, 0, 28, 28);
-                changeColor(document.getElementById('undo'), 0.3);
-
-                document.getElementById('undo').onclick = function () {
+                changeColor(find('undo'), 0.3);
+                find('undo').onclick = function () {
                     undo();
                 };
             };
@@ -926,10 +914,10 @@ gothicFont.load().then((font) => {
             };
             image.src = data_uris.view3d;
 
-            document.getElementById('3d_view').onclick = function () {
-                this.classList.toggle("on");
-                this.classList.toggle("selected-shape");
-            }
+            // find('3d_view').onclick = function () {
+            //     this.classList.toggle("on");
+            //     this.classList.toggle("selected-shape");
+            // }
         }
 
         function decorateHomework() {
@@ -947,10 +935,10 @@ gothicFont.load().then((font) => {
             };
             image.src = data_uris.movie;
 
-            document.getElementById('movie').onclick = function () {
-                this.classList.toggle("on");
-                this.classList.toggle("selected-shape");
-            }
+            // find('movie').onclick = function () {
+            //     this.classList.toggle("on");
+            //     this.classList.toggle("selected-shape");
+            // }
         }
 
         function decoratecallteacher() {
@@ -984,20 +972,15 @@ gothicFont.load().then((font) => {
 
             var pencilContainer = find('pencil-container'),
                 strokeStyleText = find('pencil-stroke-style'),
-                fillStyleText = find('pencil-fill-style'),
                 btnPencilDone = find('pencil-done'),
-                canvas = context.canvas,
-                alpha = 0.2;
+                canvas = context.canvas;
 
             pencilStrokeStyle = hexToRGBA("#484848")
 
-
             addEvent(canvas, 'click', function () {
                 hideContainers();
-
                 if (this.classList.contains('off')) return false;
-                document.getElementById("temp-canvas").className = "pen";
-
+                tempCanvas.className = "pen";
                 pencilContainer.style.display = 'block';
                 pencilContainer.style.top = (canvas.offsetTop) + 'px';
                 pencilContainer.style.left = (canvas.offsetLeft + canvas.clientWidth) - 2 + 'px';
@@ -1006,7 +989,6 @@ gothicFont.load().then((font) => {
             addEvent(btnPencilDone, 'click', () => {
                 pencilContainer.style.display = 'none';
                 pencilLineWidth = strokeStyleText.value;
-                pencilStrokeStyle = hexToRGBA(fillStyleText.value);
             });
         }
 
@@ -1024,9 +1006,7 @@ gothicFont.load().then((font) => {
             };
             image.src = data_uris.markerIcon;
 
-            var markerContainer = find('marker-container'),
-                strokeStyleText = find('marker-stroke-style'),
-                fillStyleText = find('marker-fill-style'),
+            var strokeStyleText = find('marker-stroke-style'),
                 btnMarkerDone = find('marker-done'),
                 canvas = context.canvas,
                 alpha = 0.2;
@@ -1037,7 +1017,7 @@ gothicFont.load().then((font) => {
                 if (this.classList.contains('off'))
                     return false;
                 hideContainers();
-                document.getElementById("temp-canvas").className = "marker";
+                tempCanvas.className = "marker";
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
             });
@@ -1045,7 +1025,6 @@ gothicFont.load().then((font) => {
             addEvent(btnMarkerDone, 'click', () => {
                 markerContainer.style.display = 'none';
                 markerLineWidth = strokeStyleText.value;
-                markerStrokeStyle = hexToRGBA(fillStyleText.value, alpha);
             });
 
 
@@ -1053,20 +1032,16 @@ gothicFont.load().then((font) => {
 
         function decorateEraser() {
             var context = getContext('eraserIcon');
-
             var image = new Image();
             image.onload = () => {
                 context.drawImage(image, 0, 0, 28, 28);
                 bindEvent(context, 'Eraser');
-
-                
             };
             image.src = data_uris.eraserIcon;
         }
 
         function decorateText() {
             var context = getContext('textIcon');
-
             var image = new Image();
             image.onload = () => {
                 context.drawImage(image, 0, 0, 28, 28);
@@ -1084,7 +1059,7 @@ gothicFont.load().then((font) => {
             };
             image.src = data_uris.clearCanvas;
 
-            document.getElementById('clearCanvas').onclick = function () {
+            find('clearCanvas').onclick = function () {
                 if (this.classList.contains('off') || points.length < 1)
                     return false;
 
@@ -1115,11 +1090,6 @@ gothicFont.load().then((font) => {
                 getContext('epub').drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.epub;
-
-            document.getElementById('epub').onclick = function () {
-                this.classList.toggle("on");
-                this.classList.toggle("selected-shape");
-            }
         }
 
         function decorateonoff() {
@@ -1131,14 +1101,13 @@ gothicFont.load().then((font) => {
             };
             image.src = data_uris.on;
 
-            document.getElementById('onoff-icon').onclick = function () {
+            find('onoff-icon').onclick = function () {
                 this.classList.toggle("on");
                 let isOn = this.classList.contains("on");
 
-
                 if (isOn) {
                     image.src = data_uris.on;
-                    let icons = document.getElementById('tool-box').children;
+                    let icons = find('tool-box').children;
                     for (let i = 0; i < icons.length; i++) {
                         if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
                             continue;
@@ -1149,12 +1118,12 @@ gothicFont.load().then((font) => {
                         icons[i].classList.remove("off");
                         icons[i].classList.add("on");
                     }
-                    document.getElementById("main-canvas").style.display = 'block';
-                    document.getElementById("temp-canvas").style.display = 'block';
+                    find("main-canvas").style.display = 'block';
+                    tempCanvas.style.display = 'block';
                 }
                 else {
                     image.src = data_uris.off;
-                    let icons = document.getElementById('tool-box').children;
+                    let icons = find('tool-box').children;
                     for (let i = 0; i < icons.length; i++) {
 
                         if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
@@ -1170,10 +1139,10 @@ gothicFont.load().then((font) => {
                         }
                     }
 
-                    document.getElementById("main-canvas").style.display = 'none';
-                    document.getElementById("temp-canvas").style.display = 'none';
-                    document.getElementById("pencil-container").style.display = 'none';
-                    document.getElementById("marker-container").style.display = 'none';
+                    find("main-canvas").style.display = 'none';
+                    tempCanvas.style.display = 'none';
+                    pencilContainer.style.display = 'none';
+                    find("marker-container").style.display = 'none';
                 }
 
             };
@@ -1181,10 +1150,8 @@ gothicFont.load().then((font) => {
     })();
 
     function hideContainers() {
-        let markerContainer = find('marker-container'),
-            pencilContainer = find('pencil-container');
-            markerContainer.style.display =
-            pencilContainer.style.display = 'none';
+        markerContainer.style.display =
+        pencilContainer.style.display = 'none';
     }
 
     function TouchConverter(e) {
@@ -1452,8 +1419,8 @@ gothicFont.load().then((font) => {
     let c = document.getElementsByClassName("i");
     for (let i = 0; i < c.length; i++) {
         c[i].addEventListener("click", function () {
-            document.getElementById("marker-container").style.display = 'none';
-            document.getElementById("pencil-container").style.display = 'none';
+            find("marker-container").style.display = 'none';
+            pencilContainer.style.display = 'none';
         })
     }
 
@@ -1473,7 +1440,7 @@ gothicFont.load().then((font) => {
     ColorSetting('marker-container', penColors);
 
     function ColorSetting(_container, colors) {
-        let container = document.getElementById(_container);
+        let container = find(_container);
         let template = container.getElementsByClassName("color_template")[0];
         let divs = [];
 
@@ -1544,8 +1511,8 @@ gothicFont.load().then((font) => {
 
 
 function MakeTitlePop(element, contents) {
-    let ele = document.getElementById(element);
-    let pop = document.getElementById("titlebox");
+    let ele = find(element);
+    let pop = find("titlebox");
 
     if (!ele)
         return;

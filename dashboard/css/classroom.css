@@ -55,6 +55,7 @@
   border:2px solid #F0F0F0;
 }
 
+
 /* cyrillic-ext */
 @font-face {
   font-family: 'Roboto';
@@ -170,6 +171,84 @@ button[disabled] {
   box-shadow: none !important;
   text-decoration: none !important;
   outline: none !important;
+}
+
+
+/* toolbox */
+
+.tool-box::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background-color:transparent;
+}
+
+.tool-box::-webkit-scrollbar-button {
+  height: 0;
+  width: 0
+}
+
+.tool-box::-webkit-scrollbar-thumb {
+  background-color:transparent;
+  border: 0;
+}
+
+
+.tool-box::-webkit-scrollbar-track {
+  background-color:transparent;
+  box-shadow: none;
+}
+
+.tool-box canvas {
+  border-radius: 2px;
+  margin-top: 15px;
+  margin-left: 11px;
+  display: none;
+}
+
+
+.tooldivide{
+  width: 40px;
+  height: 20px;
+  border-bottom: solid 2px gray;
+  left: 6px;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.tool-box canvas:first-child,
+.tool-box canvas:first-child:hover {
+  margin-top: 0;
+  border-top: 0;
+}
+.tool-box canvas:hover {
+  box-shadow: none;
+  border-radius: 3px;
+  background: rgb(204,204,204);
+}
+.selected-shape {
+  content: url(/dashboard/img/click_box.png);
+  background: #dde1e3!important;
+}
+.tool-box {
+  z-index: 10001;
+  padding-top: 10px;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  position: absolute;
+  top: 0;
+  width: 50px;
+  background-color: #FBFBFB;
+  overflow: hidden;
+  height: calc(100% - 10px);
+  overflow: hidden;
+  overflow-y: auto;
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tool-box canvas {
+  border-radius: 2px;
+  margin-top: 15px;
+  margin-left: 11px;
+  display: none;
 }
 
 .extra-controls {
