@@ -41,9 +41,8 @@ class canvasManagerClass {
         })
     };
     setCanvasButtons(data) {
-        let frame = GetWidgetFrame();
         Object.keys(data).forEach(function (e) {
-            let btn = frame.document.getElementById(e);
+            let btn = document.getElementById(e);
             if (btn)
                 btn.addEventListener("click", function () {
                     data[e](btn);
@@ -186,16 +185,16 @@ function removeOnSelect(btn) {
 
     alertBox($.i18n('ASK_CLOSE_CURRENT'), $.i18n('NOTIFICATION'), function () {
         if (classroomInfo.share3D.state) {
-            GetWidgetFrame().document.getElementById("3d_view").click();
+            document.getElementById("3d_view").click();
             classroomInfo.share3D.state = false;
         }
 
         if (classroomInfo.shareScreen.state) {
-            GetWidgetFrame().document.getElementById("screen_share").click();
+            document.getElementById("screen_share").click();
         }
 
         if (isSharingMovie) {
-            GetWidgetFrame().document.getElementById("movie").click();
+            document.getElementById("movie").click();
             isSharingMovie = false;
         }
 
@@ -205,7 +204,7 @@ function removeOnSelect(btn) {
         }
 
         if (isSharingEpub) {
-            GetWidgetFrame().document.getElementById("epub").click();
+            document.getElementById("epub").click();
             isSharingEpub = false;
         }
 

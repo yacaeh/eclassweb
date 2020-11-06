@@ -58,7 +58,6 @@ class epubManagerClass {
 
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
-        frame.document.getElementById('tool-box').style.zIndex = '3';
 
         var book = ePub('https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf');
         window.book = book;
@@ -146,7 +145,6 @@ class epubManagerClass {
 
         frame.document.getElementById('main-canvas').style.zIndex = '1';
         frame.document.getElementById('temp-canvas').style.zIndex = '2';
-        frame.document.getElementById('tool-box').style.zIndex = '3';
         frame.document.getElementById('epub-viewer').remove();
         frame.document.getElementById('loading-window').remove();
     }
