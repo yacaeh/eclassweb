@@ -614,6 +614,11 @@ hr {
 #header {
   height: 50px;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  z-index: 5;
+  background: white;
+  position: absolute;
+  right: 0;
+  left: 0;
 }
 
 #top_attach-file {

@@ -117,7 +117,6 @@ if(!window.params.userFullName){
   }
 }
 
-
 document.getElementById('onoff-icon').style.display   = 'block';
 document.getElementById('epub').style.display         = 'block';
 document.getElementById('screen_share').style.display = 'block';
