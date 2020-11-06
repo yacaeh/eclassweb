@@ -462,7 +462,7 @@ class maincamManagerClass {
   start(callback) {
     var inter = setInterval(function () {
       if (maincamManager.get().readyState == 4) {
-        maincamManager.get().muted = false;
+        connection.extra.roomOwner ? maincamManager.get().muted = true : maincamManager.get().muted = false;
         maincamManager.get().play();
         clearInterval(inter);
         if (callback)
