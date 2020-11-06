@@ -102,7 +102,6 @@ gothicFont.load().then((font) => {
 
     function find(selector) {
         let ret = document.getElementById(selector) || window.parent.document.getElementById(selector);;
-        console.error(ret);
         if(!ret)
             console.log(selector);
 
