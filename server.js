@@ -65,14 +65,14 @@ function serverHandler(request, response) {
             filename = (filename || '').toString();
 
             if (request.method == "POST") {
-                let ret = undefined;
-                request.on('data', function (e) {
-                    session.sessioncheck(request, response);
-                    let data = JSON.parse('' + e);
-                    
+                try{
+
+                    let ret = undefined;
+                    request.on('data', function (e) {
+                        session.sessioncheck(request, response);
+                        let data = JSON.parse('' + e);
                     session.api(request, data).then((_ret) => {
                         if(!_ret) return;
-
                         ret = _ret;
                         response.write(JSON.stringify(ret));
                         response.end();
@@ -89,6 +89,10 @@ function serverHandler(request, response) {
 
                 })
                 return;
+                }
+                catch(e){
+                    console.error(e);
+                }
             }
 
             if(request.method == 'GET'){

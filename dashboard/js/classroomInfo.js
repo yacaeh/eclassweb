@@ -24,6 +24,7 @@ classroomCommand = {
 
         if (classroomInfo.viewer.state) {
             classroomCommand.syncViewer();
+            pageNavigator.allControl(classroomInfo.allControl);
             onBtn("file");
         }
 
@@ -79,6 +80,7 @@ classroomCommand = {
 
     onSynchronizationClassRoom: function (_roomInfo) {
         classroomInfo = _roomInfo;
+    
         this.updateSyncRoom();
     },
 };
