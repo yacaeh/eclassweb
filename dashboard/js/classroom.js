@@ -166,6 +166,9 @@ designer.appendTo(widgetContainer, () => {
   onWidgetLoaded();
 });
 
+
+
+
 connection.onmessage = function (event) {
   if (debug)
     console.log(event);

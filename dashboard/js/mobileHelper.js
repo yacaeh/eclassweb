@@ -23,13 +23,12 @@ class mobileHelperClass {
         MainCamSetting();
 
         function ToolSetting() {
-            let doc = GetDoc();
-            let toolbox = doc.getElementById("tool-box");
-            toolbox.removeChild(doc.getElementsByClassName("tooldivide")[0])
-            toolbox.removeChild(doc.getElementById("screen_share"))
-            toolbox.removeChild(doc.getElementById("textIcon"))
-            toolbox.removeChild(doc.getElementById("clearCanvas"))
-            toolbox.removeChild(doc.getElementById("undo"))
+            let toolbox = document.getElementById("tool-box");
+            toolbox.removeChild(document.getElementsByClassName("tooldivide")[0])
+            toolbox.removeChild(document.getElementById("screen_share"))
+            toolbox.removeChild(document.getElementById("textIcon"))
+            toolbox.removeChild(document.getElementById("clearCanvas"))
+            toolbox.removeChild(document.getElementById("undo"))
         }
 
         function MainCamSetting() {
@@ -150,8 +149,7 @@ class mobileHelperClass {
         }
 
         function FullScreenBtnInit() {
-            let doc = GetDoc();
-            let btn = doc.getElementById("full");
+            let btn = document.getElementById("full");
             btn.classList.add("fullscreen");
             btn.classList.add("off");
             btn.style.display = 'block';

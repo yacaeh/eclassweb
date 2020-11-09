@@ -68,7 +68,7 @@ function updateLanguage(){
 				topButtonContents.student_mic           = $.i18n('STUDENT_MIC');
 
 				GetWidgetFrame().updateLanguage();
-				GetWidgetFrame().$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));	
+				$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));	
 			}
 			catch{
 			}

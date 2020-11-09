@@ -205,6 +205,115 @@ button[disabled] {
   display: none;
 }
 
+#marker-selected-color,
+#marker-selected-color-2, 
+#pencil-selected-color,
+#pencil-selected-color-2,
+#text-selected-color {
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    left: 5px;
+    top: 30px;
+    height: 20px;
+    position: absolute;
+}
+
+
+.slider_btn{
+  width: 10%;
+  left: -5px;
+  top: -3px;
+  position: absolute;
+  content: url(/dashboard/img/circle.png);
+}
+
+.slider_btn:hover{
+  width: 13%;
+  top: -5px;
+}
+
+.slider-back{
+  height: 100%;
+  background-color: rgb(24,219,190);
+  position: absolute;
+}
+
+.slider-front{
+  height: 5px;
+  top: 12px;
+  width: 115px;
+  position: absolute;
+  background-color: #A6A6A6;
+  left: 13px;
+}
+.svalue{
+  position: absolute;
+  left: 177px;
+}
+
+.color_template{
+  position: absolute;
+  top: 30px;
+  left: 8px;
+  width: 150px;
+  height: 16px;
+  display: grid;
+  grid-template-columns: repeat(7, 16px);
+  grid-column-gap: 9px;
+}
+
+
+.color{
+  background-color: aqua;
+  /* outline: solid 2px black; */
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.4);
+  box-shadow: 0 0 0pt 1.5pt #c4c4c4;
+  cursor: pointer;
+}
+
+.color_template > .on {
+  box-shadow: 0 0 0pt 1.5pt #FFFFFF, 0px 5px 10px rgba(0, 0, 0, 0.3);
+}
+.colors-container input {
+  width: 25px;
+  padding: 2px 5px;
+  text-align: center;
+}
+/* colors */
+
+.colors-container label {
+  width: 100px;
+  display: inline-block;
+}
+.colors-container input {
+  width: 35px;
+  left: 134px;
+  height: 18px;
+  top: 1px;
+  font-size: 15px;
+  text-align: center;
+  font-family: Roboto;
+  font-weight: normal;
+  line-height: 18px;
+  color: #707070;
+}
+.colors-container .input-div {
+  margin-bottom: 5px;
+}
+
+.context-popup {
+  position: absolute;
+  width: 185px;
+  height: 53px;
+  left: 58px!important;
+  background-color: #FFFFFF;
+  border-radius: 3px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: none;
+}
 
 .tooldivide{
   width: 40px;
@@ -238,7 +347,7 @@ button[disabled] {
   width: 50px;
   background-color: #FBFBFB;
   overflow: hidden;
-  height: calc(100% - 10px);
+  height: 100%;
   overflow: hidden;
   overflow-y: auto;
   outline: 1px solid rgba(0, 0, 0, 0.1);
@@ -440,10 +549,52 @@ hr {
   right: 17.7%;
   height: calc(100% - 50px);
   border: 0px solid black;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 0px solid rgba(0, 0, 0, 0.1);
   border-bottom: 0px;
   overscroll-behavior: none;
   z-index: 2;
+}
+
+
+.fontSelectUl,
+.fontSizeUl {
+    list-style: none;
+    width: 200px;
+    background: #f9f9f9;
+    position: absolute;
+    left: 0;
+    top: 35px;
+    padding: 0;
+}
+.fontSelectUl {
+    padding-left: 5px;
+}
+.fontSelectUl li,
+.fontSizeUl li {
+    height: 24px;
+    line-height: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 14px;
+    border-left: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+}
+.fontSelectUl li:last-child,
+.fontSizeUl li:last-child {
+    -webkit-border-radius: 0 0 4px 4px;
+    -moz-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+    border-bottom: 1px solid #EEEEEE;
+}
+.fontSelectUl li:hover,
+.fontSizeUl li:hover {
+    background: #DDD;
+}
+.fontSelectUl li.font-family-selected,
+.fontSizeUl li.font-size-selected {
+    background: rgb(6, 205, 255)!important;
+    color: white!important;
 }
 
 
@@ -628,8 +779,14 @@ hr {
 }
 
 #header {
+  top: 0px;
   height: 50px;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  z-index: 5;
+  background: white;
+  position: absolute;
+  right: 0;
+  left: 0;
 }
 
 #top_attach-file {
@@ -1816,7 +1973,12 @@ body:fullscreen {
   bottom: 5px;
   left: auto;
 }
-
+.textInputUI,
+.fontSelectUl,
+.fontColorUI,
+.fontSizeUl{
+    z-index: 10000000;
+}
 
 .chatonoff{
   width: 30px;
@@ -1857,4 +2019,17 @@ body:fullscreen {
 .language {
   position: absolute;
   right: 0px;
+}
+
+
+.color_template_text{
+  position: absolute;
+  top: 30px;
+  left: 8px;
+  width: 150px;
+  height: 16px;
+  display: grid;
+  grid-template-columns: repeat(7, 16px);
+  grid-column-gap: 9px;
+  z-index: 1000;
 }

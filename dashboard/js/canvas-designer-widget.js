@@ -50,21 +50,27 @@ function CanvasDesigner() {
 
     designer.appendTo = function (parentNode, callback) {
         callback = callback || function () { };
+        let form = document.createElement("div");
+        form.style.left = '50px';
+        form.style.width =  'calc(100% - 50px)';
+        form.style.height = '100%';
+        form.style.position = 'absolute';
+        parentNode.appendChild(form);
+        
         designer.iframe = document.createElement('iframe');
         designer.iframe.onload = function () {
             callback();
             callback = null;
         };
-
+        
         designer.iframe.src = designer.widgetHtmlURL + '?widgetJsURL=' + designer.widgetJsURL + '&icons=' + JSON.stringify(designer.icons);
         designer.iframe.style.width = '100%';
         designer.iframe.style.height = '100%';
+        designer.iframe.style.position = 'absolute';
         designer.iframe.style.border = 0;
-
         window.removeEventListener('message', onMessage);
         window.addEventListener('message', onMessage, false);
-
-        parentNode.appendChild(designer.iframe);
+        form.appendChild(designer.iframe);
     };
 
     designer.addSyncListener = function (callback) {

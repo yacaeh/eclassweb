@@ -6,6 +6,7 @@
 // https://github.com/muaz-khan/Canvas-Designer
 
 'use strict';
+
 $(window).bind("load", function () {
     updateLanguage();
 });
@@ -40,6 +41,198 @@ gothicFont.load().then((font) => {
     var pencilContainer = find('pencil-container');
     var markerContainer = find('marker-container');
     var tempCanvas = find("temp-canvas");
+    var iframe = window.parent.document.getElementById("widget-container").getElementsByTagName('iframe')[0];
+
+
+    class ZoomManager {
+        constructor(target) {
+            console.log(target.getBoundingClientRect())
+
+            this.width = target.getBoundingClientRect().width;
+            this.height = target.getBoundingClientRect().height;
+            this.target = target;
+            this.zoomLevel = 1;
+            this.currentPosX = 0;
+            this.currentPosY = 0;
+            this.maxZoomLevel = 5;
+            this.lastdist = 0;
+            this.startdist = 0;
+
+            this.isTouch = false;
+
+            target.addEventListener("resize", () => {
+                console.log("resized");
+            })
+        }
+
+        getDistance(p1, p2) {
+            let x = p2[0] - p1[0];
+            let y = p2[1] - p1[1];
+            let dist = x * x + y * y;
+            return Math.sqrt(dist);
+        }
+
+        setEvent(element) {
+            let _this = this;
+
+            element.addEventListener("touchstart", function (e) {
+                console.log("touch start", e.touches);
+                _this.isTouch = e.touches.length == 2;
+
+                if (e.touches.length == 2) {
+
+                    let touch1 = e.touches[0];
+                    let touch2 = e.touches[1];
+
+                    _this.startdist = _this.getDistance(
+                        [touch1.screenX, touch1.screenY],
+                        [touch2.screenX, touch2.screenX])
+                }
+
+            })
+
+            element.addEventListener("touchend", function (e) {
+                _this.isTouch = e.touches.length == 2;
+                _this.lastdist = 0;
+            })
+
+            element.addEventListener("touchmove", function (e) {
+                if (!_this.isTouch)
+                    return;
+
+                let targetzoomLevel = _this.zoomLevel;
+                let touch1 = e.touches[0];
+                let touch2 = e.touches[1];
+
+                let dist = _this.getDistance(
+                    [touch1.screenX, touch1.screenY],
+                    [touch2.screenX, touch2.screenX])
+
+                let diff = _this.lastdist - dist;
+                if(diff == 0 )
+                    return;
+
+                console.log("차이 : ", diff)
+
+                let center = [
+                    (touch1.screenX + touch2.screenX) / 2,
+                    (touch1.screenY + touch2.screenY) / 2];
+
+
+
+                if (diff < 0) {
+                    targetzoomLevel += 0.1;
+                    targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
+                    console.log("zoomin");
+                    _this.zoomIn(center[0], center[1])
+                }
+                else {
+                    targetzoomLevel -= 0.1;
+                    targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
+                    _this.zoomOut();
+                    console.log("zoomout");
+                }
+
+                _this.lastdist = dist;
+
+                _this.setLevel(targetzoomLevel);
+                _this.boundCheck();
+                _this.setPosistion();
+                _this.render();
+            })
+
+            element.addEventListener("wheel", function (e) {
+                let targetzoomLevel = _this.zoomLevel;
+                if (e.deltaY < 0) {
+                    targetzoomLevel += 0.1
+                    if (_this.maxZoomLevel < targetzoomLevel)
+                        return;
+                }
+                else {
+                    targetzoomLevel -= 0.1
+                    if (1 > targetzoomLevel)
+                        return;
+                }
+                targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
+
+                let mousePosX = e.screenX - window.screenLeft;
+                let mousePosY = e.screenY - window.screenTop;
+
+                if (e.deltaY < 0) {
+                    _this.zoomIn(mousePosX, mousePosY);
+                }
+                else {
+                    _this.zoomOut();
+                }
+
+                _this.setLevel(targetzoomLevel);
+                _this.boundCheck();
+                _this.setPosistion();
+                _this.render();
+            })
+        }
+
+        zoomIn(x, y) {
+            let viewX = x / this.width;
+            let viewY = y / this.height;
+            let xpower = Math.abs(viewX - 0.5) * 150;
+            let ypower = Math.abs(viewY - 0.5) * 150;
+
+            if (viewX < 0.5) {
+                this.currentPosX += xpower;
+            }
+            else {
+                this.currentPosX -= xpower;
+            }
+
+            if (viewY < 0.5) {
+                this.currentPosY += ypower;
+            }
+            else {
+                this.currentPosY -= ypower;
+            }
+        }
+
+        zoomOut() {
+            let remainLevel = (this.zoomLevel - 1) * 10;
+            let rx = this.currentPosX / remainLevel;
+            let ry = this.currentPosY / remainLevel;
+            this.currentPosX -= rx;
+            this.currentPosY -= ry;
+        }
+
+        getLevel() {
+            return this.zoomLevel;
+        }
+
+        setLevel(level) {
+            this.zoomLevel = level;
+        }
+
+        boundCheck() {
+            let left = this.width * this.zoomLevel / 2 - this.width / 2;
+            let top = this.height * this.zoomLevel / 2 - this.height / 2;
+            this.currentPosX = this.clamp(this.currentPosX, -left, left);
+            this.currentPosY = this.clamp(this.currentPosY, -top, top);
+        }
+
+        clamp(value, min, max) {
+            return Math.min(Math.max(min, value), max) || 0;
+        }
+
+        setPosistion() {
+            this.target.style.left = this.currentPosX + 'px';
+            this.target.style.top = this.currentPosY + 'px';
+        }
+
+        render() {
+            this.target.style.transform = "scale(" + this.zoomLevel + ")";
+
+        }
+    }
+
+    let zoom = new ZoomManager(iframe);
+    zoom.setEvent(tempCanvas);
 
     var points = [],
         lineWidth = 2,
@@ -69,13 +262,13 @@ gothicFont.load().then((font) => {
     };
     let undoicon = find('undo');
 
-    function orderHistoryChecker(){
-        if(orderHistory.length > 50)
-            orderHistory.splice(0,1);
-        if(orderHistory.length == 0){
+    function orderHistoryChecker() {
+        if (orderHistory.length > 50)
+            orderHistory.splice(0, 1);
+        if (orderHistory.length == 0) {
             changeColor(undoicon, 0.3);
         }
-        else if(orderHistory.length == 1){
+        else if (orderHistory.length == 1) {
             returnColor(undoicon);
         }
     }
@@ -84,7 +277,7 @@ gothicFont.load().then((font) => {
     function addEvent(element, eventType, callback) {
         if (eventType.split(' ').length > 1) {
             let events = eventType.split(' ');
-            for (let i = 0; i < events.length; i++) 
+            for (let i = 0; i < events.length; i++)
                 addEvent(element, events[i], callback);
             return;
         }
@@ -102,7 +295,7 @@ gothicFont.load().then((font) => {
 
     function find(selector) {
         let ret = document.getElementById(selector) || window.parent.document.getElementById(selector);;
-        if(!ret)
+        if (!ret)
             console.log(selector);
 
         return ret;
@@ -111,7 +304,7 @@ gothicFont.load().then((font) => {
     function getContext(id) {
         var canv = find(id),
             ctx = canv.getContext('2d');
-        canv.setAttribute('width', innerWidth - 50);
+        canv.setAttribute('width', innerWidth);
         canv.setAttribute('height', innerHeight);
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = strokeStyle;
@@ -133,7 +326,7 @@ gothicFont.load().then((font) => {
     window.resize = function () {
         canvasresize('main-canvas');
         canvasresize('temp-canvas');
-        paper.view.viewSize = new paper.Size(innerWidth,innerHeight);
+        paper.view.viewSize = new paper.Size(innerWidth, innerHeight);
         drawHelper.redraw();
     }
 
@@ -141,7 +334,7 @@ gothicFont.load().then((font) => {
         var canv = find(id);
         if (!canv)
             return;
-        canv.setAttribute('width', innerWidth - 50);
+        canv.setAttribute('width', innerWidth);
         canv.setAttribute('height', innerHeight);
     }
 
@@ -187,7 +380,7 @@ gothicFont.load().then((font) => {
         redraw: function () {
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
             context.clearRect(0, 0, innerWidth, innerHeight);
-            
+
             var path = undefined;
             var start = undefined;
 
@@ -214,7 +407,7 @@ gothicFont.load().then((font) => {
                 let end = true;
                 points.forEach(function (point) {
                     if (point[0] == "marker" || point[0] == "line") {
-                        if(point[1][0] == -1){
+                        if (point[1][0] == -1) {
                             path.smooth();
                             path.simplify();
                             end = true;
@@ -222,7 +415,7 @@ gothicFont.load().then((font) => {
                             return true;
                         }
 
-                        if(end){
+                        if (end) {
                             path = new paper.Path();
                             start = new paper.Point(resizePoint(point[1]));
                             path.moveTo(start);
@@ -234,7 +427,7 @@ gothicFont.load().then((font) => {
                             return true;
                         }
 
-                        path.lineTo(resizePoint(point[1]));  
+                        path.lineTo(resizePoint(point[1]));
                     }
                     else {
                         let size = point[2][4].split(' ')[0];
@@ -242,8 +435,8 @@ gothicFont.load().then((font) => {
 
 
                         let text = new paper.PointText({
-                            point:resizePoint([point[1][1], point[1][2]]),
-                            justification : 'center',
+                            point: resizePoint([point[1][1], point[1][2]]),
+                            justification: 'center',
                             content: point[1][0].substr(1, point[1][0].length - 2),
                             fillColor: point[2][2],
                             fontFamily: font,
@@ -288,7 +481,7 @@ gothicFont.load().then((font) => {
                 this.prepoint = [];
                 return;
             }
-            
+
             const p = resizePoint(point);
             context.beginPath();
 
@@ -501,7 +694,7 @@ gothicFont.load().then((font) => {
                 else {
                     near = isNear(x, y, point[1]);
                 }
-        
+
 
                 if (near) {
                     for (let i = 0; i < pointHistory.length; i++) {
@@ -510,7 +703,7 @@ gothicFont.load().then((font) => {
                             _idx = i;
                             let numofpoint = pointHistory[i] - pre
                             let orderdata = {};
-                            orderdata[pre] = points.slice(pre, pre+numofpoint);
+                            orderdata[pre] = points.slice(pre, pre + numofpoint);
                             orderHistory.push(orderdata);
                             orderHistoryChecker();
                             points.splice(pre, numofpoint);
@@ -595,8 +788,8 @@ gothicFont.load().then((font) => {
         },
         canvasInput: null,
         updateInput: function () {
-            document.querySelector(".textInputUI").focus();
-            document.querySelector(".textInputUI").addEventListener('change', (event) => {
+            window.parent.document.querySelector(".textInputUI").focus();
+            window.parent.document.querySelector(".textInputUI").addEventListener('change', (event) => {
                 textHandler.text = event.target.value;
             });
         },
@@ -655,7 +848,7 @@ gothicFont.load().then((font) => {
 
             this.eachFontFamily(function (child) {
                 child.onclick = function (e) {
-                    _this.eachFontFamily(function(child){
+                    _this.eachFontFamily(function (child) {
                         child.className = '';
                     })
                     e.preventDefault();
@@ -667,7 +860,7 @@ gothicFont.load().then((font) => {
 
             this.eachFontSize(function (child) {
                 child.onclick = function (e) {
-                    _this.eachFontSize(function(child){
+                    _this.eachFontSize(function (child) {
                         child.className = '';
                     })
                     e.preventDefault();
@@ -683,7 +876,7 @@ gothicFont.load().then((font) => {
                     this.className = 'font-color-selected';
                 };
             });
-            document.getElementsByClassName("textInputUI")[0].focus();
+            window.parent.document.getElementsByClassName("textInputUI")[0].focus();
 
         },
         //textStrokeStyle : '#' + find('text-fill-style').value,
@@ -740,14 +933,14 @@ gothicFont.load().then((font) => {
         },
         onReturnKeyPressed: function () {
             if (!textHandler.text || !textHandler.text.length) return;
-            document.querySelector('.textInputUI').value = "";
+            window.parent.document.querySelector('.textInputUI').value = "";
             this.appendPoints();
             drawHelper.redraw();
             this.showOrHideTextTools('hide');
         },
-        textInputBox: document.querySelector('.textInputUI'),
-        fontFamilyBox: document.querySelector('.fontSelectUl'),
-        fontSizeBox: document.querySelector('.fontSizeUl'),
+        textInputBox: window.parent.document.querySelector('.textInputUI'),
+        fontFamilyBox: window.parent.document.querySelector('.fontSelectUl'),
+        fontSizeBox: window.parent.document.querySelector('.fontSizeUl'),
         fontColorBox: find('textInputContainer').querySelector('.color_template_text'),
         textInputContainer: find('textInputContainer')
     };
@@ -775,7 +968,7 @@ gothicFont.load().then((font) => {
     };
 
     function setSelection(element, prop) {
-        
+
         if (textHandler.text && textHandler.text.length) {
             textHandler.appendPoints();
             textHandler.onShapeUnSelected();
@@ -806,19 +999,25 @@ gothicFont.load().then((font) => {
     }
 
     function returnColor(id) {
-        if(!id)
+        if (!id)
             return;
 
-        var ctx = find(id.id).getContext('2d');
-        context.lineWidth = 2;
-        context.strokeStyle = '#6c96c8';
-        let nimage = new Image();
-        nimage.onload = () => {
-            ctx.globalAlpha = 1;
-            ctx.clearRect(0, 0, 40, 40);
-            ctx.drawImage(nimage, 0, 0, 28, 28);
+        try {
+
+            var ctx = find(id.id).getContext('2d');
+            context.lineWidth = 2;
+            context.strokeStyle = '#6c96c8';
+            let nimage = new Image();
+            nimage.onload = () => {
+                ctx.globalAlpha = 1;
+                ctx.clearRect(0, 0, 40, 40);
+                ctx.drawImage(nimage, 0, 0, 28, 28);
+            }
+            nimage.src = data_uris[id.id];
         }
-        nimage.src = data_uris[id.id];
+        catch {
+
+        }
     }
     /* Default: setting default selected shape!! */
     is.set(window.selectedIcon);
@@ -836,14 +1035,14 @@ gothicFont.load().then((font) => {
         decorateFile();
         decoratecallteacher();
         decorateHomework();
-        decoratemovie();            
-        decoratePencil();            
-        decorateMarker();            
-        decorateEraser();            
-        decorateText();            
-        decorateclearCanvas();            
-        decorateScreenShare();            
-        decoratEpub();            
+        decoratemovie();
+        decoratePencil();
+        decorateMarker();
+        decorateEraser();
+        decorateText();
+        decorateclearCanvas();
+        decorateScreenShare();
+        decoratEpub();
         decorateonoff();
 
         function getContext(id) {
@@ -884,7 +1083,7 @@ gothicFont.load().then((font) => {
             });
         }
 
-   
+
         function decorateUndo() {
             var context = getContext('undo');
             var image = new Image();
@@ -897,7 +1096,7 @@ gothicFont.load().then((font) => {
             };
             image.src = data_uris.undo;
         }
-   
+
         function decorateFull() {
             let image = new Image();
             image.onload = () => {
@@ -1112,9 +1311,9 @@ gothicFont.load().then((font) => {
                         if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
                             continue;
 
-                        if(icons[i].id != "undo" || orderHistory.length != 0)
+                        if (icons[i].id != "undo" || orderHistory.length != 0)
                             returnColor(icons[i]);
-                        
+
                         icons[i].classList.remove("off");
                         icons[i].classList.add("on");
                     }
@@ -1130,7 +1329,7 @@ gothicFont.load().then((font) => {
                             continue;
 
                         if (icons[i].style.display == 'block') {
-                            if(icons[i].id != "undo" || orderHistory.length != 0){
+                            if (icons[i].id != "undo" || orderHistory.length != 0) {
                                 changeColor(icons[i], 0.3);
                             }
 
@@ -1151,7 +1350,7 @@ gothicFont.load().then((font) => {
 
     function hideContainers() {
         markerContainer.style.display =
-        pencilContainer.style.display = 'none';
+            pencilContainer.style.display = 'none';
     }
 
     function TouchConverter(e) {
@@ -1164,15 +1363,44 @@ gothicFont.load().then((font) => {
 
     addEvent(canvas, 'touchstart mousedown', function (e) {
         if (e.touches) {
+
+
+            if (e.touches.length >= 2) {
+                let cache = is;
+                let command = "default";
+
+                if (cache.isPencil) {
+                    command = "pen";
+                    pencilHandler.mouseup(e);
+                }
+                else if (cache.isEraser) {
+                    command = "eraser";
+                    eraserHandler.mouseup(e);
+                }
+                else if (cache.isMarker) {
+                    command = "marker";
+                    markerHandler.mouseup(e);
+                }
+
+                !cache.isPdf && drawHelper.redraw();
+
+                if (!cache.isEraser) {
+                    syncPoints(false, command);
+                }
+
+                preventStopEvent(e);
+                return;
+            }
+
             e = TouchConverter(e);
         }
 
         var cache = is;
         window.parent.document.getElementById("student-menu").style.display = 'none';
-        if      (cache.isPencil)    pencilHandler.mousedown(e);
-        else if (cache.isEraser)    eraserHandler.mousedown(e);
-        else if (cache.isText)      textHandler.mousedown(e);
-        else if (cache.isMarker)    markerHandler.mousedown(e);
+        if (cache.isPencil) pencilHandler.mousedown(e);
+        else if (cache.isEraser) eraserHandler.mousedown(e);
+        else if (cache.isText) textHandler.mousedown(e);
+        else if (cache.isMarker) markerHandler.mousedown(e);
 
         preventStopEvent(e);
     });
@@ -1183,7 +1411,7 @@ gothicFont.load().then((font) => {
         }
 
         if (typeof e.preventDefault === 'function') {
-            if(e.cancleable)
+            if (e.cancleable)
                 e.preventDefault();
         }
 
@@ -1223,10 +1451,10 @@ gothicFont.load().then((font) => {
             e = TouchConverter(e);
         }
 
-        if (is.isPencil)        pencilHandler.mousemove(e);
-        else if (is.isEraser)   eraserHandler.mousemove(e);
-        else if (is.isText)     textHandler.mousemove(e);
-        else if (is.isMarker)   markerHandler.mousemove(e);
+        if (is.isPencil) pencilHandler.mousemove(e);
+        else if (is.isEraser) eraserHandler.mousemove(e);
+        else if (is.isText) textHandler.mousemove(e);
+        else if (is.isMarker) markerHandler.mousemove(e);
 
         preventStopEvent(e);
     });
@@ -1274,7 +1502,7 @@ gothicFont.load().then((font) => {
             return;
         }
 
-        if (!event.data.canvasDesignerSyncData) 
+        if (!event.data.canvasDesignerSyncData)
             return;
 
         let data = event.data.canvasDesignerSyncData;
@@ -1282,7 +1510,7 @@ gothicFont.load().then((font) => {
         if (data.isStudent) {
             let id = data.userid;
             if (id) {
-                if (!studentPoints[id] || data.isSyncAll) 
+                if (!studentPoints[id] || data.isSyncAll)
                     studentPoints[id] = []
                 PushPoints(data, studentPoints[id]);
             }
@@ -1293,7 +1521,7 @@ gothicFont.load().then((font) => {
             }
         }
         else {
-            if(data.isSyncAll){
+            if (data.isSyncAll) {
                 teacherPoints = [];
             }
             PushPoints(data, teacherPoints);
@@ -1305,11 +1533,11 @@ gothicFont.load().then((font) => {
 
 
     function PushPoints(data, array) {
-        if(data.canvassend)
+        if (data.canvassend)
             array.length = 0;
 
         switch (data.command) {
-            case "undo" :
+            case "undo":
                 array.splice(-1)
                 break;
             case "eraser":
@@ -1378,11 +1606,11 @@ gothicFont.load().then((font) => {
     }
 
     function syncData(data) {
-        data.pageidx    = window.parent.pointer_saver.nowIdx;
-        data.userid     = _uid;
-        data.history    = pointHistory;
+        data.pageidx = window.parent.pointer_saver.nowIdx;
+        data.userid = _uid;
+        data.history = pointHistory;
         data.startIndex = points.length;
-        lastPointIndex  = points.length;
+        lastPointIndex = points.length;
         window.parent.postMessage({
             canvasDesignerSyncData: data,
             uid: uid
@@ -1406,10 +1634,10 @@ gothicFont.load().then((font) => {
         }
 
         syncData({
-            isSyncAll        : isSyncAll,
-            points      : pointsToShare || [],
-            command     : command,
-            startIndex  : lastPointIndex
+            isSyncAll: isSyncAll,
+            points: pointsToShare || [],
+            command: command,
+            startIndex: lastPointIndex
         });
 
         if (!pointsToShare.length && points.length) return;
@@ -1470,39 +1698,39 @@ gothicFont.load().then((font) => {
         }
     }
 
-    function undo(){
-        if(orderHistory.length == 0)
-        return;
-    
-    let command = orderHistory[orderHistory.length-1];
-    if(command == 'undo'){
-        if (points.length) {
-            let idx = pointHistory.length - 2;
-            idx == -1 ? points = [] : points.length = pointHistory[idx];
-            pointHistory.pop();
-            drawHelper.redraw();
-        }
-        syncPoints(false, "undo");
-    }
-    else{
-        let idx = Object.keys(command)[0];
-        let newPoints = command[idx];
-        let position = -1;
-        
-        for(let i = 0; i < pointHistory.length; i++){
-            idx < pointHistory[i] ? pointHistory[i] += newPoints.length :
-                                    position = i;
-        }
+    function undo() {
+        if (orderHistory.length == 0)
+            return;
 
-        let prenum = position == -1 ? 0 : pointHistory[position];
-        pointHistory.splice(position+1,0, prenum + newPoints.length);
-        points.splice.apply(points, [pointHistory[position],0].concat(newPoints));
-    
-        drawHelper.redraw();
-        syncPoints(false, newPoints[0][0]);
-    }
-    orderHistory.pop();
-    orderHistoryChecker();
+        let command = orderHistory[orderHistory.length - 1];
+        if (command == 'undo') {
+            if (points.length) {
+                let idx = pointHistory.length - 2;
+                idx == -1 ? points = [] : points.length = pointHistory[idx];
+                pointHistory.pop();
+                drawHelper.redraw();
+            }
+            syncPoints(false, "undo");
+        }
+        else {
+            let idx = Object.keys(command)[0];
+            let newPoints = command[idx];
+            let position = -1;
+
+            for (let i = 0; i < pointHistory.length; i++) {
+                idx < pointHistory[i] ? pointHistory[i] += newPoints.length :
+                    position = i;
+            }
+
+            let prenum = position == -1 ? 0 : pointHistory[position];
+            pointHistory.splice(position + 1, 0, prenum + newPoints.length);
+            points.splice.apply(points, [pointHistory[position], 0].concat(newPoints));
+
+            drawHelper.redraw();
+            syncPoints(false, newPoints[0][0]);
+        }
+        orderHistory.pop();
+        orderHistoryChecker();
     }
 })();
 
@@ -1538,10 +1766,10 @@ function MakeTitlePop(element, contents) {
 function SliderSetting(element, targetinput, min, max, defaultv, callback) {
     max -= min;
 
-    let slider = document.getElementById(element);
+    let slider = window.parent.document.getElementById(element);
     let bar = slider.getElementsByClassName("slider_btn")[0];
     let back = slider.getElementsByClassName("slider-back")[0];
-    let sliderval = document.getElementById(targetinput);
+    let sliderval = window.parent.document.getElementById(targetinput);
     let isClick = false;
 
     Set(defaultv);
@@ -1600,7 +1828,7 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
         back.style.width = (ratio * sliderWidth) + 'px';
         bar.style.left = (ratio * sliderWidth) - bar.getBoundingClientRect().width / 2 + 'px';
         sliderval.value = (max * ratio).toFixed(0) * 1 + min;
-    })  
+    })
 }
 
 function handleDragDropEvent(oEvent) {
