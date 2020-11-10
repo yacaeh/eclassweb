@@ -42,195 +42,6 @@ gothicFont.load().then((font) => {
     var markerContainer = find('marker-container');
     var tempCanvas = find("temp-canvas");
     var iframe = window.parent.document.getElementById("widget-container").getElementsByTagName('iframe')[0];
-
-
-    class ZoomManager {
-        constructor(target) {
-            console.log(target.getBoundingClientRect())
-
-            this.width = target.getBoundingClientRect().width;
-            this.height = target.getBoundingClientRect().height;
-            this.target = target;
-            this.zoomLevel = 1;
-            this.currentPosX = 0;
-            this.currentPosY = 0;
-            this.maxZoomLevel = 5;
-            this.lastdist = 0;
-            this.startdist = 0;
-
-            this.isTouch = false;
-
-            target.addEventListener("resize", () => {
-                console.log("resized");
-            })
-        }
-
-        getDistance(p1, p2) {
-            let x = p2[0] - p1[0];
-            let y = p2[1] - p1[1];
-            let dist = x * x + y * y;
-            return Math.sqrt(dist);
-        }
-
-        setEvent(element) {
-            let _this = this;
-
-            element.addEventListener("touchstart", function (e) {
-                console.log("touch start", e.touches);
-                _this.isTouch = e.touches.length == 2;
-
-                if (e.touches.length == 2) {
-
-                    let touch1 = e.touches[0];
-                    let touch2 = e.touches[1];
-
-                    _this.startdist = _this.getDistance(
-                        [touch1.screenX, touch1.screenY],
-                        [touch2.screenX, touch2.screenX])
-                }
-
-            })
-
-            element.addEventListener("touchend", function (e) {
-                _this.isTouch = e.touches.length == 2;
-                _this.lastdist = 0;
-            })
-
-            element.addEventListener("touchmove", function (e) {
-                if (!_this.isTouch)
-                    return;
-
-                let targetzoomLevel = _this.zoomLevel;
-                let touch1 = e.touches[0];
-                let touch2 = e.touches[1];
-
-                let dist = _this.getDistance(
-                    [touch1.screenX, touch1.screenY],
-                    [touch2.screenX, touch2.screenX])
-
-                let diff = _this.lastdist - dist;
-                if(diff == 0 )
-                    return;
-
-                console.log("차이 : ", diff)
-
-                let center = [
-                    (touch1.screenX + touch2.screenX) / 2,
-                    (touch1.screenY + touch2.screenY) / 2];
-
-
-
-                if (diff < 0) {
-                    targetzoomLevel += 0.1;
-                    targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
-                    console.log("zoomin");
-                    _this.zoomIn(center[0], center[1])
-                }
-                else {
-                    targetzoomLevel -= 0.1;
-                    targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
-                    _this.zoomOut();
-                    console.log("zoomout");
-                }
-
-                _this.lastdist = dist;
-
-                _this.setLevel(targetzoomLevel);
-                _this.boundCheck();
-                _this.setPosistion();
-                _this.render();
-            })
-
-            element.addEventListener("wheel", function (e) {
-                let targetzoomLevel = _this.zoomLevel;
-                if (e.deltaY < 0) {
-                    targetzoomLevel += 0.1
-                    if (_this.maxZoomLevel < targetzoomLevel)
-                        return;
-                }
-                else {
-                    targetzoomLevel -= 0.1
-                    if (1 > targetzoomLevel)
-                        return;
-                }
-                targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
-
-                let mousePosX = e.screenX - window.screenLeft;
-                let mousePosY = e.screenY - window.screenTop;
-
-                if (e.deltaY < 0) {
-                    _this.zoomIn(mousePosX, mousePosY);
-                }
-                else {
-                    _this.zoomOut();
-                }
-
-                _this.setLevel(targetzoomLevel);
-                _this.boundCheck();
-                _this.setPosistion();
-                _this.render();
-            })
-        }
-
-        zoomIn(x, y) {
-            let viewX = x / this.width;
-            let viewY = y / this.height;
-            let xpower = Math.abs(viewX - 0.5) * 150;
-            let ypower = Math.abs(viewY - 0.5) * 150;
-
-            if (viewX < 0.5) {
-                this.currentPosX += xpower;
-            }
-            else {
-                this.currentPosX -= xpower;
-            }
-
-            if (viewY < 0.5) {
-                this.currentPosY += ypower;
-            }
-            else {
-                this.currentPosY -= ypower;
-            }
-        }
-
-        zoomOut() {
-            let remainLevel = (this.zoomLevel - 1) * 10;
-            let rx = this.currentPosX / remainLevel;
-            let ry = this.currentPosY / remainLevel;
-            this.currentPosX -= rx;
-            this.currentPosY -= ry;
-        }
-
-        getLevel() {
-            return this.zoomLevel;
-        }
-
-        setLevel(level) {
-            this.zoomLevel = level;
-        }
-
-        boundCheck() {
-            let left = this.width * this.zoomLevel / 2 - this.width / 2;
-            let top = this.height * this.zoomLevel / 2 - this.height / 2;
-            this.currentPosX = this.clamp(this.currentPosX, -left, left);
-            this.currentPosY = this.clamp(this.currentPosY, -top, top);
-        }
-
-        clamp(value, min, max) {
-            return Math.min(Math.max(min, value), max) || 0;
-        }
-
-        setPosistion() {
-            this.target.style.left = this.currentPosX + 'px';
-            this.target.style.top = this.currentPosY + 'px';
-        }
-
-        render() {
-            this.target.style.transform = "scale(" + this.zoomLevel + ")";
-
-        }
-    }
-
     let zoom = new ZoomManager(iframe);
     zoom.setEvent(tempCanvas);
 
@@ -334,6 +145,7 @@ gothicFont.load().then((font) => {
         var canv = find(id);
         if (!canv)
             return;
+
         canv.setAttribute('width', innerWidth);
         canv.setAttribute('height', innerHeight);
     }
@@ -1362,6 +1174,11 @@ gothicFont.load().then((font) => {
     }
 
     addEvent(canvas, 'touchstart mousedown', function (e) {
+
+        if(zoom.isSpace)
+            return;
+
+
         if (e.touches) {
 
 
@@ -1788,6 +1605,7 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
     bar.addEventListener("mousedown", function () {
         isClick = true;
     })
+
 
     window.addEventListener("mousemove", function (e) {
         if (isClick) {

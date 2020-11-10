@@ -14,6 +14,7 @@
     <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
     <script src="/dashboard/js/lib/updateLanguage_widget.js"></script>
     <script src="/dashboard/js/lib.js" ></script>
+    <script src="/dashboard/js/zoom.js" ></script>
     <script type="text/javascript"  src="/dashboard/js/lib/paper-full.min.js" ></script>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -74,8 +75,6 @@ ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="re
         }
 
         var script = document.createElement('script');
-        // script.type = 'text/paperscript';
-        // script.setAttribute('canvas', 'temp-canvas');
         script.src = params.widgetJsURL;
         (document.body || document.documentElement).appendChild(script);
     </script>

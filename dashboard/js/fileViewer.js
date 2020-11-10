@@ -96,7 +96,7 @@ class fileViewerLoader {
         fileViewer.setAttribute('src', 'https://' + window.location.host + '/ViewerJS/#' + url);
 
         if (mobileHelper.isMobile)
-            fileViewer.style.width = "calc(100% - 52px)";
+            fileViewer.style.width = "calc(100%)";
 
         fileViewer.setAttribute('allowFullScreen', '');
         GetWidgetFrame().document.getElementsByClassName('design-surface')[0].appendChild(fileViewer);
