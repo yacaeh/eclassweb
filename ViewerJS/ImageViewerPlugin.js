@@ -41,39 +41,18 @@ function ImageViewerPlugin() {
         leftToolbar.appendChild(buttonSeperator);
         leftToolbar.appendChild(rotateRight);
 
-        // Attach events to the above buttons
-        rotateLeft.addEventListener('click', function () {
-            imageRotateLeft();
-        });
-        rotateRight.addEventListener('click', function () {
-            imageRotateRight();
-        });
-    }
-
-    function imageRotateLeft() {
-        if ( rotation <= 0 ) {
-            rotation = 360;
-        }
-        rotation -= 90;
-
-        document.getElementById("image").className = 'rotate' + rotation;
-    }
-
-    function imageRotateRight() {
-        if ( rotation >= 360 ) {
-            rotation = 0;
-        }
-        rotation += 90;
-
-        document.getElementById("image").className = 'rotate' + rotation;
+   
     }
 
     this.initialize = function ( viewerElement, documentUrl ) {
         // If the URL has a fragment (#...), try to load the file it represents
         imgElement = document.createElement("img");
-        imgElement.setAttribute('src', documentUrl);
+        imgElement.src = documentUrl;
         imgElement.setAttribute('alt', 'na');
         imgElement.setAttribute('id', 'image');
+        imgElement.style.width = '100%';
+        imgElement.style.height = 'auto'
+        imgElement.style.maxWidth = '900px';
 
         viewerElement.appendChild(imgElement);
         viewerElement.style.overflow = "auto";
@@ -89,6 +68,8 @@ function ImageViewerPlugin() {
     };
 
     this.onLoad = function () {
+        console.error("on loadk")
+
     };
 
     this.fitToWidth = function ( width ) {

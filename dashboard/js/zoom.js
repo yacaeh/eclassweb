@@ -24,7 +24,7 @@ class ZoomManager {
         this.touchStartPosX = 0;
         this.touchStartPosY = 0;
         this.lastScale = 1;
-
+        this.touchCenter = undefined;
         this.startTouches = undefined;
 
 
@@ -83,20 +83,8 @@ class ZoomManager {
     }
 
     handleZoom(event, newScale) {
-        var touchCenter = this.getTouchCenter(this.getTouches(event)),
-            scale = newScale * this.lastScale;
-            console.log(scale , newScale, this.lastScale);
-        // this.lastScale = scale;
-
-        //     this.nthZoom += 1;
-        // if (this.nthZoom > 3) {
-
-        //     this.scale(scale, touchCenter);
-        //     this.drag(touchCenter, this.lastZoomCenter);
-        // }
-        // console.log("touch Center : ", touchCenter);
-        // console.log(scale,newScale,this.lastScale);
-        this.lastZoomCenter = touchCenter;
+        var scale = newScale * this.lastScale;
+        this.lastZoomCenter = this.touchCenter;
         return scale;
     };
 
@@ -113,10 +101,10 @@ class ZoomManager {
 
         element.addEventListener("touchstart", function (e) {
             _this.fingers = e.touches.length;
-
             if (_this.fingers == 2) {
                 _this.lastScale = _this.zoomLevel;
                 _this.startTouches = _this.targetTouches(e.touches);
+                _this.touchCenter =  _this.getTouchCenter(_this.getTouches(e))
             }
             else if (_this.fingers == 3) {
                 let xSum = 0;
@@ -146,8 +134,15 @@ class ZoomManager {
 
                 let scale = _this.handleZoom(e, _this.calculateScale(_this.startTouches, _this.targetTouches(e.touches)));
                 scale = _this.clamp(scale, 1, _this.maxZoomLevel);
-                _this.setLevel(scale);
 
+                if(_this.zoomLevel > scale){
+                    _this.zoomOut(scale)
+                }
+                else{
+                    _this.zoomIn(_this.touchCenter.x, _this.touchCenter.y, scale);
+                }
+                
+                _this.setLevel(scale);
                 _this.boundCheck();
                 _this.setPosistion();
                 _this.render();
@@ -222,14 +217,14 @@ class ZoomManager {
             }
             targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
 
-            let mousePosX = e.screenX - window.screenLeft;
+            let mousePosX = e.screenX - window.screenLeft ;
             let mousePosY = e.screenY - window.screenTop;
 
             if (e.deltaY < 0) {
-                _this.zoomIn(mousePosX, mousePosY);
+                _this.zoomIn(mousePosX, mousePosY, targetzoomLevel);
             }
             else {
-                _this.zoomOut();
+                _this.zoomOut(targetzoomLevel);
             }
 
             _this.setLevel(targetzoomLevel);
@@ -253,29 +248,22 @@ class ZoomManager {
         })
     }
 
-    zoomIn(x, y) {
-        let viewX = x / this.width;
-        let viewY = y / this.height;
-        let xpower = Math.abs(viewX - 0.5) * 150;
-        let ypower = Math.abs(viewY - 0.5) * 150;
+    zoomIn(x, y, size) {
+        let currentPosX = (x * this.zoomLevel) - (this.width  / 2* this.zoomLevel);
+        let currentPosY = (y * this.zoomLevel) - (this.height / 2 * this.zoomLevel);
 
-        if (viewX < 0.5) {
-            this.currentPosX += xpower;
-        }
-        else {
-            this.currentPosX -= xpower;
-        }
+        let targetPosX = (x * size) - (this.width / 2* size);
+        let targetPosY = (y * size) - (this.height / 2* size);
 
-        if (viewY < 0.5) {
-            this.currentPosY += ypower;
-        }
-        else {
-            this.currentPosY -= ypower;
-        }
+        let diffX = targetPosX - currentPosX ;
+        let diffY = targetPosY - currentPosY ;
+        
+        this.currentPosX -= diffX;
+        this.currentPosY -= diffY;
     }
 
-    zoomOut() {
-        let remainLevel = (this.zoomLevel - 1) * 10;
+    zoomOut(scale) {
+        let remainLevel = (scale - 1) * 10;
         let rx = this.currentPosX / remainLevel;
         let ry = this.currentPosY / remainLevel;
         this.currentPosX -= rx;
