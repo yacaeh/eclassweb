@@ -97,7 +97,6 @@ class classroomManagerClass {
         let y = canvas.height;
         let renderCanvas = frame.document.getElementById('renderCanvas');
         if (renderCanvas) {
-            renderCanvas.style.left = "50px";
             renderCanvas.width = x;
             renderCanvas.height = y;
         }

@@ -14,6 +14,7 @@
     <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
     <script src="/dashboard/js/lib/updateLanguage_widget.js"></script>
     <script src="/dashboard/js/lib.js" ></script>
+    <script src="/dashboard/js/zoom.js" ></script>
     <script type="text/javascript"  src="/dashboard/js/lib/paper-full.min.js" ></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
@@ -23,105 +24,15 @@
 <body  ondragenter="handleDragDropEvent(event)"
 ondragover="handleDragDropEvent(event)"
 ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
-
     <section id="design-surface" class="design-surface">
         <canvas id="temp-canvas" style="z-index: 3;" class="pen"></canvas>
         <canvas id="main-canvas" style="z-index: 2;"></canvas>
         <video id="screen-viewer" controls playsinline autoplay></video>
-
     </section>
-
-
     <section id="titlebox">
         <span id="titletext">설명입니다</span>
         <span class="sq"></span>
     </section>
-
-
-    <!-- options -->
-
-    <section id="options-container" class="options-container">
-        <div>
-            <input type="checkbox" id="is-absolute-points" checked="">
-            <label for="is-absolute-points">Absolute Points</label>
-        </div>
-        <div>
-            <input type="checkbox" id="is-shorten-code" checked="">
-            <label for="is-shorten-code">Shorten Code</label>
-        </div>
-    </section>
-
-    <!-- colors selector -->
-
-    <section id="colors-container" class="context-popup colors-container">
-        <div class="input-div">
-            <label for="stroke-style">Stroke Style:</label>
-            <input id="stroke-style" type="color" value="#6c96c8">
-        </div>
-
-        <div class="input-div">
-            <label for="fill-style">Fill Style:</label>
-            <input id="fill-style" type="color" value="#ffffff">
-        </div>
-
-        <div id="colors-done" class="btn-007">Done</div>
-    </section>
-
-    <section id="marker-container" class="context-popup colors-container">
-        <input style="display: none;" id="sliderval" type="number" class="sliderval inputbox">
-        <div class="color_template"></div>
-        <span id="markerslider" class="slider-front">
-            <span class="slider-back"></span>
-            <span class="slider_btn"></span>
-        </span>
-        <input class="svalue" id="marker-stroke-style">
-        <div id="marker-done" style="display: none;" class="btn-007">선택</div>
-    </section>
-
-    <section id="pencil-container" class="context-popup colors-container">
-        <input style="display: none;" id="sliderval" type="number" class="sliderval inputbox">
-        <div class="color_template"></div> 
-        <span id="pencileslider" class="slider-front">
-            <span class="slider-back"></span>
-            <span class="slider_btn"></span>
-        </span>
-        <input class="svalue" id="pencil-stroke-style">
-        <div class="done" id="pencil-done" style="display: none;" class="btn-007">선택</div>
-    </section>
-
-  
-    <!-- fade -->
-
-    <div id="fade"></div>
-    <div id="textInputContainer" style="z-index:99999999;">
-    <!-- text font/family/color -->
-    <input class="textInputUI" type="text" placeholder="글자를 입력하고 엔터를 누르세요." style="ime-mode:active;display: none; position: absolute; top: 0; left: 0; width: 216px;height:50px;border: 5px solid black;">
-    <ul class="fontSelectUl" style="display: none; position: absolute; top: 0; left: 0; width: 166px;">
-        <li>HY중고딕</li>
-        <li>나눔고딕</li>
-        <li>나눔펜글씨</li>
-        <li>Times New Roman</li>
-        <li>Verdana</li>
-    </ul>
-
-    <ul class="fontSizeUl" style="display: none; position: absolute; top: 0; left: 0; width: 50px; text-align: center;">
-        <li>15</li>
-        <li>17</li>
-        <li>19</li>
-        <li>20</li>
-        <li>22</li>
-        <li>25</li>
-        <li>30</li>
-        <li>35</li>
-        <li>42</li>
-        <li>48</li>
-        <li>60</li>
-        <li>72</li>
-        <li>80</li>
-        <li>90</li>
-        <li>150</li>
-    </ul>
-    <div class="color_template_text"></div>
 </div>
 
 
