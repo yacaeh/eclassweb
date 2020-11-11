@@ -1,8 +1,8 @@
 class SaveNotification extends React.Component {
     state = {
-        studentsAnswer : {},
+        // studentsAnswer : {},
         teacherRequest : {},
-        totalCount : 0
+        // totalCount : 0
     }
 
     constructor(props){
@@ -15,7 +15,7 @@ class SaveNotification extends React.Component {
     }
 
     exportAttention() {
-        if( this.state.totalCount <= 0 ){
+        if( attentionManager.totalCount <= 0 ){
             alert($.i18n( 'NO_DATA_STORE' ));
             return false;
         } 
@@ -45,14 +45,14 @@ class SaveNotification extends React.Component {
         contents[0] = [$.i18n('NAME'), $.i18n('ANSWER')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
-        for(let i = 0; i < this.state.totalCount; ++i) {
+        for(let i = 0; i < attentionManager.totalCount; ++i) {
             contents[0][i+prefix] = `${i+1}`;
         }        
         
         let row = 1;
 
-        let answer = this.state.studentsAnswer;
-        Object.keys(this.state.studentsAnswer).forEach(function(id){
+        let answer = attentionManager.studentsAnswer;
+        Object.keys(attentionManager.studentsAnswer).forEach(function(id){
             const submit = answer[id];
             let content = contents[row];
             content = [submit.name];        
