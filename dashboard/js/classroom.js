@@ -14,7 +14,7 @@
 
 
 ReactDOM.render(
-  <App connection={connection}/>,
+  <App />,
   document.getElementById('app')
 )
 
