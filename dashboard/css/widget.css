@@ -64,33 +64,6 @@
 }
 
 
-#titlebox{
-    z-index: 9999;
-    width: auto;
-    height: 20px;
-    position: absolute;
-    background-color: black;
-    left: 62px;
-    color: white;
-    border-radius: 7px;
-    font-family: Roboto;
-    display: none;
-}
-
-#titlebox > .sq{
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    left: -2px;
-    top: 6px;
-    background: #000000;
-    transform: rotate(45deg);
-}
-
-#titletext{
-    margin: 10px;
-}
-
 body {
     font-family: "Roboto";
     font-size: 17px;

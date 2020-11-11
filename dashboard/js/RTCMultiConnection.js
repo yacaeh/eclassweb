@@ -370,7 +370,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         connection.socket.on('updated-classroomInfo', function(e){
             classroomInfo = e;
-            newscreenshareManager.hide();
+            screenshareManager.hide();
         })
 
         connection.socket.on('logs', function (log) {

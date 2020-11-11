@@ -17,17 +17,17 @@ var examObj = {
 examObj.closeBoard = function() {
     widgetContainer.removeAttribute("style")
     $('#exam-board').hide(300, function () {
-        rightTab.style.zIndex = 3;
         classroomManager.canvasResize();
+        rightTab.style.zIndex = 2;
     });
 }
 
 examObj.showBoard = function() {
     widgetContainer.style.right = "max(17.7%, 290px)";
     classroomManager.canvasResize();
+    rightTab.style.zIndex = 0;
     $('#exam-omr').hide();
     $('#exam-teacher-menu').show();
-    rightTab.style.zIndex = -1;
     $('#exam-board').show(300);
 }
 
@@ -523,6 +523,8 @@ function setQuestionAnswer(answerList) {
 
 // 학생들 OMR 세팅
 function setStudentOMR(quesCount, examTime) {
+    rightTab.style.zIndex = 0;
+
     if (mobileHelper.isMobile) {
         widgetContainer.style.right = "max(0px, 290px)";
     }
@@ -530,7 +532,6 @@ function setStudentOMR(quesCount, examTime) {
         widgetContainer.style.right = "max(17.7%, 290px)";
     }
     classroomManager.canvasResize();
-    rightTab.style.zIndex = -1;
 
     $('#exam-omr').show();
     $('#exam-board').show();
@@ -615,11 +616,9 @@ function omrChange(num) {
 
 function finishExam() {
     console.debug("Finish exam");
-
     clearInterval(m_ExamTimerInterval);
     classroomInfo.exam = { state : false }
     classroomManager.updateClassroomInfo();
-
     document.getElementById("exam-time").value = 0;
     $('#exam-setting-bar').show();
     $('#exam-state').html('');

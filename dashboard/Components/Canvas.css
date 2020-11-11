@@ -1,0 +1,81 @@
+#textInputContainer{
+    z-index: 99999999;
+}
+
+.textInputUI {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 216px;
+    height: 50px;
+    border: 5px solid black;
+    -ms-ime-mode: active;
+}
+
+.textInputUI,
+.fontSelectUl,
+.fontColorUI,
+.fontSizeUl{
+    z-index: 10000000;
+    font-family: 'Roboto';
+    font-size: 12px;
+}
+
+.fontSelectUl{
+    display: 'none';
+    position: 'absolute';
+    top: 0;
+    left: 0;
+    width: '166px'
+}
+
+.fontSizeUl{
+    display: 'none';
+    position: 'absolute';
+    top: 0;
+    left: 0;
+    width: '50px';
+    text-align: 'center'
+}
+
+.fontSelectUl,
+.fontSizeUl {
+    list-style: none;
+    width: 200px;
+    background: #f9f9f9;
+    position: absolute;
+    left: 0;
+    top: 35px;
+    padding: 0;
+}
+.fontSelectUl {
+    padding-left: 5px;
+}
+.fontSelectUl li,
+.fontSizeUl li {
+    height: 24px;
+    line-height: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 14px;
+    border-left: 1px solid #f0f0f0;
+    border-right: 1px solid #f0f0f0;
+}
+.fontSelectUl li:last-child,
+.fontSizeUl li:last-child {
+    -webkit-border-radius: 0 0 4px 4px;
+    -moz-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+    border-bottom: 1px solid #EEEEEE;
+}
+.fontSelectUl li:hover,
+.fontSizeUl li:hover {
+    background: #DDD;
+}
+.fontSelectUl li.font-family-selected,
+.fontSizeUl li.font-size-selected {
+    background: rgb(6, 205, 255)!important;
+    color: white!important;
+}

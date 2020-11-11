@@ -12,8 +12,8 @@ class PointerSaver {
         this.nowIdx = 0;
         this.path = path;
         let json = path + "_" + connection.extra.userFullName + ".json";
-        Get(json, function (e) {
-            let data = JSON.parse(e);
+        axios.get(json).then(function (e) {
+            let data = e.data;
 
             if (data == 404 || Object.keys(data).length == 0) {
                 pointer_saver.container = {};
@@ -40,8 +40,7 @@ class PointerSaver {
             userId: name,
             point: this.container
         }
-        Post(url, data, function (e) {
-        })
+        axios.post(url, data)
         this.path = undefined;
     }
     save() {

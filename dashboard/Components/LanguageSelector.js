@@ -1,11 +1,9 @@
 class LanguageSelector extends React.Component {
     constructor(props) {
         super(props);
-
         if (!localStorage.getItem("locale")) {
             localStorage.setItem('locale', 'en');
         }
-
         window.language = localStorage.getItem('locale');
         this.updateLanguage();
     }
@@ -82,8 +80,41 @@ class LanguageSelector extends React.Component {
                         topButtonContents.student_canvas = $.i18n('STUDENT_CANVAS');
                         topButtonContents.student_mic = $.i18n('STUDENT_MIC');
 
-                        GetWidgetFrame().updateLanguage();
-                        GetWidgetFrame().$('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));
+                        MakeTitlePop("onoff-icon", $.i18n('CANVAS_ON_OFF'));
+                        MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
+                        MakeTitlePop("markerIcon", $.i18n('MARKER'));
+                        MakeTitlePop("eraserIcon", $.i18n('ERASER'));
+                        MakeTitlePop("textIcon", $.i18n('TEXT'));
+                        MakeTitlePop("undo", $.i18n('UNDO'));
+                        MakeTitlePop("clearCanvas", $.i18n('CLEAR_CANVAS'));
+                        MakeTitlePop("screen_share", $.i18n('SHARE_SCREEN'));
+                        MakeTitlePop("3d_view", $.i18n('SHARE_3D'));
+                        MakeTitlePop("movie", $.i18n('SHARE_YOUTUBE'));
+                        MakeTitlePop("file", $.i18n('SHARE_FILE'));
+                        MakeTitlePop("epub", $.i18n('SHARE_EPUB'));
+                        MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
+                        MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));
+
+                        $('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));
+
+                        function MakeTitlePop(element, contents) {
+                            let pop = document.getElementById("toolboxHelper");
+                            element = document.getElementById(element);
+                            if (!element)    return;
+                            element.addEventListener("mouseover", function () {
+                                if (this.classList.contains("off"))
+                                    return false;
+                                pop.style.display = 'block';
+                                let rect = element.getBoundingClientRect();
+                                let y = rect.y;
+                                pop.style.top = y - 40 + 'px';
+                                pop.children[0].innerHTML = contents;
+                            })
+
+                            element.addEventListener("mouseleave", function () {
+                                pop.style.display = 'none';
+                            })
+                        }
                     }
                     catch {
                     }

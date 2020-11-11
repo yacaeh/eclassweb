@@ -1,28 +1,4 @@
-class App extends React.Component {
-    state = {
-        showMainVideo: false,
-    }
 
-    constructor(props) {
-        super(props);
-    };
-
-    render() {
-        return (
-            <>
-                <Header />
-                <Article />
-                <URLLoader />
-                <RightForm />
-                <FileViewer />
-            </>
-        )
-    };
-
-    componentDidMount() {
-        ChattingManager.init();
-    }
-}
 
 class CurrentTime extends React.Component {
     render() {

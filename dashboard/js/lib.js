@@ -53,8 +53,6 @@ function Hide(element) {
 // 알림 박스 생성
 function alertBox(message, title, callback_yes, callback_no) {
   rightTab.style.zIndex = 1;
-
-
   callback_yes = callback_yes || function () { };
 
   if (typeof (callback_no) == "string") {
@@ -97,47 +95,11 @@ function alertBox(message, title, callback_yes, callback_no) {
   $('#alert-box').fadeIn(300);
 }
 
-function Post(url, data, callback) {
-  let xml = new XMLHttpRequest();
-  xml.open("POST", url, true);
-  xml.setRequestHeader('Content-Type', 'application/json'); // 컨텐츠타입을 json으로
-  xml.send(JSON.stringify(data));
-  xml.addEventListener("readystatechange", function (data) {
-    if (xml.readyState == xml.DONE && xml.status == 200) {
-      callback(JSON.parse(xml.responseText));
-    }
-  })
-  return xml
-}
-
 function PostAsync(url, data) {
   return axios.post(url, data).then(function (e) {
     return e.data;
   })
 }
-
-function GetAsync(url) {
-  return axios.get(url).then(function (e) {
-    return e.data;
-  })
-}
-
-function Get(url, callback) {
-  let xml = new XMLHttpRequest();
-  xml.open("GET", url);
-  xml.send();
-
-  xml.addEventListener("readystatechange", function (data) {
-    if (xml.readyState == xml.DONE && xml.status == 200) {
-      callback(xml.responseText);
-    }
-    else if (xml.readyState == xml.DONE && xml.status == 404) {
-      callback(xml.status);
-    }
-
-  })
-}
-
 
 async function SetNowLoginInfo(){
   const info = await PostAsync("/get-now-account", {});

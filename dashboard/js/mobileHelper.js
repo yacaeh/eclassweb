@@ -4,11 +4,11 @@ class mobileHelperClass {
         this.conversationPanel;
     }
     init() {
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-            // || !connection.extra.roomOwner
-        ) {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             this.conversationPanel = document.getElementById('conversation-panel');
             this.setMobile();
+        }else{
+            document.getElementById("full").style.display = 'none';
         }
     }
     setMobile() {
