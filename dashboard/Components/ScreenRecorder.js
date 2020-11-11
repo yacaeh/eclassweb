@@ -120,7 +120,7 @@ class screenRecorderClass {
         let url = window.URL.createObjectURL(this.blob);
         this.RecodingStop()
   
-        const downloadLink = document.querySelector('a#downloadLink');
+        const downloadLink = document.createElement("a");
         downloadLink.addEventListener('progress', e => console.log(e));
         downloadLink.href = url;
         downloadLink.download = this.makeName();

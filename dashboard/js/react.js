@@ -29,9 +29,10 @@ class CurrentTime extends React.Component {
     render() {
         return <span className="time">
             <span id="current-time" />
-            <span id="recording-time" />
+            <span id="recording-time">
             <img src="/dashboard/img/recording.png" style={{ display: 'none', marginRight: '7px', marginBottom: '2px' }} />
             <span className="text">0:00:00</span>
+            </span>
         </span>
     }
 }

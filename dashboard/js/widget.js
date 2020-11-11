@@ -858,7 +858,6 @@ gothicFont.load().then((font) => {
         decorateonoff();
 
         function getContext(id) {
-            console.log(id);
             var context = find(id).getContext('2d');
             context.lineWidth = 2;
             context.strokeStyle = '#6c96c8';
