@@ -151,18 +151,19 @@ class classroomManagerClass {
 
     removeToolTip() {
         classroomManager.altdown = false;
-        this.tooltips.forEach(element => GetWidgetFrame().document.getElementById("tool-box").removeChild(element));
+        this.tooltips.forEach(element => document.getElementById("tool-box").removeChild(element));
         this.tooltips = [];
     };
 
     setShortCut(shortCut) {
-        $(GetWidgetFrame()).on("keydown", down);
-        $(window).on("keydown", down);
-
-        $(GetWidgetFrame()).on("keyup", up);
-        $(window).on("keyup", up);
+        window.addEventListener('keydown', down);
+        GetWidgetFrame().addEventListener('keydown', down);
+        window.addEventListener('keyup', up);
+        GetWidgetFrame().addEventListener('keyup', up);
 
         function down(key) {
+            console.log(key);
+            
             if (key.altKey) {
                 if (!classroomManager.altdown) {
                     MakeTooltip(shortCut);
@@ -177,7 +178,7 @@ class classroomManagerClass {
                             classroomManager.altdown = false;
                         }
                         try {
-                            GetWidgetFrame().document.getElementById(Object.keys(cut)).click();
+                            document.getElementById(Object.keys(cut)).click();
                         }
                         catch{
                         }
@@ -198,17 +199,15 @@ class classroomManagerClass {
 
         function MakeTooltip(shortcut) {
             shortcut.forEach(function (cut) {
-                let btn = GetWidgetFrame().document.getElementById(Object.keys(cut));
-                if (!btn)
-                    return false;
-
+                let btn = document.getElementById(Object.keys(cut));
+                if (!btn) return false;
                 let top = btn.getBoundingClientRect().top;
-                let div = GetWidgetFrame().document.createElement("div");
-                div.className = "tooltip";
+                let div = document.createElement("div");
+                div.className = "tooltips";
                 div.innerHTML = Object.values(cut)[0];
-                div.style.top = top + 15 + 'px';
+                div.style.top = top - 30 + 'px';
                 classroomManager.tooltips.push(div);
-                GetWidgetFrame().document.getElementById("tool-box").appendChild(div);
+                document.getElementById("tool-box").appendChild(div);
             });
         }
     }

@@ -1281,7 +1281,7 @@ gothicFont.load().then((font) => {
     var lastPointIndex = 0;
     var uid;
 
-    addEvent(document, 'keydown', (e) => {
+    addEvent(window.parent.document, 'keydown', (e) => {
         keyCode = e.which || e.keyCode || 0;
     });
 
@@ -1300,7 +1300,7 @@ gothicFont.load().then((font) => {
         }
     });
 
-    addEvent(document, 'keypress', (e) => {
+    addEvent(window.parent.document, 'keypress', (e) => {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
         }

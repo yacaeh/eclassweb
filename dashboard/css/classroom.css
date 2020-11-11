@@ -741,6 +741,24 @@ hr {
   pointer-events: none;
 }
 
+
+
+.tooltips{
+  z-index: 100;
+  position: absolute;
+  left: 28px;
+  font-family: 'Roboto';
+  top: 100px;
+  background-color: black;
+  color: white;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
 #recording-time {
   font-family: Roboto;
   font-style: normal;
