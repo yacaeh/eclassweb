@@ -26,15 +26,14 @@ class epubManagerClass {
     }
     EpubPositionSetting() {
         let viewer = GetWidgetFrame().document.getElementById("epub-viewer");
-        let can = GetWidgetFrame().document.getElementById("main-canvas");
-        let wrapsize1 = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0];
-        let wrapsize2 = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("content")[0];
-        let wrapsize = wrapsize1 || wrapsize2;
+        let can = GetWidgetFrame().document.getElementById("temp-canvas");
+        let wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0] || 
+                        viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("content")[0];
 
-        console.log(wrapsize, wrapsize1,wrapsize2);
-
-        wrapsize = wrapsize.getBoundingClientRect();
-        viewer.style.left = Math.max(50, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
+        if(!wrapsize) return;
+        
+            wrapsize = wrapsize.getBoundingClientRect();
+        viewer.style.left = Math.max(0, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
     }
     loadEpubViewer() {
         canvasManager.clearCanvas();
@@ -53,6 +52,7 @@ class epubManagerClass {
         let loadingWindow = document.createElement("div");
         loadingWindow.setAttribute('id', 'loading-window');
         let loadingIcon = document.createElement("img");
+
         loadingIcon.src = "/dashboard/img/loading.gif";
         loadingIcon.className = "loading";
         loadingWindow.appendChild(loadingIcon);

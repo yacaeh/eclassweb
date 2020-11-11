@@ -878,6 +878,7 @@ gothicFont.load().then((font) => {
 
                 if (this.id === 'eraserIcon') {
                     if (this.classList.contains('off')) return false;
+                    BtnOff();
                     tempCanvas.className = "";
                     tempCanvas.classList.add("eraser");
                     cache.strokeStyle = strokeStyle;
@@ -924,11 +925,6 @@ gothicFont.load().then((font) => {
                 getContext('3d_view').drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.view3d;
-
-            // find('3d_view').onclick = function () {
-            //     this.classList.toggle("on");
-            //     this.classList.toggle("selected-shape");
-            // }
         }
 
         function decorateHomework() {
@@ -990,6 +986,8 @@ gothicFont.load().then((font) => {
 
             addEvent(canvas, 'click', function () {
                 hideContainers();
+                BtnOff();
+
                 if (this.classList.contains('off')) return false;
                 tempCanvas.className = "pen";
                 pencilContainer.style.display = 'block';
@@ -1028,6 +1026,8 @@ gothicFont.load().then((font) => {
                 if (this.classList.contains('off'))
                     return false;
                 hideContainers();
+                BtnOff();
+
                 tempCanvas.className = "marker";
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
@@ -1165,6 +1165,10 @@ gothicFont.load().then((font) => {
             pencilContainer.style.display = 'none';
     }
 
+    function BtnOff() {
+        window.parent.document.getElementsByClassName("selected-shape")[0].classList.remove("selected-shape");
+    }
+
     function TouchConverter(e) {
         var r = {
             pageX: e.touches[0].pageX,
@@ -1284,7 +1288,7 @@ gothicFont.load().then((font) => {
         keyCode = e.which || e.keyCode || 0;
     });
 
-    addEvent(document, 'keyup', (e) => {
+    addEvent(window.parent.document, 'keyup', (e) => {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
         }

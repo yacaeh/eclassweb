@@ -352,37 +352,6 @@ input:focus {
     border: 1px solid rgb(218, 207, 207);
     color: rgb(197, 189, 189);
 }
-.fontSelect {
-    position: relative;
-    padding: 3px;
-    height: 28px;
-    line-height: 28px;
-    cursor: pointer;
-    margin: 3px;
-    width: 200px;
-    background-image: -webkit-linear-gradient(top, #f9f9f9, #f0f0f0);
-    background-image: -moz-linear-gradient(top, #f9f9f9, #f0f0f0);
-    background-image: -o-linear-gradient(top, #f9f9f9, #f0f0f0);
-    background-image: -ms-linear-gradient(top, #f9f9f9, #f0f0f0);
-    background-image: linear-gradient(top, #f9f9f9, #f0f0f0);
-    filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0, StartColorStr='$from', EndColorStr='$to');
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    border: 1px solid #cecece;
-}
-.fontSelect span {
-    overflow: hidden;
-    margin-left: 5px;
-}
-.fontSelect .arrow-down {
-    position: absolute;
-    right: 10px;
-    top: 14px;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 6px solid #AAA;
-}
 
 
 #text-selected-color-2 {
@@ -608,7 +577,6 @@ background: rgb(204,204,204,0) !important;
 }
 
 #epub-viewer{
-    left: 50px;
     position: absolute;
     height: 100%;
     direction: ltr;

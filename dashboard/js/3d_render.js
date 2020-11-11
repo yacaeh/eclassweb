@@ -176,6 +176,10 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
+
+    btn.classList.toggle("on");
+    btn.classList.toggle("selected-shape");
+
     canvasManager.clear();
     const isViewer = !classroomInfo.share3D.state;
     classroomInfo.share3D.state = isViewer;

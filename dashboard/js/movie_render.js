@@ -7,6 +7,9 @@ function Movie_Render_Button(btn) {
         return;
     }
 
+    btn.classList.toggle("on");
+    btn.classList.toggle("selected-shape");
+    
     var visible = urlform.style.display;
 
     //console.log(visible);
