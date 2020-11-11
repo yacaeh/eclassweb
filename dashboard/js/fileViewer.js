@@ -96,7 +96,7 @@ class fileViewerLoader {
         fileViewer.setAttribute('src', 'https://' + window.location.host + '/ViewerJS/#' + url);
 
         if (mobileHelper.isMobile)
-            fileViewer.style.width = "calc(100% - 52px)";
+            fileViewer.style.width = "calc(100%)";
 
         fileViewer.setAttribute('allowFullScreen', '');
         GetWidgetFrame().document.getElementsByClassName('design-surface')[0].appendChild(fileViewer);
@@ -867,7 +867,7 @@ function unloadFileViewer() {
     pointer_saver.save();
     pageNavigator.off();
 
-    var btn = GetWidgetFrame().document.getElementById("file");
+    var btn = document.getElementById("file");
     btn.classList.remove("selected-shape");
     btn.classList.remove("on");
 
@@ -884,7 +884,7 @@ function loadFileViewer(path) {
 
     mfileViewer.nowPath = path;
 
-    var btn = GetWidgetFrame().document.getElementById("file");
+    var btn = document.getElementById("file");
     btn.classList.add("selected-shape");
     btn.classList.add("on");
 

@@ -69,7 +69,6 @@ function modelEnable() {
         frame.document.getElementsByClassName('design-surface')[0].appendChild(_3d_canvas);
         frame.document.getElementById("main-canvas").style.zIndex = "1";
         frame.document.getElementById("temp-canvas").style.zIndex = "2";
-        frame.document.getElementById("tool-box").style.zIndex = "3";
         engineInit(_3d_canvas);
         createScene(_3d_canvas); //Call the createScene function
     }
@@ -177,6 +176,10 @@ function _3DCanvasOnOff(btn) {
         removeOnSelect(btn);
         return;
     }
+
+    btn.classList.toggle("on");
+    btn.classList.toggle("selected-shape");
+
     canvasManager.clear();
     const isViewer = !classroomInfo.share3D.state;
     classroomInfo.share3D.state = isViewer;

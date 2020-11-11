@@ -109,6 +109,26 @@ if(!window.params.userFullName){
 
 ChattingManager.init();
 
+document.getElementById('onoff-icon').style.display   = 'block';
+document.getElementById('epub').style.display         = 'block';
+document.getElementById('screen_share').style.display = 'block';
+document.getElementById('clearCanvas').style.display  = 'block';
+document.getElementById('textIcon').style.display     = 'block';
+document.getElementById('eraserIcon').style.display   = 'block';
+document.getElementById('markerIcon').style.display   = 'block';
+document.getElementById('pencilIcon').style.display   = 'block';
+document.getElementById('undo').style.display         = 'block';
+document.getElementById('movie').style.display        = 'block';
+document.getElementById('callteacher').style.display  = 'block';
+document.getElementById('file').style.display         = 'block';
+document.getElementById('3d_view').style.display      = 'block';
+document.getElementById('homework').style.display     = 'block';
+
+document.getElementById('epub').onclick = function () {
+  this.classList.toggle("on");
+  this.classList.toggle("selected-shape");
+}
+
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
   examObj.init();
@@ -145,6 +165,9 @@ designer.appendTo(widgetContainer, () => {
                                classroomManager.joinRoom();
   onWidgetLoaded();
 });
+
+
+
 
 connection.onmessage = function (event) {
   if (debug)

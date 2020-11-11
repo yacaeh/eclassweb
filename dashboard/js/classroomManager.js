@@ -135,7 +135,6 @@ class classroomManagerClass {
         let y = canvas.height;
         let renderCanvas = frame.document.getElementById('renderCanvas');
         if (renderCanvas) {
-            renderCanvas.style.left = "50px";
             renderCanvas.width = x;
             renderCanvas.height = y;
         }
@@ -144,14 +143,13 @@ class classroomManagerClass {
     };
 
     setTeacher() {
-        let frame = GetWidgetFrame();
         document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
         $("#my-name").remove();
         $(".feature").show();
         $(".controll").show();
         $(".for_teacher").show();
-        $(frame.document.getElementById("callteacher")).remove();
-        $(frame.document.getElementById("homework")).remove();
+        $(document.getElementById("callteacher")).remove();
+        $(document.getElementById("homework")).remove();
     };
 
     setStudent() {
@@ -163,11 +161,10 @@ class classroomManagerClass {
         $(".for_teacher").remove();
         $("#student_list").remove();
 
-        let frame = GetWidgetFrame();
-        $(frame.document.getElementById("3d_view")).remove();
-        $(frame.document.getElementById("movie")).remove();
-        $(frame.document.getElementById("file")).remove();
-        $(frame.document.getElementById("epub")).remove();
+        $(document.getElementById("3d_view")).remove();
+        $(document.getElementById("movie")).remove();
+        $(document.getElementById("file")).remove();
+        $(document.getElementById("epub")).remove();
     };
 
     gotoMain() {
