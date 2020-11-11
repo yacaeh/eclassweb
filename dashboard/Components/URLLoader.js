@@ -59,15 +59,12 @@ function Movie_Render_Button(btn) {
         removeOnSelect(btn);
         return;
     }
-<<<<<<< HEAD:dashboard/Components/URLLoader.js
     
     let urlform = document.getElementById("urlform");
-=======
 
     btn.classList.toggle("on");
     btn.classList.toggle("selected-shape");
     
->>>>>>> 014a958dd0315c4d4797a584012ffd776848d045:dashboard/js/movie_render.js
     var visible = urlform.style.display;
 
     if (visible == "inline-block") {

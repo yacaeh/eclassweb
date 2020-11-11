@@ -691,7 +691,7 @@ gothicFont.load().then((font) => {
             window.parent.document.getElementsByClassName("textInputUI")[0].focus();
 
         },
-        //textStrokeStyle : '#' + find('text-fill-style').value,
+
         eachFontColor: function (callback) {
             var container = find('textInputContainer');
             var template = container.getElementsByClassName("color_template_text")[0];
@@ -867,7 +867,9 @@ gothicFont.load().then((font) => {
 
         function bindEvent(context, shape) {
             addEvent(context.canvas, 'click', function () {
+                
                 if (shape === 'Text') {
+                    BtnOff();
                     if (this.classList.contains("off"))
                         return false;
                     textHandler.onShapeSelected();
@@ -942,11 +944,6 @@ gothicFont.load().then((font) => {
                 getContext('movie').drawImage(image, 0, 0, 28, 28);
             };
             image.src = data_uris.movie;
-
-            // find('movie').onclick = function () {
-            //     this.classList.toggle("on");
-            //     this.classList.toggle("selected-shape");
-            // }
         }
 
         function decoratecallteacher() {
@@ -1475,6 +1472,7 @@ gothicFont.load().then((font) => {
     }
 
     SliderSetting("pencileslider", "pencil-stroke-style", 1, 22, 3, function (v) {
+        console.log(v);
         clone(drawHelper).getOptions = () => {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, font];
         }
@@ -1624,14 +1622,7 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
         }
     })
 
-    document.getElementById("temp-canvas").addEventListener("mouseup", function () {
-        if (isClick) {
-            isClick = false;
-            callback(sliderval.value);
-        }
-    })
-
-    window.addEventListener("mouseup", function () {
+    window.parent.addEventListener("mouseup", function () {
         if (isClick) {
             isClick = false;
             callback(sliderval.value);
