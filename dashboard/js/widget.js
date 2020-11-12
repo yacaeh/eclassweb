@@ -26,9 +26,14 @@ gothicFont.load().then((font) => {
     const tempCanvas    = find("temp-canvas");
     const context     = getContext('main-canvas'),
           tempContext = getContext('temp-canvas');
+    const lineUid = find('line-uid');
+    let useruidlist = {};
+
 
     paper.setup(mainCanvas);
-
+    paper.settings.handleSize = 0;
+    paper.settings.selectedColor = 'blue';
+    
     var group = new paper.Group();
     var canvas = tempContext.canvas;
     var teacherPoints = [];
@@ -192,9 +197,9 @@ gothicFont.load().then((font) => {
 
             let _this = this;
 
-            Object.keys(studentPoints).forEach(function (e) {
-                studentPoints[e].forEach(function (data) {
-                    drawpoint(data.points, e);
+            Object.keys(studentPoints).forEach(function (uid) {
+                studentPoints[uid].forEach(function (data) {
+                    drawpoint(data.points, uid);
                 })
             })
 
@@ -210,64 +215,112 @@ gothicFont.load().then((font) => {
                 let end = true;
                 let path = undefined;
 
-                points.forEach(function (point) {
-                    if (point[0] == "marker" || point[0] == "line") {
-                        if (point[1][0] == -1) {
-                            
-                            // 임시 버그 수정
-                            if(point.length == 2){
-                                path.strokeColor = 'red';
-                                path.strokeWidth = 5;
-                            }
-                            else{
-                                path.strokeColor = point[2][1];
-                                path.strokeWidth = point[2][0];
+                try {
+                    points.forEach(function (point) {
+                        if (point[0] == "marker" || point[0] == "line") {
+          
+
+                            if (point[1][0] == -1) {
+                                if(!path){
+                                    return true;
+                                }
+                                // 임시 버그 수정
+                                if (point.length == 2) {
+                                    path.strokeColor = 'red';
+                                    path.strokeWidth = 5;
+                                }
+                                else {
+                                    path.strokeColor = point[2][1];
+                                    path.strokeWidth = point[2][0];
+                                }
+
+                                path.smooth();
+                                path.simplify();
+
+                                path.onMouseEnter = function (e) {
+                                    if (point[0] == 'marker') {
+                                        this.strokeColor = 'rgba(0,0,0,0.2)';
+                                    }
+                                    else {
+                                        this.selected = true;
+                                        this.strokeColor = 'rgba(0,0,0,0.5)';
+                                    }
+                                    if (uid in useruidlist) {
+                                        lineUid.innerHTML = useruidlist[uid];
+                                    } else {
+                                        window.parent.connection.socket.emit('get-user-name', uid, function (name) {
+                                            lineUid.innerHTML = name;
+                                            useruidlist.uid = name;
+                                        })
+                                    }
+                                    lineUid.style.display = 'block';
+                                    this.strokeWidth = parseInt(point[2][0]) + 5;
+                                }
+
+                                path.onMouseLeave = function (e) {
+                                    lineUid.style.display = 'none';
+                                    this.strokeColor = point[2][1];
+                                    this.strokeWidth = point[2][0];
+                                    this.selected = false;
+                                }
+
+                                path.uid = uid;
+                                group.addChild(path);
+                                end = true;
+                                return true;
                             }
 
-                            path.strokeCap = 'round';
-                            path.smooth();
-                            path.simplify();
-                            
-                            path.onMouseEnter = function(e){
-                                this.strokeColor = 'red';
-                                console.log(e);
-                                console.log(e.target.uid);
-                                this.strokeWidth = point[2][0] * 2;
-                            }
-                            
-                            path.onMouseLeave = function(e){
-                                this.strokeColor = point[2][1];
-                                this.strokeWidth = point[2][0];
+                            if (end) {
+                                path = new paper.Path();
+                                path.strokeCap = 'round';
+                                path.moveTo(new paper.Point(resizePoint(point[1])));
+                                end = false;
+                                return true;
                             }
 
-                            path.uid = uid;
-                            group.addChild(path);
+                            path.lineTo(resizePoint(point[1]));
+                        }
+
+                        else {
+                            let text = new paper.PointText({
+                                point: resizePoint([point[1][1], point[1][2]]),
+                                justification: 'center',
+                                content: point[1][0].substr(1, point[1][0].length - 2),
+                                fillColor: point[2][2],
+                                fontFamily: point[2][4].split(' ')[1],
+                                fontSize: point[2][4].split(' ')[0]
+                            })
+
+                            text.onMouseEnter = function (e) {
+                                if (uid in useruidlist) {
+                                    lineUid.innerHTML = useruidlist[uid];
+                                } else {
+                                    window.parent.connection.socket.emit('get-user-name', uid, function (name) {
+                                        lineUid.innerHTML = name;
+                                        useruidlist.uid = name;
+                                    })
+                                }
+                                lineUid.style.display = 'block';
+                                this.strokeColor = 'black';
+                                this.strokeWidth = 1;
+                            }
+
+                            text.onMouseLeave = function (e) {
+                                lineUid.style.display = 'none';
+                                this.strokeWidth = 0;
+                            }
+
                             end = true;
-                            return true;
+                            group.addChild(text);
                         }
-
-                        if (end) {
-                            path = new paper.Path();
-                            path.moveTo(new paper.Point(resizePoint(point[1])));
-                            end = false;
-                            return true;
-                        }
-
-                        path.lineTo(resizePoint(point[1]));
-                    }
-
-                    else {
-                        group.addChild(new paper.PointText({
-                            point       : resizePoint([point[1][1], point[1][2]]),
-                            justification: 'center',
-                            content     : point[1][0].substr(1, point[1][0].length - 2),
-                            fillColor   : point[2][2],
-                            fontFamily  : point[2][4].split(' ')[1],
-                            fontSize    : point[2][4].split(' ')[0]
-                        }));
-                    }
-                });
-                _this.prepoint = [];
+                    });
+                    _this.prepoint = [];
+                }
+                catch (e) {
+                    console.error(e);
+                    console.error(path)
+                    console.error(teacherPoints);
+                }
             }
 
         },
@@ -634,6 +687,8 @@ gothicFont.load().then((font) => {
             } else if (!this.lastFillStyle.length) {
                 this.lastFillStyle = textHandler.lastFillStyle;
             }
+            
+            this.textInputContainer.style.display = show == 'show' ? 'block' : 'none';
 
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
@@ -769,6 +824,7 @@ gothicFont.load().then((font) => {
     };
 
     function setSelection(element, prop) {
+        BtnOff();
 
         if (textHandler.text && textHandler.text.length) {
             textHandler.appendPoints();
@@ -847,7 +903,6 @@ gothicFont.load().then((font) => {
             addEvent(context.canvas, 'click', function () {
 
                 if (shape === 'Text') {
-                    BtnOff();
                     if (this.classList.contains("off"))
                         return false;
                     textHandler.onShapeSelected();
@@ -859,7 +914,6 @@ gothicFont.load().then((font) => {
 
                 if (this.id === 'eraserIcon') {
                     if (this.classList.contains('off')) return false;
-                    BtnOff();
                     tempCanvas.className = "";
                     tempCanvas.classList.add("eraser");
                     cache.strokeStyle = strokeStyle;
@@ -900,8 +954,6 @@ gothicFont.load().then((font) => {
 
             addEvent(canvas, 'click', function () {
                 hideContainers();
-                BtnOff();
-
                 if (this.classList.contains('off')) return false;
                 tempCanvas.className = "pen";
                 pencilContainer.style.display = 'block';
@@ -930,8 +982,6 @@ gothicFont.load().then((font) => {
 
             addEvent(canvas, 'click', function () {
                 hideContainers();
-                BtnOff();
-                
                 if (this.classList.contains('off'))
                     return false;
 
@@ -1032,7 +1082,8 @@ gothicFont.load().then((font) => {
     }
 
     function BtnOff() {
-        window.parent.document.getElementsByClassName("selected-shape")[0].classList.remove("selected-shape");
+        if(window.parent.document.getElementsByClassName("selected-shape")[0])
+            window.parent.document.getElementsByClassName("selected-shape")[0].classList.remove("selected-shape");
     }
 
     function TouchConverter(e) {
@@ -1050,8 +1101,6 @@ gothicFont.load().then((font) => {
 
 
         if (e.touches) {
-
-
             if (e.touches.length >= 2) {
                 let cache = is;
                 let command = "default";
@@ -1069,11 +1118,9 @@ gothicFont.load().then((font) => {
                     markerHandler.mouseup(e);
                 }
 
-                !cache.isPdf && drawHelper.redraw();
-
-                if (!cache.isEraser) {
-                    syncPoints(false, command);
-                }
+                // if (!cache.isEraser) {
+                //     syncPoints(false, command);
+                // }
 
                 preventStopEvent(e);
                 return;
@@ -1124,9 +1171,9 @@ gothicFont.load().then((font) => {
             markerHandler.mouseup(e);
         }
 
-        !cache.isPdf && drawHelper.redraw();
-
-        if (!cache.isEraser) {
+        
+        if (!cache.isEraser && !cache.isText) {
+            drawHelper.redraw();
             syncPoints(false, command);
         }
 
@@ -1137,6 +1184,9 @@ gothicFont.load().then((font) => {
         if (e.touches) {
             e = TouchConverter(e);
         }
+                    
+        lineUid.style.left = e.layerX + 'px';
+        lineUid.style.top = e.layerY + 'px';
 
         if(e.type == 'mousemove' && e.buttons == 0)
             return;
@@ -1243,18 +1293,18 @@ gothicFont.load().then((font) => {
                 window.parent.currentHistory = pointHistory;
                 break;
             case "default":
-            case "loaddata":
-                var startIdx = 0;
+                var startIdx = 0;   
                 data.history.forEach(function (history) {
                     if (startIdx == history)
-                        return false;
-                    var points = data.points.slice(startIdx, history);
-                    var command = points[0][0];
+                    return false;
+                    var point = data.points.slice(startIdx, history);
+                    if(point.length == 0 )
+                    return true;
+                    var command = point[0][0];
                     var startIndex = startIdx;
                     startIdx = history;
-
                     var d = {
-                        points: points,
+                        points: point,
                         command: command,
                         startIndex: startIndex,
                         userid: data.userid,

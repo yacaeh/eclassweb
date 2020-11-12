@@ -162,8 +162,6 @@ class classroomManagerClass {
         GetWidgetFrame().addEventListener('keyup', up);
 
         function down(key) {
-            console.log(key);
-            
             if (key.altKey) {
                 if (!classroomManager.altdown) {
                     MakeTooltip(shortCut);

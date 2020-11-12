@@ -1,5 +1,6 @@
 #textInputContainer{
     z-index: 99999999;
+    display: none;
 }
 
 .textInputUI {

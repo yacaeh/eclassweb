@@ -31,9 +31,9 @@ module.exports = exports = function (socket, config) {
     // io.set('origins', 'https://domain.com');
 
     function alertbox(...params){                 
-        let top = "┌";
-        let mid = "│  ";
-        let bot = "└";   
+        let top = "-";
+        let mid = "-  ";
+        let bot = "-";   
         
         let length = 0;
         length += params.length + 2;
@@ -43,13 +43,13 @@ module.exports = exports = function (socket, config) {
         })
 
         for(let i = 0 ; i < length; i++){
-            top += '─';
-            bot += '─';
+            top += '-';
+            bot += '-';
         }
 
-        top += '┐';
-        mid += '│';
-        bot += '┘';
+        top += '-';
+        mid += '-';
+        bot += '-';
 
         console.log(top);
         console.log(mid);

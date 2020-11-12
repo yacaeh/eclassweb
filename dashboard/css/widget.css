@@ -573,3 +573,19 @@ background: rgb(204,204,204,0) !important;
     top: calc(50% - 20px);
 }
 
+
+#line-uid{
+    z-index: 9999;
+    width: auto;
+    height: 20px;
+    position: absolute;
+    background-color: black;
+    color: white;
+    border-radius: 7px;
+    font-size: 13px;
+    font-family: Roboto;
+    display: none;
+    pointer-events: none;
+    padding-left: 5px;
+    padding-right: 5px;
+}
