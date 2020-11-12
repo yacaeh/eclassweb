@@ -7,10 +7,6 @@
 
 'use strict';
 
-$(window).bind("load", function () {
-    updateLanguage();
-});
-
 const penFont = new FontFace('나눔펜글씨', 'url(/dashboard/fonts/NanumPen.ttf)');
 penFont.load().then((font) => {
     document.fonts.add(font);
@@ -22,15 +18,23 @@ gothicFont.load().then((font) => {
 });
 
 (function () {
-    var context = getContext('main-canvas'),
-        tempContext = getContext('temp-canvas');
+    const _uid = window.parent.connection.userid;
+    const penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
+    const pencilContainer = find('pencil-container');
+    const markerContainer = find('marker-container');
+    const mainCanvas    = find('main-canvas');
+    const tempCanvas    = find("temp-canvas");
+    const context     = getContext('main-canvas'),
+          tempContext = getContext('temp-canvas');
+    const lineUid = find('line-uid');
+    let useruidlist = {};
 
-    paper.setup(find("main-canvas"));
 
+    paper.setup(mainCanvas);
+    paper.settings.handleSize = 0;
+    paper.settings.selectedColor = 'blue';
+    
     var group = new paper.Group();
-
-    var _uid = window.parent.connection.userid;
-    let penColors = ["#484848", "#FFFFFF", "#F12A2A", "#FFEA31", "#52F12A", "#2AA9F1", "#BC4FFF"]
     var canvas = tempContext.canvas;
     var teacherPoints = [];
     var studentPoints = {};
@@ -38,11 +42,7 @@ gothicFont.load().then((font) => {
     var orderHistory = [];
     var markerpoint = [];
 
-    var pencilContainer = find('pencil-container');
-    var markerContainer = find('marker-container');
-    var tempCanvas = find("temp-canvas");
-    var iframe = window.parent.document.getElementById("widget-container").getElementsByTagName('iframe')[0];
-    let zoom = new ZoomManager(iframe);
+    let zoom = new ZoomManager(window.parent.document.getElementById("widget-container").getElementsByTagName('iframe')[0]);
     zoom.setEvent(tempCanvas);
 
     var points = [],
@@ -71,6 +71,7 @@ gothicFont.load().then((font) => {
             cache['is' + shape] = true;
         }
     };
+
     let undoicon = find('undo');
 
     function orderHistoryChecker() {
@@ -185,82 +186,143 @@ gothicFont.load().then((font) => {
         return [hexToR(h), hexToG(h), hexToB(h)]
     }
 
+
     var drawHelper = {
         prepoint: [],
         marking: false,
 
         redraw: function () {
             tempContext.clearRect(0, 0, innerWidth, innerHeight);
-            context.clearRect(0, 0, innerWidth, innerHeight);
-
-            var path = undefined;
-            var start = undefined;
-
-            context.lineCap = "round";
-            context.lineJoin = "round";
             group.removeChildren();
+
             let _this = this;
 
-            Object.keys(studentPoints).forEach(function (e) {
-                studentPoints[e].forEach(function (data) {
-                    drawpoint(data.points);
+            Object.keys(studentPoints).forEach(function (uid) {
+                studentPoints[uid].forEach(function (data) {
+                    drawpoint(data.points, uid);
                 })
             })
 
             teacherPoints.forEach(function (data) {
-                drawpoint(data.points);
+                drawpoint(data.points, window.parent.GetOwnerId());
             })
 
-            drawpoint(points);
+            drawpoint(points, _uid);
 
             paper.view.draw();
 
-            function drawpoint(points) {
+            function drawpoint(points, uid) {
                 let end = true;
-                points.forEach(function (point) {
-                    if (point[0] == "marker" || point[0] == "line") {
-                        if (point[1][0] == -1) {
-                            path.smooth();
-                            path.simplify();
+                let path = undefined;
+
+                try {
+                    points.forEach(function (point) {
+                        if (point[0] == "marker" || point[0] == "line") {
+          
+
+                            if (point[1][0] == -1) {
+                                if(!path){
+                                    return true;
+                                }
+                                // 임시 버그 수정
+                                if (point.length == 2) {
+                                    path.strokeColor = 'red';
+                                    path.strokeWidth = 5;
+                                }
+                                else {
+                                    path.strokeColor = point[2][1];
+                                    path.strokeWidth = point[2][0];
+                                }
+
+                                path.smooth();
+                                path.simplify();
+
+                                path.onMouseEnter = function (e) {
+                                    if (point[0] == 'marker') {
+                                        this.strokeColor = 'rgba(0,0,0,0.2)';
+                                    }
+                                    else {
+                                        this.selected = true;
+                                        this.strokeColor = 'rgba(0,0,0,0.5)';
+                                    }
+                                    if (uid in useruidlist) {
+                                        lineUid.innerHTML = useruidlist[uid];
+                                    } else {
+                                        window.parent.connection.socket.emit('get-user-name', uid, function (name) {
+                                            lineUid.innerHTML = name;
+                                            useruidlist.uid = name;
+                                        })
+                                    }
+                                    lineUid.style.display = 'block';
+                                    this.strokeWidth = parseInt(point[2][0]) + 5;
+                                }
+
+                                path.onMouseLeave = function (e) {
+                                    lineUid.style.display = 'none';
+                                    this.strokeColor = point[2][1];
+                                    this.strokeWidth = point[2][0];
+                                    this.selected = false;
+                                }
+
+                                path.uid = uid;
+                                group.addChild(path);
+                                end = true;
+                                return true;
+                            }
+
+                            if (end) {
+                                path = new paper.Path();
+                                path.strokeCap = 'round';
+                                path.moveTo(new paper.Point(resizePoint(point[1])));
+                                end = false;
+                                return true;
+                            }
+
+                            path.lineTo(resizePoint(point[1]));
+                        }
+
+                        else {
+                            let text = new paper.PointText({
+                                point: resizePoint([point[1][1], point[1][2]]),
+                                justification: 'center',
+                                content: point[1][0].substr(1, point[1][0].length - 2),
+                                fillColor: point[2][2],
+                                fontFamily: point[2][4].split(' ')[1],
+                                fontSize: point[2][4].split(' ')[0]
+                            })
+
+                            text.onMouseEnter = function (e) {
+                                if (uid in useruidlist) {
+                                    lineUid.innerHTML = useruidlist[uid];
+                                } else {
+                                    window.parent.connection.socket.emit('get-user-name', uid, function (name) {
+                                        lineUid.innerHTML = name;
+                                        useruidlist.uid = name;
+                                    })
+                                }
+                                lineUid.style.display = 'block';
+                                this.strokeColor = 'black';
+                                this.strokeWidth = 1;
+                            }
+
+                            text.onMouseLeave = function (e) {
+                                lineUid.style.display = 'none';
+                                this.strokeWidth = 0;
+                            }
+
                             end = true;
-                            group.addChild(path);
-                            return true;
+                            group.addChild(text);
                         }
-
-                        if (end) {
-                            path = new paper.Path();
-                            start = new paper.Point(resizePoint(point[1]));
-                            path.moveTo(start);
-                            path.strokeColor = point[2][1];
-                            path.strokeWidth = point[2][0]
-                            path.strokeCap = 'round';
-
-                            end = false;
-                            return true;
-                        }
-
-                        path.lineTo(resizePoint(point[1]));
-                    }
-                    else {
-                        let size = point[2][4].split(' ')[0];
-                        let font = point[2][4].split(' ')[1];
-
-
-                        let text = new paper.PointText({
-                            point: resizePoint([point[1][1], point[1][2]]),
-                            justification: 'center',
-                            content: point[1][0].substr(1, point[1][0].length - 2),
-                            fillColor: point[2][2],
-                            fontFamily: font,
-                            fontSize: size
-                        });
-                        group.addChild(text);
-                    }
-
-                });
-                _this.prepoint = [];
-
+                    });
+                    _this.prepoint = [];
+                }
+                catch (e) {
+                    console.error(e);
+                    console.error(path)
+                    console.error(teacherPoints);
+                }
             }
+
         },
 
         getOptions: function (opt) {
@@ -283,7 +345,6 @@ gothicFont.load().then((font) => {
 
             if (!isNoFillStroke) {
                 context.stroke();
-                // context.fill();
             }
         },
         line: function (context, point, options, nopre = false) {
@@ -349,13 +410,12 @@ gothicFont.load().then((font) => {
             t.ismousedown = true;
 
             tempContext.lineCap = 'round';
-            let opt = pencilDrawHelper.getOptions();
-            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt, true);
-            points[points.length] = ['line', [t.prevX, t.prevY], opt];
+            pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], pencilDrawHelper.getOptions(), true);
+            points[points.length] = ['line', [t.prevX, t.prevY]];
             pencilContainer.style.display = 'none';
         },
         mouseup: function () {
-            points[points.length] = ['line', [-1, -1]];
+            points[points.length] = ['line', [-1, -1], pencilDrawHelper.getOptions()];
             pointHistory.push(points.length);
             orderHistory.push('undo');
             orderHistoryChecker();
@@ -373,9 +433,8 @@ gothicFont.load().then((font) => {
 
             if (t.ismousedown) {
                 tempContext.lineCap = 'round';
-                let opt = pencilDrawHelper.getOptions()
-                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], opt);
-                points[points.length] = ['line', [t.prevX, t.prevY], opt];
+                pencilDrawHelper.line(tempContext, [t.prevX, t.prevY], pencilDrawHelper.getOptions());
+                points[points.length] = ['line', [t.prevX, t.prevY]];
                 t.prevX = nx;
                 t.prevY = ny;
             }
@@ -410,13 +469,11 @@ gothicFont.load().then((font) => {
             tempContext.lineCap = 'round';
             markerpoint = [];
             markerpoint.push([x, y]);
-            let opt = markerDrawHelper.getOptions();
-            points[points.length] = ['marker', [t.prevX, t.prevY], opt];
-
+            points[points.length] = ['marker', [t.prevX, t.prevY]];
             markerContainer.style.display = 'none';
         },
         mouseup: function (e) {
-            points[points.length] = ['marker', [-1, -1]];
+            points[points.length] = ['marker', [-1, -1], markerDrawHelper.getOptions()];
             pointHistory.push(points.length);
             orderHistory.push('undo');
             orderHistoryChecker();
@@ -436,9 +493,8 @@ gothicFont.load().then((font) => {
                 tempContext.lineCap = 'round';
 
                 markerpoint.push([x, y]);
-                let opt = markerDrawHelper.getOptions();
-                markerDrawHelper.marker(tempContext, markerpoint, opt, []);
-                points[points.length] = ['marker', [t.prevX, t.prevY], opt];
+                markerDrawHelper.marker(tempContext, markerpoint, markerDrawHelper.getOptions(), []);
+                points[points.length] = ['marker', [t.prevX, t.prevY]];
                 t.prevX = nx;
                 t.prevY = ny;
             }
@@ -631,6 +687,8 @@ gothicFont.load().then((font) => {
             } else if (!this.lastFillStyle.length) {
                 this.lastFillStyle = textHandler.lastFillStyle;
             }
+            
+            this.textInputContainer.style.display = show == 'show' ? 'block' : 'none';
 
             this.textInputBox.style.display = show == 'show' ? 'block' : 'none';
             this.textInputBox.style.left = this.x + 'px';
@@ -691,7 +749,7 @@ gothicFont.load().then((font) => {
             window.parent.document.getElementsByClassName("textInputUI")[0].focus();
 
         },
-        //textStrokeStyle : '#' + find('text-fill-style').value,
+
         eachFontColor: function (callback) {
             var container = find('textInputContainer');
             var template = container.getElementsByClassName("color_template_text")[0];
@@ -750,36 +808,23 @@ gothicFont.load().then((font) => {
             drawHelper.redraw();
             this.showOrHideTextTools('hide');
         },
-        textInputBox: window.parent.document.querySelector('.textInputUI'),
-        fontFamilyBox: window.parent.document.querySelector('.fontSelectUl'),
-        fontSizeBox: window.parent.document.querySelector('.fontSizeUl'),
-        fontColorBox: find('textInputContainer').querySelector('.color_template_text'),
+        textInputBox    : window.parent.document.querySelector('.textInputUI'),
+        fontFamilyBox   : window.parent.document.querySelector('.fontSelectUl'),
+        fontSizeBox     : window.parent.document.querySelector('.fontSizeUl'),
+        fontColorBox    : find('textInputContainer').querySelector('.color_template_text'),
         textInputContainer: find('textInputContainer')
     };
 
     var icons = JSON.parse(params.icons);
 
     var data_uris = {
-        pencilIcon: icons.pencil,
-        markerIcon: icons.marker,
-        eraserIcon: icons.eraser,
-        textIcon: icons.text || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAWVJREFUeJzt28ENgzAQAEETpf+WSQfJA6xD2ZkCjCWv7mFgLQAAAKDimN4A69y8/tczfm1+OA8ngDgBxAkgTgBxAogTQJx7gOf7dU9w6QxNgDgBxAkgTgBxAogTQJwA4t43rLH7ffa/G72LMQHiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIu+N7gOl/C65+jzC9/1EmQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxx/QGWOfm9b+esQkQJ4A4AcQJIE4AcQKIEwAAAABAxAcVTAXjELyg1wAAAABJRU5ErkJggg==',
-        undo: icons.undo || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABPxJREFUeNrsnVuIVVUYx9dpQiIdvOBtDGa8RILSQz4koWYvRZeXEkRztJd8ExGkSPBRSxDMB0ESxBBpSnyLMCGJChV6SSURpEkcZia8RjqpmTTT97HXYQYcZ87Za5+z917f7wd/BhT1eNZvfWutvdbeuzI0NOTALk/wFSAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAlBq9LyAkJeY5yWeSmabbz6gA70n6JX9LplkWwNoQME/yleSwZI7ktn6HzAFsoL3+R8kaBv5hnjTS63fR8DYrAL3eaAWg1xuuAPR6oxWAXm+4AtDrjVYA7fWfSNbSlPYqQLXX0/jGKgC93nAFoNcbrQD0esMVgF5vtALQ6w1XAHq90QqQR6//jwpgt9dXJE9LWqwKUAk91lWpVEI/Q4fkY0lnDv9/7f2/Sf5yyfEw/XlLck3SI+mT9PqfA0VswOD2y1mATt/4HQXuJPcl170oFyVnJeckl/zvIUDKsV4b/t2SVs5/Jb9Lzki+l/wg+aOMAuRxKniDL69DEUUrxDE/f5nWbAHKcix8ruTLyBp+tFyW7JY8jwDDrI+w14+Xu5IjkhctCzDPSK8fK/9IDrrkTiRTAmww2OvHii4tt/nrDlELoGP9FzT4Y6Mrh5diFaCTXl9T9KLShzEJMJexPlW6JDPKLsBGfxGEBk2XXyQL8xIgi82gQQchvCA5IVma27XkDIaADiZ+mawSXolhEniFxkydm5KVLANt56pkSQwXgqgG6dMtaY/hUjBzg/TR01ETY9kMWkc1SJW9sW0HUw3qiy6x34lFAOYG6aLf1eyYBGBuUH8OxCYAc4P6omcQl8UoQN5zg0G/M6enex8WXILv3Cj3cYS2XxHuCxh5gGRnrevfjPhT8qo/tTPJZ6pLnh/c7uXU4WqBZLrL/0aatyTHy34qeLxq0NXEXqWneVvH+UwtXoiXJZslR3M883DSJXczRTUEPG6l0Iwv+Ybv2fUyRfKGZJ9L7g9olgB6J9MKCwI0a26QVoCRTJa87ZL7AgaaIMEhKwJUWd/AlUIWAoxkkZ/HXG7wjmGbJQEaWQ2yFqCKHvPa6jd1GiHBRmsCNGpu0CgBqsxyydNL72UswNdWBci6GjRagCp6DPznDAXQW9jnWBUgy7lBswSorhz2ZyjBKusCZFENmilAlS2SBxkIsAcBwncY8xBAWe2G31eUNj/plUkECNthzEsA5U1/KTrkFPFMBAirBnkKoLwuuROwkbWc18Y9ilaBlX5PoejoDSHv++3euvfhXHL7fRCxvjSqx1eC6oMpioxeQv4g5Z99NvhfN/Dm0LFWCnkPASPZk2IY+Jw5QNjcoEgCTJB8W6cA3yBA2EqhSAIoz7j6NpJOI0D6atDnL8jMKNhne81PCmsR4FcESM98l7w+vq2An21HjQJ0I0A4RVwJPSU5VYMAvVwHCKeID7jQQ6qbXPIA67FoidF+SDjvkrME5sofDPOpS84RNKx6IUCx0aFgq1+tUAGMog+WPIAAttFl4ZVRfr2CADbQo+DbEcA2+iTW4whgF73w85HL+OVVCFAuLjh/GNQzIfQvLNLt4VAbrX4o0FfS9Ev7Lc5VACg3DAEIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgApeN/AQYAUjtq/Zx6jVYAAAAASUVORK5CYII=',
-        clearCanvas: icons.clearCanvas,
         on: icons.on,
         off: icons.off,
-        screenShare: icons.screenShare,
-        view3d: icons.view3d,
-        movie: icons.movie,
-        file: icons.file,
-        epub: icons.epub,
-        callteacher: icons.callteacher,
-        fulloff: icons.fulloff,
-        fullon: icons.fullon,
-        homework: icons.homework,
+        undo : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABPxJREFUeNrsnVuIVVUYx9dpQiIdvOBtDGa8RILSQz4koWYvRZeXEkRztJd8ExGkSPBRSxDMB0ESxBBpSnyLMCGJChV6SSURpEkcZia8RjqpmTTT97HXYQYcZ87Za5+z917f7wd/BhT1eNZvfWutvdbeuzI0NOTALk/wFSAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAlBq9LyAkJeY5yWeSmabbz6gA70n6JX9LplkWwNoQME/yleSwZI7ktn6HzAFsoL3+R8kaBv5hnjTS63fR8DYrAL3eaAWg1xuuAPR6oxWAXm+4AtDrjVYA7fWfSNbSlPYqQLXX0/jGKgC93nAFoNcbrQD0esMVgF5vtALQ6w1XAHq90QqQR6//jwpgt9dXJE9LWqwKUAk91lWpVEI/Q4fkY0lnDv9/7f2/Sf5yyfEw/XlLck3SI+mT9PqfA0VswOD2y1mATt/4HQXuJPcl170oFyVnJeckl/zvIUDKsV4b/t2SVs5/Jb9Lzki+l/wg+aOMAuRxKniDL69DEUUrxDE/f5nWbAHKcix8ruTLyBp+tFyW7JY8jwDDrI+w14+Xu5IjkhctCzDPSK8fK/9IDrrkTiRTAmww2OvHii4tt/nrDlELoGP9FzT4Y6Mrh5diFaCTXl9T9KLShzEJMJexPlW6JDPKLsBGfxGEBk2XXyQL8xIgi82gQQchvCA5IVma27XkDIaADiZ+mawSXolhEniFxkydm5KVLANt56pkSQwXgqgG6dMtaY/hUjBzg/TR01ETY9kMWkc1SJW9sW0HUw3qiy6x34lFAOYG6aLf1eyYBGBuUH8OxCYAc4P6omcQl8UoQN5zg0G/M6enex8WXILv3Cj3cYS2XxHuCxh5gGRnrevfjPhT8qo/tTPJZ6pLnh/c7uXU4WqBZLrL/0aatyTHy34qeLxq0NXEXqWneVvH+UwtXoiXJZslR3M883DSJXczRTUEPG6l0Iwv+Ybv2fUyRfKGZJ9L7g9olgB6J9MKCwI0a26QVoCRTJa87ZL7AgaaIMEhKwJUWd/AlUIWAoxkkZ/HXG7wjmGbJQEaWQ2yFqCKHvPa6jd1GiHBRmsCNGpu0CgBqsxyydNL72UswNdWBci6GjRagCp6DPznDAXQW9jnWBUgy7lBswSorhz2ZyjBKusCZFENmilAlS2SBxkIsAcBwncY8xBAWe2G31eUNj/plUkECNthzEsA5U1/KTrkFPFMBAirBnkKoLwuuROwkbWc18Y9ilaBlX5PoejoDSHv++3euvfhXHL7fRCxvjSqx1eC6oMpioxeQv4g5Z99NvhfN/Dm0LFWCnkPASPZk2IY+Jw5QNjcoEgCTJB8W6cA3yBA2EqhSAIoz7j6NpJOI0D6atDnL8jMKNhne81PCmsR4FcESM98l7w+vq2An21HjQJ0I0A4RVwJPSU5VYMAvVwHCKeID7jQQ6qbXPIA67FoidF+SDjvkrME5sofDPOpS84RNKx6IUCx0aFgq1+tUAGMog+WPIAAttFl4ZVRfr2CADbQo+DbEcA2+iTW4whgF73w85HL+OVVCFAuLjh/GNQzIfQvLNLt4VAbrX4o0FfS9Ev7Lc5VACg3DAEIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgApeN/AQYAUjtq/Zx6jVYAAAAASUVORK5CYII='
     };
 
     function setSelection(element, prop) {
+        BtnOff();
 
         if (textHandler.text && textHandler.text.length) {
             textHandler.appendPoints();
@@ -842,19 +887,9 @@ gothicFont.load().then((font) => {
         var cache = {};
 
         decorateUndo();
-        decorateFull();
-        decorate3dview();
-        decorateFile();
-        decoratecallteacher();
-        decorateHomework();
-        decoratemovie();
         decoratePencil();
         decorateMarker();
-        decorateEraser();
-        decorateText();
         decorateclearCanvas();
-        decorateScreenShare();
-        decoratEpub();
         decorateonoff();
 
         function getContext(id) {
@@ -866,6 +901,7 @@ gothicFont.load().then((font) => {
 
         function bindEvent(context, shape) {
             addEvent(context.canvas, 'click', function () {
+
                 if (shape === 'Text') {
                     if (this.classList.contains("off"))
                         return false;
@@ -878,7 +914,6 @@ gothicFont.load().then((font) => {
 
                 if (this.id === 'eraserIcon') {
                     if (this.classList.contains('off')) return false;
-                    BtnOff();
                     tempCanvas.className = "";
                     tempCanvas.classList.add("eraser");
                     cache.strokeStyle = strokeStyle;
@@ -898,71 +933,12 @@ gothicFont.load().then((font) => {
 
 
         function decorateUndo() {
-            var context = getContext('undo');
-            var image = new Image();
-            image.onload = function () {
-                context.drawImage(image, 0, 0, 28, 28);
-                changeColor(find('undo'), 0.3);
-                find('undo').onclick = function () {
-                    undo();
-                };
+            changeColor(find('undo'), 0.3);
+            find('undo').onclick = function () {
+                undo();
             };
-            image.src = data_uris.undo;
         }
 
-        function decorateFull() {
-            let image = new Image();
-            image.onload = () => {
-                getContext('full').drawImage(image, 0, 0, 28, 28);
-            };
-
-            image.src = data_uris.fullon;
-        }
-
-        function decorate3dview() {
-            var image = new Image();
-            image.onload = () => {
-                getContext('3d_view').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.view3d;
-        }
-
-        function decorateHomework() {
-            let image = new Image();
-            image.onload = () => {
-                getContext('homework').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.homework;
-        }
-
-        function decoratemovie() {
-            let image = new Image();
-            image.onload = () => {
-                getContext('movie').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.movie;
-
-            // find('movie').onclick = function () {
-            //     this.classList.toggle("on");
-            //     this.classList.toggle("selected-shape");
-            // }
-        }
-
-        function decoratecallteacher() {
-            let image = new Image();
-            image.onload = () => {
-                getContext('callteacher').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.callteacher;
-        }
-
-        function decorateFile() {
-            let image = new Image();
-            image.onload = () => {
-                getContext('file').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.file;
-        }
 
         function decoratePencil() {
             function hexToRGBA(h) {
@@ -970,24 +946,14 @@ gothicFont.load().then((font) => {
             }
 
             var context = getContext('pencilIcon');
-            var image = new Image();
-            image.onload = () => {
-                context.drawImage(image, 0, 0, 28, 28);
-                bindEvent(context, 'Pencil');
-            };
-            image.src = data_uris.pencilIcon;
-
-            var pencilContainer = find('pencil-container'),
-                strokeStyleText = find('pencil-stroke-style'),
+            var strokeStyleText = find('pencil-stroke-style'),
                 btnPencilDone = find('pencil-done'),
                 canvas = context.canvas;
-
+                bindEvent(context, 'Pencil');
             pencilStrokeStyle = hexToRGBA("#484848")
 
             addEvent(canvas, 'click', function () {
                 hideContainers();
-                BtnOff();
-
                 if (this.classList.contains('off')) return false;
                 tempCanvas.className = "pen";
                 pencilContainer.style.display = 'block';
@@ -1007,27 +973,19 @@ gothicFont.load().then((font) => {
             }
 
             var context = getContext('markerIcon');
-
-            var image = new Image();
-            image.onload = function () {
-                context.drawImage(image, 0, 0, 28, 28);
-                bindEvent(context, 'Marker');
-            };
-            image.src = data_uris.markerIcon;
-
             var strokeStyleText = find('marker-stroke-style'),
                 btnMarkerDone = find('marker-done'),
                 canvas = context.canvas,
                 alpha = 0.2;
-
+                bindEvent(context, 'Marker');
             markerStrokeStyle = hexToRGBA("#F12A2A", alpha)
 
             addEvent(canvas, 'click', function () {
+                hideContainers();
                 if (this.classList.contains('off'))
                     return false;
-                hideContainers();
-                BtnOff();
 
+                find('markerIcon').classList.add('selected-shape');
                 tempCanvas.className = "marker";
                 markerContainer.style.display = 'block';
                 markerContainer.style.top = (canvas.offsetTop + 1) + 'px';
@@ -1037,39 +995,13 @@ gothicFont.load().then((font) => {
                 markerContainer.style.display = 'none';
                 markerLineWidth = strokeStyleText.value;
             });
-
-
         }
+       
+        bindEvent(getContext('eraserIcon'), 'Eraser');
+        bindEvent(getContext('textIcon'), 'Text');
 
-        function decorateEraser() {
-            var context = getContext('eraserIcon');
-            var image = new Image();
-            image.onload = () => {
-                context.drawImage(image, 0, 0, 28, 28);
-                bindEvent(context, 'Eraser');
-            };
-            image.src = data_uris.eraserIcon;
-        }
-
-        function decorateText() {
-            var context = getContext('textIcon');
-            var image = new Image();
-            image.onload = () => {
-                context.drawImage(image, 0, 0, 28, 28);
-                bindEvent(context, 'Text');
-            };
-            image.src = data_uris.textIcon;
-        }
 
         function decorateclearCanvas() {
-            var context = getContext('clearCanvas');
-
-            var image = new Image();
-            image.onload = () => {
-                context.drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.clearCanvas;
-
             find('clearCanvas').onclick = function () {
                 if (this.classList.contains('off') || points.length < 1)
                     return false;
@@ -1078,31 +1010,15 @@ gothicFont.load().then((font) => {
                 orderHistoryChecker();
                 window.parent.currentPoints = []
                 window.parent.currentHistory = []
-
                 points = []
                 pointHistory = [];
                 drawHelper.redraw();
-
                 syncPoints(true, "clear");
             };
         }
 
-        function decorateScreenShare() {
-            var image = new Image();
-            image.onload = () => {
-                getContext('screen_share').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.screenShare;
-        }
-
-        function decoratEpub() {
-            var image = new Image();
-            image.onload = () => {
-                getContext('epub').drawImage(image, 0, 0, 28, 28);
-            };
-            image.src = data_uris.epub;
-        }
-
+  
+   
         function decorateonoff() {
             let context = getContext('onoff-icon');
             let image = new Image();
@@ -1129,7 +1045,7 @@ gothicFont.load().then((font) => {
                         icons[i].classList.remove("off");
                         icons[i].classList.add("on");
                     }
-                    find("main-canvas").style.display = 'block';
+                    mainCanvas.style.display = 'block';
                     tempCanvas.style.display = 'block';
                 }
                 else {
@@ -1137,7 +1053,8 @@ gothicFont.load().then((font) => {
                     let icons = find('tool-box').children;
                     for (let i = 0; i < icons.length; i++) {
 
-                        if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
+                        if (!icons[i].classList.contains('draw') || 
+                            icons[i].id == 'onoff-icon')
                             continue;
 
                         if (icons[i].style.display == 'block') {
@@ -1150,10 +1067,9 @@ gothicFont.load().then((font) => {
                         }
                     }
 
-                    find("main-canvas").style.display = 'none';
+                    mainCanvas.style.display = 'none';
                     tempCanvas.style.display = 'none';
-                    pencilContainer.style.display = 'none';
-                    find("marker-container").style.display = 'none';
+                    hideContainers();
                 }
 
             };
@@ -1166,7 +1082,8 @@ gothicFont.load().then((font) => {
     }
 
     function BtnOff() {
-        window.parent.document.getElementsByClassName("selected-shape")[0].classList.remove("selected-shape");
+        if(window.parent.document.getElementsByClassName("selected-shape")[0])
+            window.parent.document.getElementsByClassName("selected-shape")[0].classList.remove("selected-shape");
     }
 
     function TouchConverter(e) {
@@ -1179,13 +1096,11 @@ gothicFont.load().then((font) => {
 
     addEvent(canvas, 'touchstart mousedown', function (e) {
 
-        if(zoom.isSpace)
+        if (zoom.isSpace)
             return;
 
 
         if (e.touches) {
-
-
             if (e.touches.length >= 2) {
                 let cache = is;
                 let command = "default";
@@ -1203,11 +1118,9 @@ gothicFont.load().then((font) => {
                     markerHandler.mouseup(e);
                 }
 
-                !cache.isPdf && drawHelper.redraw();
-
-                if (!cache.isEraser) {
-                    syncPoints(false, command);
-                }
+                // if (!cache.isEraser) {
+                //     syncPoints(false, command);
+                // }
 
                 preventStopEvent(e);
                 return;
@@ -1258,9 +1171,9 @@ gothicFont.load().then((font) => {
             markerHandler.mouseup(e);
         }
 
-        !cache.isPdf && drawHelper.redraw();
-
-        if (!cache.isEraser) {
+        
+        if (!cache.isEraser && !cache.isText) {
+            drawHelper.redraw();
             syncPoints(false, command);
         }
 
@@ -1271,6 +1184,12 @@ gothicFont.load().then((font) => {
         if (e.touches) {
             e = TouchConverter(e);
         }
+                    
+        lineUid.style.left = e.layerX + 'px';
+        lineUid.style.top = e.layerY + 'px';
+
+        if(e.type == 'mousemove' && e.buttons == 0)
+            return;
 
         if (is.isPencil) pencilHandler.mousemove(e);
         else if (is.isEraser) eraserHandler.mousemove(e);
@@ -1284,7 +1203,7 @@ gothicFont.load().then((font) => {
     var lastPointIndex = 0;
     var uid;
 
-    addEvent(document, 'keydown', (e) => {
+    addEvent(window.parent.document, 'keydown', (e) => {
         keyCode = e.which || e.keyCode || 0;
     });
 
@@ -1303,7 +1222,7 @@ gothicFont.load().then((font) => {
         }
     });
 
-    addEvent(document, 'keypress', (e) => {
+    addEvent(window.parent.document, 'keypress', (e) => {
         if (e.which == null && (e.charCode != null || e.keyCode != null)) {
             e.which = e.charCode != null ? e.charCode : e.keyCode;
         }
@@ -1374,18 +1293,18 @@ gothicFont.load().then((font) => {
                 window.parent.currentHistory = pointHistory;
                 break;
             case "default":
-            case "loaddata":
-                var startIdx = 0;
+                var startIdx = 0;   
                 data.history.forEach(function (history) {
                     if (startIdx == history)
-                        return false;
-                    var points = data.points.slice(startIdx, history);
-                    var command = points[0][0];
+                    return false;
+                    var point = data.points.slice(startIdx, history);
+                    if(point.length == 0 )
+                    return true;
+                    var command = point[0][0];
                     var startIndex = startIdx;
                     startIdx = history;
-
                     var d = {
-                        points: points,
+                        points: point,
                         command: command,
                         startIndex: startIndex,
                         userid: data.userid,
@@ -1468,23 +1387,26 @@ gothicFont.load().then((font) => {
     let c = document.getElementsByClassName("i");
     for (let i = 0; i < c.length; i++) {
         c[i].addEventListener("click", function () {
-            find("marker-container").style.display = 'none';
+            markerContainer.style.display = 'none';
             pencilContainer.style.display = 'none';
         })
     }
 
     SliderSetting("pencileslider", "pencil-stroke-style", 1, 22, 3, function (v) {
+        console.log(v);
         clone(drawHelper).getOptions = () => {
             return [pencilLineWidth, pencilStrokeStyle, fillStyle, globalAlpha, font];
         }
         pencilLineWidth = v;
     });
+
     SliderSetting("markerslider", "marker-stroke-style", 14, 40, 21, function (v) {
         clone(drawHelper).getOptions = () => {
             return [markerLineWidth, markerStrokeStyle, fillStyle, globalAlpha, font];
         }
         markerLineWidth = v;
     });
+
     ColorSetting('pencil-container', penColors);
     ColorSetting('marker-container', penColors);
 
@@ -1559,29 +1481,6 @@ gothicFont.load().then((font) => {
 
 
 
-function MakeTitlePop(element, contents) {
-    let ele = find(element);
-    let pop = find("titlebox");
-
-    if (!ele)
-        return;
-
-    ele.addEventListener("mouseover", function () {
-        if (this.classList.contains("off"))
-            return false;
-
-        pop.style.display = 'block';
-        let rect = ele.getBoundingClientRect();
-        let y = rect.y;
-        let height = 7;
-        pop.style.top = y + height + 'px';
-        pop.children[0].innerHTML = contents;
-    })
-
-    ele.addEventListener("mouseleave", function () {
-        pop.style.display = 'none';
-    })
-}
 
 
 function SliderSetting(element, targetinput, min, max, defaultv, callback) {
@@ -1623,14 +1522,7 @@ function SliderSetting(element, targetinput, min, max, defaultv, callback) {
         }
     })
 
-    document.getElementById("temp-canvas").addEventListener("mouseup", function () {
-        if (isClick) {
-            isClick = false;
-            callback(sliderval.value);
-        }
-    })
-
-    window.addEventListener("mouseup", function () {
+    window.parent.addEventListener("mouseup", function () {
         if (isClick) {
             isClick = false;
             callback(sliderval.value);

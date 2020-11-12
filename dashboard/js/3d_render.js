@@ -67,8 +67,6 @@ function modelEnable() {
         _3d_canvas.setAttribute('id', 'renderCanvas');
         _3d_canvas.style.cssText = 'position:absolute';
         frame.document.getElementsByClassName('design-surface')[0].appendChild(_3d_canvas);
-        frame.document.getElementById("main-canvas").style.zIndex = "1";
-        frame.document.getElementById("temp-canvas").style.zIndex = "2";
         engineInit(_3d_canvas);
         createScene(_3d_canvas); //Call the createScene function
     }
@@ -160,8 +158,6 @@ function sync3DModel() {
     }
     set3DModelStateData(data.newPosition, data.newRotation);
 }
-
-
 
 function setShared3DStateLocal(_state) {
     classroomInfo.share3D.state = _state;

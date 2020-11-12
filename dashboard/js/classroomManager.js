@@ -17,29 +17,6 @@ class classroomManagerClass {
             }
         });
 
-        _AllCantrallFunc();
-        AddEvent("confirm-title", "click", ViewUploadList);
-        AddEvent("confirm-title2", "click", ViewHomeworkList);
-        AddEvent("icon_exit", "click", () =>
-            alertBox($.i18n('EXIT_CONFIRM'), $.i18n('WARNING'), () => {
-                if (connection.extra.roomOwner) {
-                    connection.send({roomBoom: true})
-                }
-                classroomManager.gotoMain();
-            },
-                function () { }
-            ))
-        AddEvent("top_save_alert", "click", attentionManager.exportAttention);
-        AddEvent("top_alert", "click", attentionManager.callAttend);
-        AddEvent("top_record_video", "click", (self) => {
-            if (!self.classList.contains("on")) {
-                screenRecorder._startCapturing();
-            }
-            else {
-                screenRecorder._stopCapturing();
-                self.classList.remove("on");
-            }
-        })
 
         AddEvent("student_list_button", "click", (self) => {
             let on = self.classList.contains("on");
@@ -64,22 +41,7 @@ class classroomManagerClass {
             })
             self.classList.toggle("on");
         })
-        AddEvent("right-tab-collapse", "click", (self) => {
-            self.classList.toggle("off");
 
-            if (self.classList.contains("off")) {
-                self.style.transform = "rotate(90deg)";
-                $(rightTab).animate({ width: "0%" })
-                $(widgetContainer).animate({ right: "0%" },
-                    classroomManager.canvasResize)
-            }
-            else {
-                self.style.transform = "rotate(-90deg)";
-                $(rightTab).animate({ width: "17.7%" })
-                $(widgetContainer).animate({ right: "17.7%" },
-                    classroomManager.canvasResize)
-            }
-        })
     }
 
     callTeacher() {
@@ -158,7 +120,6 @@ class classroomManagerClass {
         $("#showcam").remove();
         $(".controll").remove();
         $("#showcanvas").remove();
-        $(".for_teacher").remove();
         $("#student_list").remove();
 
         $(document.getElementById("3d_view")).remove();
@@ -172,17 +133,17 @@ class classroomManagerClass {
     };
 
     setTopToolTip(data) {
+        let tooltip = document.getElementById("toptooltip");
         Object.keys(data).forEach(function (id) {
             let element = document.getElementById(id);
             if (element)
                 element.addEventListener("mouseover", function (e) {
-                    document.getElementById("toptooltip").style.display = 'block';
-                    let tooltip = document.getElementById("toptooltip")
+                    tooltip.style.display = 'block';
                     tooltip.children[0].innerHTML = data[id];
                     let width = tooltip.getBoundingClientRect().width / 2;
                     tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width / 2) - width + "px";
                     element.addEventListener("mouseleave", function () {
-                        document.getElementById("toptooltip").style.display = 'none';
+                        tooltip.style.display = 'none';
                     })
                 })
         });
@@ -190,16 +151,15 @@ class classroomManagerClass {
 
     removeToolTip() {
         classroomManager.altdown = false;
-        this.tooltips.forEach(element => GetWidgetFrame().document.getElementById("tool-box").removeChild(element));
+        this.tooltips.forEach(element => document.getElementById("tool-box").removeChild(element));
         this.tooltips = [];
     };
 
     setShortCut(shortCut) {
-        $(GetWidgetFrame()).on("keydown", down);
-        $(window).on("keydown", down);
-
-        $(GetWidgetFrame()).on("keyup", up);
-        $(window).on("keyup", up);
+        window.addEventListener('keydown', down);
+        GetWidgetFrame().addEventListener('keydown', down);
+        window.addEventListener('keyup', up);
+        GetWidgetFrame().addEventListener('keyup', up);
 
         function down(key) {
             if (key.altKey) {
@@ -216,7 +176,7 @@ class classroomManagerClass {
                             classroomManager.altdown = false;
                         }
                         try {
-                            GetWidgetFrame().document.getElementById(Object.keys(cut)).click();
+                            document.getElementById(Object.keys(cut)).click();
                         }
                         catch{
                         }
@@ -237,17 +197,15 @@ class classroomManagerClass {
 
         function MakeTooltip(shortcut) {
             shortcut.forEach(function (cut) {
-                let btn = GetWidgetFrame().document.getElementById(Object.keys(cut));
-                if (!btn)
-                    return false;
-
+                let btn = document.getElementById(Object.keys(cut));
+                if (!btn) return false;
                 let top = btn.getBoundingClientRect().top;
-                let div = GetWidgetFrame().document.createElement("div");
-                div.className = "tooltip";
+                let div = document.createElement("div");
+                div.className = "tooltips";
                 div.innerHTML = Object.values(cut)[0];
-                div.style.top = top + 15 + 'px';
+                div.style.top = top - 30 + 'px';
                 classroomManager.tooltips.push(div);
-                GetWidgetFrame().document.getElementById("tool-box").appendChild(div);
+                document.getElementById("tool-box").appendChild(div);
             });
         }
     }

@@ -1,18 +1,71 @@
-var top_movie_jthis;
-var move_url_div = $("#urlform");
+class URLLoader extends React.Component {
+    state = {
+        url: undefined
+    }
+
+    constructor(props) {
+        super(props);
+    };
+
+    render() {
+        return (<>
+            <div id="urlform" style={{ display: 'none' }}>
+                <span className="name" data-i18n="FOOTAGE" />
+                <span className="back" />
+                <input id="urlinput"
+                    onChange={this.handleChange}
+                    onKeyUp={this.keyHandler}
+                    type="text"
+                    placeholder="URL을 입력하세요">
+                </input>
+            </div>
+        </>)
+    };
+
+    handleChange = (e) => {
+        this.setState({ url: e.target.value })
+    };
+
+    keyHandler = (e) => {
+        if (window.event.keyCode == 13) {
+            this.moveRenderFuction(this.state.url);
+            e.target.value = '';
+        }
+    };
+
+    moveRenderFuction(url) {
+        const movie_type = getMovieType(url);
+
+        if (movie_type == "YOUTUBE") {
+            embedYoutubeContent(true, setURLString(url), true);
+        }
+        else if (movie_type == "ESTUDY" || movie_type == "MOVIE" || url.indexOf("mp4") !== -1) {
+            VideoEdunetContent(true, setURLString(url), true);
+        }
+        else if (movie_type == "GOOGLE_DOC_PRESENTATION") {
+            iframeGoogleDoc_Presentation(true, setURLString(url), true);
+        }
+        else {
+            iframeEdunetContent(true, url, true);
+        }
+    }
+}
+
+
+
 
 function Movie_Render_Button(btn) {
     if (!isSharingMovie && checkSharing()) {
         removeOnSelect(btn);
         return;
     }
+    
+    let urlform = document.getElementById("urlform");
 
     btn.classList.toggle("on");
     btn.classList.toggle("selected-shape");
     
     var visible = urlform.style.display;
-
-    //console.log(visible);
 
     if (visible == "inline-block") {
         classroomInfo.movierender = {
@@ -51,23 +104,6 @@ function _Send_Moive_Video(_type, _url, _visible, _send) {
     }
 }
 
-function _Movie_Button_Enable(jthis, visible) {
-    if (visible) {
-        jthis.addClass('top_share_video_on');
-        jthis.removeClass('top_share_video_off')
-    }
-    else {
-        jthis.addClass('top_share_video_off');
-        jthis.removeClass('top_share_video_on')
-    }
-}
-
-function _Movie_Render_key_event() {
-    if (window.event.keyCode == 13) {
-        _Movie_Render_Func();
-    }
-}
-
 function OnMovieRender(state, type, url) {
     if (type == 'YOUTUBE')
         embedYoutubeContent(state, url, false);
@@ -77,31 +113,8 @@ function OnMovieRender(state, type, url) {
         iframeGoogleDoc_Presentation(state, url, false);
     else
         iframeEdunetContent(state, url, false);
-
 }
 
-function _Movie_Render_Func() {
-    let urlinput = document.getElementById("urlinput");
-
-    const url = urlinput.value;
-    const movie_type = getMovieType(url);
-
-
-    if (movie_type == "YOUTUBE") {
-        embedYoutubeContent(true, setURLString(url), true);
-    }
-    else if (movie_type == "ESTUDY" || movie_type == "MOVIE" || url.indexOf("mp4") !== -1) {
-        VideoEdunetContent(true, setURLString(url), true);
-    } else if (movie_type == "GOOGLE_DOC_PRESENTATION") {
-        iframeGoogleDoc_Presentation(true, setURLString(url), true);
-    }
-    else {
-        iframeEdunetContent(true, url, true);
-    }
-
-
-    urlinput.value = '';
-}
 
 function embedYoutubeContent(bshow, url, send) {
     if (bshow) {

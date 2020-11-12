@@ -33,7 +33,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.shareScreen.state) {
-            // newscreenshareManager.rejoin();
+            // screenshareManager.rejoin();
         }
 
         if (classroomInfo.movierender.state) {
@@ -341,7 +341,9 @@ classroomCommand.syncEpub = function () {
 
 function updateClassTime() {
     let currentTime = document.getElementById("current-time");
-    setTimeout(() => { Hide("loading-screen") }, 1000)
+    setTimeout(() => { 
+        document.body.removeChild(document.getElementById("loading-screen"));
+    }, 1000)
     classTimeIntervalHandle = setInterval(Sec, 1000);
 
     function Sec() {

@@ -66,45 +66,10 @@ pageNavigator = {
 
   init: function () {
     this.self = this;
-    let self = this.self;
-
     this.obj = document.getElementById("epub-navi");
     this.list = document.getElementById("thumbnail-list");
     this.maxidx = document.getElementById("epubmaxidx");
     this.inputwindow = document.getElementById("epubidx");
-
-    this.inputwindow.addEventListener("change", function (e) {
-      self.inputevent();
-    })
-
-    document.getElementById('prev').addEventListener('click', function () {
-      self.leftbtn();
-    });
-
-    document.getElementById('next').addEventListener('click', function () {
-      self.rightbtn();
-    });
-
-    document.getElementById('lprev').addEventListener('click', function () {
-      self.lastleftbtn();
-    });
-
-    document.getElementById('lnext').addEventListener('click', function () {
-      self.lastrightbtn();
-    });
-
-    document.getElementById("epub-collapse").addEventListener('click', function () {
-      if (this.classList.contains("closed")) {
-        $(self.obj).animate({ "height": "95%" });
-        this.classList.remove("closed")
-        this.style.transform = "rotate(-90deg)";
-      }
-      else {
-        $(self.obj).animate({ "height": "93px" });
-        this.classList.add("closed")
-        this.style.transform = "rotate(90deg)";
-      }
-    })
   },
 
   set: function (max) {
@@ -191,4 +156,5 @@ pageNavigator = {
         }
     }
   }
+  
 }

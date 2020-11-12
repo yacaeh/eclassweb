@@ -210,7 +210,6 @@ class permissionManagerClass {
   setMicPermission() {
     console.debug("Get mic permission");
     Show("student_mic");
-    // document.getElementById("mic_permission").innerHTML = $.i18n('STUDENT_MIC_PERMISSION');
     this.unmute();
   };
 

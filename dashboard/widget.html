@@ -1,84 +1,65 @@
 ﻿<!DOCTYPE html>
-<html itemscope itemtype="http://schema.org/WebPage">
+<html>
 
 <head>
-    <script src="/dashboard/js/lib/jquery-3.3.1.min.js"></script>
-    <script src="/dashboard/js/lib/jquery-ui.min.js"></script>
-    <script src="/dashboard/js/lib/CLDRPluralRuleParser.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.messagestore.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.fallbacks.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.language.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
-    <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
-    <script src="/dashboard/js/lib/updateLanguage_widget.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src="/dashboard/js/lib.js" ></script>
     <script src="/dashboard/js/zoom.js" ></script>
     <script type="text/javascript"  src="/dashboard/js/lib/paper-full.min.js" ></script>
-
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0, user-scalable=no">
-
-    <title>Canvas Designer | Muaz Khan</title>
-    <meta name="description" content="HTML5 Canvas Designer | Muaz Khan – A tool aimed to give you a full-fledged drawing surface and also auto generate appropriate code for you in different formats! Generator/Tool/Editor – 2D API/Context">
-
-    <meta name="author" content="Muaz Khan">
-    <link rel="author" type="text/html" href="https://plus.google.com/+MuazKhan">
     <link href="/dashboard/css/widget.css" rel="stylesheet">
 </head>
 
-<body  ondragenter="handleDragDropEvent(event)"
-ondragover="handleDragDropEvent(event)"
-ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+<body   ondragenter="handleDragDropEvent(event)"
+        ondragover="handleDragDropEvent(event)"
+        ondrop="handleDragDropEvent(event)" 
+        oncontextmenu="return false" 
+        ondragstart="return false" 
+        onselectstart="return false">
+
     <section id="design-surface" class="design-surface">
-        <canvas id="temp-canvas" style="z-index: 3;" class="pen"></canvas>
         <canvas id="main-canvas" style="z-index: 2;"></canvas>
+        <canvas id="temp-canvas" style="z-index: 3;" class="pen"></canvas>
         <video id="screen-viewer" controls playsinline autoplay></video>
-    </section>
-    <section id="titlebox">
-        <span id="titletext">설명입니다</span>
-        <span class="sq"></span>
+        <div id="line-uid"></div>
+        
     </section>
 </div>
 
+<script>
+    (function () {
+        var params = {},
+            r = /([^&=]+)=?([^&]*)/g;
 
-
-    <script>
-        (function() {
-            var params = {},
-                r = /([^&=]+)=?([^&]*)/g;
-
-            function d(s) {
-                return decodeURIComponent(s.replace(/\+/g, ' '));
-            }
-
-            var match, search = window.location.search;
-            while (match = r.exec(search.substring(1)))
-                params[d(match[1])] = d(match[2]);
-
-            window.params = params;
-        })();
-
-        window.selectedIcon = params.selectedIcon;
-
-        if (window.selectedIcon) {
-            try {
-                window.selectedIcon = window.selectedIcon.split('')[0].toUpperCase() + window.selectedIcon.replace(window.selectedIcon.split('').shift(1), '');
-            } catch (e) {
-                window.selectedIcon = 'Pencil';
-            }
-        } else {
-            window.selectedIcon = 'Pencil';
+        function d(s) {
+            return decodeURIComponent(s.replace(/\+/g, ' '));
         }
 
-        var script = document.createElement('script');
-        script.src = params.widgetJsURL;
-        (document.body || document.documentElement).appendChild(script);
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>
+        var match, search = window.location.search;
+        while (match = r.exec(search.substring(1)))
+            params[d(match[1])] = d(match[2]);
+
+        window.params = params;
+    })();
+
+    window.selectedIcon = params.selectedIcon;
+
+    if (window.selectedIcon) {
+        try {
+            window.selectedIcon = window.selectedIcon.split('')[0].toUpperCase() + window.selectedIcon.replace(window.selectedIcon.split('').shift(1), '');
+        } catch (e) {
+            window.selectedIcon = 'Pencil';
+        }
+    } else {
+        window.selectedIcon = 'Pencil';
+    }
+
+    var script = document.createElement('script');
+    script.src = params.widgetJsURL;
+    (document.body || document.documentElement).appendChild(script);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>
 </body>
 
 </html>

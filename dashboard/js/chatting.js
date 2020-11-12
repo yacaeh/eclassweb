@@ -8,30 +8,7 @@ class ChattingManagerClass {
     init() {
         this.noticeElement = document.getElementById('noticewindow');
         this.normalElement = document.getElementById('conversation-panel');
-        var notice = document.getElementById("notice");
-        var normal = document.getElementsByClassName('conversation-panel')[0];
 
-        document.getElementById('collapse').addEventListener('click', function () {
-            if (notice.classList.contains('on')) {
-                $(notice).animate({
-                    height: '8%',
-                    borderBottom: '0px solid gray',
-                });
-                $(normal).animate({ height: '90%' });
-                notice.style.borderBottom = '0px solid #ffffff';
-                notice.lastElementChild.lastElementChild.style.transform = 'rotate(0deg)';
-            } else {
-                $(notice).animate({
-                    height: '50%',
-                    borderBottom: '0px solid gray',
-                });
-                $(normal).animate({ height: '48%' });
-                notice.style.borderBottom = '1px solid #B8B8B8';
-                notice.lastElementChild.lastElementChild.style.transform = 'rotate(180deg)';
-            }
-            notice.classList.toggle('off');
-            notice.classList.toggle('on');
-        });
         $('#txt-chat-message').emojioneArea({
             pickerPosition: 'top',
             filtersPosition: 'bottom',
@@ -65,7 +42,6 @@ class ChattingManagerClass {
                     msg: chatMessage,
                     name: connection.extra.userFullName
                 })
-
             }
         };
 

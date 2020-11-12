@@ -1,174 +1,11 @@
-/////////////////////////////////////
-// 스크린 공유, 스크린 저장 관련 //////
-/////////////////////////////////////
-
-// 스크린 저장 //////////////////////////////
-
-class screenRecorderClass {
-  RecordingStart() {
-    var now = 0;
-    var recordingTime = document.getElementById("recording-time");
-    var text = recordingTime.getElementsByClassName("text")[0];
-
-    document.getElementById("top_record_video").classList.add("on");
-    document.getElementById("current-time").style.lineHeight = "18px";
-    recordingTime.style.display = 'block';
-
-    function timer() {
-      now += 1;
-      var time = now;
-      var hour = Math.floor(time / 3600);
-      time %= 3600;
-
-      var min = Math.floor(time / 60);
-      time %= 60;
-
-      if (min < 10) min = '0' + min;
-
-      if (time < 10) time = '0' + time;
-
-      text.innerHTML = hour + ':' + min + ':' + time;
-    }
-    this.interval = setInterval(timer, 1000);
-  }
-
-  RecodingStop() {
-    clearInterval(this.interval);
-    document.getElementById("top_record_video").classList.remove("on");
-    var recordingTime = document.getElementById("recording-time");
-    var text = recordingTime.getElementsByClassName("text")[0];
-    document.getElementById("current-time").style.lineHeight = "36px";
-    recordingTime.style.display = 'none';
-    text.innerHTML = '0:00:00';
-  }
-  constructor() {
-    this.mergeAudioStreams = () => {
-      const context = new AudioContext();
-      const destination = context.createMediaStreamDestination();
-      let hasDesktop = false;
-      let hasVoice = false;
-      if (this.desktopStream && this.desktopStream.getAudioTracks().length > 0) {
-        // If you don't want to share Audio from the desktop it should still work with just the voice.
-        const source1 = context.createMediaStreamSource(this.desktopStream);
-        const desktopGain = context.createGain();
-        desktopGain.gain.value = 0.7;
-        source1.connect(desktopGain).connect(destination);
-        hasDesktop = true;
-      }
-
-      if (this.voiceStream && this.voiceStream.getAudioTracks().length > 0) {
-        const source2 = context.createMediaStreamSource(this.voiceStream);
-        const voiceGain = context.createGain();
-        voiceGain.gain.value = 0.7;
-        source2.connect(voiceGain).connect(destination);
-        hasVoice = true;
-      }
-
-      console.log(this.desktopStream)
-      console.log(this.desktopStream.getAudioTracks())
-
-      return (hasDesktop || hasVoice) ? destination.stream.getAudioTracks() : [];
-    };
-  }
-
-  async _startCapturing() {
-    this.start = true;
-
-    this.desktopStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-    this.voiceStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-
-    const tracks = [
-      ...this.desktopStream.getVideoTracks(),
-      ...this.mergeAudioStreams()
-    ];
-
-    this.stream = new MediaStream(tracks);
-    this.blobs = [];
-
-    let options = { mimeType: 'video/webm;codecs=vp9,opus' };
-    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-      console.error(`${options.mimeType} is not supported`);
-      options = { mimeType: 'video/webm;codecs=vp8,opus' };
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-        console.error(`${options.mimeType} is not supported`);
-        options = { mimeType: 'video/webm' };
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-          console.error(`${options.mimeType} is not supported`);
-          options = { mimeType: '' };
-        }
-      }
-    }
-
-    this.rec = new MediaRecorder(this.stream, options);
-
-    this.rec.ondataavailable = (e) => this.blobs.push(e.data);
-    this.rec.onstop = async () => {
-      this.blob = new Blob(this.blobs, { type: 'video/webm' });
-      let url = window.URL.createObjectURL(this.blob);
-      this.RecodingStop()
-
-      const downloadLink = document.querySelector('a#downloadLink');
-      downloadLink.addEventListener('progress', e => console.log(e));
-      downloadLink.href = url;
-      downloadLink.download = this.makeName();
-      downloadLink.click();
-    };
-
-    this.desktopStream.addEventListener('inactive', e => {
-      if (e.type == "inactive") {
-        this._stopCapturing();
-      }
-    });
-
-
-    this.voiceStream.addEventListener('inactive', e => {
-      if (e.type == "inactive") {
-        this._stopCapturing();
-      }
-    });
-
-    this.RecordingStart();
-    this.rec.start(10);
-  };
-
-  _stopCapturing() {
-    if (this.rec.state == "inactive") {
-      return false;
-    }
-    this.rec.stop();
-    this.desktopStream.getAudioTracks().forEach(s => s.stop());
-    this.stream.getTracks().forEach(s => s.stop())
-    this.stream = null;
-  };
-
-  makeName() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const hour = date.getHours();
-    const min = date.getMinutes();
-    const sec = date.getSeconds();
-    return year + "/" + month + "/" + day + "/ " + hour + "/" + min + "/" + sec + '-' + $.i18n('RECORD') + '.webm';
-  }
-}
-
-class NewScreenShareManagerClass {
+class ScreenShareManagerClass {
   constructor() {
     this.isScreenShare = false;
     this.lastStream = undefined;
     this.self = this;
     this.senders = [];
     this.sender = undefined;
-
-    // this.minFrameRate = 5
-    // this.maxFrameRate = 10;
   }
-
-  // setFrameRate(min,max) {
-  //   this.minFrameRate = min;
-  //   this.maxFrameRate = max;
-  // };
 
   get() {
     return GetWidgetFrame().document.getElementById("screen-viewer");
@@ -190,7 +27,7 @@ class NewScreenShareManagerClass {
   start(stream, btn) {
     connection.send({ showScreenShare: stream.id });
     window.shareStream = stream;
-    newscreenshareManager.show();
+    screenshareManager.show();
   }
   stop() {
     console.log("Stop screen sharing")
@@ -218,11 +55,11 @@ class NewScreenShareManagerClass {
     }
 
     if (on) {
-      newscreenshareManager.isSharingScreen = false;
+      screenshareManager.isSharingScreen = false;
 
-      if (typeof (newscreenshareManager.lastStream) !== "undefined")
+      if (typeof (screenshareManager.lastStream) !== "undefined")
       console.log("SCreenshare stop on ");
-      newscreenshareManager.lastStream.getTracks().forEach((track) => track.stop());
+      screenshareManager.lastStream.getTracks().forEach((track) => track.stop());
       btn.classList.remove("on");
       return false;
     }
@@ -261,21 +98,21 @@ class NewScreenShareManagerClass {
           btn.classList.toggle("on");
           stream.isScreenShare = true;
           screenStream = stream;
-          newscreenshareManager.get().volume = 0;
-          newscreenshareManager.isSharingScreen = true;
-          newscreenshareManager.lastStream = stream;
+          screenshareManager.get().volume = 0;
+          screenshareManager.isSharingScreen = true;
+          screenshareManager.lastStream = stream;
 
           let track = stream.getVideoTracks()[0];
           this.sender = pc.addTrack(track, stream);
 
           track.onended = () => { // Click on browser UI stop sharing button
             console.info("Sharing has ended");
-            newscreenshareManager.onclose();
+            screenshareManager.onclose();
             pc.removeTrack(this.sender);
             this.sender = undefined;
           };
           
-          // pc.getSenders()[2].replaceTrack(newscreenshareManager.lastStream.getVideoTracks()[0]);
+          // pc.getSenders()[2].replaceTrack(screenshareManager.lastStream.getVideoTracks()[0]);
 
           replaceScreenTrack(stream, btn);
           addStreamStopListener(stream, function () {
@@ -299,7 +136,7 @@ class NewScreenShareManagerClass {
               btn.classList.remove("on");
               btn.classList.remove("selected-shape")
             }
-            newscreenshareManager.hide();
+            screenshareManager.hide();
 
           })
         },
@@ -348,14 +185,14 @@ class NewScreenShareManagerClass {
     function replaceScreenTrack(stream, btn) {
       canvasManager.clear();
       console.log("Stream Start", stream.id);
-      newscreenshareManager.srcObject(stream);
+      screenshareManager.srcObject(stream);
       classroomInfo.shareScreen = {
         state: true,
         id: stream.id,
         userid: connection.userid
       };
       classroomManager.updateClassroomInfo((result) => console.log(result));
-      newscreenshareManager.start(stream, btn);
+      screenshareManager.start(stream, btn);
     }
   }
   streamstart(stream) {
@@ -407,7 +244,7 @@ class NewScreenShareManagerClass {
 
     if (event.data.hideScreenShare) {
       console.log("SCREEN SHARE STOPED", event.userid)
-      newscreenshareManager.hide();
+      screenshareManager.hide();
       classroomInfo.shareScreen = {
         state: false,
         id: undefined,
@@ -418,7 +255,7 @@ class NewScreenShareManagerClass {
 
     if (event.data.studentStreaming) {
       console.log("Student Start Streaming");
-      newscreenshareManager.start(event.data.studentStreaming)
+      screenshareManager.start(event.data.studentStreaming)
       return true;
     }
   }
@@ -430,7 +267,7 @@ class NewScreenShareManagerClass {
 
   //       console.log(stream);
   //       console.log("classroomInfo.shareScreen.id",classroomInfo.shareScreen.id)
-  //       newscreenshareManager.streamstart(stream);
+  //       screenshareManager.streamstart(stream);
   //       clearInterval(interval);
   //     }
   //     catch(error){

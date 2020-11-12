@@ -4,11 +4,11 @@ class mobileHelperClass {
         this.conversationPanel;
     }
     init() {
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-            // || !connection.extra.roomOwner
-        ) {
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             this.conversationPanel = document.getElementById('conversation-panel');
             this.setMobile();
+        }else{
+            document.getElementById("full").style.display = 'none';
         }
     }
     setMobile() {
@@ -232,12 +232,8 @@ class mobileHelperClass {
             return GetWidgetFrame().document;
         }
         function ChatSetting() {
-            let widget = widgetContainer;
             let chatinput = document.getElementsByClassName("emojionearea-inline")[0]
-            console.log(chatinput);
-            console.log(widget.firstChild);
-            console.log(widget);
-            widget.insertBefore(chatinput, widget.firstChild)
+            widgetContainer.insertBefore(chatinput, widgetContainer.firstChild)
             AppendInFrame(mobileHelper.conversationPanel);
             let div = document.createElement("div");
             div.className = "chatonoff";
@@ -246,7 +242,7 @@ class mobileHelperClass {
             img.src = "/dashboard/img/openchat.png";
             div.appendChild(img);
 
-            widget.insertBefore(div, widget.firstChild)
+            widgetContainer.insertBefore(div, widgetContainer.firstChild)
 
             div.addEventListener("click", function () {
                 this.classList.toggle("off");

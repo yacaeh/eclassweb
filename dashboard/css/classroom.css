@@ -200,9 +200,8 @@ button[disabled] {
 
 .tool-box canvas {
   border-radius: 2px;
-  margin-top: 15px;
+  margin-top: 10px;
   margin-left: 11px;
-  display: none;
 }
 
 #marker-selected-color,
@@ -218,7 +217,6 @@ button[disabled] {
     height: 20px;
     position: absolute;
 }
-
 
 .slider_btn{
   width: 10%;
@@ -353,13 +351,6 @@ button[disabled] {
   outline: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.tool-box canvas {
-  border-radius: 2px;
-  margin-top: 15px;
-  margin-left: 11px;
-  display: none;
-}
-
 .extra-controls {
   position: absolute;
   right: 21%;
@@ -370,18 +361,6 @@ button[disabled] {
   margin-top: 5px;
   font-size: 24px;
   text-shadow: 1px 1px white;
-}
-
-#other-videos {
-  margin-top: 5px;
-}
-
-#other-videos video {
-  width: 45%;
-  margin: 5px;
-  border: 1px solid black;
-  padding: 1px;
-  border-radius: 3px;
 }
 
 #txt-chat-message {
@@ -556,49 +535,6 @@ hr {
 }
 
 
-.fontSelectUl,
-.fontSizeUl {
-    list-style: none;
-    width: 200px;
-    background: #f9f9f9;
-    position: absolute;
-    left: 0;
-    top: 35px;
-    padding: 0;
-}
-.fontSelectUl {
-    padding-left: 5px;
-}
-.fontSelectUl li,
-.fontSizeUl li {
-    height: 24px;
-    line-height: 24px;
-    overflow: hidden;
-    cursor: pointer;
-    padding: 0 10px;
-    font-size: 14px;
-    border-left: 1px solid #f0f0f0;
-    border-right: 1px solid #f0f0f0;
-}
-.fontSelectUl li:last-child,
-.fontSizeUl li:last-child {
-    -webkit-border-radius: 0 0 4px 4px;
-    -moz-border-radius: 0 0 4px 4px;
-    border-radius: 0 0 4px 4px;
-    border-bottom: 1px solid #EEEEEE;
-}
-.fontSelectUl li:hover,
-.fontSizeUl li:hover {
-    background: #DDD;
-}
-.fontSelectUl li.font-family-selected,
-.fontSizeUl li.font-size-selected {
-    background: rgb(6, 205, 255)!important;
-    color: white!important;
-}
-
-
-
 #temp-stream-canvas {
   display: none;
   opacity: 0.1;
@@ -643,11 +579,6 @@ hr {
   position: absolute !important;
   left: 5px;
   width: 96%;
-}
-
-.for_teacher {
-  width: 100%;
-  height: 30%;
 }
 
 .onUserStatusChanged {
@@ -721,6 +652,7 @@ hr {
 #top_student {
   content: url(/dashboard/img/student.png);
 }
+
 #top_camera {
   content: url(/dashboard/img/cam.png);
 }
@@ -755,6 +687,57 @@ hr {
   line-height: 36px;
   position: relative;
   pointer-events: none;
+}
+
+
+#toolboxHelper{
+  z-index: 9999;
+  width: auto;
+  height: 20px;
+  position: absolute;
+  background-color: black;
+  left: 62px;
+  color: white;
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: Roboto;
+  display: none;
+}
+
+#toolboxHelper > .sq{
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  left: -2px;
+  top: 6px;
+  background: #000000;
+  transform: rotate(45deg);
+}
+
+#titletext{
+  margin: 10px;
+}
+
+#app{
+  width: 100%;
+  height: 100%;
+}
+
+
+.tooltips{
+  z-index: 100;
+  position: absolute;
+  left: 28px;
+  font-family: 'Roboto';
+  top: 100px;
+  background-color: black;
+  color: white;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  border-radius: 7px;
+  font-size: 14px;
 }
 
 #recording-time {
@@ -832,17 +815,6 @@ hr {
 .icons {
   float: right;
   height: 50px;
-}
-
-#student_permission{
-  color: green;
-  font-size: 14px;
-  font-family: roboto;
-  vertical-align: middle;
-  display: inline-grid;
-  height: 50px;
-  margin-left: 5px;
-  line-height: 25px;
 }
 
 .student-menu {
@@ -1018,24 +990,6 @@ hr {
   position: absolute;
 }
 
-.nos > .now_selected_student {
-  position: absolute;
-}
-
-.nos > .now_selected_student > .name {
-  position: absolute;
-  width: 70px;
-  height: 19px;
-  left: 13px;
-  top: 9px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 16px;
-  line-height: 19px;
-  color: #000000;
-}
-
 .nos_student_icon {
   position: absolute;
   top: calc(50% - 14px);
@@ -1069,28 +1023,6 @@ hr {
   display: none;
 }
 
-.nos > .now_selected_student > .status_img {
-  border-radius: 10px;
-  height: 9px;
-  width: 9px;
-  left: 14.5px;
-  background-color: #67ef1d;
-  position: absolute;
-  top: 34px;
-}
-.nos > .now_selected_student > .status_text {
-  position: absolute;
-  width: 60px;
-  height: 14px;
-  left: 30px;
-  top: 32px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 12px;
-  line-height: 14px;
-  color: #707070;
-}
 
 #student_list {
   float: left;
@@ -1973,12 +1905,7 @@ body:fullscreen {
   bottom: 5px;
   left: auto;
 }
-.textInputUI,
-.fontSelectUl,
-.fontColorUI,
-.fontSizeUl{
-    z-index: 10000000;
-}
+
 
 .chatonoff{
   width: 30px;

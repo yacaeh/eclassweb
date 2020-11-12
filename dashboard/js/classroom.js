@@ -12,6 +12,12 @@
   window.params = params;
 })();
 
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('app')
+)
+
 //=============================================================================================
 
 var debug = false;
@@ -22,12 +28,11 @@ var isSharingEpub = false;
 let isFileViewer = false;
 
 const widgetContainer = document.getElementById("widget-container");
-const rightTab = document.getElementById("right-tab")
+const rightTab        = document.getElementById("right-tab")
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
-// var screenshareManager  = new ScreenShareManagerClass();
-var newscreenshareManager  = new NewScreenShareManagerClass();
+var screenshareManager  = new ScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
 var epubManager         = new epubManagerClass();
@@ -44,7 +49,7 @@ const topButtonContents = {};
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
-  'screen_share'      : newscreenshareManager.btn,
+  'screen_share'      : screenshareManager.btn,
   '3d_view'           : _3DCanvasOnOff,
   'movie'             : Movie_Render_Button,
   'file'              : LoadFile,
@@ -107,31 +112,8 @@ if(!window.params.userFullName){
   }
 }
 
-ChattingManager.init();
-
-document.getElementById('onoff-icon').style.display   = 'block';
-document.getElementById('epub').style.display         = 'block';
-document.getElementById('screen_share').style.display = 'block';
-document.getElementById('clearCanvas').style.display  = 'block';
-document.getElementById('textIcon').style.display     = 'block';
-document.getElementById('eraserIcon').style.display   = 'block';
-document.getElementById('markerIcon').style.display   = 'block';
-document.getElementById('pencilIcon').style.display   = 'block';
-document.getElementById('undo').style.display         = 'block';
-document.getElementById('movie').style.display        = 'block';
-document.getElementById('callteacher').style.display  = 'block';
-document.getElementById('file').style.display         = 'block';
-document.getElementById('3d_view').style.display      = 'block';
-document.getElementById('homework').style.display     = 'block';
-
-document.getElementById('epub').onclick = function () {
-  this.classList.toggle("on");
-  this.classList.toggle("selected-shape");
-}
-
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
-  examObj.init();
   pageNavigator.init();
   canvasManager.init();
   permissionManager.init();
@@ -156,7 +138,7 @@ connection.onclose = connection.onerror = connection.onleave = function (event) 
 
 connection.onstreamended = function (event) {
   console.log('onstreameneded!', event);
-  newscreenshareManager.onclose(event);
+  screenshareManager.onclose(event);
 };
 
 designer.appendTo(widgetContainer, () => {
@@ -166,9 +148,6 @@ designer.appendTo(widgetContainer, () => {
   onWidgetLoaded();
 });
 
-
-
-
 connection.onmessage = function (event) {
   if (debug)
     console.log(event);
@@ -176,7 +155,7 @@ connection.onmessage = function (event) {
   if (permissionManager.eventListener(event))
     return;
 
-  if (newscreenshareManager.eventListener(event))
+  if (screenshareManager.eventListener(event))
     return;
 
   if (maincamManager.eventListener(event))
@@ -272,10 +251,12 @@ connection.onmessage = function (event) {
   if (event.data.closeTesting) {
     if (!connection.extra.roomOwner) {
       $('#exam-board').hide(300);
-      rightTab.style.zIndex = 3;
     }
+    rightTab.style.zIndex = 2;
 
-    mobileHelper.isMobile ? widgetContainer.style.right = "0px" : widgetContainer.removeAttribute("style");
+    mobileHelper.isMobile ? 
+      widgetContainer.style.right = "0px" : 
+      widgetContainer.removeAttribute("style");
     return;
   }
 

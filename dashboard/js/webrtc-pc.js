@@ -64,13 +64,13 @@ async function webRTCPCInit() {
           ) {
             console.log('Share Screen!', stream.id);
             screenStream = stream;
-            newscreenshareManager.streamstart(stream);
+            screenshareManager.streamstart(stream);
             track.paused = false;
 
             
             track.onended = function(event) {
               console.log("Screen On ended!");
-              newscreenshareManager.onclose();
+              screenshareManager.onclose();
             };
 
           } 

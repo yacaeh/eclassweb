@@ -5,7 +5,6 @@
 */
 
 class fileViewerLoader {
-
     constructor() {
         this.bOpen = false;
         this.type = 'none';
