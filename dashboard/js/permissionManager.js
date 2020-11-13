@@ -244,20 +244,17 @@ class permissionManagerClass {
 
 
 
-function OnClickStudent(div) {
-  div.addEventListener("click", function (e) {
+function OnClickStudent(e, uid, name) {
     var menu = document.getElementById('student-menu');
-    var name = e.target.dataset.name;
-
     permissionManager.nowSelectStudent = e.target;
 
     SetBtn("classP", e.target.dataset.classPermission);
     SetBtn("micP", e.target.dataset.micPermission);
     SetBtn("canP", e.target.dataset.canvasPermission);
 
-    function SetBtn(id, ispermission) {
-      let btn = $('#' + id);
-      let circle = $('#' + id + '> .circle');
+    function SetBtn(uid, ispermission) {
+      let btn = $('#' + uid);
+      let circle = $('#' + uid + '> .circle');
 
       btn.clearQueue();
       circle.clearQueue();
@@ -275,17 +272,14 @@ function OnClickStudent(div) {
       }
     }
 
-    $(menu).css({
-      right: document.body.clientWidth - e.clientX,
-      top: e.clientY,
-    });
+    menu.style.right = document.body.clientWidth - e.clientX + 'px';
+    menu.style.top = e.clientY - 50 + 'px';
 
     if (!$('#student-menu').is(':visible')) {
       $('#student-menu').show('blind', {}, 150, function () { });
     }
 
     menu.getElementsByClassName('stuname')[0].innerHTML = name;
-  });
 }
 
 function button(t, c, on) {

@@ -5,28 +5,6 @@ class epubManagerClass {
         this.renditionBuffer = undefined;
     }
 
-    loadEpub(btn) {
-        if (!isSharingEpub && checkSharing()) {
-            removeOnSelect(btn);
-            return;
-        }
-
-        btn.classList.toggle("on");
-        btn.classList.toggle("selected-shape");
-          
-        if (epubManager.isEpubViewer === false) {
-            isSharingEpub = true;
-            epubManager.isEpubViewer = true;
-            epubManager.loadEpubViewer();
-            classroomCommand.sendOpenEpub();
-        } else {
-            isSharingEpub = false;
-            epubManager.isEpubViewer = false;
-            epubManager.unloadEpubViewer();
-            $('#canvas-controller').hide();
-            classroomCommand.sendCloseEpub();
-        }
-    }
     EpubPositionSetting() {
         let viewer = GetWidgetFrame().document.getElementById("epub-viewer");
         let can = GetWidgetFrame().document.getElementById("temp-canvas");
@@ -61,8 +39,8 @@ class epubManagerClass {
         loadingWindow.appendChild(loadingIcon);
 
         let frame = GetWidgetFrame();
-        frame.document.getElementsByClassName('design-surface')[0].appendChild(loadingWindow);
-        frame.document.getElementsByClassName('design-surface')[0].appendChild(epubViewer);
+        frame.document.getElementById('design-surface').appendChild(loadingWindow);
+        frame.document.getElementById('design-surface').appendChild(epubViewer);
 
         // var book = ePub('https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf');
         var book = ePub('https://files.primom.co.kr:1443/uploads/epub/lesson1/ops/content.opf');

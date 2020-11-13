@@ -2,7 +2,6 @@ class Widget extends React.Component {
     render() {
         return <article id="article">
             <WidgetContainer />
-            <Authorization />
         </article>
     }
 }

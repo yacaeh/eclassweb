@@ -259,32 +259,8 @@ class ScreenShareManagerClass {
       return true;
     }
   }
-  // rejoin() {
-  //   console.log(classroomInfo.shareScreen.id);
-  //   let interval = setInterval(function () {
-  //     try {
-  //       let stream = pc.getReceivers();
-
-  //       console.log(stream);
-  //       console.log("classroomInfo.shareScreen.id",classroomInfo.shareScreen.id)
-  //       screenshareManager.streamstart(stream);
-  //       clearInterval(interval);
-  //     }
-  //     catch(error){
-  //       console.error(error)
-  //     }
-  //   }, 500);
-  // }
-  onclose() {
-    if (classroomInfo.shareScreen.id) {
-      console.error("Streamer exit");
-      this.stop();
-      console.log("onclose stop");
-      connection.send({ hideScreenShare: true });
-    }
-  }
-
 }
+
 class maincamManagerClass {
   get() {
     let video = document.getElementById("main-video");

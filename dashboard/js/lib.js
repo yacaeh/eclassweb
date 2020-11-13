@@ -22,33 +22,19 @@ function GetOwnerId() {
 
 // canvas element 를 받아옴
 function GetWidgetFrame() {
-  let frame = widgetContainer.getElementsByTagName('iframe')[0].contentWindow;
-  return frame;
+  return widgetContainer.getElementsByTagName('iframe')[0].contentWindow;
 }
 
 function Show(element) {
-  if (!element)
-    return;
-
-  if (typeof element === "string") {
-    document.getElementById(element).style.display = "block";
-  }
-  else {
-    element.style.display = "block";
-  }
+  if (!element) return;
+    typeof element === "string" ? document.getElementById(element).style.display = "block"
+    : element.style.display = "block";
 }
 
 function Hide(element) {
-  console.log(element);
-  if (!element)
-    return;
-
-  if (typeof element === "string") {
-    document.getElementById(element).style.display = "none";
-  }
-  else {
-    element.style.display = "none";
-  }
+  if (!element) return;
+  typeof element === "string" ? document.getElementById(element).style.display = "none"
+                              : element.style.display = "none";
 }
 
 // 알림 박스 생성

@@ -1,4 +1,5 @@
 window.params = GetParamsFromURL();
+var reactEvent = {};
 ReactDOM.render(<App />, document.getElementById('app'));
 
 //=============================================================================================
@@ -9,10 +10,6 @@ var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
-
-const topButtonContents = {};
-const widgetContainer = document.getElementById("widget-container");
-const rightTab        = document.getElementById("right-tab")
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
@@ -28,16 +25,9 @@ var attentionManager    = new attentionManagerClass();
 
 //=============================================================================================
 
-// 좌측 버튼 기능
-const canvasButtonContents = {
-  'screen_share'      : screenshareManager.btn,
-  '3d_view'           : _3DCanvasOnOff,
-  'movie'             : Movie_Render_Button,
-  'file'              : LoadFile,
-  'epub'              : epubManager.loadEpub,
-  'callteacher'       : classroomManager.callTeacher,
-  'homework'          : HomeworkSubmit,
-}
+const topButtonContents = {};
+const widgetContainer = document.getElementById("widget-container");
+const rightTab        = document.getElementById("right-tab")
 
 // Alt + 단축키
 const shortCut = [
@@ -79,7 +69,6 @@ window.onWidgetLoaded = function () {
   pageNavigator.init();
   canvasManager.init();
   permissionManager.init();
-  canvasManager.setCanvasButtons(canvasButtonContents);
   classroomManager.init(shortCut, topButtonContents);
   mobileHelper.init();
 }
@@ -90,18 +79,8 @@ window.onSocketConnected = function () {
   webRTCPCInit();
 };
 
-connection.onopen = function (event) {
-  classroomManager.joinStudent(event);
-};
-
-connection.onclose = connection.onerror = connection.onleave = function (event) {
-  classroomManager.leftStudent(event);
-};
-
-connection.onstreamended = function (event) {
-  console.log('onstreameneded!', event);
-  screenshareManager.onclose(event);
-};
+connection.onopen = event => reactEvent.joinStudent(event);
+connection.onclose = connection.onerror = connection.onleave = event => reactEvent.leftStudent(event);
 
 designer.appendTo(() => {
   console.debug('Designer append');
@@ -114,22 +93,13 @@ connection.onmessage = function (event) {
   if (debug)
     console.log(event);
 
-  if (permissionManager.eventListener(event))
-    return;
-
-  if (screenshareManager.eventListener(event))
-    return;
-
-  if (maincamManager.eventListener(event))
-    return;
-
-  if (ChattingManager.eventListener(event))
-    return;
-
-  if (canvasManager.eventListener(event))
-    return;
-
-  if (classroomManager.eventListener(event))
+  if (permissionManager.eventListener(event) ||
+      screenshareManager.eventListener(event) ||
+      maincamManager.eventListener(event) ||
+      ChattingManager.eventListener(event) ||
+      canvasManager.eventListener(event) ||
+      classroomManager.eventListener(event)
+    )
     return;
 
   if (event.data === 'plz-sync-points') {

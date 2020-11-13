@@ -261,6 +261,8 @@ function PDFViewerPlugin() {
     this.createCanvas = function (container){
         let image = document.createElement('img');
         this.image = image; 
+        // this.image.style.width = '100%';
+        // this.image.style.height = 'auto';
         container.appendChild(image);
     }
 
@@ -389,7 +391,7 @@ function PDFViewerPlugin() {
         n = n < 1 ? 1 : n ;
         this.image.src = this.url + this.images[n-1];
         window.parent.parent.showPage(n);     
-        currentPage                             = n;
+        currentPage = n;
     };
 
     this.getPluginName = function () {

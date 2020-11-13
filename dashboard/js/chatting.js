@@ -75,8 +75,7 @@ class ChattingManagerClass {
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
-    leftStudent(event) {
-        let name = event.extra.userFullName;
+    leftStudent(name) {
         if (name == undefined)
             return;
 

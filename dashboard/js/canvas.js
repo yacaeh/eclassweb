@@ -40,15 +40,6 @@ class canvasManagerClass {
             uid: connection.userid,
         })
     };
-    setCanvasButtons(data) {
-        Object.keys(data).forEach(function (e) {
-            let btn = document.getElementById(e);
-            if (btn)
-                btn.addEventListener("click", function () {
-                    data[e](btn);
-                })
-        })
-    };
     eventListener(event) {
         if (event.data.sendcanvasdata) {
             this.sendMyCanvas = event.data.state;

@@ -90,7 +90,7 @@ classroomCommand = {
 };
 
 function onBtn(id) {
-    let btn = GetWidgetFrame().document.getElementById(id);
+    let btn = document.getElementById(id);
     if (btn)
         btn.classList.add("selected-shape")
 }

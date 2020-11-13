@@ -1,0 +1,112 @@
+class Student extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            name : undefined,
+            class : false,
+            mic : false,
+            canvas : false,
+            display : 'none'
+        }
+
+        this.onMouseEnter = this.onMouseEnter.bind(this);
+        this.onMouseLeave = this.onMouseLeave.bind(this);
+        this.onMouseClick = this.onMouseClick.bind(this);
+        this.myRef = React.createRef();
+
+        let _this = this;
+        connection.socket.emit("get-user-name", this.props.uid, function(e){
+            _this.setState({name : e});
+            ChattingManager.enterStudent(e);
+        })
+    }
+
+    componentDidMount(){
+        classroomManager.studentListResize();
+
+        if (classroomInfo.classPermission == this.props.uid) {
+            this.setState({class : true});
+            MakeIcon(this.props.uid, "screen");
+        }
+    
+        if (classroomInfo.micPermission == this.props.uid) {
+            this.setState({mic : true});
+            MakeIcon(this.props.uid, "mic");
+        }
+    
+        if (classroomInfo.canvasPermission.includes(this.props.uid)) {
+            this.setState({canvas : true});
+            MakeIcon(this.props.uid, "canvas");
+        }
+
+        if (!classroomInfo.showcanvas)
+            this.myRef.current.style.display = 'none';
+
+        canvasManager.canvas_array[this.props.uid] = this.myRef.current;
+    };
+
+    componentWillUnmount(){
+        if (this.props.uid == classroomInfo.classPermission)
+            classroomInfo.classPermission = undefined;
+
+        if (this.props.uid == classroomInfo.micPermission)
+            classroomInfo.micPermission = undefined;
+
+        if (permissionManager.IsCanvasPermission(this.props.uid))
+            permissionManager.DeleteCanvasPermission(this.props.uid);
+
+        ChattingManager.leftStudent(this.state.name);
+        examObj.leftStudent(this.props.uid);
+        delete canvasManager.canvas_array[this.props.uid];
+        console.debug("Left student", "[", this.props.uid, "]", "[", this.state.name, "]");
+        classroomManager.studentListResize();
+    };
+    
+    render(){
+        return <span 
+            onClick={this.onMouseClick}
+            onMouseLeave={this.onMouseLeave} 
+            onMouseEnter={this.onMouseEnter} 
+        className = "student" 
+        data-name = {this.state.name} 
+        data-id={this.props.uid}
+        data-class-permission = {this.state.class}
+        data-mic-permission = {this.state.mic}
+        data-canvas-permission = {this.state.canvas}>
+            <span className = 'permissions' style={{display : 'none'}}  />
+            <span className = 'student-overlay' />
+            <span className = 'bor' />
+            <span className = 'name'>{this.state.name}</span>
+            <img ref={this.myRef} />
+        </span>
+    }
+
+    onMouseClick(e){
+        OnClickStudent(e, this.props.uid , this.state.name);
+    }
+
+    onMouseEnter(){
+        if (classroomInfo.canvasPermission.includes(this.props.uid))
+            return;
+
+        connection.send({
+            sendcanvasdata: true,
+            state: true
+        }, this.props.uid)
+
+        canvasManager.showingCanvasId = this.props.uid;
+    };
+
+    onMouseLeave() {
+        if (!classroomInfo.showcanvas)
+            connection.send({
+                sendcanvasdata: true,
+                state: false
+            }, this.props.uid)
+
+        if (!classroomInfo.canvasPermission.includes(this.props.uid))
+            canvasManager.clearStudentCanvas(this.props.uid);
+
+        canvasManager.showingCanvasId = undefined;
+    };
+}

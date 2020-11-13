@@ -10,10 +10,6 @@ class Header extends React.Component {
         this.studentBtnHandler = this.studentBtnHandler.bind(this);
     }
 
-    componentDidMount() {
-        ChattingManager.init();
-    };
-
     Features() {
         return <span className="feature">
             <img className="divide" />

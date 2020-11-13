@@ -125,19 +125,15 @@ class pdfViewer {
     }
 
     showPage(_page) {
-        if (this.checkSamePage(_page)) return;
+        console.log(_page);
 
         let fileViewer = this.getElementFileViewer();
         if (!fileViewer) return;
-
-        var e = new Event("change");
-        $(fileViewer.contentWindow.document.getElementById("pageNumber")).val(_page);
-        fileViewer.contentWindow.document.getElementById("pageNumber").dispatchEvent(e);
-
         this.setPage(_page);
     }
 
     setPage(_page) {
+        console.log("SETPAGE", _page);
         this.page = _page;
         this.onpage(this.page);
     }
@@ -441,6 +437,7 @@ mfileViewer.onupdateeachtype[pdfString] = function (_data) {
 mfileViewer.onsynceachtype[pdfString] = function () {
     console.log('onsync pdf');
     const page = classroomInfo.viewer.pdf.page;
+    console.log(page);
     mfileViewer.getCurrentViewer().showPage(page);
 }
 
@@ -533,10 +530,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     viewer.ontimeupdate = (_currentTime) => {
         classroomInfo.viewer.media.time = _currentTime;
     }
-}
-
-function HomeworkSubmit() {
-    HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
 }
 
 function HomeworkUploadModal(message, callback) {
@@ -898,6 +891,7 @@ function pdfOnLoaded() {
 }
 
 function showPage(n) {
+    console.log("SHOW PAGE ", n)
     pointer_saver.save()
     pointer_saver.load(n - 1);
     pageNavigator.select(n - 1);
