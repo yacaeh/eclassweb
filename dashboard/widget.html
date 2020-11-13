@@ -4,62 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <script src="/dashboard/js/lib.js" ></script>
-    <script src="/dashboard/js/zoom.js" ></script>
-    <script type="text/javascript"  src="/dashboard/js/lib/paper-full.min.js" ></script>
     <link href="/dashboard/css/widget.css" rel="stylesheet">
 </head>
 
-<body   ondragenter="handleDragDropEvent(event)"
-        ondragover="handleDragDropEvent(event)"
-        ondrop="handleDragDropEvent(event)" 
-        oncontextmenu="return false" 
-        ondragstart="return false" 
-        onselectstart="return false">
+<body ondragenter="handleDragDropEvent(event)" ondragover="handleDragDropEvent(event)"
+    ondrop="handleDragDropEvent(event)" oncontextmenu="return false" ondragstart="return false"
+    onselectstart="return false">
 
     <section id="design-surface" class="design-surface">
         <canvas id="main-canvas" style="z-index: 2;"></canvas>
         <canvas id="temp-canvas" style="z-index: 3;" class="pen"></canvas>
         <video id="screen-viewer" controls playsinline autoplay></video>
         <div id="line-uid"></div>
-        
     </section>
-</div>
 
-<script>
-    (function () {
-        var params = {},
-            r = /([^&=]+)=?([^&]*)/g;
+    </div>
 
-        function d(s) {
-            return decodeURIComponent(s.replace(/\+/g, ' '));
-        }
+    <script src="/dashboard/js/lib.js"></script>
+    <script src="/dashboard/js/zoom.js"></script>
+    <script type="text/javascript" src="/dashboard/js/lib/paper-full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>
+    <script type="text/javascript" src="./js/widget.js"></script>
 
-        var match, search = window.location.search;
-        while (match = r.exec(search.substring(1)))
-            params[d(match[1])] = d(match[2]);
-
-        window.params = params;
-    })();
-
-    window.selectedIcon = params.selectedIcon;
-
-    if (window.selectedIcon) {
-        try {
-            window.selectedIcon = window.selectedIcon.split('')[0].toUpperCase() + window.selectedIcon.replace(window.selectedIcon.split('').shift(1), '');
-        } catch (e) {
-            window.selectedIcon = 'Pencil';
-        }
-    } else {
-        window.selectedIcon = 'Pencil';
-    }
-
-    var script = document.createElement('script');
-    script.src = params.widgetJsURL;
-    (document.body || document.documentElement).appendChild(script);
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.0.489/build/pdf.min.js"></script>
 </body>
 
 </html>

@@ -8,8 +8,12 @@ classroomCommand = {
     },
 
     updateSyncRoom: function () {
+        // Allcontroll updateControlView
+
         if (classroomInfo.allControl) {
-            updateControlView(false);
+            if (!connection.extra.roomOwner) {
+                classroomInfo.allControl ? Show("student_isallcontrol") : Hide("student_isallcontrol");
+            }
         }
 
         if (classroomInfo.share3D.state) {

@@ -39,6 +39,7 @@ function Show(element) {
 }
 
 function Hide(element) {
+  console.log(element);
   if (!element)
     return;
 
@@ -110,6 +111,45 @@ async function SetNowLoginInfo(){
     window.params.userFullName =  logininfo.data.name;
   }
   return info;
+}
+
+function GetParamsFromURL(){
+  let params = {},
+    r = /([^&=]+)=?([^&]*)/g;
+
+  function d(s) {
+    return decodeURIComponent(s.replace(/\+/g, ' '));
+  }
+  let match,
+    search = window.location.search;
+  while ((match = r.exec(search.substring(1))))
+    params[d(match[1])] = d(match[2]);
+  window.params = params;
+  return params;
+}
+
+function CheckLogin() {
+  if (!window.params.userFullName) {
+
+    let request = new XMLHttpRequest();
+    request.open('POST', '/get-now-account', false);
+    request.send(JSON.stringify({ id: params.sessionid }));
+
+    if (request.status === 200) {
+      const ret = JSON.parse(request.responseText);
+      console.log(ret)
+      if (ret.code == 400) {
+        console.error("no login info")
+        alert("로그인 정보가 없습니다");
+        location.href = '/dashboard/login.html';
+      }
+      else {
+        connection.userid = ret.data.uid;
+        connection.byLogin = true;
+        connection.extra.userFullName = ret.data.name;
+      }
+    }
+  }
 }
 
 // ----------------------------------------------------------------------

@@ -14,19 +14,16 @@ class PointerSaver {
         let json = path + "_" + connection.extra.userFullName + ".json";
         axios.get(json).then(function (e) {
             let data = e.data;
-
             if (data == 404 || Object.keys(data).length == 0) {
                 pointer_saver.container = {};
                 canvasManager.clear();
                 designer.sync();
                 return;
             }
-
             pointer_saver.container = data;
             window.currentPoints = data[0].points;
             window.currentHistory = data[0].history;
             data[0].command = "my";
-
             designer.syncData(data[0]);
             designer.sync();
         })

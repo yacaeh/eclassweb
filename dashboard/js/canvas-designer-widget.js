@@ -1,19 +1,7 @@
-// _______________
-// Canvas-Designer
-
-// Open-Sourced: https://github.com/muaz-khan/Canvas-Designer
-
-// --------------------------------------------------
-// Muaz Khan     - www.MuazKhan.com
-// MIT License   - www.WebRTC-Experiment.com/licence
-// --------------------------------------------------
-
 function CanvasDesigner() {
     var designer = this;
     designer.iframe = null;
     designer.pointsLength = 0;
-    designer.icons = {};
-    designer.callbacks = {};
     
     var syncDataListener = function (data) { };
 
@@ -48,29 +36,15 @@ function CanvasDesigner() {
 
     designer.uid = getRandomString();
 
-    designer.appendTo = function (parentNode, callback) {
+    designer.appendTo = function (callback) {
         callback = callback || function () { };
-        let form = document.createElement("div");
-        form.style.left = '50px';
-        form.style.width =  'calc(100% - 50px)';
-        form.style.height = '100%';
-        form.style.position = 'absolute';
-        parentNode.appendChild(form);
-        
-        designer.iframe = document.createElement('iframe');
+        designer.iframe = document.getElementById('widget-canvas');
         designer.iframe.onload = function () {
             callback();
             callback = null;
         };
-        
-        designer.iframe.src = designer.widgetHtmlURL + '?widgetJsURL=' + designer.widgetJsURL + '&icons=' + JSON.stringify(designer.icons);
-        designer.iframe.style.width = '100%';
-        designer.iframe.style.height = '100%';
-        designer.iframe.style.position = 'absolute';
-        designer.iframe.style.border = 0;
         window.removeEventListener('message', onMessage);
         window.addEventListener('message', onMessage, false);
-        form.appendChild(designer.iframe);
     };
 
     designer.addSyncListener = function (callback) {
@@ -78,14 +52,12 @@ function CanvasDesigner() {
     };
 
     designer.syncData = function (data) {
-        if (!designer.iframe) return;
         designer.postMessage({
             canvasDesignerSyncData: data
         });
     };
 
     designer.sync = function () {
-        if (!designer.iframe) return;
         designer.postMessage({
             syncPoints: true
         });

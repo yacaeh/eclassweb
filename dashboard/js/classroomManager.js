@@ -4,7 +4,6 @@ class classroomManagerClass {
         this.altdown = false;
     }
     init(shortCut, topButtonContents) {
-        this.toggleViewType();
         this.windowFocusChecker();
         this.setShortCut(shortCut);
         this.setTopToolTip(topButtonContents);
@@ -381,59 +380,6 @@ class classroomManagerClass {
             on ? list.appendChild(btn) : list.insertBefore(btn, list.children[16])
             btn.style.display = "inline-block";
         }
-    };
-
-    toggleViewType() {
-        $('.view_type').click(function (e) {
-            $('.view_type').removeClass('view_type-on');
-            this.classList.add("view_type-on");
-            let childern = document.getElementById("student_list").children;
-
-            switch (this.id) {
-                case 'top_student':
-                    $('.view_type').removeClass('vstudent');
-                    classroomInfo.showcanvas = true;
-                    for (let i = 0; i < childern.length; i++) {
-                        Show(childern[i].getElementsByTagName("img")[0]);
-                        Hide(childern[i].getElementsByTagName("video")[0]);
-                    }
-                    $('#student_list').show();
-                    connection.send({
-                        sendcanvasdata: true,
-                        state: true
-                    })
-                    break;
-                case 'top_camera':
-                    classroomInfo.showcanvas = false;
-
-                    if(e.target.classList.contains('view_type-on')){
-                        e.target.classList.toggle('vstudent');
-                    }
-                    
-                    if(!e.target.classList.contains('vstudent')){
-                        for (let i = 0; i < childern.length; i++) {
-                            Show(childern[i].getElementsByTagName("video")[0]);
-                            Hide(childern[i].getElementsByTagName("img")[0]);
-                        }
-                        connection.send({
-                            sendcanvasdata: true,
-                            state: false
-                        })
-                        maincamManager.hide();
-                    }
-                    else{
-                        for (let i = 0; i < childern.length; i++) {
-                            Hide(childern[i].getElementsByTagName("video")[0]);
-                        }
-                        maincamManager.show();
-                    }
-
-
-
-                    break;
-            }
-            classroomManager.updateClassroomInfo();
-        });
     };
 
     createRoom() {

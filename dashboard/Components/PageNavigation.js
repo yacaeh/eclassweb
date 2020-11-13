@@ -6,8 +6,8 @@ class NaviController extends React.Component {
     render() {
         return <span id="navi-control">
             <img id="lprev" onClick={this.lprev} />
-            <img id="prev" onClick={this.prev} />
-            <img id="next" onClick={this.next} />
+            <img id="prev"  onClick={this.prev} />
+            <img id="next"  onClick={this.next} />
             <img id="lnext" onClick={this.lnext} />
         </span>
     };

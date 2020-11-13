@@ -12,7 +12,7 @@ class App extends React.Component {
         return (
             <>
                 <Header />
-                <Article />
+                <Widget />
                 <URLLoader />
                 <RightForm />
                 <FileViewer />
@@ -35,7 +35,6 @@ class App extends React.Component {
     setParamsFromURL = () => {
         let params = {},
             r = /([^&=]+)=?([^&]*)/g;
-
         function d(s) {
             return decodeURIComponent(s.replace(/\+/g, ' '));
         }
@@ -43,7 +42,6 @@ class App extends React.Component {
             search = window.location.search;
         while ((match = r.exec(search.substring(1))))
             params[d(match[1])] = d(match[2]);
-
-        this.setState(params);
+        this.setState({roomOwner : params.open == "true"})
     }
 }

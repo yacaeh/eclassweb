@@ -1,22 +1,5 @@
-(function () {
-  let params = {},
-    r = /([^&=]+)=?([^&]*)/g;
-
-  function d(s) {
-    return decodeURIComponent(s.replace(/\+/g, ' '));
-  }
-  let match,
-    search = window.location.search;
-  while ((match = r.exec(search.substring(1))))
-    params[d(match[1])] = d(match[2]);
-  window.params = params;
-})();
-
-
-ReactDOM.render(
-  <App />,
-  document.getElementById('app')
-)
+window.params = GetParamsFromURL();
+ReactDOM.render(<App />, document.getElementById('app'));
 
 //=============================================================================================
 
@@ -27,6 +10,7 @@ var isSharingFile = false;
 var isSharingEpub = false;
 let isFileViewer = false;
 
+const topButtonContents = {};
 const widgetContainer = document.getElementById("widget-container");
 const rightTab        = document.getElementById("right-tab")
 
@@ -43,9 +27,6 @@ var permissionManager   = new permissionManagerClass();
 var attentionManager    = new attentionManagerClass();
 
 //=============================================================================================
-
-// 상단 버튼 도움말
-const topButtonContents = {};
 
 // 좌측 버튼 기능
 const canvasButtonContents = {
@@ -91,26 +72,7 @@ connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
-if(!window.params.userFullName){
-  let request = new XMLHttpRequest();
-  request.open('POST', '/get-now-account', false); 
-  request.send(JSON.stringify({id : params.sessionid}));
-
-  if (request.status === 200) {
-    const ret = JSON.parse(request.responseText);
-    console.log(ret)
-    if(ret.code == 400){
-      console.error("no login info")
-      alert("로그인 정보가 없습니다");
-      location.href = '/dashboard/login.html';
-    }
-    else{
-      connection.userid = ret.data.uid;
-      connection.byLogin = true;
-      connection.extra.userFullName = ret.data.name;
-    }
-  }
-}
+CheckLogin();
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
@@ -141,7 +103,7 @@ connection.onstreamended = function (event) {
   screenshareManager.onclose(event);
 };
 
-designer.appendTo(widgetContainer, () => {
+designer.appendTo(() => {
   console.debug('Designer append');
   connection.extra.roomOwner ? classroomManager.createRoom() :
                                classroomManager.joinRoom();

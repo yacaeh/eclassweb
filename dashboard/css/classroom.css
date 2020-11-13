@@ -486,6 +486,8 @@ button[disabled] {
   top: max(30px, 5%);
   height: 24%;
   background-color: black;
+  display: 'none';
+  z-index: 5;
 }
 
 hr {
@@ -556,6 +558,8 @@ hr {
 }
 
 #article {
+  width: auto;
+  height: 100%;
   top: 20px;
 }
 
@@ -1932,16 +1936,7 @@ body:fullscreen {
   display: flex;
 }
 
-.permission-icon{
-  display: none;
-  right: 17.7%;
-  position: relative;
-  top: 10px;
-  float: right;
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
-}
+
 
 .language {
   position: absolute;

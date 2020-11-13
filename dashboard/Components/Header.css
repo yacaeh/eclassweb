@@ -1,0 +1,17 @@
+#student_isallcontrol{
+    display: none;
+    right: 200px;
+    position: absolute;
+    top: 10px;
+}
+
+.permission-icon{
+    display: none;
+    right: 17.7%;
+    position: relative;
+    top: 10px;
+    float: right;
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+  }

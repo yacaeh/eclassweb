@@ -1,6 +1,7 @@
 /*
     캔버스, 판서 관련
 */
+var designer = new CanvasDesigner();
 
 class canvasManagerClass {
     constructor() {
@@ -8,7 +9,6 @@ class canvasManagerClass {
         this.showingCanvasId = undefined;
         this.canvas_array = {};
         this.canvas = undefined;
-
     }
 
     init() {
@@ -131,12 +131,6 @@ class canvasManagerClass {
     };
 }
 
-var designer = new CanvasDesigner();
-
-designer.widgetHtmlURL          = './widget.html';
-designer.widgetJsURL            = './js/widget.js';
-designer.icons.on               = '/dashboard/img/view_on.png';
-designer.icons.off              = '/dashboard/img/view_off.png';
 
 designer.addSyncListener(function (data) {
     var isStudent = permissionManager.IsCanvasPermission(data.userid);

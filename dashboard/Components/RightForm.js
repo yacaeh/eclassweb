@@ -1,31 +1,3 @@
-
-
-class CurrentTime extends React.Component {
-    render() {
-        return <span className="time">
-                <span id="current-time" />
-                <span id="recording-time">
-                <img src="/dashboard/img/recording.png" style={{ display: 'none', marginRight: '7px', marginBottom: '2px' }} />
-                <span className="text">0:00:00</span>
-            </span>
-        </span>
-    }
-}
-
-class StudentList extends React.Component {
-    render() {
-        return <div id="student_list">
-            <div id="student_list_button" />
-        </div>
-    }
-}
-
-class MainCam extends React.Component {
-    render() {
-        return <video style={{ display: 'none', zIndex: 5 }} id="main-video" playsInline autoPlay />
-    }
-}
-
 class RightForm extends React.Component {
     state = {
         collapsed: false
@@ -66,4 +38,16 @@ class RightForm extends React.Component {
     }
 }
 
+class StudentList extends React.Component {
+    render() {
+        return <div id="student_list">
+            <div id="student_list_button" />
+        </div>
+    }
+}
 
+class MainCam extends React.Component {
+    render() {
+        return <video id="main-video" playsInline autoPlay />
+    }
+}

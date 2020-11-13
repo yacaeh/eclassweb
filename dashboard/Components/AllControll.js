@@ -24,14 +24,9 @@ class AllControll extends React.Component {
     };
 
     updateControlView(send) {
-        if (connection.extra.roomOwner) {
-
-        }
-        else {
+        if (!connection.extra.roomOwner) {
             classroomInfo.allControl ? Show("student_isallcontrol") : Hide("student_isallcontrol");
         }
-
-
         if (send) {
             classroomInfo.allControl ?
                 connection.send({ allControl: { state: true, roomInfo: classroomInfo } }) :
