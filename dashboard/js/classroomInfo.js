@@ -27,6 +27,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.viewer.state) {
+            if(classroomInfo.allControl)
             classroomCommand.syncViewer();
             pageNavigator.allControl(classroomInfo.allControl);
             onBtn("file");

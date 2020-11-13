@@ -133,7 +133,6 @@ class pdfViewer {
     }
 
     setPage(_page) {
-        console.log("SETPAGE", _page);
         this.page = _page;
         this.onpage(this.page);
     }
@@ -435,10 +434,9 @@ mfileViewer.onupdateeachtype[pdfString] = function (_data) {
 }
 
 mfileViewer.onsynceachtype[pdfString] = function () {
-    console.log('onsync pdf');
     const page = classroomInfo.viewer.pdf.page;
-    console.log(page);
-    mfileViewer.getCurrentViewer().showPage(page);
+    console.log('onupdate pdf', page);
+    pageNavigator.button(page-1);
 }
 
 mfileViewer.onloadedeachtype[pdfString] = function () {
@@ -891,7 +889,6 @@ function pdfOnLoaded() {
 }
 
 function showPage(n) {
-    console.log("SHOW PAGE ", n)
     pointer_saver.save()
     pointer_saver.load(n - 1);
     pageNavigator.select(n - 1);
