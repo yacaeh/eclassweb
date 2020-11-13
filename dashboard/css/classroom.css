@@ -1762,7 +1762,7 @@ body:fullscreen {
   position: absolute;
   bottom: 10px;
   right: 20px;
-  height: 95%;
+  height: 93px;
   width: 155px;
   background-color: #F0F0F0;
   border-radius: 9px;
@@ -1831,7 +1831,7 @@ body:fullscreen {
 
 #epub-collapse{
   content: url(/dashboard/img/nextpage.png);
-  transform: rotate(-90deg);
+  transform: rotate(90deg);
   position: absolute;
   right: 5px;
   bottom: 5px;
