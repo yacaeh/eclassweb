@@ -850,7 +850,7 @@ gothicFont.load().then((font) => {
             ctx.clearRect(0, 0, 40, 40);
             ctx.drawImage(nimage, 0, 0, 28, 28);
         };
-        nimage.src = id.toDataURL();
+        nimage.src = id.dataset.src;
     }
 
     function returnColor(id) {
@@ -868,7 +868,7 @@ gothicFont.load().then((font) => {
                 ctx.clearRect(0, 0, 40, 40);
                 ctx.drawImage(nimage, 0, 0, 28, 28);
             }
-            nimage.src = data_uris[id.id];
+            nimage.src = id.dataset.src;
         }
         catch {
 
@@ -1036,19 +1036,15 @@ gothicFont.load().then((font) => {
                     image.src = data_uris.off;
                     let icons = find('tool-box').children;
                     for (let i = 0; i < icons.length; i++) {
-
-                        if (!icons[i].classList.contains('draw') || 
-                            icons[i].id == 'onoff-icon')
+                        if (!icons[i].classList.contains('draw') || icons[i].id == 'onoff-icon')
                             continue;
 
-                        if (icons[i].style.display == 'block') {
-                            if (icons[i].id != "undo" || orderHistory.length != 0) {
-                                changeColor(icons[i], 0.3);
-                            }
-
-                            icons[i].classList.remove("on");
-                            icons[i].classList.add("off");
+                        if (icons[i].id != "undo" || orderHistory.length != 0) {
+                            changeColor(icons[i], 0.3);
                         }
+
+                        icons[i].classList.remove("on");
+                        icons[i].classList.add("off");
                     }
 
                     mainCanvas.style.display = 'none';

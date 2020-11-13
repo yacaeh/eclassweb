@@ -16,7 +16,7 @@ class RightForm extends React.Component {
         return (
             <div id="right-tab" className="right-tab">
                 <div id="right-tab-collapse" onClick={this.collapse}>
-                    <img src="/dashboard/img/openchat.png" />
+                    <img style={{pointerEvents : 'none'}} src="/dashboard/img/openchat.png" />
                 </div>
                 <NumberOfStudents num={this.state.numberOfStudents} />
                 <Authorization />
@@ -54,7 +54,7 @@ class RightForm extends React.Component {
             $(widgetContainer).animate({ right: "0%" }, classroomManager.canvasResize);
         }
         else {
-            e.target.style.transform = "rotate(-90deg)";
+            e.target.style.transform = "rotate(270deg)";
             $(rightTab).animate({ width: "17.7%" });
             $(widgetContainer).animate({ right: "17.7%" }, classroomManager.canvasResize);
         }

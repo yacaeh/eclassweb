@@ -47,7 +47,7 @@ class PageNavigation extends React.Component {
                     <span id="navi-top">
                         <input id="epubidx" autoComplete="off" onChange={this.inputHandler} />
                         <span id="epubmaxidx" />
-                        <img id="epub-collapse" onClick={this.collapse} />
+                        <img className="epub-collapse" onClick={this.collapse} />
                     </span>
 
                     <ThumbnailList />
