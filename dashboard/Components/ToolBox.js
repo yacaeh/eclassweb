@@ -3,12 +3,12 @@ class ToolBox extends React.Component {
     render() {
         return <section id="tool-box" className="tool-box">
             <canvas className="on" id="onoff-icon" className="on" width="28" height="28" ></canvas>
-            <ToolBoxIcon className='draw' src='/dashboard/img/pen.png' id='pencilIcon' />
-            <ToolBoxIcon className='draw' src='/dashboard/img/pen2.png' id='markerIcon' />
-            <ToolBoxIcon className='i draw' src='/dashboard/img/eraser.png' id='eraserIcon' />
-            <ToolBoxIcon className='i draw' src='/dashboard/img/text.png' id='textIcon' />
-            <ToolBoxIcon className='i draw' src='/dashboard/img/undo.png' id='undo' />
-            <ToolBoxIcon className='i draw' src='/dashboard/img/trash.png' id='clearCanvas' />
+            <ToolBoxIcon key='pencilIcon' className='draw' src='/dashboard/img/pen.png' id='pencilIcon' />
+            <ToolBoxIcon key='markerIcon' className='draw' src='/dashboard/img/pen2.png' id='markerIcon' />
+            <ToolBoxIcon key='eraserIcon' className='i draw' src='/dashboard/img/eraser.png' id='eraserIcon' />
+            <ToolBoxIcon key='textIcon' className='i draw' src='/dashboard/img/text.png' id='textIcon' />
+            <ToolBoxIcon key='undo' className='i draw' src='/dashboard/img/undo.png' id='undo' />
+            <ToolBoxIcon key='clearCanvas' className='i draw' src='/dashboard/img/trash.png' id='clearCanvas' />
             <ToolBoxLine />
             <ScreenShareButton />
             <_3DCanvasButton />
