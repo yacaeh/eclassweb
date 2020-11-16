@@ -22,6 +22,7 @@ class ToolBox extends React.Component {
     }
 }
 
+
 function CallteacherButton(){
     function onClick(){
         classroomManager.callTeacher()
@@ -37,8 +38,8 @@ function ScreenShareButton(){
 }
 
 function FileviewerButton() {
-    function onClick() {
-        LoadFile();
+    function onClick(e) {
+        LoadFile(e.target);
     }
     return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/openfile.png' id='file' />
 }
@@ -73,7 +74,7 @@ function EpubButton() {
 
 function HomeworkButton() {
     function onClick() {
-        HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
+        HomeworkUploadModal()
     }
     return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/homework.png' id='homework' />
 }

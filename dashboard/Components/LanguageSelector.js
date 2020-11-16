@@ -37,35 +37,24 @@ class LanguageSelector extends React.Component {
             window.i18n.locale = window.language;
             window.i18n.load('/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale)
                 .done(function () {
-                    $("title").prop({
-                        text: $.i18n('TITLE')
-                    });
 
-                    $('#txt-roomid').prop({
-                        placeholder: $.i18n('ROOM_NUMBER')
-                    });
-
-                    $('#txt-user-name').prop({
-                        placeholder: $.i18n('NAME')
-                    });
-
-                    $('#txt-room-password').prop({
-                        placeholder: $.i18n('PASSWORD')
-                    });
-
-                    $('.conversation-panel .emojionearea-editor').prop({
-                        placeholder: $.i18n('CHAT_PLACEHOLDER'),
-                    });
-
-                    $('#exam-time').prop({
-                        placeholder: $.i18n('QUIZ_MINUTES')
-                    });
-
-                    $('#urlform #urlinput').prop({
-                        placeholder: $.i18n('ENTER_URL')
-                    });
-
+                    $('#btn-confirm-action').html($.i18n('OK'));
+                    $("title").prop({text: $.i18n('TITLE')});
+                    $('#txt-roomid').prop({placeholder: $.i18n('ROOM_NUMBER')});
+                    $('#txt-user-name').prop({placeholder: $.i18n('NAME')});
+                    $('#txt-room-password').prop({placeholder: $.i18n('PASSWORD')});
+                    $('.conversation-panel .emojionearea-editor').prop({placeholder: $.i18n('CHAT_PLACEHOLDER'),});
+                    $('#exam-time').prop({placeholder: $.i18n('QUIZ_MINUTES')});
+                    $('#urlform #urlinput').prop({placeholder: $.i18n('ENTER_URL')});
                     $('.emojionearea-editor').attr("placeholder", $.i18n('CHAT_PLACEHOLDER'));
+                    
+                    $('#btn-confirm-close').html($.i18n('CANCEL'));
+                    $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE'));
+                    $('#confirm-title').html($.i18n('FILE_MANAGER'));
+                    $('#confirm-title2').html($.i18n('ASSIGNMENT'));
+                    $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE'));
+                    $('#confirm-title2').html($.i18n('ASSIGNMENT'))
+                    $('#btn-confirm-close').html($.i18n('CANCEL'));
 
                     try {
                         topButtonContents.top_all_controll = $.i18n('MANAGE_ALL');

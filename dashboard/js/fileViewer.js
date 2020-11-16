@@ -530,21 +530,11 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
-function HomeworkUploadModal(message, callback) {
-    callback = callback || function () { }
-
-    console.log(message);
+function HomeworkUploadModal() {
     $('#btn-confirm-close').hide();
     $('#btn-confirm-file-close').hide();
     $("#confirm-title2").hide();
-    $('#confirm-title').html(message).removeClass("selected");
-    $('#btn-confirm-action').html($.i18n('CLOSE')).unbind('click').bind('click', function (e) {
-        e.preventDefault();
-        $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
-        callback(true);
-    });
-    $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
+    $('#confirm-title').html($.i18n('SUBMIT_ASSIGNMENT')).removeClass("selected");
     $('#confirm-box-topper').show();
     $('#confirm-box').modal({
         backdrop: 'static',
@@ -553,69 +543,30 @@ function HomeworkUploadModal(message, callback) {
     loadFileInput();
 }
 
-function fileUploadModal(message, callback) {
-    callback = callback || function () { }
-
-    console.log(message);
-    getUploadFileList();
+function fileUploadModal() {
     $("#confirm-title2").show();
-    $('#btn-confirm-action').html($.i18n('OK')).unbind('click').bind('click', function (e) {
-        e.preventDefault();
-        $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
-        callback(true);
-    });
-
-    $('#btn-confirm-close').html($.i18n('CANCEL'));
-
-    $('.btn-confirm-close').unbind('click').bind('click', function (e) {
-        e.preventDefault();
-        $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
-        callback(false);
-    });
-
-    $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
-    $('#confirm-title').html(message).addClass("selected");
-    $('#confirm-title2').html($.i18n('ASSIGNMENT')).removeClass("selected");
     $('#confirm-box-topper').show();
-
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false
     });
+
+    $('#refresh').click();
+    $('#confirm-title').click();
+
     if (!isFileViewer) $('#btn-confirm-file-close').hide();
     else {
         $('#btn-confirm-file-close').show();
-        $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE')).unbind('click').bind('click', function (e) {
-            e.preventDefault();
-            unloadFileViewer();
-        });
     }
 
     loadFileInput();
 }
 
-function ViewHomeworkList(btn) {
-    btn.classList.add("selected");
-    document.getElementById("confirm-title").classList.remove("selected");
-    $("form[name=upload]").hide();
-    getUploadFileList("/homework");
-}
-
-function ViewUploadList(btn) {
-    btn.classList.add("selected");
-    document.getElementById("confirm-title2").classList.remove("selected");
-    $("form[name=upload]").show();
-    getUploadFileList();
-}
-
 async function getUploadFileList(extraPath) {
-    if (typeof extraPath === "undefined")
-        extraPath = "";
-
+    extraPath = extraPath || '';
     let data = { "userId": params.sessionid, "extraPath": extraPath };
     let ret = await axios.post(fileServerUrl + '/list', data);
+    console.log(ret);
     if(ret.status == 200){
         updateFileList(ret.data, extraPath);
     }
@@ -623,91 +574,42 @@ async function getUploadFileList(extraPath) {
         console.error("directory doesn't exist!", ret.status);
         updateFileList([], extraPath);
     }
+    return ret.data;
 }
 
 function updateFileList(list, extraPath) {
-    $("#confirm-message .list-group-flush").remove();
+    // $("#confirm-message .list-group-flush").remove();
 
-    var re = /(?:\.([^.]+))?$/;
-    var listElement = '<ul class="list-group-flush">';
+    // var re = /(?:\.([^.]+))?$/;
+    // var listElement = '<ul class="list-group-flush">';
 
-    if (list.length == 0) {
-        listElement += $.i18n('NO_FILES');
-    }
-    else {
-        list.files.forEach(file => {
-            if (file.name == "homework" || re.exec(file.name)[1] == "json" || !re.exec(file.name)[1])
-                return;
+    // if (list.length == 0) {
+    //     listElement += $.i18n('NO_FILES');
+    // }
+    // else {
+    //     list.files.forEach(file => {
+    //         if (file.name == "homework" || re.exec(file.name)[1] == "json" || !re.exec(file.name)[1])
+    //             return;
 
-            var buttons = "";
-            if (extraPath == "/homework") {
-                buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
-            onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
-            }
+    //         var buttons = "";
+    //         if (extraPath == "/homework") {
+    //             buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
+    //         onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
+    //         }
 
-            buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
-          onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
-          <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
-          onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
+    //         buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
+    //       onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
+    //       <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
+    //       onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
 
-            listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
-                getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
-                '</label>' + buttons;
-        })
-    }
-    listElement += '</ul>';
-    var $listElement = $($.parseHTML(listElement));
-    $("#confirm-message").prepend($listElement);
-}
-
-function getFileType(ext) {
-    // console.log("ext:", ext);
-    let element = '';
-    if (ext === undefined) {
-        element += '<i class="fas fa-folder text-primary"></i>';
-    }
-    else if (ext.match(/(doc|docx)$/i)) {
-        element += '<i class="fas fa-file-word text-primary"></i>';
-    }
-    else if (ext.match(/(xls|xlsx)$/i)) {
-        element += '<i class="fas fa-file-excel text-success"></i>';
-    }
-    else if (ext.match(/(ppt|pptx)$/i)) {
-        element += '<i class="fas fa-file-powerpoint text-danger"></i>';
-    }
-    else if (ext.match(/(pdf)$/i)) {
-        element += '<i class="fas fa-file-pdf text-danger"></i>';
-    }
-    else if (ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)) {
-        element += '<i class="fas fa-file-archive text-muted"></i>';
-    }
-    else if (ext.match(/(htm|html)$/i)) {
-        element += '<i class="fas fa-file-code text-info"></i>';
-    }
-    else if (ext.match(/(txt|ini|csv|java|php|js|css)$/i)) {
-        element += '<i class="fas fa-file-code text-info"></i>';
-    }
-    else if (ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)) {
-        element += '<i class="fas fa-file-video text-warning"></i>';
-    }
-    else if (ext.match(/(mp3|wav)$/i)) {
-        element += '<i class="fas fa-file-audio text-warning"></i>';
-    }
-    else if (ext.match(/(jpg)$/i)) {
-        element += '<i class="fas fa-file-image text-danger"></i>';
-    }
-    else if (ext.match(/(gif)$/i)) {
-        element += '<i class="fas fa-file-image text-muted"></i>';
-    }
-    else if (ext.match(/(png)$/i)) {
-        element += '<i class="fas fa-file-image text-primary"></i>';
-    }
-    else {
-        element += '<i class="fas fa-file text-muted"></i>';
-    }
-    // console.log(element);
-
-    return element;
+    //         listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
+    //             getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
+    //             '</label>' + buttons;
+    //     })
+    // }
+    // listElement += '</ul>';
+    // var $listElement = $($.parseHTML(listElement));
+    // $("#confirm-message").prepend($listElement);
 }
 
 function downloadUploadedFile(url, name) {
@@ -748,96 +650,11 @@ async function deleteUploadedFile(filename, extraPath) {
 }
 
 function loadFileInput() {
-    var lang = language;
-    if (lang == 'ko') { lang = 'kr'; }
-
-    console.log("lang", lang);
     $(document).ready(function () {
         let extraPath = "";
-
         if (!connection.extra.roomOwner)
             extraPath = "/homework";
-
-        $("#test-upload").fileinput({
-            'theme': 'fas',
-            'showPreview': true,
-            'language': lang,
-            'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg", "odt"],
-            'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
-            'elErrorContainer': '#errorBlock'
-        });
-        $("#file-explorer").fileinput({
-            'theme': 'explorer-fas',
-            'language': lang,
-            'uploadUrl': fileServerUrl + '/upload',
-            fileActionSettings: {
-                showZoom: false,
-            },
-
-
-            overwriteInitial: false,
-            initialPreviewAsData: true,
-            preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
-            previewFileIconSettings: { // configure your icon file extensions
-                'doc': '<i class="fas fa-file-word text-primary"></i>',
-                'xls': '<i class="fas fa-file-excel text-success"></i>',
-                'ppt': '<i class="fas fa-file-powerpoint text-danger"></i>',
-                'pdf': '<i class="fas fa-file-pdf text-danger"></i>',
-                'zip': '<i class="fas fa-file-archive text-muted"></i>',
-                'htm': '<i class="fas fa-file-code text-info"></i>',
-                'txt': '<i class="fas fa-file-text text-info"></i>',
-                'mov': '<i class="fas fa-file-video text-warning"></i>',
-                'mp3': '<i class="fas fa-file-audio text-warning"></i>',
-                // note for these file types below no extension determination logic 
-                // has been configured (the keys itself will be used as extensions)
-                'jpg': '<i class="fas fa-file-image text-danger"></i>',
-                'gif': '<i class="fas fa-file-image text-muted"></i>',
-                'png': '<i class="fas fa-file-image text-primary"></i>'
-            },
-            previewFileExtSettings: { // configure the logic for determining icon file extensions
-                'doc': function (ext) {
-                    return ext.match(/(doc|docx)$/i);
-                },
-                'xls': function (ext) {
-                    return ext.match(/(xls|xlsx)$/i);
-                },
-                'ppt': function (ext) {
-                    return ext.match(/(ppt|pptx)$/i);
-                },
-                'zip': function (ext) {
-                    return ext.match(/(zip|rar|tar|gzip|gz|7z)$/i);
-                },
-                'htm': function (ext) {
-                    return ext.match(/(htm|html)$/i);
-                },
-                'txt': function (ext) {
-                    return ext.match(/(txt|ini|csv|java|php|js|css)$/i);
-                },
-                'mov': function (ext) {
-                    return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
-                },
-                'mp3': function (ext) {
-                    return ext.match(/(mp3|wav)$/i);
-                }
-            },
-            uploadExtraData: {
-                // userId: path
-                userId: params.sessionid,
-                extraPath: extraPath,
-            },
-
-        }).on('fileuploaded', function (event, previewId, index, fileId) {
-            console.error('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
-            console.log(previewId.response);
-            if (connection.extra.roomOwner)
-                getUploadFileList();
-        }).on('fileuploaderror', function (event, data, msg) {
-            console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
-        }).on('filebatchuploadcomplete', function (event, preview, config, tags, extraData) {
-            console.log('File Batch Uploaded', preview, config, tags, extraData);
-        });
     });
-
 }
 
 function LoadFile(btn) {
@@ -847,7 +664,7 @@ function LoadFile(btn) {
     }
     if (!connection.extra.roomOwner)
         return;
-    fileUploadModal($.i18n('FILE_MANAGER'), function (e) { });
+    fileUploadModal();
 }
 
 

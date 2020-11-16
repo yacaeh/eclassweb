@@ -167,8 +167,8 @@ class Notice extends React.Component {
             <div ref={this.window} className="scroll" id="noticewindow">
                 Logs<br />
                 <div id="logs">
-                    {list}
                 </div>
+                    {list}
             </div>
 
             <div id="collapse" onClick={this.props.collapse}>

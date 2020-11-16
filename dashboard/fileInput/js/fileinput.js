@@ -1701,7 +1701,7 @@
             tModal = '<div class="modal-dialog modal-lg{rtl}" role="document">\n' +
                 '  <div class="modal-content">\n' +
                 '    <div class="modal-header">\n' +
-                '      <h5 class="modal-title">{heading}</h5>\n' +
+                '      <h5 class="fileViewer_Btn">{heading}</h5>\n' +
                 '      <span class="kv-zoom-title"></span>\n' +
                 '      <div class="kv-zoom-actions">{toggleheader}{fullscreen}{borderless}{close}</div>\n' +
                 '    </div>\n' +
