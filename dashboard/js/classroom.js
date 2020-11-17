@@ -1,5 +1,7 @@
 window.params = GetParamsFromURL();
 var reactEvent = {};
+
+var epubManager         = new epubManagerClass();
 ReactDOM.render(<App />, document.getElementById('app'));
 
 //=============================================================================================
@@ -9,14 +11,12 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var isSharingEpub = false;
-let isFileViewer = false;
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
-var epubManager         = new epubManagerClass();
 var mobileHelper        = new mobileHelperClass();
 var pointer_saver       = new PointerSaver();
 var classroomManager    = new classroomManagerClass();
@@ -62,7 +62,6 @@ connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
-CheckLogin();
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
@@ -77,6 +76,7 @@ window.onSocketConnected = function () {
   updateClassTime();
   classroomCommand.updateSyncRoom();
   webRTCPCInit();
+  document.body.removeChild(document.getElementById("loading-screen"));
 };
 
 connection.onopen = event => reactEvent.joinStudent(event);
@@ -148,7 +148,18 @@ connection.onmessage = function (event) {
   }
 
   if (event.data.epub) {
-    classroomCommand.receiveEpubMessage(event.data.epub);
+    let data = event.data.epub
+    if (data.cmd) {
+      classroomCommand.updateEpubCmd(data);
+  } else {
+      let currentState = classroomInfo.epub.state;
+      if (currentState != data.state) {
+          classroomInfo.epub = data;
+          console.log(event.data);
+          classroomInfo.epub.state ? classroomCommand.openEpub(event.data.url) : epubManager.unloadEpubViewer();
+      }
+  }
+
     return;
   }
 

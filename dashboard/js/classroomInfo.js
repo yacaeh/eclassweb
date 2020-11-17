@@ -199,10 +199,6 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
-classroomCommand.openFile = function (_url) {
-    mfileViewer.openFile(_url);
-}
-
 classroomCommand.updateViewer = function (_cmd) {
     mfileViewer.updateViewer(_cmd);
 }
@@ -223,24 +219,13 @@ classroomCommand.syncViewer = function () {
     mfileViewer.syncViewer();
 }
 
-classroomCommand.receiveEpubMessage = function (_epub) {
-    if (_epub.cmd) {
-        classroomCommand.updateEpubCmd(_epub);
-    } else {
-        let currentState = classroomInfo.epub.state;
-        if (currentState != _epub.state) {
-            classroomInfo.epub = _epub;
-            classroomCommand.syncEpub();
-        }
-    }
-};
-
-classroomCommand.sendOpenEpub = function () {
+classroomCommand.sendOpenEpub = function (url) {
     classroomInfo.epub.state = true;
     connection.send({
-        epub: classroomInfo.epub,
-        start: classroomInfo.epub.start,
-        end: classroomInfo.epub.end,
+        epub    : classroomInfo.epub,
+        start   : classroomInfo.epub.start,
+        end     : classroomInfo.epub.end,
+        url
     });
     classroomManager.updateClassroomInfo();
 };
@@ -251,7 +236,7 @@ classroomCommand.sendCloseEpub = function () {
     classroomManager.updateClassroomInfo();
 };
 
-classroomCommand.openEpub = function () {
+classroomCommand.openEpub = function (url) {
     if (isSharingEpub) {
         if (epubManager.renditionBuffer) {
             if (classroomInfo.allControl)
@@ -259,8 +244,7 @@ classroomCommand.openEpub = function () {
         }
     }
     else {
-        epubManager.loadEpubViewer();
-        $('#canvas-controller').show();
+        epubManager.loadEpubViewer(url);
     }
 
     if (!connection.extra.roomOwner) {
@@ -292,10 +276,6 @@ classroomCommand.openEpub = function () {
     }
 };
 
-classroomCommand.closeEpub = function () {
-    epubManager.unloadEpubViewer();
-    $('#canvas-controller').hide();
-}
 
 classroomCommand.sendEpubCmd = function (_cmd, _data) {
     if (!connection.extra.roomOwner) return;
@@ -339,17 +319,9 @@ classroomCommand.updateEpubCmd = function (_data) {
     }
 }
 
-classroomCommand.syncEpub = function () {
-    classroomInfo.epub.state ? classroomCommand.openEpub() : classroomCommand.closeEpub();
-};
-
-
 function updateClassTime() {
     let currentTime = document.getElementById("current-time");
-    setTimeout(() => { 
-        document.body.removeChild(document.getElementById("loading-screen"));
-    }, 1000)
-    classTimeIntervalHandle = setInterval(Sec, 1000);
+    setInterval(Sec, 1000);
 
     function Sec() {
         let now = new Date().getTime() - classroomInfo.roomOpenTime;

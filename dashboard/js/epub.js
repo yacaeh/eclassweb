@@ -13,10 +13,13 @@ class epubManagerClass {
 
         if(!wrapsize) return;
         
-            wrapsize = wrapsize.getBoundingClientRect();
+        wrapsize = wrapsize.getBoundingClientRect();
         viewer.style.left = Math.max(0, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
     }
-    loadEpubViewer() {
+
+    loadEpubViewer(url) {
+        let _this = this;
+
         canvasManager.clearCanvas();
         pageNavigator.on();
 
@@ -42,12 +45,11 @@ class epubManagerClass {
         frame.document.getElementById('design-surface').appendChild(loadingWindow);
         frame.document.getElementById('design-surface').appendChild(epubViewer);
 
-        // var book = ePub('https://files.primom.co.kr:1443/uploads/epub/6da5303c-d218-67f1-8db1-2a8e5d2e5936/Lesson1.epub/ops/content.opf');
-        var book = ePub('https://files.primom.co.kr:1443/uploads/epub/lesson1/ops/content.opf');
-
+        var book = ePub(url);
         window.book = book;
 
         this.path = book.url.href;
+        console.log(this.path);
         pointer_saver.load_container(this.path);
 
         var rendition = book.renderTo(epubViewer, {
@@ -67,24 +69,18 @@ class epubManagerClass {
             classroomInfo.epub.page ? displayed = rendition.display(classroomInfo.epub.page) : displayed = rendition.display();
         }
 
-        displayed.then(function (renderer) {
-        });
-
-        // Navigation loaded
         book.loaded.navigation.then(function (toc) {
             var len = book.spine.length;
             pageNavigator.set(len);
-
             let origin = book.url.origin;
             let path = book.path.directory;
             let location = origin + path;
-
             pageNavigator.epubsetting();
-
             Object.keys(book.package.manifest).forEach(function (e) {
                 let href = book.package.manifest[e].href;
                 if (href.includes("thumbnail")) {
                     let img = document.createElement("img");
+                    img.style.width = '100%';
                     img.src = location + href;
                     pageNavigator.push(img, function () {
                         rendition.display(this.getAttribute("idx"));
@@ -100,21 +96,10 @@ class epubManagerClass {
             classroomCommand.sendEpubCmd('page', {
                 page: locations.start.index
             });
-            epubManager.EpubPositionSetting();
+            _this.EpubPositionSetting();
         });
-
-        var keyListener = function (e) {
-            // Left Key
-            if ((e.keyCode || e.which) == 37)
-                rendition.prev();
-            // Right Key
-            if ((e.keyCode || e.which) == 39)
-                rendition.next();
-        };
-
-        rendition.on('keyup', keyListener);
-        document.addEventListener('keyup', keyListener, false);
     }
+
     unloadEpubViewer() {
         pointer_saver.save_container();
         console.debug("Epub Off");

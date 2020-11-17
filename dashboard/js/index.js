@@ -163,16 +163,12 @@ function alertBox(message, title, specialMessage, callback) {
     $('.btn-alert-close').unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#alert-box').modal('hide');
-        $('#confirm-box-topper').hide();
-
         callback();
     });
 
     $('#alert-title').html(title || 'Alert');
     $('#alert-special').html(specialMessage || '');
     $('#alert-message').html(message);
-    $('#confirm-box-topper').show();
-
     $('#alert-box').modal({
         backdrop: 'static',
         keyboard: false
@@ -183,7 +179,6 @@ function confirmBox(message, callback) {
     $('#btn-confirm-action').html('Confirm').unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
         callback(true);
     });
 
@@ -192,14 +187,11 @@ function confirmBox(message, callback) {
     $('.btn-confirm-close').unbind('click').bind('click', function (e) {
         e.preventDefault();
         $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
         callback(false);
     });
 
     $('#confirm-message').html(message);
     $('#confirm-title').html('Please Confirm');
-    $('#confirm-box-topper').show();
-
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false

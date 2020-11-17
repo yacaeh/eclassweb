@@ -1,9 +1,3 @@
-
-
-/*
-    pdf, video, audio, jpg .. 등등
-*/
-
 class fileViewerLoader {
     constructor() {
         this.bOpen = false;
@@ -88,7 +82,6 @@ class fileViewerLoader {
 
     createElementViewer(url) {
         $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
 
         let fileViewer = document.createElement('iframe');
         fileViewer.setAttribute('id', 'file-viewer');
@@ -103,7 +96,6 @@ class fileViewerLoader {
 
     removeElementViewer() {
         GetWidgetFrame().document.getElementById('file-viewer').remove();
-        document.getElementById("btn-confirm-file-close").style.display = "none";
     }
 
     LockViewer(_lock) {
@@ -114,6 +106,7 @@ class fileViewerLoader {
             viewer.style.pointerEvents = _lock ? 'none' : '';
     }
 }
+
 class pdfViewer {
     constructor() {
         this.onpage = function (_page) { }
@@ -212,6 +205,7 @@ class mediaViewer {
             this.onended();
     }
 }
+
 class fileViewer {
     constructor() {
         this.mViewerLoader = new fileViewerLoader();
@@ -351,19 +345,10 @@ class fileViewer {
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
 let pdfString = 'pdf';
 var mfileViewer = new fileViewer();
 
 mfileViewer.onopen = function (_type, _url) {
-
-    isSharingFile = true;
-    isFileViewer = true;
-
     classroomInfo.viewer.type = _type;
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
@@ -381,11 +366,7 @@ mfileViewer.onopen = function (_type, _url) {
 
 mfileViewer.onclose = function () {
     this.nowPath = undefined;
-    isSharingFile = false;
-    isFileViewer = false;
-
     console.debug('PDF close');
-
     pointer_saver.nowIdx = 0;
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
@@ -532,128 +513,22 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
 
 function HomeworkUploadModal() {
     $('#btn-confirm-close').hide();
-    $('#btn-confirm-file-close').hide();
+    $('.list-group-flush').remove();
     $("#confirm-title2").hide();
+    $("#confirm-title3").hide();
+    $("#confirm-title4").hide();
+    $("#confirm-title5").hide();
     $('#confirm-title').html($.i18n('SUBMIT_ASSIGNMENT')).removeClass("selected");
-    $('#confirm-box-topper').show();
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false
     });
-    loadFileInput();
 }
 
 function fileUploadModal() {
-    $("#confirm-title2").show();
-    $('#confirm-box-topper').show();
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false
-    });
-
-    $('#refresh').click();
-    $('#confirm-title').click();
-
-    if (!isFileViewer) $('#btn-confirm-file-close').hide();
-    else {
-        $('#btn-confirm-file-close').show();
-    }
-
-    loadFileInput();
-}
-
-async function getUploadFileList(extraPath) {
-    extraPath = extraPath || '';
-    let data = { "userId": params.sessionid, "extraPath": extraPath };
-    let ret = await axios.post(fileServerUrl + '/list', data);
-    console.log(ret);
-    if(ret.status == 200){
-        updateFileList(ret.data, extraPath);
-    }
-    else{
-        console.error("directory doesn't exist!", ret.status);
-        updateFileList([], extraPath);
-    }
-    return ret.data;
-}
-
-function updateFileList(list, extraPath) {
-    // $("#confirm-message .list-group-flush").remove();
-
-    // var re = /(?:\.([^.]+))?$/;
-    // var listElement = '<ul class="list-group-flush">';
-
-    // if (list.length == 0) {
-    //     listElement += $.i18n('NO_FILES');
-    // }
-    // else {
-    //     list.files.forEach(file => {
-    //         if (file.name == "homework" || re.exec(file.name)[1] == "json" || !re.exec(file.name)[1])
-    //             return;
-
-    //         var buttons = "";
-    //         if (extraPath == "/homework") {
-    //             buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
-    //         onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
-    //         }
-
-    //         buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
-    //       onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
-    //       <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
-    //       onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
-
-    //         listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
-    //             getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
-    //             '</label>' + buttons;
-    //     })
-    // }
-    // listElement += '</ul>';
-    // var $listElement = $($.parseHTML(listElement));
-    // $("#confirm-message").prepend($listElement);
-}
-
-function downloadUploadedFile(url, name) {
-    fetch(url)
-        .then(resp => resp.blob())
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(() => alert('oh no!'));
-}
-
-async function deleteUploadedFile(filename, extraPath) {
-    if (mfileViewer.nowPath) {
-        var nowName = mfileViewer.nowPath.split('/');
-        nowName = nowName[nowName.length - 1];
-        if (filename == nowName) {
-            alert($.i18n('DELETE_OPEN_ERROR'));
-            return;
-        }
-    }
-
-    let data = {
-        "userId": params.sessionid,
-        "name": filename,
-        "extraPath": extraPath
-    };
-    let ret = await axios.post(fileServerUrl + '/delete', data);
-    if(ret.status == 200){
-        getUploadFileList(extraPath);
-    }
-}
-
-function loadFileInput() {
-    $(document).ready(function () {
-        let extraPath = "";
-        if (!connection.extra.roomOwner)
-            extraPath = "/homework";
     });
 }
 
@@ -662,47 +537,7 @@ function LoadFile(btn) {
         removeOnSelect(btn);
         return;
     }
-    if (!connection.extra.roomOwner)
-        return;
-    fileUploadModal();
-}
-
-
-function unloadFileViewer() {
-    console.log("UNLOAD FILEVIEWER");
-    canvasManager.clear();
-    pointer_saver.save();
-    pageNavigator.off();
-
-    var btn = document.getElementById("file");
-    btn.classList.remove("selected-shape");
-    btn.classList.remove("on");
-
-    isSharingFile = false;
-    isFileViewer = false;
-    classroomCommand.closeFile();
-}
-
-function loadFileViewer(path) {
-    if (mfileViewer.nowPath == path) {
-        alert($.i18n('SAME_FILE_OPEN_ERROR'));
-        return;
-    }
-
-    mfileViewer.nowPath = path;
-
-    var btn = document.getElementById("file");
-    btn.classList.add("selected-shape");
-    btn.classList.add("on");
-
-    isSharingFile = true;
-    isFileViewer = true;
-    classroomCommand.openFile(path);
-}
-
-function pdfOnLoaded() {
-    console.log("PDF ON");
-    classroomCommand.onViewerLoaded();
+    connection.extra.roomOwner && fileUploadModal();
 }
 
 function showPage(n) {

@@ -3660,26 +3660,31 @@
             let url = '';
 
             let uplodedata = {fileId : id};
+            console.log(fileObj.file.type);
+
             if(fileObj.file.type == 'application/pdf'){
                 let pdf = new PDFViewerPlugin();
                 let pages = await pdf.convertpages(URL.createObjectURL(fileObj.file));
-                console.log(pages);
-                console.log(pages[0][0]);
-
                 formdata.append('extraPath', '');
                 formdata.append('fileName', fileName);
                 formdata.append('page', pages[0][0]);
-
-
                 pages[0].forEach(element => {
                     formdata.append('pages[]', element);
                 });
-
                 pages[1].forEach(element => {
                     formdata.append('thumbnails[]', element);
                 });
-            url = fileServerUrl + '/pdf'
-            }else{
+                url = fileServerUrl + '/pdf'
+            }
+            else if(fileObj.file.type == 'application/epub+zip'){
+                console.error('epub start');
+                console.log(fileObj.file)
+                let file = await compress(fileObj.file);
+                console.error('epub End');
+                console.log(fileObj.file,',',file)
+                formdata.append(self.uploadFileAttr, file, fileName);
+            }
+            else{
                 formdata.append(self.uploadFileAttr, fileObj.file, fileName);
             }
             let asd = '';

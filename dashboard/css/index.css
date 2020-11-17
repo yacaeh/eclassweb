@@ -342,20 +342,6 @@ input[disabled], button[disabled] {
   margin-top: 15px;
 }
 
-#confirm-box-topper {
-  display:none;
-  z-index:99999999;
-  top:0;
-  left:0;
-  bottom:0;
-  right:0;
-  width:100%;
-  height:100%;
-  position:fixed;
-  background:#000000ad;
-  display:none;z-index:999999999999999;
-}
-
 #alert-box {
   display:none;z-index:999999999999999;
 }

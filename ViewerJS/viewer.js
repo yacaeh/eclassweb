@@ -73,7 +73,7 @@ function Viewer( viewerPlugin, parameters ) {
             }else{
                 window.top.pageNavigator.off();
             }
-            window.top.pdfOnLoaded ();
+            window.top.classroomCommand.onViewerLoaded();
             initialized = true;
         };
 

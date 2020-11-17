@@ -9,129 +9,75 @@ class ToolBox extends React.Component {
             <ToolBoxIcon key='textIcon' className='i draw' src='/dashboard/img/text.png' id='textIcon' />
             <ToolBoxIcon key='undo' className='i draw' src='/dashboard/img/undo.png' id='undo' />
             <ToolBoxIcon key='clearCanvas' className='i draw' src='/dashboard/img/trash.png' id='clearCanvas' />
-            <ToolBoxLine />
-            <ScreenShareButton />
-            <_3DCanvasButton />
-            <MovieRenderButton />
-            <FileviewerButton />
-            <EpubButton />
-            <CallteacherButton />
-            <HomeworkButton />
+            <ToolBoxLine key='------------------------' />
+            <ToolBoxIcon key='screen_share' onClick={ScreenShareButton} className='i' src='/dashboard/img/screenshare.png' id='screen_share' />
+            <ToolBoxIcon key='3d_view' onClick={_3DCanvasButton} className='i' src='/dashboard/img/3D.png' id='3d_view' />
+            <ToolBoxIcon key='movie' onClick={MovieRenderButton} className='i' src='/dashboard/img/videolink.png' id='movie' />
+            <ToolBoxIcon key='file' onClick={FileviewerButton} className='i' src='/dashboard/img/openfile.png' id='file' />
+            <ToolBoxIcon key='callTeacher' onClick={CallTeacherButton} className='i' src='/dashboard/img/handsup.png' id='callteacher' />
+            <ToolBoxIcon key='homework' onClick={HomeworkUploadModal} className='i' src='/dashboard/img/homework.png' id='homework' />
             <canvas className="i no-hover" id="full" width="28" height="28" />
         </section>
     }
 }
 
 
-function CallteacherButton(){
-    function onClick(){
-        classroomManager.callTeacher()
-    }
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/handsup.png' id='callteacher' />
+function ScreenShareButton(e) {
+    screenshareManager.btn(e.target);
 }
 
-function ScreenShareButton(){
-    function onClick(e) {
-        screenshareManager.btn(e.target);
-    }
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/screenshare.png' id='screen_share' />
+function FileviewerButton(e) {
+    LoadFile(e.target);
 }
 
-function FileviewerButton() {
-    function onClick(e) {
-        LoadFile(e.target);
-    }
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/openfile.png' id='file' />
+function CallTeacherButton(e){
+    classroomManager.callTeacher();
 }
 
-function EpubButton() {
-    function onClick(btn) {
-        btn = btn.target;
-
-        if (!isSharingEpub && checkSharing()) {
-            removeOnSelect(btn);
-            return;
-        }
-
-        btn.classList.toggle("on");
-        btn.classList.toggle("selected-shape");
-          
-        if (epubManager.isEpubViewer === false) {
-            isSharingEpub = true;
-            epubManager.isEpubViewer = true;
-            epubManager.loadEpubViewer();
-            classroomCommand.sendOpenEpub();
-        } else {
-            isSharingEpub = false;
-            epubManager.isEpubViewer = false;
-            epubManager.unloadEpubViewer();
-            $('#canvas-controller').hide();
-            classroomCommand.sendCloseEpub();
-        }
+function MovieRenderButton(btn) {
+    if (!isSharingMovie && checkSharing()) {
+        removeOnSelect(btn.target);
+        return;
     }
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/epub.png' id='epub' />
+    let urlform = document.getElementById("urlform");
+    btn.target.classList.toggle("on");
+    btn.target.classList.toggle("selected-shape");
+    var visible = urlform.style.display;
+    if (visible == "inline-block") {
+        classroomInfo.movierender = {
+            state: false,
+            url: undefined
+        };
+        classroomManager.updateClassroomInfo(function () { });
+        isSharingMovie = false;
+        urlform.style.display = "none";
+        embedYoutubeContent(false, "", true);
+    }
+    else {
+        isSharingMovie = true;
+        urlform.style.display = "inline-block";
+    }
 }
 
-function HomeworkButton() {
-    function onClick() {
-        HomeworkUploadModal()
-    }
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/homework.png' id='homework' />
-}
-
-
-function MovieRenderButton() {
-    function onClick(btn) {
-        if (!isSharingMovie && checkSharing()) {
-            removeOnSelect(btn.target);
-            return;
-        }
-        let urlform = document.getElementById("urlform");
-        btn.target.classList.toggle("on");
-        btn.target.classList.toggle("selected-shape");
-        var visible = urlform.style.display;
-        if (visible == "inline-block") {
-            classroomInfo.movierender = {
-                state: false,
-                url: undefined
-            };
-            classroomManager.updateClassroomInfo(function () { });
-            isSharingMovie = false;
-            urlform.style.display = "none";
-            embedYoutubeContent(false, "", true);
-        }
-        else {
-            isSharingMovie = true;
-            urlform.style.display = "inline-block";
-        }
+function _3DCanvasButton(btn) {
+    if (!classroomInfo.share3D.state && checkSharing()) {
+        removeOnSelect(btn.target);
+        return;
     }
 
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/videolink.png' id='movie' />
-}
+    btn.target.classList.toggle("on");
+    btn.target.classList.toggle("selected-shape");
 
-function _3DCanvasButton() {
-    function onClick(btn) {
-        if (!classroomInfo.share3D.state && checkSharing()) {
-            removeOnSelect(btn.target);
-            return;
-        }
-
-        btn.target.classList.toggle("on");
-        btn.target.classList.toggle("selected-shape");
-
-        canvasManager.clear();
-        const isViewer = !classroomInfo.share3D.state;
-        classroomInfo.share3D.state = isViewer;
-        isSharing3D = isViewer;
-        classroomManager.updateClassroomInfo(() => {
-            setShared3DStateLocal(isViewer)
-            connection.send({
-                modelEnable: { enable: classroomInfo.share3D.state }
-            });
-        })
-    }
-
-    return <ToolBoxIcon className='i' onClick={onClick} src='/dashboard/img/3D.png' id='3d_view' />
+    canvasManager.clear();
+    const isViewer = !classroomInfo.share3D.state;
+    classroomInfo.share3D.state = isViewer;
+    isSharing3D = isViewer;
+    classroomManager.updateClassroomInfo(() => {
+        setShared3DStateLocal(isViewer)
+        connection.send({
+            modelEnable: { enable: classroomInfo.share3D.state }
+        });
+    })
 }
 
 class ToolBoxIcon extends React.Component {

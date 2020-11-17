@@ -168,7 +168,7 @@ function removeOnSelect(btn) {
         }
 
         if (isSharingFile) {
-            unloadFileViewer();
+            document.getElementById("btn-confirm-file-close").click();
             isSharingFile = false;
         }
 
