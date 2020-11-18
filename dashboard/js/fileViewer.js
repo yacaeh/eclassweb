@@ -95,7 +95,12 @@ class fileViewerLoader {
     }
 
     removeElementViewer() {
-        GetWidgetFrame().document.getElementById('file-viewer').remove();
+        try{
+            GetWidgetFrame().document.getElementById('file-viewer').remove();
+        }
+        catch(e){
+
+        }
     }
 
     LockViewer(_lock) {
@@ -367,6 +372,7 @@ mfileViewer.onopen = function (_type, _url) {
 mfileViewer.onclose = function () {
     this.nowPath = undefined;
     console.debug('PDF close');
+    console.log(window.currentPoints);
     pointer_saver.nowIdx = 0;
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
@@ -545,5 +551,5 @@ function showPage(n) {
     pointer_saver.load(n - 1);
     pageNavigator.select(n - 1);
     if (connection.extra.roomOwner || !classroomInfo.allControl)
-        classroomCommand.onShowPage(n);
+         mfileViewer.onShowPage(n);
 }

@@ -136,7 +136,7 @@ function checkSharing() {
         classroomInfo.share3D.state ||
         isSharingMovie ||
         isSharingFile ||
-        isSharingEpub;
+        classroomInfo.epub.state;
 }
 
 function removeOnSelect(btn) {
@@ -172,9 +172,9 @@ function removeOnSelect(btn) {
             isSharingFile = false;
         }
 
-        if (isSharingEpub) {
-            document.getElementById("epub").click();
-            isSharingEpub = false;
+        if (classroomInfo.epub.state) {
+            document.getElementById("btn-confirm-file-close").click();
+            isSharingFile = false;
         }
 
         setTimeout(function () {

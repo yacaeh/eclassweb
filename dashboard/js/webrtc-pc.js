@@ -37,13 +37,6 @@ const VideoResolutions = {
     qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
   };
 
-let resolutionOption = connection.extra.roomOwner ? 'qvga' : 'thumb';
-
-let options = {
-  resolution: resolutionOption,
-  audio: true,
-  video: true,
-};
 
 let localStream;
 let screenStream;
@@ -55,6 +48,15 @@ let streamlist = {};
 
 async function webRTCPCInit() {
   try {
+
+    let resolutionOption = connection.extra.roomOwner ? 'qvga' : 'thumb';
+
+    let options = {
+      resolution: resolutionOption,
+      audio: true,
+      video: true,
+    };
+
 
     let join = async () => {
       console.log('Join to stream new video');

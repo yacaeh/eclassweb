@@ -6,6 +6,7 @@ class PointerSaver {
     }
 
     async load_container(path) {
+        console.warn("LOAD");
         if (this.path) {
             this.save_container();
         }
@@ -34,14 +35,11 @@ class PointerSaver {
     }
     save_container() {
         this.save();
-        let url = fileServerUrl + '/point';
-        let name = connection.extra.userFullName;
-        let data = {
+        axios.post(fileServerUrl + '/point', {
             filepath: this.path,
-            userId: name,
+            userId: connection.extra.userFullName,
             point: this.container
-        }
-        axios.post(url, data)
+        })
         this.path = undefined;
     }
     save() {
@@ -98,7 +96,7 @@ class PointerSaver {
     }
     get() {
 
-        classroomInfo.canvasPermission.forEach((id) => {
+        classroomInfo.permissions.canvasPermission.forEach((id) => {
             connection.send({
                 getpointer: true,
                 idx: this.nowIdx

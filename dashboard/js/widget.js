@@ -245,12 +245,13 @@ gothicFont.load().then((font) => {
                                         this.selected = true;
                                         this.strokeColor = 'rgba(0,0,0,0.5)';
                                     }
+
                                     if (uid in useruidlist) {
                                         lineUid.innerHTML = useruidlist[uid];
                                     } else {
                                         window.parent.connection.socket.emit('get-user-name', uid, function (name) {
                                             lineUid.innerHTML = name;
-                                            useruidlist.uid = name;
+                                            useruidlist[uid] = name;
                                         })
                                     }
                                     lineUid.style.display = 'block';
@@ -297,7 +298,7 @@ gothicFont.load().then((font) => {
                                 } else {
                                     window.parent.connection.socket.emit('get-user-name', uid, function (name) {
                                         lineUid.innerHTML = name;
-                                        useruidlist.uid = name;
+                                        useruidlist[uid] = name;
                                     })
                                 }
                                 lineUid.style.display = 'block';

@@ -208,14 +208,16 @@ class FileViewer extends React.Component {
         btn.classList.remove("selected-shape");
         btn.classList.remove("on");
         
+        if(classroomInfo.viewer.state)
+                mfileViewer.closeFile();
 
-        if(this.state.nowType != 'epub'){
-            classroomCommand.closeFile();
-        }
-        else{
-            classroomCommand.sendCloseEpub();
+
+
+        if(classroomInfo.epub.state){
+            classroomCommand.sendCloseEpub();       
             epubManager.unloadEpubViewer();
         }
+            
 
         isSharingFile = false;
         this.setState({
@@ -237,15 +239,14 @@ class FileViewer extends React.Component {
         btn.classList.add("on");
         isSharingFile = true;
 
-        if(this.state.isFileViewer){
-            if(this.state.nowType == "epub"){
-                classroomCommand.sendCloseEpub();
-                epubManager.unloadEpubViewer();
-            }
-            else if(type == 'epub'){
-                classroomCommand.closeFile();
-            } 
+        if(classroomInfo.epub.state){
+            classroomCommand.sendCloseEpub();
+            epubManager.unloadEpubViewer();
         }
+
+        if(classroomInfo.viewer.state)
+            mfileViewer.closeFile();
+
 
 
         if (type != 'epub') {

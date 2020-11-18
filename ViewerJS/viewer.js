@@ -73,7 +73,7 @@ function Viewer( viewerPlugin, parameters ) {
             }else{
                 window.top.pageNavigator.off();
             }
-            window.top.classroomCommand.onViewerLoaded();
+            window.top.mfileViewer.onLoadedViewer();
             initialized = true;
         };
 
@@ -278,9 +278,6 @@ function Viewer( viewerPlugin, parameters ) {
     async function estimateTypeByHeaderContentType( documentUrl, cb ) {
         let ret = await axios.head(documentUrl);
         var mimetype, matchingPluginData;
-
-        console.log(ret);
-
         mimetype = ret.headers['content-type'];
 
         if ( mimetype ) {

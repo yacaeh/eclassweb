@@ -47,7 +47,7 @@ class ScreenShareManagerClass {
 
     var on = btn.classList.contains("on");
     if (!connection.extra.roomOwner &&
-      connection.userid != classroomInfo.classPermission) {
+      connection.userid != classroomInfo.permissions.classPermission) {
       alert($.i18n('NO_SCREEN_PERMISSION'));
       btn.classList.remove("on");
       btn.classList.remove("selected-shape");
@@ -294,9 +294,7 @@ class maincamManagerClass {
   }
 
   async addNewStudentCam(stream, track) {
-    let userlist = connection.peers.getAllParticipants();
     let isFind = false;
-
     let el = document.createElement("video")
     try {
       el.controls = false;
@@ -366,8 +364,5 @@ class maincamManagerClass {
       id: stream.id
     };
 
-  }
-
-  eventListener(event) {
   }
 }

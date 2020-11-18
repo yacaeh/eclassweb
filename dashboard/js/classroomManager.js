@@ -183,40 +183,6 @@ class classroomManagerClass {
         }
     }
 
-    studentListResize() {
-        let btn = document.getElementById("student_list_button")
-        let list = document.getElementById("student_list");
-        let len = list.children.length - 1;
-        let on = btn.classList.contains("on");
-
-        if (on && len != 16)
-            len++;
-        let line = Math.ceil(len / 4);
-
-        if (on) {
-            line = Math.max(4, line);
-            $(list).css({
-                gridAutoRows: 100 / line + "%",
-                height: 6 * line + "%"
-            })
-        }
-        else {
-            btn.innerHTML = "+" + (len - 15);
-            $(list).css({
-                gridAutoRows: 100 / 4 + "%",
-                height: 6 * 4 + "%"
-            })
-        }
-
-        if (line <= 4) {
-            Hide(btn);
-        }
-        else if (line >= 5) {
-            on ? list.appendChild(btn) : list.insertBefore(btn, list.children[16])
-            btn.style.display = "inline-block";
-        }
-    };
-
     createRoom() {
         console.debug('Opening Class!');
         classroomManager.setTeacher();

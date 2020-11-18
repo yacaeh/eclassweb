@@ -603,17 +603,16 @@ module.exports = exports = function (socket, config) {
                                 state: false,
                                 data: {}
                             },
-                            pdf: {
-                                state: false
-                            },
                             exam: false,
                             viewer: {
                                 state: false,
                                 url: undefined
                             },
-                            classPermission: undefined,
-                            micPermission: undefined,
-                            canvasPermission: [],
+                            permissions : {
+                                classPermission: undefined,
+                                micPermission: undefined,
+                                canvasPermission: [],
+                            }
                         },
                         socketMessageEvent: '',
                         socketCustomEvent: '',
@@ -632,7 +631,7 @@ module.exports = exports = function (socket, config) {
                         name : listOfUsers[socket.userid].extra.userFullName,
                     };
 
-                    db.createRoom(listOfRooms[roomid], roomid);
+                    // db.createRoom(listOfRooms[roomid], roomid);
                     alertbox("Appended room", roomid, userid);
 
                     return;
@@ -1157,6 +1156,7 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on("get-user-name", function(userid, callback){
+            console.log(listOfRooms[getRoomId()].userlist[userid]);
             callback(listOfRooms[getRoomId()].userlist[userid].name);
         })
 
@@ -1244,14 +1244,14 @@ module.exports = exports = function (socket, config) {
                 userList        : {}
             }
             data.userList[user.userid] = user;
-            db.log.appendRoom(openTime.full + "_" + user.userid, data);
+            // db.log.appendRoom(openTime.full + "_" + user.userid, data);
         }
 
         async function JoinStudent() {
             let user = GetUserData();
-            let data = await db.log.get(GetLogDBID());
-            data.userList[user.userid] = user;
-            db.log.set(GetLogDBID(), data);
+            // let data = await db.log.get(GetLogDBID());
+            // data.userList[user.userid] = user;
+            // db.log.set(GetLogDBID(), data);
             console.log("Join Student", socket.userid);
         }
 
@@ -1279,17 +1279,17 @@ module.exports = exports = function (socket, config) {
 
             }
             
-            let data = await db.log.get(roomid);
+            // let data = await db.log.get(roomid);
             if (room.owner != socket.userid) {
-                data.userList[user.userid].leftTime = GetTime().time;
+                // data.userList[user.userid]['leftTime'] = GetTime().time;
                 console.log("Left student", socket.userid);
             }
             else if (room.owner == socket.userid) {
-                data.userList[user.userid].leftTime = GetTime().time;
-                data.roomCloseTime = GetTime().time;
+                // data.userList[user.userid]['leftTime'] = GetTime().time;
+                // data.roomCloseTime = GetTime().time;
                 console.log("Teacher Left Class", socket.userid);
             }
-            db.log.set(roomid, data);
+            // db.log.set(roomid, data);
         }
 
         function GetLogDBID() {

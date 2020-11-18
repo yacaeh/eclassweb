@@ -10,7 +10,6 @@ var debug = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
-var isSharingEpub = false;
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
@@ -95,7 +94,6 @@ connection.onmessage = function (event) {
 
   if (permissionManager.eventListener(event) ||
       screenshareManager.eventListener(event) ||
-      maincamManager.eventListener(event) ||
       ChattingManager.eventListener(event) ||
       canvasManager.eventListener(event) ||
       classroomManager.eventListener(event)
@@ -143,7 +141,7 @@ connection.onmessage = function (event) {
       canvasManager.clear();
     }
 
-    classroomCommand.updateViewer(event.data.viewer);
+    mfileViewer.updateViewer(event.data.viewer);
     return;
   }
 

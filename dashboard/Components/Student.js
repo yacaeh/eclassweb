@@ -22,19 +22,19 @@ class Student extends React.Component {
     }
 
     componentDidMount(){
-        classroomManager.studentListResize();
+        this.studentListResize();
 
-        if (classroomInfo.classPermission == this.props.uid) {
+        if (classroomInfo.permissions.classPermission == this.props.uid) {
             this.setState({class : true});
             MakeIcon(this.props.uid, "screen");
         }
     
-        if (classroomInfo.micPermission == this.props.uid) {
+        if (classroomInfo.permissions.micPermission == this.props.uid) {
             this.setState({mic : true});
             MakeIcon(this.props.uid, "mic");
         }
     
-        if (classroomInfo.canvasPermission.includes(this.props.uid)) {
+        if (classroomInfo.permissions.canvasPermission.includes(this.props.uid)) {
             this.setState({canvas : true});
             MakeIcon(this.props.uid, "canvas");
         }
@@ -45,12 +45,43 @@ class Student extends React.Component {
         canvasManager.canvas_array[this.props.uid] = this.myRef.current;
     };
 
-    componentWillUnmount(){
-        if (this.props.uid == classroomInfo.classPermission)
-            classroomInfo.classPermission = undefined;
+    studentListResize() {
+        let btn = document.getElementById("student_list_button")
+        let list = document.getElementById("student_list");
+        let len = list.children.length - 1;
+        let on = btn.classList.contains("on");
 
-        if (this.props.uid == classroomInfo.micPermission)
-            classroomInfo.micPermission = undefined;
+        if (on && len != 16)
+            len++;
+        let line = Math.ceil(len / 4);
+
+        if (on) {
+            line = Math.max(4, line);
+            list.style.gridAutoRows = 100 / line + "%";
+            list.style.height = 6 * line + "%";
+        }
+        else {
+            btn.innerHTML = "+" + (len - 15);
+            list.style.gridAutoRows = 100 / 4 + "%";
+            list.style.height = 6 * 4 + "%";
+        }
+
+        if (line <= 4) {
+            btn.style.display = 'none';
+        }
+        else if (line >= 5) {
+            on ? list.appendChild(btn) : list.insertBefore(btn, list.children[16])
+            btn.style.display = "inline-block";
+        }
+    };
+
+
+    componentWillUnmount(){
+        if (this.props.uid == classroomInfo.permissions.classPermission)
+            classroomInfo.permissions.classPermission = undefined;
+
+        if (this.props.uid == classroomInfo.permissions.micPermission)
+            classroomInfo.permissions.micPermission = undefined;
 
         if (permissionManager.IsCanvasPermission(this.props.uid))
             permissionManager.DeleteCanvasPermission(this.props.uid);
@@ -59,7 +90,7 @@ class Student extends React.Component {
         examObj.leftStudent(this.props.uid);
         delete canvasManager.canvas_array[this.props.uid];
         console.debug("Left student", "[", this.props.uid, "]", "[", this.state.name, "]");
-        classroomManager.studentListResize();
+        this.studentListResize();
     };
     
     render(){
@@ -86,7 +117,7 @@ class Student extends React.Component {
     }
 
     onMouseEnter(){
-        if (classroomInfo.canvasPermission.includes(this.props.uid))
+        if (classroomInfo.permissions.canvasPermission.includes(this.props.uid))
             return;
 
         connection.send({
@@ -104,7 +135,7 @@ class Student extends React.Component {
                 state: false
             }, this.props.uid)
 
-        if (!classroomInfo.canvasPermission.includes(this.props.uid))
+        if (!classroomInfo.permissions.canvasPermission.includes(this.props.uid))
             canvasManager.clearStudentCanvas(this.props.uid);
 
         canvasManager.showingCanvasId = undefined;

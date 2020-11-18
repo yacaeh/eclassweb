@@ -9,7 +9,7 @@ class epubManagerClass {
         canvasManager.clearCanvas();
         pageNavigator.on();
 
-        isSharingEpub = true;
+        classroomInfo.epub.state = true;
         this.isEpubViewer = true;
         console.log("Load Epub viewer");
 
@@ -103,10 +103,14 @@ class epubManagerClass {
         pointer_saver.nowIdx = 0;
         canvasManager.clear();
         pageNavigator.off();
-
-        isSharingEpub = false;
+        classroomInfo.epub.state = false;
         this.isEpubViewer = false;
         this.renditionBuffer = null;
-        GetWidgetFrame().document.getElementById('epub-top').remove();
+        try{
+            GetWidgetFrame().document.getElementById('epub-top').remove();
+        }
+        catch(e){
+
+        }
     }
 }

@@ -28,7 +28,7 @@ classroomCommand = {
 
         if (classroomInfo.viewer.state) {
             if(classroomInfo.allControl)
-            classroomCommand.syncViewer();
+            mfileViewer.syncViewer();
             pageNavigator.allControl(classroomInfo.allControl);
             onBtn("file");
         }
@@ -65,17 +65,17 @@ classroomCommand = {
                 let student = students[i];
                 let id = student.dataset.id;
 
-                if (classroomInfo.classPermission == id) {
+                if (classroomInfo.permissions.classPermission == id) {
                     FindInList(id).dataset.classPermission = true;
                     MakeIcon(id, "screen");
                 }
 
-                if (classroomInfo.micPermission == id) {
+                if (classroomInfo.permissions.micPermission == id) {
                     FindInList(id).dataset.micPermission = true;
                     MakeIcon(id, "mic");
                 }
 
-                if (classroomInfo.canvasPermission.includes(id)) {
+                if (classroomInfo.permissions.canvasPermission.includes(id)) {
                     FindInList(id).dataset.canvasPermission = true;
                     MakeIcon(id, "canvas");
                 }
@@ -199,26 +199,6 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
-classroomCommand.updateViewer = function (_cmd) {
-    mfileViewer.updateViewer(_cmd);
-}
-
-classroomCommand.closeFile = function () {
-    mfileViewer.closeFile();
-}
-
-classroomCommand.onShowPage = function (_page) {
-    mfileViewer.onShowPage(_page);
-}
-
-classroomCommand.onViewerLoaded = function () {
-    mfileViewer.onLoadedViewer();
-}
-
-classroomCommand.syncViewer = function () {
-    mfileViewer.syncViewer();
-}
-
 classroomCommand.sendOpenEpub = function (url) {
     classroomInfo.epub.state = true;
     classroomInfo.epub.url = url;
@@ -238,7 +218,7 @@ classroomCommand.sendCloseEpub = function () {
 };
 
 classroomCommand.openEpub = function (url) {
-    if (isSharingEpub) {
+    if (classroomInfo.epub.state) {
         if (epubManager.renditionBuffer) {
             if (classroomInfo.allControl)
                 epubManager.renditionBuffer.display(classroomInfo.epub.page);
@@ -250,7 +230,7 @@ classroomCommand.openEpub = function (url) {
 
     if (!connection.extra.roomOwner) {
         if (classroomInfo.allControl) {
-            if (isSharingEpub) {
+            if (classroomInfo.epub.state) {
                 Hide('next')
                 Hide('prev')
                 Hide('lnext')
@@ -262,7 +242,7 @@ classroomCommand.openEpub = function (url) {
             }
         }
         else {
-            if (isSharingEpub) {
+            if (classroomInfo.epub.state) {
                 Show('next')
                 Show('prev')
                 Show('lnext')

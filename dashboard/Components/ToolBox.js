@@ -109,7 +109,6 @@ class ToolBoxIcon extends React.Component {
 function ToolBoxLine() {
     return <div className="tooldivide" />
 }
-
 class ToolBoxHelp extends React.Component {
     render() {
         return <section id="toolboxHelper">
