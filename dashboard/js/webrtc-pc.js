@@ -2,6 +2,14 @@
 const log = (msg) =>
   (document.getElementById('logs').innerHTML += msg + '<br>');
 
+function uuidv4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+  
 const config = {
   iceServers: [
     {
@@ -47,6 +55,121 @@ let streamlist = {};
 
 async function webRTCPCInit() {
   try {
+
+    let join = async () => {
+      console.log('Join to stream new video');
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer)
+      .catch(function(e) {
+        console.log(e)});
+      const id = connection.userid;
+      socket.send(
+        JSON.stringify({
+          method: 'join',
+          params: { sid: params.sessionid, offer: pc.localDescription },
+          id,
+        })
+      );
+
+      socket.addEventListener('message', (event) => {
+        const resp = JSON.parse(event.data);
+        if (resp.id === id) {
+          // Hook this here so it's not called before joining
+          pc.onnegotiationneeded = async function () {
+              const offer = await pc.createOffer()
+              .catch(function(e) {
+                console.error(e)});
+              await pc.setLocalDescription(offer)
+              .catch(function(e) {
+                console.error(e)});
+  
+              const id = uuidv4();
+              socket.send(
+                JSON.stringify({
+                  method: 'offer',
+                  params: { desc: offer },
+                  id : id
+                })
+              );
+              nego = true;  
+
+              socket.addEventListener("message", (event) => {
+                const resp = JSON.parse(event.data);
+                if (resp.id === id) {
+                  pc.setRemoteDescription(resp.result);
+                }
+              });
+          };
+
+          pc.setRemoteDescription(resp.result)
+          .catch(function(e) {
+            console.error(e)});
+
+        } else if (resp.method == "trickle") {
+          pc.addIceCandidate(resp.params);
+        }
+
+      });
+      
+    };
+
+    await navigator.mediaDevices
+      .getUserMedia({
+        video:
+          options.video instanceof Object
+            ? {
+                ...VideoResolutions[options.resolution],
+                ...options.video,
+              }
+            : options.video
+            ? VideoResolutions[options.resolution]
+            : false,
+        audio: options.audio,
+      })
+      .then((stream) => {
+        localStream = stream;
+        localStream.getTracks().forEach((track) => {
+          track.paused = true;
+          pc.addTrack(track, localStream);
+          if (connection.extra.roomOwner && !teacherAdded) {
+            teacherAdded = true;
+            maincamManager.addNewTeacherCam(localStream);
+            maincamManager.hide();
+            track.paused = false;
+            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {
+            });
+          }
+
+          if (!connection.extra.roomOwner)
+            connection.socket.emit("update-student-cam", Object.assign({}, {
+              id: connection.userid,
+              streamid: stream.id
+            }), function (e) {
+            });
+
+
+        });
+        pc.addTransceiver('video', {
+          direction: 'sendrecv',
+        });
+        pc.addTransceiver('audio', {
+          direction: 'sendrecv',
+        });
+
+        join();
+      })
+      .catch((err)=>{
+        pc.addTransceiver('video', {
+          direction: 'recvonly',
+        });
+        pc.addTransceiver('audio', {
+          direction: 'recvonly',
+        });
+
+        join();
+        });
+
+
     pc.ontrack = function ({ track, streams }) {
       streams.forEach((stream) => {
         streamlist[stream.id] = stream;
@@ -113,18 +236,18 @@ async function webRTCPCInit() {
       if (!resp.id && resp.method === 'offer') {
         await pc.setRemoteDescription(resp.params)
         .catch(function(e) {
-          console.error(e)});
+          console.log(e)});
         
         const answer = await pc.createAnswer()
         .catch(function(e) {
-          console.error(e)});
+          console.log(e)});
 
         await pc.setLocalDescription(answer)
         .catch(function(e) {
-          console.error(e)});
+          console.log(e)});
       
 
-        const id = connection.userid;
+        const id = uuidv4();
         socket.send(
           JSON.stringify({
             method: 'answer',
@@ -132,8 +255,6 @@ async function webRTCPCInit() {
             id,
           })
         );
-      } else if (resp.method === 'trickle') {
-        pc.addIceCandidate(resp.params).catch(log);
       }
 
       /////////////////////////////////////////////////
@@ -142,120 +263,7 @@ async function webRTCPCInit() {
       
     });
 
-    let join = async () => {
-      console.log('Join to stream new video');
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer)
-      .catch(function(e) {
-        console.error(e)});
-      const id = connection.userid;
-      socket.send(
-        JSON.stringify({
-          method: 'join',
-          params: { sid: params.sessionid, offer: pc.localDescription },
-          id,
-        })
-      );
-
-      socket.addEventListener('message', (event) => {
-        const resp = JSON.parse(event.data);
-        if (resp.id === id) {
-
-          // Hook this here so it's not called before joining
-          pc.onnegotiationneeded = async function () {
-
-              const offer = await pc.createOffer()
-              .catch(function(e) {
-                console.error(e)});
-              await pc.setLocalDescription(offer)
-              .catch(function(e) {
-                console.error(e)});
-  
-              const id = Math.random().toString();
-              socket.send(
-                JSON.stringify({
-                  method: 'offer',
-                  params: { desc: pc.localDescription },
-                  id : id
-                })
-              );
-              nego = true;  
-
-              socket.addEventListener("message", (event) => {
-                const resp = JSON.parse(event.data);
-                if (resp.id === id) {
-                  pc.setRemoteDescription(resp.result);
-                }
-              });
-          };
-
-          pc.setRemoteDescription(resp.result)
-          .catch(function(e) {
-            console.error(e)});
-        }
-
-      });
-      
-    };
-
-    await navigator.mediaDevices
-      .getUserMedia({
-        video:
-          options.video instanceof Object
-            ? {
-                ...VideoResolutions[options.resolution],
-                ...options.video,
-              }
-            : options.video
-            ? VideoResolutions[options.resolution]
-            : false,
-        audio: options.audio,
-      })
-      .then((stream) => {
-        localStream = stream;
-        localStream.getTracks().forEach((track) => {
-          track.paused = true;
-          pc.addTrack(track, localStream);
-          if (connection.extra.roomOwner && !teacherAdded) {
-            teacherAdded = true;
-            maincamManager.addNewTeacherCam(localStream);
-            maincamManager.hide();
-            track.paused = false;
-            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {
-              console.log('updated teacher cam',e);
-            });
-          }
-
-          if (!connection.extra.roomOwner)
-            connection.socket.emit("update-student-cam", Object.assign({}, {
-              id: connection.userid,
-              streamid: stream.id
-            }), function (e) {
-              console.log('updated teacher cam');
-            });
-
-
-        });
-        pc.addTransceiver('video', {
-          direction: 'sendrecv',
-        });
-        pc.addTransceiver('audio', {
-          direction: 'sendrecv',
-        });
-
-        join();
-      })
-      .catch((err)=>{
-        pc.addTransceiver('video', {
-          direction: 'recvonly',
-        });
-        pc.addTransceiver('audio', {
-          direction: 'recvonly',
-        });
-
-        join();
-        });
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 }
