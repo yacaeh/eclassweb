@@ -1934,7 +1934,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             DetectRTC.MediaStreamTrack = Object.keys(MediaStreamTrack.prototype);
         } else DetectRTC.MediaStreamTrack = false;
 
-        var RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+        // var RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 
         if (typeof RTCPeerConnection !== 'undefined') {
             DetectRTC.RTCPeerConnection = Object.keys(RTCPeerConnection.prototype);
@@ -2205,14 +2205,14 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             if (typeof RTCRtpTransceiver === 'undefined') return false;
             if (!('currentDirection' in RTCRtpTransceiver.prototype)) return false;
 
-            var tempPc = new RTCPeerConnection();
+            // var tempPc = new RTCPeerConnection();
 
             try {
-                tempPc.addTransceiver('audio');
+                // tempPc.addTransceiver('audio');
                 canAddTransceiver = true;
             } catch (e) { }
 
-            tempPc.close();
+            // tempPc.close();
         } catch (e) {
             canAddTransceiver = false;
         }
@@ -2222,26 +2222,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
     function isUnifiedPlanSuppored() {
         var isUnifiedPlanSupported = false;
-
-        try {
-            var pc = new RTCPeerConnection({
-                sdpSemantics: 'unified-plan'
-            });
-
-            try {
-                var config = pc.getConfiguration();
-                if (config.sdpSemantics == 'unified-plan')
-                    isUnifiedPlanSupported = true;
-                else if (config.sdpSemantics == 'plan-b')
-                    isUnifiedPlanSupported = false;
-                else
-                    isUnifiedPlanSupported = false;
-            } catch (e) {
-                isUnifiedPlanSupported = false;
-            }
-        } catch (e) {
-            isUnifiedPlanSupported = false;
-        }
 
         return isUnifiedPlanSupported;
     }
