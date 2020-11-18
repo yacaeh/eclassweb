@@ -43,8 +43,9 @@ class epubManagerClass {
         var rendition = book.renderTo(epubViewer, {
             flow: 'paginated',
             position : 'absolute',
-            width: 'calc(100% - 50px)',
-            minSpreadWidth: '768px',
+            width: '100%',
+            height : '100%',
+            minSpreadWidth: '450px',
             snap: true
         });
 
@@ -79,9 +80,13 @@ class epubManagerClass {
         });
 
         rendition.on('relocated', function (locations) {
-            let doc = epubViewer.getElementsByTagName('iframe')[0].contentWindow.document.documentElement;
-            doc.style.display = 'flex';
-            doc.style.justifyContent = 'center';
+            let doc = epubViewer.getElementsByTagName('iframe')[0].contentWindow.document;
+            doc.documentElement.style.display = 'flex';
+            doc.documentElement.style.justifyContent = 'center';
+            doc.documentElement.style.height = '100%';
+            // doc.documentElement.style.alignItems = 'center';
+            // doc.body.appendChild;
+
             pointer_saver.save()
             pointer_saver.load(locations.start.index);
             pageNavigator.select(locations.start.index);
