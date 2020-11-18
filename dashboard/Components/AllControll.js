@@ -39,12 +39,12 @@ function onAllControlValue(_allControl) {
     classroomInfo.allControl = _allControl.state;
     if (classroomInfo.allControl) {
         console.debug("All Controll On", _allControl);
-        Show("student_isallcontrol")
+        document.getElementById("student_isallcontrol").style.display = 'block';
         classroomCommand.onSynchronizationClassRoom(_allControl.roomInfo)
     }
     else {
         console.debug("All Controll Off");
-        Hide("student_isallcontrol")
+        document.getElementById("student_isallcontrol").style.display = 'none';
         classroomCommand.updateSyncRoom();
     }
 }

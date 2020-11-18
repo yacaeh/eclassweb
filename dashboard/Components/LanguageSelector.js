@@ -9,13 +9,11 @@ class LanguageSelector extends React.Component {
     }
 
     render() {
-        return <span>
-            <select className="language span3" onChange={this.saveLocale}>
+        return <select className="language span3" onChange={this.saveLocale}>
                 <option value="en">English</option>
                 <option value="ko">한국어</option>
                 <option value="id">Bahasa Indonesia</option>
             </select>
-        </span>
     }
 
     saveLocale = () => {

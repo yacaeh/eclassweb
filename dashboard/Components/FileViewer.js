@@ -237,15 +237,22 @@ class FileViewer extends React.Component {
         btn.classList.add("on");
         isSharingFile = true;
 
+        if(this.state.isFileViewer){
+            if(this.state.nowType == "epub"){
+                classroomCommand.sendCloseEpub();
+                epubManager.unloadEpubViewer();
+            }
+            else if(type == 'epub'){
+                classroomCommand.closeFile();
+            } 
+        }
+
+
         if (type != 'epub') {
             mfileViewer.openFile(path);
         }
         else {
-            if(this.state.nowType == "epub" && this.state.isFileViewer){
-                classroomCommand.sendCloseEpub();
-                epubManager.unloadEpubViewer();
-            }
-
+            pageNavigator.removethumbnail();
             this.closeWindow();
             epubManager.loadEpubViewer(path);
             classroomCommand.sendOpenEpub(path);

@@ -22,7 +22,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.epub.state) {
-            classroomCommand.openEpub();
+            classroomCommand.openEpub(classroomInfo.epub.url);
             onBtn("epub");
         }
 
@@ -221,6 +221,7 @@ classroomCommand.syncViewer = function () {
 
 classroomCommand.sendOpenEpub = function (url) {
     classroomInfo.epub.state = true;
+    classroomInfo.epub.url = url;
     connection.send({
         epub    : classroomInfo.epub,
         start   : classroomInfo.epub.start,

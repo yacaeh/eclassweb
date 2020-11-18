@@ -1,3 +1,5 @@
+ReactDOM.render(<LanguageSelector />, document.getElementById('lang'));
+
 var ver_time_table = false;
 
 if (ver_time_table) {

@@ -12,6 +12,11 @@
 
   <link href="/favicon.ico" rel="shortcut icon" />
 
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+
   <link href="/dashboard/css/bootstrap.min.css" rel="stylesheet">
   <link href="/dashboard/css/index.css" rel="stylesheet">
 
@@ -30,7 +35,7 @@
   <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
   <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
   <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
-	<script src="/dashboard/js/lib/updateLanguage.js"></script>
+  <script type="text/babel" src="/dashboard/Components/LanguageSelector.js"></script>
 </head>
 
 <body background="/dashboard/img/new_login_bg.png">
@@ -87,11 +92,8 @@
     <!-- Login Form -->
     <div id="login_form" class="modal-dialog" style="max-width: 430px;">
       <div class="modal-content" style="margin-top: 20vh;">
-        <select class="language span3" onchange="saveLocale()">
-          <option value="en">English</option>
-          <option value="ko">한국어</option>
-          <option value="id">Bahasa Indonesia</option>
-        </select>
+        <div id="lang"></div>
+
         <div class="login-header login-text login-bottom-border" data-i18n="LOGIN">로그인</div>
         <div class="login-body login-bottom-border">
           <form class="login-bottom-border">
@@ -202,7 +204,7 @@
   </div>
 
   <script src="/dashboard/js/lib.js"></script>
-  <script src="/dashboard/js/index.js"></script>
+  <script type="text/babel" src="/dashboard/js/index.js"></script>
   <script src="/dashboard/js/time_table.js"></script>
   <script src="/dashboard/js/devicetester.js"></script>
 

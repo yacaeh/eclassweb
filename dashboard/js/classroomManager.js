@@ -75,8 +75,6 @@ class classroomManagerClass {
             renderCanvas.width = x;
             renderCanvas.height = y;
         }
-        if (frame.document.getElementById("epub-viewer"))
-            epubManager.EpubPositionSetting()
     };
 
     setTeacher() {

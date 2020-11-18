@@ -9,11 +9,8 @@ function ImageViewerPlugin() {
         imgElement.src = documentUrl;
         imgElement.setAttribute('alt', 'na');
         imgElement.setAttribute('id', 'image');
-        imgElement.style.width = '100%';
-        imgElement.style.height = 'auto'
         imgElement.style.maxWidth = '900px';
         viewerElement.appendChild(imgElement);
-        viewerElement.style.overflow = "auto";
         self.onLoad();
     };
 

@@ -5,21 +5,7 @@ class epubManagerClass {
         this.renditionBuffer = undefined;
     }
 
-    EpubPositionSetting() {
-        let viewer = GetWidgetFrame().document.getElementById("epub-viewer");
-        let can = GetWidgetFrame().document.getElementById("temp-canvas");
-        let wrapsize = viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("wrap")[0] || 
-                        viewer.getElementsByTagName("iframe")[0].contentWindow.document.getElementsByClassName("content")[0];
-
-        if(!wrapsize) return;
-        
-        wrapsize = wrapsize.getBoundingClientRect();
-        viewer.style.left = Math.max(0, (can.width * 0.5) - (wrapsize.width * 0.5)) + "px";
-    }
-
     loadEpubViewer(url) {
-        let _this = this;
-
         canvasManager.clearCanvas();
         pageNavigator.on();
 
@@ -29,21 +15,23 @@ class epubManagerClass {
 
         widgetContainer.style.width - 50;
 
+        let epubDiv = document.createElement('div');
+        epubDiv.className = 'epub-top';
+        epubDiv.id = 'epub-top'
+
         let epubViewer = document.createElement('div');
         epubViewer.setAttribute('id', 'epub-viewer');
         epubViewer.setAttribute('class', 'spread');
+        epubViewer.style.width = '100%';
 
-        let loadingWindow = document.createElement("div");
-        loadingWindow.setAttribute('id', 'loading-window');
         let loadingIcon = document.createElement("img");
-
         loadingIcon.src = "/dashboard/img/loading.gif";
-        loadingIcon.className = "loading";
-        loadingWindow.appendChild(loadingIcon);
-
-        let frame = GetWidgetFrame();
-        frame.document.getElementById('design-surface').appendChild(loadingWindow);
-        frame.document.getElementById('design-surface').appendChild(epubViewer);
+        loadingIcon.style.position = 'absolute';
+        loadingIcon.style.zIndex = '-1';
+        
+        epubDiv.appendChild(epubViewer)
+        epubDiv.appendChild(loadingIcon);
+        GetWidgetFrame().document.getElementById('design-surface').appendChild(epubDiv);
 
         var book = ePub(url);
         window.book = book;
@@ -54,7 +42,8 @@ class epubManagerClass {
 
         var rendition = book.renderTo(epubViewer, {
             flow: 'paginated',
-            height: "100%",
+            position : 'absolute',
+            width: 'calc(100% - 50px)',
             minSpreadWidth: '768px',
             snap: true
         });
@@ -90,13 +79,15 @@ class epubManagerClass {
         });
 
         rendition.on('relocated', function (locations) {
+            let doc = epubViewer.getElementsByTagName('iframe')[0].contentWindow.document.documentElement;
+            doc.style.display = 'flex';
+            doc.style.justifyContent = 'center';
             pointer_saver.save()
             pointer_saver.load(locations.start.index);
             pageNavigator.select(locations.start.index);
             classroomCommand.sendEpubCmd('page', {
                 page: locations.start.index
             });
-            _this.EpubPositionSetting();
         });
     }
 
@@ -111,8 +102,6 @@ class epubManagerClass {
         isSharingEpub = false;
         this.isEpubViewer = false;
         this.renditionBuffer = null;
-        let frame = GetWidgetFrame();
-        frame.document.getElementById('epub-viewer').remove();
-        frame.document.getElementById('loading-window').remove();
+        GetWidgetFrame().document.getElementById('epub-top').remove();
     }
 }

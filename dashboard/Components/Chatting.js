@@ -11,12 +11,13 @@ class ChattingWindow extends React.Component {
 
         this.collapse = this.collapse.bind(this);
         this.notice = React.createRef();
+        this.normal = React.createRef();
     };
 
 
     render() {
         return <div id="chatting" className="chatting">
-            <Notice list={this.state.notice} collapse={this.collapse} />
+            <Notice ref={this.notice} list={this.state.notice} collapse={this.collapse} />
             <ConversationPanel ref={this.normal} list={this.state.chattingLogs} />
         </div>
     };

@@ -69,6 +69,7 @@
 }
 
 #image {
+    max-width: 100%;
     transform-origin: top left; /* IE 10+, Firefox, etc. */
     -webkit-transform-origin: top left; /* Chrome */
     -ms-transform-origin: top left; /* IE 9 */
@@ -753,19 +754,16 @@ html[dir='rtl'] .dropdownToolbarButton {
 }
 
 #canvasContainer {
-    overflow:         auto;
-
-    padding-top:      6px;
-    padding-bottom:   6px;
-    position:         absolute;
-    top:              32px;
-    right:            0;
-    bottom:           40px;
-    left:             0;
+    position: absolute;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 5;
-    text-align:       center;
-
-    background-color: #EFF1F0;
     background-image: url(images/texture.png);
 }
 
