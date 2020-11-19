@@ -1,8 +1,30 @@
-window.params = GetParamsFromURL();
-var reactEvent = {};
+window.params = GetParamsFromURL();var reactEvent = {};
+function reducer(state = {}, action) {
+  switch(action.type){
+    case "SCREEN_SHARE" :
+      state.class = true;
+      break;
+  }
 
-var epubManager         = new epubManagerClass();
-ReactDOM.render(<App />, document.getElementById('app'));
+  console.log(state);
+  return state;
+}
+
+const store = Redux.createStore(reducer);
+var connection          = new RTCMultiConnection();
+
+const render = () => {
+  ReactDOM.render(
+    <ReactRedux.Provider store = {store}>
+        <App connection={connection} /> 
+    </ReactRedux.Provider>,
+    document.getElementById('app'));
+}
+store.subscribe(render);
+store.subscribe(function(e){
+  store.getState();
+})
+render();
 
 //=============================================================================================
 
@@ -11,7 +33,7 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 
-var connection          = new RTCMultiConnection();
+var epubManager         = new epubManagerClass();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
@@ -60,7 +82,6 @@ connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
-
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");

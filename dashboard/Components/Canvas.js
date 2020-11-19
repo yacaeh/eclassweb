@@ -1,8 +1,11 @@
 
 class Canvas extends React.Component {
-    render(){
+    render() {
         let url = './widget.html';
         return <div className='canvas-div' >
+            <MarkerContainer />
+            <PencilContainer />
+            <TextInputContainer />
             <iframe className='canvas-iframe' id='widget-canvas' src={url} />
         </div>
     }
@@ -39,7 +42,7 @@ function Slider(props) {
 }
 
 class TextInputContainer extends React.Component {
-    fontSize = [15,17,19,20,22,25,30,35,42,48,60,72,80,90,150];
+    fontSize = [15, 17, 19, 20, 22, 25, 30, 35, 42, 48, 60, 72, 80, 90, 150];
     fontFamily = ['HY중고딕', '나눔고딕', '나눔펜글씨', 'Times New Roman', 'Verdana']
     render() {
         return (<> <div id="textInputContainer">
@@ -76,23 +79,23 @@ class TextInputContainer extends React.Component {
     }
 
     fontFamilySetting = () => {
-        function Li(props){
+        function Li(props) {
             return <li> {props.font} </li>
         }
         let list = [];
         this.fontFamily.forEach(font => {
-            list.push(<Li font={font} key={font}/>);
+            list.push(<Li font={font} key={font} />);
         });
         return list;
     }
 
-    FontSizeSetting = () =>{
-        function Li(props){
+    FontSizeSetting = () => {
+        function Li(props) {
             return <li> {props.size} </li>
         }
         let list = [];
         this.fontSize.forEach(size => {
-            list.push(<Li size={size} key={size}/>);
+            list.push(<Li size={size} key={size} />);
         });
         return list;
     }

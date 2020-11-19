@@ -76,11 +76,11 @@ class Header extends React.Component {
                     <img id="icon_exit" onClick={this.exitRoom} />
                     <span id="my-name" />
                     <span id="session-id" />
-                    <img id="student_isallcontrol" src="/dashboard/img/lock.png" />
 
-                    <img className="permission-icon" id="student_screenshare" src="/dashboard/img/get_screenshare.png" />
-                    <img className="permission-icon" id="student_canvas" src="/dashboard/img/get_canvas.png" />
-                    <img className="permission-icon" id="student_mic" src="/dashboard/img/get_mic.png" />
+                    <img id="student_isallcontrol" src="/dashboard/img/lock.png" />
+                    <img className="permission-icon" id="student_screenshare"/>
+                    <img className="permission-icon" id="student_canvas"/>
+                    <img className="permission-icon" id="student_mic"/>
 
                     <div className="icons">
                         <span className="controll">

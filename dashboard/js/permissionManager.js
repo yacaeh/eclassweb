@@ -5,9 +5,14 @@ class permissionManagerClass {
 
   init() {
     window.addEventListener("click", (e) => {
-      if (document.getElementById('student-menu').contains(e.target)) return false;
-      if ($(e.target).hasClass('student')) return false;
-      if ($('#student-menu').show()) $('#student-menu').hide();
+      if (document.getElementById('student-menu').contains(e.target)) 
+        return false;
+      
+      if (e.target.classList.contains('student')) 
+      return false;
+      
+      if ($('#student-menu').show()) 
+        $('#student-menu').hide();
     });
 
     $(".perbtn").click(function () {

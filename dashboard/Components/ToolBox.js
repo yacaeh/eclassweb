@@ -16,13 +16,16 @@ class ToolBox extends React.Component {
             <ToolBoxIcon key='file' onClick={FileviewerButton} className='i' src='/dashboard/img/openfile.png' id='file' />
             <ToolBoxIcon key='callTeacher' onClick={CallTeacherButton} className='i' src='/dashboard/img/handsup.png' id='callteacher' />
             <ToolBoxIcon key='homework' onClick={HomeworkUploadModal} className='i' src='/dashboard/img/homework.png' id='homework' />
-            <canvas className="i no-hover" id="full" width="28" height="28" />
+            <ToolBoxIcon key='full' className='i no-hover' src='/dashboard/img/cam_max.png' id='full' />
         </section>
     }
 }
 
 
 function ScreenShareButton(e) {
+    // const Todo = ReactRedux.connect();
+    // let action = {type:'SCREEN_SHARE', id:1};
+    // store.dispatch(action);
     screenshareManager.btn(e.target);
 }
 

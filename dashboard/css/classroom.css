@@ -132,11 +132,6 @@
     U+FEFF, U+FFFD;
 }
 
-@font-face {
-  font-family: 'HY중고딕';
-  src: url('/dashboard/fonts/H2GTRE.TTF');
-}
-
 html,
 body,
 section,
@@ -173,6 +168,15 @@ button[disabled] {
   outline: none !important;
 }
 
+#student_screenshare{
+  content: url(/dashboard/img/get_screenshare.png);
+}
+#student_canvas{
+  content: url(/dashboard/img/get_canvas.png);
+}
+#student_mic{
+  content: url(/dashboard/img/get_mic.png);
+}
 
 /* toolbox */
 
@@ -305,7 +309,7 @@ button[disabled] {
   position: absolute;
   width: 185px;
   height: 53px;
-  left: 58px!important;
+  left: 5px!important;
   background-color: #FFFFFF;
   border-radius: 3px;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
@@ -364,23 +368,37 @@ button[disabled] {
 }
 
 #txt-chat-message {
-  width: 100%;
-  resize: vertical;
-  margin: 5px;
-  margin-right: 0;
-  min-height: 30px;
+  font-family: 'Roboto';
+  font-size: 13px;
+  font-weight: 500;
+  height: 30px;
+  left: 5px;
+  position: relative;
+  top: 8px;
+  width: 95%;
+  border: solid 2px rgb(24,219,190);
+  padding-left: 10px;
+  border-radius: 6px;
 }
 
-#btn-chat-message {
-  width: 300px;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  background-color: rgb(24, 219, 190);
-  border-color: aquamarine;
+#txt-chat-message:focus {
+  border-radius: 6px;
+  border: solid 2px rgb(21, 172, 149);
+  outline: none !important;
+}
+
+#widget-container #txt-chat-message {
+  position: absolute;
+  bottom: 8px;
+  right: 5px;
+  left: unset;
+  top: unset;
+  width: 30%;
+  z-index: 10;
 }
 
 #notice {
-  position: absolute;
+  position: relative;
   height: 50%;
   top: 0px;
   left: 0px;
@@ -424,9 +442,8 @@ button[disabled] {
   position: absolute;
   background-color: #eff1f0;
   width: 100%;
-  height: 43px;
+  height: 45px;
   bottom: 0px;
-  z-index: -1;
   border-top: 1px solid #b8b8b8;
 }
 
@@ -576,20 +593,11 @@ hr {
   z-index: 2;
 }
 
-
-
-.emojionearea.emojionearea-inline {
-  bottom: 3px;
-  position: absolute !important;
-  left: 5px;
-  width: 96%;
-}
-
 .onUserStatusChanged {
   padding: 5px 10px;
 }
 
-.chatting {
+#chatting {
   position: absolute;
   top: 29%;
   width: 100%;
@@ -597,11 +605,8 @@ hr {
 }
 
 .conversation-panel {
-  left: 0px;
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  height: 48%;
+  position: relative;
+  height: 44%;
   overflow: inherit !important;
 }
 
@@ -766,14 +771,11 @@ hr {
 }
 
 #header {
-  top: 0px;
   height: 50px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   z-index: 5;
   background: white;
-  position: absolute;
-  right: 0;
-  left: 0;
+  position: relative;
 }
 
 #top_attach-file {
@@ -1405,9 +1407,9 @@ input[type='number']:focus {
 }
 
 #urlinput {
-  position: absolute;
+  position: relative;
   left: 8px;
-  top: 42px;
+  top: 5px;
   width: 96%;
   border: 2px solid #B8B8B8;
   border-radius: 3px;
@@ -1889,14 +1891,6 @@ body:fullscreen {
   background-color: white;
 }
 
-#widget-container > .emojionearea-inline{
-  width: 30%;
-  right: 25px;
-  bottom: 5px;
-  left: auto;
-}
-
-
 .chatonoff{
   width: 30px;
   height: 30px;
@@ -1909,6 +1903,7 @@ body:fullscreen {
   text-align: center;
   vertical-align: middle;
   transform: rotate(-90deg);
+  z-index: 10;
 }
 
 #loading-screen{

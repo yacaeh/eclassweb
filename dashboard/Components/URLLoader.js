@@ -1,3 +1,8 @@
+class URLViewer extends React.Component {
+    render() {
+        return <div id="edunetContent" />
+    }
+}
 class URLLoader extends React.Component {
     state = {
         url: undefined
@@ -11,13 +16,12 @@ class URLLoader extends React.Component {
         return (<>
             <div id="urlform" style={{ display: 'none' }}>
                 <span className="name" data-i18n="FOOTAGE" />
-                <span className="back" />
+                <span className="back">
                 <input id="urlinput"
                     onChange={this.handleChange}
                     onKeyUp={this.keyHandler}
-                    type="text"
-                    placeholder="URL을 입력하세요">
-                </input>
+                    type="text" />
+                </span>
             </div>
         </>)
     };
@@ -72,14 +76,20 @@ function _Send_Moive_Video(_type, _url, _visible, _send) {
 }
 
 function OnMovieRender(state, type, url) {
-    if (type == 'YOUTUBE')
-        embedYoutubeContent(state, url, false);
-    else if (type == 'VIDEO')
-        VideoEdunetContent(state, url, false);
-    else if (type == 'GOOGLE_DOC_PRESENTATION')
-        iframeGoogleDoc_Presentation(state, url, false);
-    else
-        iframeEdunetContent(state, url, false);
+    switch(type) {
+        case "YOUTUBE" : 
+            embedYoutubeContent(state, url, false);
+            break;
+        case "VIDEO" :
+            VideoEdunetContent(state, url, false);
+            break;
+        case "GOOGLE_DOC_PRESENTATION" :
+            iframeGoogleDoc_Presentation(state, url, false);
+            break;
+        default :
+            iframeEdunetContent(state, url, false);
+            break;
+    }
 }
 
 

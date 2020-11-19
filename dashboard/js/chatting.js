@@ -18,10 +18,9 @@ class ChattingManagerClass {
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
     }
-    leftStudent(name) {
-        if (name == undefined)
-            return;
 
+    leftStudent(name) {
+        if (name == undefined) return;
         let div = document.createElement('div');
         div.className = 'teachermsg2 left';
         div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + $.i18n('STUDENT_LEFT') + '</b>';

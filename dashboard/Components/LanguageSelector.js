@@ -41,10 +41,9 @@ class LanguageSelector extends React.Component {
                     $('#txt-roomid').prop({placeholder: $.i18n('ROOM_NUMBER')});
                     $('#txt-user-name').prop({placeholder: $.i18n('NAME')});
                     $('#txt-room-password').prop({placeholder: $.i18n('PASSWORD')});
-                    $('.conversation-panel .emojionearea-editor').prop({placeholder: $.i18n('CHAT_PLACEHOLDER'),});
                     $('#exam-time').prop({placeholder: $.i18n('QUIZ_MINUTES')});
                     $('#urlform #urlinput').prop({placeholder: $.i18n('ENTER_URL')});
-                    $('.emojionearea-editor').attr("placeholder", $.i18n('CHAT_PLACEHOLDER'));
+                    $('#txt-chat-message').attr("placeholder", $.i18n('CHAT_PLACEHOLDER'));
                     
                     $('#btn-confirm-close').html($.i18n('CANCEL'));
                     $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE'));

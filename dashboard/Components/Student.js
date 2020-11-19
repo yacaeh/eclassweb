@@ -1,3 +1,46 @@
+class StudentList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            collapse : true
+        }
+
+        this.myRef = React.createRef();
+        this.onClick = this.onClick.bind(this);
+    }
+    render() {
+        const list = this.props.studentList.map(id => (<Student key={id} uid={id} />))
+        return <div ref={this.myRef} id="student_list">
+            <div onClick={this.onClick} id="student_list_button" />
+            {list}
+        </div>
+    }
+
+    onClick(self) {
+        self = self.target;
+        this.setState({collapse : !this.state.collapse}, () => {
+            let list = this.myRef.current;
+            let len = list.children.length;
+            let line = Math.ceil(len / 4);
+    
+            if (!this.state.collapse) {
+                list.appendChild(self);
+                line = Math.max(4, line);
+                self.innerHTML = "…";
+            }
+            else {
+                self.innerHTML = "+" + (len - 16);
+                list.insertBefore(self, list.children[15]);
+                line = 4;
+            }
+            
+            list.style.gridAutoRows = 100 / line + "%";
+            list.style.height = 6 * line + "%";
+        })
+    }
+}
+
+
 class Student extends React.Component {
     constructor(props) {
         super(props)
