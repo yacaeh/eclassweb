@@ -230,7 +230,7 @@ class FileViewer extends React.Component {
 
     loadFileViewer(path, type) {
         if (this.state.nowPath == path) {
-            alert($.i18n('SAME_FILE_OPEN_ERROR'));
+            alert(window.langlist.SAME_FILE_OPEN_ERROR);
             return;
         }
 
@@ -340,7 +340,7 @@ class FileList extends React.Component {
             var nowName = this.props.nowPath.split('/');
             nowName = nowName[nowName.length - 1];
             if (filename == nowName) {
-                alert($.i18n('DELETE_OPEN_ERROR'));
+                alert(window.langlist.DELETE_OPEN_ERROR);
                 return;
             }
         }

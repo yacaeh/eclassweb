@@ -16,7 +16,7 @@ class SaveNotification extends React.Component {
 
     exportAttention() {
         if( attentionManager.totalCount <= 0 ){
-            alert($.i18n( 'NO_DATA_STORE' ));
+            alert(window.langlist.NO_DATA_STORE);
             return false;
         } 
 
@@ -42,7 +42,7 @@ class SaveNotification extends React.Component {
 
     getSubmitData () {
         let contents = [];        
-        contents[0] = [$.i18n('NAME'), $.i18n('ANSWER')];   // 타이틀        
+        contents[0] = [window.langlist.NAME, window.langlist.ANSWER];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for(let i = 0; i < attentionManager.totalCount; ++i) {
@@ -97,9 +97,9 @@ class Attention extends React.Component {
         }
 
 
-        alertBox("<span>" + $.i18n('NOTIFICATION_WARNING') + "</span>  ", $.i18n('NOTIFICATION'), () => {
+        alertBox("<span>" + window.langlist.NOTIFICATION_WARNING + "</span>  ", window.langlist.NOTIFICATION, () => {
             attentionManager.totalCount++;
-            attentionManager.teacherRequest[attentionManager.totalCount] = {name: $.i18n('ATTENTION_PLEASE')};
+            attentionManager.teacherRequest[attentionManager.totalCount] = {name: window.langlist.ATTENTION_PLEASE};
             callback();
             connection.send({alert: true});
         }, () => { });

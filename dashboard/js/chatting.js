@@ -13,7 +13,7 @@ class ChattingManagerClass {
     enterStudent(name) {
         let div = document.createElement('div');
         div.className = 'teachermsg2 enter';
-        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + $.i18n('STUDENT_JOIN') + '</b>';
+        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + window.langlist.STUDENT_JOIN + '</b>';
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;
@@ -23,7 +23,7 @@ class ChattingManagerClass {
         if (name == undefined) return;
         let div = document.createElement('div');
         div.className = 'teachermsg2 left';
-        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + $.i18n('STUDENT_LEFT') + '</b>';
+        div.innerHTML = '<b> <font color="#000000">' + name + ' </font>' + window.langlist.STUDENT_LEFT + '</b>';
         this.noticeElement.appendChild(div);
         this.noticeElement.scrollTop = this.noticeElement.clientHeight;
         this.noticeElement.scrollTop = this.noticeElement.scrollHeight - this.noticeElement.scrollTop;

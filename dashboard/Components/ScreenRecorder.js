@@ -162,6 +162,6 @@ class screenRecorderClass {
       const hour = date.getHours();
       const min = date.getMinutes();
       const sec = date.getSeconds();
-      return year + "/" + month + "/" + day + "/ " + hour + "/" + min + "/" + sec + '-' + $.i18n('RECORD') + '.webm';
+      return year + "/" + month + "/" + day + "/ " + hour + "/" + min + "/" + sec + '-' + window.langlist.RECORD + '.webm';
     }
   }

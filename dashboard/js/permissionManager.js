@@ -23,7 +23,7 @@ class permissionManagerClass {
         case "classP":
           if (this.classList.contains("off")) {
             if (classroomInfo.permissions.classPermission) {
-              alert($.i18n('STUDENT_PERMISSION_ALREADY'));
+              alert(window.langlist.STUDENT_PERMISSION_ALREADY);
               return false;
             }
             permissionManager.AddClassPermission(pid);
@@ -35,7 +35,7 @@ class permissionManagerClass {
         case "micP":
           if (this.classList.contains("off")) {
             if (classroomInfo.permissions.micPermission) {
-              alert($.i18n('STUDENT_PERMISSION_ALREADY'));
+              alert(window.langlist.STUDENT_PERMISSION_ALREADY);
               return false;
             }
             permissionManager.AddMicPermission(pid);

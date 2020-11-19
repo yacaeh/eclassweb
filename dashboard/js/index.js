@@ -41,13 +41,13 @@ connection.sdpConstraints.mandatory = {
 $('#btn-join-hidden-room').click(function () {
     var roomid = $('#txt-roomid').val().toString();
     if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox($.i18n('ROOM_NUMBER_ERROR'), $.i18n('ERROR'));
+        alertBox(window.langlist.ROOM_NUMBER_ERROR, window.langlist.ERROR);
         return;
     }
 
     var fullName = $('#txt-user-name').val().toString();
     if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox($.i18n('NO_NAME_ERROR'), $.i18n('ERROR'));
+        alertBox(window.langlist.NO_NAME_ERROR, window.langlist.ERROR);
         return;
     }
 
@@ -55,7 +55,7 @@ $('#btn-join-hidden-room').click(function () {
 
     var roomPassword = $('#txt-room-password').val().toString();
     if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox($.i18n('ROOM_PASSWORD_ERROR'), $.i18n('ERROR'));
+        alertBox(window.langlist.ROOM_PASSWORD_ERROR, window.langlist.ERROR);
         return;
     }
     connection.password = roomPassword;
@@ -65,7 +65,7 @@ $('#btn-join-hidden-room').click(function () {
             joinAHiddenRoom(roomid);
         }
         else {
-            alertBox($.i18n('ROOM_INFO_ERROR'), $.i18n('ERROR'));
+            alertBox(window.langlist.ROOM_INFO_ERROR, window.langlist.ERROR);
         }
     });
     return;
@@ -78,14 +78,14 @@ function checkCamAndMicExist() {
             connection.mediaConstraints.audio = false;
             connection.session.audio = false;
             console.log("user has no mic!");
-            alert($.i18n('NO_MIC_ERROR'));
+            alert(window.langlist.NO_MIC_ERROR);
         }
 
         if (!connection.DetectRTC.hasWebcam) {
             connection.mediaConstraints.video = false;
             connection.session.video = false;
             console.log("user has no cam!");
-            alert($.i18n('NO_CAM_ERROR'));
+            alert(window.langlist.NO_CAM_ERROR);
         }
 
     });
@@ -203,13 +203,13 @@ function confirmBox(message, callback) {
 $('#btn-create-room').click(function () {
     var roomid = $('#txt-roomid').val().toString();
     if (!roomid || !roomid.replace(/ /g, '').length) {
-        alertBox($.i18n('ROOM_NUMBER_ERROR'), $.i18n('ERROR'));
+        alertBox(window.langlist.ROOM_NUMBER_ERROR, window.langlist.ERROR);
         return;
     }
 
     var fullName = $('#txt-user-name').val().toString();
     if (!fullName || !fullName.replace(/ /g, '').length) {
-        alertBox($.i18n('NO_NAME_ERROR'), $.i18n('ERROR'));
+        alertBox(window.langlist.NO_NAME_ERROR, window.langlist.ERROR);
         return;
     }
 
@@ -217,7 +217,7 @@ $('#btn-create-room').click(function () {
 
     var roomPassword = $('#txt-room-password').val().toString();
     if (!roomPassword || !roomPassword.replace(/ /g, '').length) {
-        alertBox($.i18n('ROOM_PASSWORD_ERROR'), $.i18n('ERROR'));
+        alertBox(window.langlist.ROOM_PASSWORD_ERROR, window.langlist.ERROR);
         return;
     }
 
@@ -233,13 +233,13 @@ $('#btn-create-room').click(function () {
         connection.DetectRTC.load(function () {
             if (!connection.DetectRTC.hasMicrophone) {
                 console.log("user has no mic!");
-                alertBox($.i18n('NO_MIC_ERROR'), $.i18n('ERROR'));
+                alertBox(window.langlist.NO_MIC_ERROR, window.langlist.ERROR);
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }
 
             if (isRoomExist === true && !extra._room.teacher_rejoin) {
-                alertBox($.i18n('EXISTING_ROOM_ERROR'), $.i18n('ERROR'));
+                alertBox(window.langlist.EXISTING_ROOM_ERROR, window.langlist.ERROR);
                 $('#btn-create-room').html(initialHTML).prop('disabled', false);
                 return;
             }

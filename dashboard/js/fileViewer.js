@@ -524,7 +524,7 @@ function HomeworkUploadModal() {
     $("#confirm-title3").hide();
     $("#confirm-title4").hide();
     $("#confirm-title5").hide();
-    $('#confirm-title').html($.i18n('SUBMIT_ASSIGNMENT')).removeClass("selected");
+    $('#confirm-title').html(window.langlist.SUBMIT_ASSIGNMENT).removeClass("selected");
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false

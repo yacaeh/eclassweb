@@ -44,12 +44,13 @@ function alertBox(message, title, callback_yes, callback_no) {
 
   if (typeof (callback_no) == "string") {
     $('.btn-alert-no').hide();
-    $('.btn-alert-yes').text($.i18n('CONFIRM'));
+    $('.btn-alert-yes').text(window.langlist.CONFIRM);
     $('.btn-alert-yes').css("width", "100%");
   }
   else {
     $('.btn-alert-no').show();
-    $('.btn-alert-yes').text($.i18n('YES'));
+    $('.btn-alert-yes').text(window.langlist.YES);
+    $('.btn-alert-no').text(window.langlist.NO);
     $('.btn-alert-yes').css("width", "50%");
   }
 
@@ -77,7 +78,7 @@ function alertBox(message, title, callback_yes, callback_no) {
     }
   });
 
-  $('#alert-title').html(title || $.i18n('NOTIFICATION'));
+  $('#alert-title').html(title || window.langlist.NOTIFICATION);
   $('#alert-content').html(message);
   $('#alert-box').fadeIn(300);
 }
@@ -113,8 +114,6 @@ function GetParamsFromURL(){
   window.params = params;
   return params;
 }
-
-
 
 // ----------------------------------------------------------------------
 

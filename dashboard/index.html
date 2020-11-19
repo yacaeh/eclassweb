@@ -26,15 +26,7 @@
   <script src="/dashboard/js/lib/bootstrap.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/dashboard/js/RTCMultiConnection.js"></script>
-
-  <script src="/dashboard/js/lib/CLDRPluralRuleParser.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.messagestore.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.fallbacks.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.language.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script type="text/babel" src="/dashboard/Components/LanguageSelector.js"></script>
 </head>
 
@@ -94,22 +86,22 @@
       <div class="modal-content" style="margin-top: 20vh;">
         <div id="lang"></div>
 
-        <div class="login-header login-text login-bottom-border" data-i18n="LOGIN">로그인</div>
+        <div id="login-title" class="login-header login-text login-bottom-border" ></div>
         <div class="login-body login-bottom-border">
           <form class="login-bottom-border">
             <div class="form-group">
-              <label for="txt-roomid" class="login-text" data-i18n="ROOM_NUMBER">방 번호</label>
+              <label id="login-roomnum" for="txt-roomid" class="login-text"></label>
               <input type="text" class="form-control login-input" id="txt-roomid" placeholder="room number">
-              <label for="txt-roomid" class="login-text" data-i18n="NAME">이름</label>
+              <label id="login-name" for="txt-roomid" class="login-text"></label>
               <input type="text" class="form-control login-input" id="txt-user-name" placeholder="name">
-              <label for="txt-roomid" class="login-text" data-i18n="PASSWORD">비밀번호</label>
+              <label id="login-pw" for="txt-roomid" class="login-text"></label>
               <input type="text" class="form-control login-input" id="txt-room-password" placeholder="password">
             </div>
           </form>
           <br>
           <div>
-            <p><button type="button" class="btn btn-blue" id="btn-join-hidden-room" data-i18n="STUDENT">STUDENT</button></p>
-            <button type="button" class="btn btn-mint" id="btn-create-room" data-i18n="TEACHER">TEACHER</button>
+            <p><button type="button" class="btn btn-blue" id="btn-join-hidden-room" ></button></p>
+            <button type="button" class="btn btn-mint" id="btn-create-room"></button>
           </div>
         </div>
 
@@ -126,11 +118,11 @@
     </div>
 
     <div id="check-device">
-      <div id="device-cam" class="device-box" data-i18n="CAMERA">카메라</div>
-      <div id="device-mic" class="device-box" data-i18n="MIC">마이크</div>
-      <div id="device-network" class="device-box" data-i18n="NETWORK">네트워크</div>
+      <div id="device-cam" class="device-box"></div>
+      <div id="device-mic" class="device-box"></div>
+      <div id="device-network" class="device-box"></div>
     </div>
-    <div id="refresh" data-i18n="REFRESH">새로고침</div>
+    <div id="refresh">새로고침</div>
 
     <input placeholder="이름" id="user-name">
 

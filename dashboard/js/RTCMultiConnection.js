@@ -360,7 +360,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         connection.socket.on('deleted-room', function(e){
             connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
-            alertBox($.i18n('TEACHER_LEFT'), $.i18n('NOTIFICATION'), () => {location.href = '/dashboard/login.html'} , $.i18n('CONFIRM'))
+            alertBox(window.langlist.TEACHER_LEFT, window.langlist.NOTIFICATION, () => {location.href = '/dashboard/login.html'} , window.langlist.CONFIRM)
 
         })
 

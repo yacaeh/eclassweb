@@ -60,7 +60,7 @@ class Header extends React.Component {
             Show(childern[i].getElementsByTagName("img")[0]);
             Hide(childern[i].getElementsByTagName("video")[0]);
         }
-        $('#student_list').show();
+        document.getElementById('student_list').state.display = 'block';
         connection.send({
             sendcanvasdata: true,
             state: true
@@ -99,14 +99,12 @@ class Header extends React.Component {
     };
 
     exitRoom() {
-        alertBox($.i18n('EXIT_CONFIRM'), $.i18n('WARNING'), () => {
+        alertBox(window.langlist.EXIT_CONFIRM, window.langlist.WARNING, () => {
             if (connection.extra.roomOwner) {
                 connection.send({ roomBoom: true })
             }
             classroomManager.gotoMain();
-        },
-            function () { }
-        );
+        });
     }
 }
 

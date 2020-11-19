@@ -190,7 +190,7 @@ class classroomManagerClass {
         connection.open(params.sessionid, function (isRoomOpened, roomid, command, _info) {
             if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
-                alert($.i18n('EXISTING_ROOM_ERROR'));
+                alert(window.langlist.EXISTING_ROOM_ERROR);
                 classroomManager.gotoMain();
             }
             else if(connection.byLogin == true){
@@ -238,7 +238,7 @@ class classroomManagerClass {
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
-                    alert($.i18n('FULL_ROOM_ERROR'));
+                    alert(window.langlist.FULL_ROOM_ERROR);
                     classroomManager.gotoMain();
                     return;
                 }
@@ -283,7 +283,7 @@ class classroomManagerClass {
         if (event.data.roomBoom) {
             connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
-            alertBox($.i18n('TEACHER_LEFT'), $.i18n('NOTIFICATION'), classroomManager.gotoMain, $.i18n('CONFIRM'))
+            alertBox(window.langlist.TEACHER_LEFT, window.langlist.NOTIFICATION, classroomManager.gotoMain, window.langlist.CONFIRM)
 
             return true;
         }

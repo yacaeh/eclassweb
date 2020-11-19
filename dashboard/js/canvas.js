@@ -141,18 +141,18 @@ function checkSharing() {
 
 function removeOnSelect(btn) {
     if (!connection.extra.roomOwner) {
-        alert($.i18n('TEACHER_USING_FEATURE'))
+        alert(window.langlist.TEACHER_USING_FEATURE)
         return;
     }
 
     if(classroomInfo.shareScreen.state && connection.userid != classroomInfo.shareScreen.userid){
-        alert($.i18n('SOMEONE_USING_SCREEN'));
+        alert(window.langlist.SOMEONE_USING_SCREEN);
         btn.classList.remove("on");
         btn.classList.remove("selected-shape");
         return;
     }
 
-    alertBox($.i18n('ASK_CLOSE_CURRENT'), $.i18n('NOTIFICATION'), function () {
+    alertBox(window.langlist.ASK_CLOSE_CURRENT, window.langlist.NOTIFICATION, function () {
         if (classroomInfo.share3D.state) {
             document.getElementById("3d_view").click();
             classroomInfo.share3D.state = false;

@@ -423,7 +423,7 @@ examObj.exportExam = function () {
     // export excel data
     function getSubmitData() {
         var contents = [];
-        contents[0] = [$.i18n('NAME'), $.i18n('SCORE')];   // 타이틀        
+        contents[0] = [window.langlist.NAME, window.langlist.SCORE];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for (var i = 0; i < examObj.questionCount; ++i) {
@@ -539,7 +539,7 @@ function setStudentOMR(quesCount, examTime) {
     var question = '';
 
     question += "<div class='exam-header'>";
-    question += "<div id='is-testing'>" + $.i18n('QUIZ_ON') + "</div>";
+    question += "<div id='is-testing'>" + window.langlist.QUIZ_ON + "</div>";
     question += "<div id='exam-student-timer' style='color:red;'>0:0</div>";
     question += '</div>';
     question += "<div class='exam-overflow exam-border-bottom'>";
@@ -558,7 +558,7 @@ function setStudentOMR(quesCount, examTime) {
     question += '</div>';
     question += `</div>`;
     question +=
-        "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>" + $.i18n('QUIZ_SUBMIT') + "</button>";
+        "<button onclick='submitOMR()' id='exam-answer-submit' class='btn btn-exam exam-80-button' onclick='finishExam()'>" + window.langlist.QUIZ_SUBMIT + "</button>";
     $('#exam-omr').html(question);
 
     let time = examTime;
@@ -580,7 +580,7 @@ function setStudentOMR(quesCount, examTime) {
 // 학생 시험 OMR 제출
 function submitOMR() {
     if (!examObj.checkStudentAnswerChecked(m_QuesCount)) {
-        alert($.i18n('QUIZ_SUBMIT_WARNING'));
+        alert(window.langlist.QUIZ_SUBMIT_WARNING);
         return;
     }
 
@@ -592,7 +592,7 @@ function stopQuestionOMR() {
     clearInterval(m_ExamTimerInterval);
     let studentOMR = getQuestionAnswerList();
     examObj.examAnswer = studentOMR;
-    $('#is-testing').html($.i18n('QUIZ_END'));
+    $('#is-testing').html(window.langlist.QUIZ_END);
     $('#exam-omr-question-list').css('pointer-events', 'none');
     $('#exam-answer-submit').hide();
 }
@@ -633,7 +633,7 @@ function showExamStateForm(quesCount, endTime) {
     let stateHtmlStr = '';
 
     stateHtmlStr += "<div class='exam-header'>";
-    stateHtmlStr += '<div>' + $.i18n('QUIZ_ON') + '</div>';
+    stateHtmlStr += '<div>' + window.langlist.QUIZ_ON + '</div>';
     stateHtmlStr += "<div id='exam-teacher-timer' style='color:red;'>0:0</div>";
     stateHtmlStr += '</div>';
     stateHtmlStr += "<div class='exam-background exam-overflow'>";
@@ -646,7 +646,7 @@ function showExamStateForm(quesCount, endTime) {
     }
     stateHtmlStr += '</div>';
     stateHtmlStr +=
-        "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>" + $.i18n('QUIZ_END') + "</button>";
+        "<button id='exam-finish' class='btn btn-danger exam-80-button' onclick='finishExam()'>" + window.langlist.QUIZ_END + "</button>";
 
     $('#exam-state').html(stateHtmlStr);
 

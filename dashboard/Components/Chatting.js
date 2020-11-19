@@ -43,7 +43,7 @@ class ChattingWindow extends React.Component {
                     owner: connection.extra.roomOwner,
                     msg: chatMessage,
                     fromMe: true,
-                    name: $.i18n('ME'),
+                    name: window.langlist.ME,
                 }
 
                 _this.setState({ 
@@ -154,7 +154,7 @@ class Notice extends React.Component {
         const list = this.props.list.map((data, idx) => <this.Chat data={data} key={idx} />);
 
         return <div id="notice">
-            <span className="text" data-i18n="TEACHER_CHAT">선생님 채팅<h1 /></span>
+            <span id='chat-notice' className="text">선생님 채팅<h1 /></span>
             <div ref={this.window} className="scroll" id="noticewindow">
                 Logs<br />
                 <div id="logs">
@@ -170,7 +170,7 @@ class Notice extends React.Component {
 
     Chat(params) {
         return <div className='teachermsg'>
-            <b><font color="#C63EE8">{$.i18n('TEACHER')}</font></b> : {params.data.msg}
+            <b><font color="#C63EE8">{window.langlist.TEACHER}</font></b> : {params.data.msg}
         </div>
     }
 }

@@ -98,7 +98,7 @@ function onBtn(id) {
 
 classroomCommand.receivAlert = function () {
     var alertTimeHandler;
-    alertBox("<progress max='100' value='100' class='alert-progress exam-state-progress'></progress>", $.i18n('NOTIFICATION'), () => {
+    alertBox("<progress max='100' value='100' class='alert-progress exam-state-progress'></progress>", window.langlist.NOTIFICATION, () => {
         response('yes');
     }, () => {
         response('no');
