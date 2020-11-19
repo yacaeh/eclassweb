@@ -226,4 +226,7 @@ connection.onmessage = function (event) {
     designer.syncData(event.data);
   }
 
+  if(event.data.setNOS){
+    reactEvent.setNOS(event.data.setNOS);
+  }
 };

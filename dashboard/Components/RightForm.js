@@ -30,28 +30,44 @@ class RightForm extends React.Component {
     componentDidMount() {
         reactEvent.joinStudent = this.joinStudent;
         reactEvent.leftStudent = this.leftStudent;
+        reactEvent.setNOS = this.setNOS;
     };
+
+    setNOS = (num) => {
+        console.error(num);
+        this.setState({ numberOfStudents: num});
+    }
 
     joinStudent(event) {
         const userId = event.userid;
 
         connection.socket.emit("get-user-name", userId, (userName) => {
             if (userName == 'ycsadmin') return;
-            console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
+            
             connection.send('plz-sync-points', userId);
+            console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
             ChattingManager.enterStudent(userName);
+
             event.extra.roomOwner && classroomManager.rejoinTeacher();
-            const list = this.state.studentList.concat({ userId, userName });
-            this.setState({ numberOfStudents: connection.getAllParticipants().length });
-            connection.extra.roomOwner && this.setState({ studentList: list });
+            
+            if(connection.extra.roomOwner){
+                const list = this.state.studentList.concat({ userId, userName });
+                this.setState({ studentList: list });
+                connection.send({setNOS : list.length});
+                this.setState({ numberOfStudents: list.length });
+            }
         })
     };
 
     leftStudent(event) {
         if (event.extra.userFullName == 'ycsadmin') return;
-        this.setState({ numberOfStudents: connection.getAllParticipants().length });
+        if(connection.extra.roomOwner){
+            const list = this.state.studentList.filter(user => user.userId != event.userid);
+            this.setState({ studentList: list});
+            connection.send({setNOS : list.length});
+            this.setState({ numberOfStudents: list.length});
+        }
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
-        connection.extra.roomOwner && this.setState({ studentList: this.state.studentList.filter(user => user.userId != event.userid) })
     }
 
     collapse = (e) => {

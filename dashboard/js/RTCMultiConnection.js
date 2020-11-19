@@ -406,7 +406,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 var allPeers = [];
                 for (var peer in this) {
                     if (skipPeers.indexOf(peer) == -1 && peer != sender) {
-                        if(this[peer].extra.userFullName != 'ycsadmin')
                             allPeers.push(peer);
                     }
                 }
