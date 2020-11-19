@@ -16,7 +16,7 @@ class RightForm extends React.Component {
         return (
             <div id="right-tab" className="right-tab">
                 <div id="right-tab-collapse" onClick={this.collapse}>
-                    <img style={{pointerEvents : 'none'}} src="/dashboard/img/openchat.png" />
+                    <img style={{ pointerEvents: 'none' }} src="/dashboard/img/openchat.png" />
                 </div>
                 <NumberOfStudents num={this.state.numberOfStudents} />
                 <Authorization />
@@ -33,17 +33,25 @@ class RightForm extends React.Component {
     };
 
     joinStudent(event) {
-        this.setState({ numberOfStudents: connection.getAllParticipants().length });
-        console.debug('Connected with ', "[", event.extra.userFullName, "]", "[", event.userid, "]");
-        connection.send('plz-sync-points', event.userid);
-        event.extra.roomOwner && classroomManager.rejoinTeacher();
-        connection.extra.roomOwner && this.setState({ studentList: this.state.studentList.concat(event.userid) });
+        const userId = event.userid;
+
+        connection.socket.emit("get-user-name", userId, (userName) => {
+            if (userName == 'ycsadmin') return;
+            console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
+            connection.send('plz-sync-points', userId);
+            ChattingManager.enterStudent(userName);
+            event.extra.roomOwner && classroomManager.rejoinTeacher();
+            const list = this.state.studentList.concat({ userId, userName });
+            this.setState({ numberOfStudents: connection.getAllParticipants().length });
+            connection.extra.roomOwner && this.setState({ studentList: list });
+        })
     };
 
     leftStudent(event) {
+        if (event.extra.userFullName == 'ycsadmin') return;
         this.setState({ numberOfStudents: connection.getAllParticipants().length });
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
-        connection.extra.roomOwner && this.setState({ studentList: this.state.studentList.filter(uid => uid != event.userid) })
+        connection.extra.roomOwner && this.setState({ studentList: this.state.studentList.filter(user => user.userId != event.userid) })
     }
 
     collapse = (e) => {

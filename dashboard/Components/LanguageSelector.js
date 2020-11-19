@@ -5,37 +5,37 @@ class LanguageSelector extends React.Component {
             localStorage.setItem('locale', 'en');
         }
         window.language = localStorage.getItem('locale');
+        this.state = {
+            lang : window.language
+        }
         this.updateLanguage();
     }
 
     render() {
-        return <select className="language span3" onChange={this.saveLocale}>
+        return <select className="language span3" value={this.state.lang} onChange={this.saveLocale}>
                 <option value="en">English</option>
                 <option value="ko">한국어</option>
                 <option value="id">Bahasa Indonesia</option>
             </select>
     }
 
-    saveLocale = () => {
-        window.language = $('.language option:selected').val();
+    saveLocale = (e) => {
+        window.language = e.target.value;
         localStorage.setItem('locale', window.language);
+        this.setState({lang : window.language})
         this.updateLanguage();
     }
 
     updateLanguage() {
-        jQuery(function ($) {
-            let options = document.getElementsByClassName("language")[0].children;
-            for (let i = 0; i < options.length; i++) {
-                if (options[i].value == localStorage.getItem("locale"))
-                    options[i].setAttribute("selected", '');
-            }
-
+        jQuery(async function ($) {
             window.i18n = $.i18n();
             window.language = localStorage.getItem('locale');
             window.i18n.locale = window.language;
+            let lang = await axios.get('/dashboard/js/languages/' + i18n.locale + '.json');
+            console.log(lang.data);
+
             window.i18n.load('/dashboard/js/languages/' + i18n.locale + '.json', i18n.locale)
                 .done(function () {
-
                     $('#btn-confirm-action').html($.i18n('OK'));
                     $("title").prop({text: $.i18n('TITLE')});
                     $('#txt-roomid').prop({placeholder: $.i18n('ROOM_NUMBER')});
@@ -66,41 +66,22 @@ class LanguageSelector extends React.Component {
                         topButtonContents.student_canvas = $.i18n('STUDENT_CANVAS');
                         topButtonContents.student_mic = $.i18n('STUDENT_MIC');
 
-                        MakeTitlePop("onoff-icon", $.i18n('CANVAS_ON_OFF'));
-                        MakeTitlePop("pencilIcon", $.i18n('PENCIL'));
-                        MakeTitlePop("markerIcon", $.i18n('MARKER'));
-                        MakeTitlePop("eraserIcon", $.i18n('ERASER'));
-                        MakeTitlePop("textIcon", $.i18n('TEXT'));
-                        MakeTitlePop("undo", $.i18n('UNDO'));
-                        MakeTitlePop("clearCanvas", $.i18n('CLEAR_CANVAS'));
-                        MakeTitlePop("screen_share", $.i18n('SHARE_SCREEN'));
-                        MakeTitlePop("3d_view", $.i18n('SHARE_3D'));
-                        MakeTitlePop("movie", $.i18n('SHARE_YOUTUBE'));
-                        MakeTitlePop("file", $.i18n('SHARE_FILE'));
-                        MakeTitlePop("epub", $.i18n('SHARE_EPUB'));
-                        MakeTitlePop("callteacher", $.i18n('CALL_TEACHER'));
-                        MakeTitlePop("homework", $.i18n('HOMWORK_ICON'));
+                        document.getElementById("onoff-icon").dataset.content = $.i18n('CANVAS_ON_OFF');
+                        document.getElementById("pencilIcon").dataset.content = $.i18n('PENCIL');
+                        document.getElementById("markerIcon").dataset.content = $.i18n('MARKER');
+                        document.getElementById("eraserIcon").dataset.content = $.i18n('ERASER');
+                        document.getElementById("textIcon").dataset.content = $.i18n('TEXT');
+                        document.getElementById("undo").dataset.content = $.i18n('UNDO');
+                        document.getElementById("clearCanvas").dataset.content = $.i18n('CLEAR_CANVAS');
+                        document.getElementById("screen_share").dataset.content = $.i18n('SHARE_SCREEN');
+                        document.getElementById("3d_view").dataset.content = $.i18n('SHARE_3D');
+                        document.getElementById("movie").dataset.content = $.i18n('SHARE_YOUTUBE');
+                        document.getElementById("file").dataset.content = $.i18n('SHARE_FILE');
+                        document.getElementById("epub").dataset.content = $.i18n('SHARE_EPUB');
+                        document.getElementById("callteacher").dataset.content = $.i18n('CALL_TEACHER');
+                        document.getElementById("homework").dataset.content = $.i18n('HOMWORK_ICON');
 
                         $('#textInputContainer .textInputUI').attr("placeholder", $.i18n('TEXT_AND_ENTER'));
-
-                        function MakeTitlePop(element, contents) {
-                            let pop = document.getElementById("toolboxHelper");
-                            element = document.getElementById(element);
-                            if (!element)    return;
-                            element.addEventListener("mouseover", function () {
-                                if (this.classList.contains("off"))
-                                    return false;
-                                pop.style.display = 'block';
-                                let rect = element.getBoundingClientRect();
-                                let y = rect.y;
-                                pop.style.top = y - 40 + 'px';
-                                pop.children[0].innerHTML = contents;
-                            })
-
-                            element.addEventListener("mouseleave", function () {
-                                pop.style.display = 'none';
-                            })
-                        }
                     }
                     catch {
                     }
