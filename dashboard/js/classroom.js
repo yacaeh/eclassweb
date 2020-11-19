@@ -1,22 +1,8 @@
-(function () {
-  let params = {},
-    r = /([^&=]+)=?([^&]*)/g;
+window.params = GetParamsFromURL();
+var reactEvent = {};
 
-  function d(s) {
-    return decodeURIComponent(s.replace(/\+/g, ' '));
-  }
-  let match,
-    search = window.location.search;
-  while ((match = r.exec(search.substring(1))))
-    params[d(match[1])] = d(match[2]);
-  window.params = params;
-})();
-
-
-ReactDOM.render(
-  <App />,
-  document.getElementById('app')
-)
+var epubManager         = new epubManagerClass();
+ReactDOM.render(<App />, document.getElementById('app'));
 
 //=============================================================================================
 
@@ -24,18 +10,12 @@ var debug = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
-var isSharingEpub = false;
-let isFileViewer = false;
-
-const widgetContainer = document.getElementById("widget-container");
-const rightTab        = document.getElementById("right-tab")
 
 var connection          = new RTCMultiConnection();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
 var maincamManager      = new maincamManagerClass();
 var canvasManager       = new canvasManagerClass();
-var epubManager         = new epubManagerClass();
 var mobileHelper        = new mobileHelperClass();
 var pointer_saver       = new PointerSaver();
 var classroomManager    = new classroomManagerClass();
@@ -44,19 +24,9 @@ var attentionManager    = new attentionManagerClass();
 
 //=============================================================================================
 
-// 상단 버튼 도움말
 const topButtonContents = {};
-
-// 좌측 버튼 기능
-const canvasButtonContents = {
-  'screen_share'      : screenshareManager.btn,
-  '3d_view'           : _3DCanvasOnOff,
-  'movie'             : Movie_Render_Button,
-  'file'              : LoadFile,
-  'epub'              : epubManager.loadEpub,
-  'callteacher'       : classroomManager.callTeacher,
-  'homework'          : HomeworkSubmit,
-}
+const widgetContainer = document.getElementById("widget-container");
+const rightTab        = document.getElementById("right-tab")
 
 // Alt + 단축키
 const shortCut = [
@@ -91,33 +61,12 @@ connection.publicRoomIdentifier = params.publicRoomIdentifier;
 connection.session = {audio: false,video: false,data: true,screen: false,};
 connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
 
-if(!window.params.userFullName){
-  let request = new XMLHttpRequest();
-  request.open('POST', '/get-now-account', false); 
-  request.send(JSON.stringify({id : params.sessionid}));
-
-  if (request.status === 200) {
-    const ret = JSON.parse(request.responseText);
-    console.log(ret)
-    if(ret.code == 400){
-      console.error("no login info")
-      alert("로그인 정보가 없습니다");
-      location.href = '/dashboard/login.html';
-    }
-    else{
-      connection.userid = ret.data.uid;
-      connection.byLogin = true;
-      connection.extra.userFullName = ret.data.name;
-    }
-  }
-}
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
   pageNavigator.init();
   canvasManager.init();
   permissionManager.init();
-  canvasManager.setCanvasButtons(canvasButtonContents);
   classroomManager.init(shortCut, topButtonContents);
   mobileHelper.init();
 }
@@ -126,22 +75,13 @@ window.onSocketConnected = function () {
   updateClassTime();
   classroomCommand.updateSyncRoom();
   webRTCPCInit();
+  document.body.removeChild(document.getElementById("loading-screen"));
 };
 
-connection.onopen = function (event) {
-  classroomManager.joinStudent(event);
-};
+connection.onopen = event => reactEvent.joinStudent(event);
+connection.onclose = connection.onerror = connection.onleave = event => reactEvent.leftStudent(event);
 
-connection.onclose = connection.onerror = connection.onleave = function (event) {
-  classroomManager.leftStudent(event);
-};
-
-connection.onstreamended = function (event) {
-  console.log('onstreameneded!', event);
-  screenshareManager.onclose(event);
-};
-
-designer.appendTo(widgetContainer, () => {
+designer.appendTo(() => {
   console.debug('Designer append');
   connection.extra.roomOwner ? classroomManager.createRoom() :
                                classroomManager.joinRoom();
@@ -152,22 +92,12 @@ connection.onmessage = function (event) {
   if (debug)
     console.log(event);
 
-  if (permissionManager.eventListener(event))
-    return;
-
-  if (screenshareManager.eventListener(event))
-    return;
-
-  if (maincamManager.eventListener(event))
-    return;
-
-  if (ChattingManager.eventListener(event))
-    return;
-
-  if (canvasManager.eventListener(event))
-    return;
-
-  if (classroomManager.eventListener(event))
+  if (permissionManager.eventListener(event) ||
+      screenshareManager.eventListener(event) ||
+      ChattingManager.eventListener(event) ||
+      canvasManager.eventListener(event) ||
+      classroomManager.eventListener(event)
+    )
     return;
 
   if (event.data === 'plz-sync-points') {
@@ -211,12 +141,23 @@ connection.onmessage = function (event) {
       canvasManager.clear();
     }
 
-    classroomCommand.updateViewer(event.data.viewer);
+    mfileViewer.updateViewer(event.data.viewer);
     return;
   }
 
   if (event.data.epub) {
-    classroomCommand.receiveEpubMessage(event.data.epub);
+    let data = event.data.epub
+    if (data.cmd) {
+      classroomCommand.updateEpubCmd(data);
+  } else {
+      let currentState = classroomInfo.epub.state;
+      if (currentState != data.state) {
+          classroomInfo.epub = data;
+          console.log(event.data);
+          classroomInfo.epub.state ? classroomCommand.openEpub(event.data.url) : epubManager.unloadEpubViewer();
+      }
+  }
+
     return;
   }
 

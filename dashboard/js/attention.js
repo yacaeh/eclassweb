@@ -30,8 +30,6 @@ class attentionManagerClass{
         studentAnswerInfo.count++;
     };
 
-
-
     resetBorder(){
         let chilldren = document.getElementById('student_list').children;
         for (let i = 0; i < chilldren.length; i++) {

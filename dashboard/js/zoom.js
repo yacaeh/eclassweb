@@ -39,7 +39,7 @@ class ZoomManager {
         let y = p2.y - p1.y;
         return Math.sqrt(x * x + y * y);
     }
-    
+
     sum(a, b) {
         return a + b;
     };
@@ -55,7 +55,7 @@ class ZoomManager {
         };
     };
 
-   getTouchCenter(touches) {
+    getTouchCenter(touches) {
         return this.getVectorAvg(touches);
     };
 
@@ -68,12 +68,12 @@ class ZoomManager {
         return Array.prototype.slice.call(event.touches).map(function (touch) {
             return {
                 x: touch.screenX,
-                y: touch.screenY 
+                y: touch.screenY
             };
         });
     };
 
-    targetTouches(touches){
+    targetTouches(touches) {
         return Array.from(touches).map(function (touch) {
             return {
                 x: touch.screenX,
@@ -104,7 +104,7 @@ class ZoomManager {
             if (_this.fingers == 2) {
                 _this.lastScale = _this.zoomLevel;
                 _this.startTouches = _this.targetTouches(e.touches);
-                _this.touchCenter =  _this.getTouchCenter(_this.getTouches(e))
+                _this.touchCenter = _this.getTouchCenter(_this.getTouches(e))
             }
             else if (_this.fingers == 3) {
                 let xSum = 0;
@@ -124,7 +124,7 @@ class ZoomManager {
 
         element.addEventListener('touchend', function (event) {
             _this.fingers = event.touches.length;
-            if(_this.fingers == 0)
+            if (_this.fingers == 0)
                 console.log("end");
 
         });
@@ -135,13 +135,13 @@ class ZoomManager {
                 let scale = _this.handleZoom(e, _this.calculateScale(_this.startTouches, _this.targetTouches(e.touches)));
                 scale = _this.clamp(scale, 1, _this.maxZoomLevel);
 
-                if(_this.zoomLevel > scale){
+                if (_this.zoomLevel > scale) {
                     _this.zoomOut(scale)
                 }
-                else{
+                else {
                     _this.zoomIn(_this.touchCenter.x, _this.touchCenter.y, scale);
                 }
-                
+
                 _this.setLevel(scale);
                 _this.boundCheck();
                 _this.setPosistion();
@@ -217,7 +217,7 @@ class ZoomManager {
             }
             targetzoomLevel = _this.clamp(targetzoomLevel, 1, _this.maxZoomLevel);
 
-            let mousePosX = e.screenX - window.screenLeft ;
+            let mousePosX = e.screenX - window.screenLeft;
             let mousePosY = e.screenY - window.screenTop;
 
             if (e.deltaY < 0) {
@@ -249,15 +249,15 @@ class ZoomManager {
     }
 
     zoomIn(x, y, size) {
-        let currentPosX = (x * this.zoomLevel) - (this.width  / 2* this.zoomLevel);
+        let currentPosX = (x * this.zoomLevel) - (this.width / 2 * this.zoomLevel);
         let currentPosY = (y * this.zoomLevel) - (this.height / 2 * this.zoomLevel);
 
-        let targetPosX = (x * size) - (this.width / 2* size);
-        let targetPosY = (y * size) - (this.height / 2* size);
+        let targetPosX = (x * size) - (this.width / 2 * size);
+        let targetPosY = (y * size) - (this.height / 2 * size);
 
-        let diffX = targetPosX - currentPosX ;
-        let diffY = targetPosY - currentPosY ;
-        
+        let diffX = targetPosX - currentPosX;
+        let diffY = targetPosY - currentPosY;
+
         this.currentPosX -= diffX;
         this.currentPosY -= diffY;
     }

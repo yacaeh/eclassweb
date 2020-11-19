@@ -187,63 +187,6 @@ function PDFViewerPlugin() {
         return new Blob([ia], {type:mimeString});
     }
 
-    function createPage( page ) {
-        var pageNumber,
-            canvas,
-            domPage,
-            viewport;
-
-        pageNumber = page.pageIndex + 1;
-
-        viewport = page.getViewport(scale);
-
-        domPage               = document.createElement('div');
-        domPage.id            = 'pageContainer' + pageNumber;
-        domPage.className     = 'page';
-        domPage.style.display = "none";
-
-        canvas    = document.createElement('canvas');
-        canvas.id = 'canvas' + pageNumber;
-
-        domPage.appendChild(canvas);
-
-        pages[page.pageIndex]           = page;
-        domPages[page.pageIndex]        = domPage;
-        renderingStates[page.pageIndex] = RENDERING.BLANK;
-
-        updatePageDimensions(page, viewport.width, viewport.height);
-        if ( maxPageWidth < viewport.width ) {
-            maxPageWidth = viewport.width;
-        }
-        if ( maxPageHeight < viewport.height ) {
-            maxPageHeight = viewport.height;
-        }
-        if ( viewport.width < viewport.height ) {
-            isGuessedSlideshow = false;
-        }
-
-        var thumbnail = canvas.cloneNode(true);  
-        thumbnail.style.width = "100%"
-        page.render({
-            canvasContext: thumbnail.getContext('2d'),
-            viewport:      page.getViewport(1)
-        }).promise.then(function () {
-            if ( getRenderingStatus(page) === RENDERING.RUNNINGOUTDATED ) {
-                ensurePageRendered(page);
-            }
-        });
-        window.parent.parent.pageNavigator.push(thumbnail, function(){
-            var idx = (this.getAttribute("idx") * 1) + 1;
-            self.showPage(idx)
-        })
-
-        createdPageCount += 1;
-        if ( createdPageCount === (pdfDocument.numPages) ) {
-            completeLoading();
-        }
-
-    }
-
     this.createThumbanil = function (thumbnails){
         let url = this.url;
         thumbnails.forEach((e) => {
@@ -261,6 +204,7 @@ function PDFViewerPlugin() {
     this.createCanvas = function (container){
         let image = document.createElement('img');
         this.image = image; 
+        image.style.maxWidth = '100%';
         container.appendChild(image);
     }
 
@@ -389,7 +333,7 @@ function PDFViewerPlugin() {
         n = n < 1 ? 1 : n ;
         this.image.src = this.url + this.images[n-1];
         window.parent.parent.showPage(n);     
-        currentPage                             = n;
+        currentPage = n;
     };
 
     this.getPluginName = function () {

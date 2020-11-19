@@ -1,6 +1,7 @@
 /*
     캔버스, 판서 관련
 */
+var designer = new CanvasDesigner();
 
 class canvasManagerClass {
     constructor() {
@@ -8,7 +9,6 @@ class canvasManagerClass {
         this.showingCanvasId = undefined;
         this.canvas_array = {};
         this.canvas = undefined;
-
     }
 
     init() {
@@ -38,15 +38,6 @@ class canvasManagerClass {
         designer.syncData({
             command: "clearteacher",
             uid: connection.userid,
-        })
-    };
-    setCanvasButtons(data) {
-        Object.keys(data).forEach(function (e) {
-            let btn = document.getElementById(e);
-            if (btn)
-                btn.addEventListener("click", function () {
-                    data[e](btn);
-                })
         })
     };
     eventListener(event) {
@@ -131,12 +122,6 @@ class canvasManagerClass {
     };
 }
 
-var designer = new CanvasDesigner();
-
-designer.widgetHtmlURL          = './widget.html';
-designer.widgetJsURL            = './js/widget.js';
-designer.icons.on               = '/dashboard/img/view_on.png';
-designer.icons.off              = '/dashboard/img/view_off.png';
 
 designer.addSyncListener(function (data) {
     var isStudent = permissionManager.IsCanvasPermission(data.userid);
@@ -151,7 +136,7 @@ function checkSharing() {
         classroomInfo.share3D.state ||
         isSharingMovie ||
         isSharingFile ||
-        isSharingEpub;
+        classroomInfo.epub.state;
 }
 
 function removeOnSelect(btn) {
@@ -183,13 +168,13 @@ function removeOnSelect(btn) {
         }
 
         if (isSharingFile) {
-            unloadFileViewer();
+            document.getElementById("btn-confirm-file-close").click();
             isSharingFile = false;
         }
 
-        if (isSharingEpub) {
-            document.getElementById("epub").click();
-            isSharingEpub = false;
+        if (classroomInfo.epub.state) {
+            document.getElementById("btn-confirm-file-close").click();
+            isSharingFile = false;
         }
 
         setTimeout(function () {

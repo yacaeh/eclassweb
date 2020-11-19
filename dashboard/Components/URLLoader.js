@@ -51,39 +51,6 @@ class URLLoader extends React.Component {
     }
 }
 
-
-
-
-function Movie_Render_Button(btn) {
-    if (!isSharingMovie && checkSharing()) {
-        removeOnSelect(btn);
-        return;
-    }
-    
-    let urlform = document.getElementById("urlform");
-
-    btn.classList.toggle("on");
-    btn.classList.toggle("selected-shape");
-    
-    var visible = urlform.style.display;
-
-    if (visible == "inline-block") {
-        classroomInfo.movierender = {
-            state: false,
-            url: undefined
-        };
-        classroomManager.updateClassroomInfo(function () { });
-
-        isSharingMovie = false;
-        urlform.style.display = "none";
-        embedYoutubeContent(false, "", true);
-    }
-    else {
-        isSharingMovie = true;
-        urlform.style.display = "inline-block";
-    }
-}
-
 function _Send_Moive_Video(_type, _url, _visible, _send) {
     classroomInfo.movierender = {
         state: _visible,

@@ -108,14 +108,9 @@ pageNavigator = {
   },
 
   select: function (idx) {
-    if(this.currentidx == (idx == -1 ? 0 : idx)) 
-      return;
-
-      this.currentidx = idx == -1 ? 0 : idx;
-
-    if(!this.list.children[this.currentidx]){
-      return;
-    }
+    if(this.currentidx == (idx == -1 ? 0 : idx))  return;
+       this.currentidx = idx == -1 ? 0 : idx;
+    if(!this.list.children[this.currentidx]) return;
 
     var pre = this.list.getElementsByClassName("selected")[0];
     if (pre)

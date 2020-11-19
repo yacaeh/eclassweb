@@ -1,9 +1,3 @@
-
-
-/*
-    pdf, video, audio, jpg .. 등등
-*/
-
 class fileViewerLoader {
     constructor() {
         this.bOpen = false;
@@ -88,7 +82,6 @@ class fileViewerLoader {
 
     createElementViewer(url) {
         $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
 
         let fileViewer = document.createElement('iframe');
         fileViewer.setAttribute('id', 'file-viewer');
@@ -102,8 +95,12 @@ class fileViewerLoader {
     }
 
     removeElementViewer() {
-        GetWidgetFrame().document.getElementById('file-viewer').remove();
-        document.getElementById("btn-confirm-file-close").style.display = "none";
+        try{
+            GetWidgetFrame().document.getElementById('file-viewer').remove();
+        }
+        catch(e){
+
+        }
     }
 
     LockViewer(_lock) {
@@ -114,6 +111,7 @@ class fileViewerLoader {
             viewer.style.pointerEvents = _lock ? 'none' : '';
     }
 }
+
 class pdfViewer {
     constructor() {
         this.onpage = function (_page) { }
@@ -125,15 +123,10 @@ class pdfViewer {
     }
 
     showPage(_page) {
-        if (this.checkSamePage(_page)) return;
+        console.log(_page);
 
         let fileViewer = this.getElementFileViewer();
         if (!fileViewer) return;
-
-        var e = new Event("change");
-        $(fileViewer.contentWindow.document.getElementById("pageNumber")).val(_page);
-        fileViewer.contentWindow.document.getElementById("pageNumber").dispatchEvent(e);
-
         this.setPage(_page);
     }
 
@@ -217,6 +210,7 @@ class mediaViewer {
             this.onended();
     }
 }
+
 class fileViewer {
     constructor() {
         this.mViewerLoader = new fileViewerLoader();
@@ -356,19 +350,10 @@ class fileViewer {
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
 let pdfString = 'pdf';
 var mfileViewer = new fileViewer();
 
 mfileViewer.onopen = function (_type, _url) {
-
-    isSharingFile = true;
-    isFileViewer = true;
-
     classroomInfo.viewer.type = _type;
     classroomInfo.viewer.url = _url;
     classroomInfo.viewer.state = true;
@@ -386,11 +371,8 @@ mfileViewer.onopen = function (_type, _url) {
 
 mfileViewer.onclose = function () {
     this.nowPath = undefined;
-    isSharingFile = false;
-    isFileViewer = false;
-
     console.debug('PDF close');
-
+    console.log(window.currentPoints);
     pointer_saver.nowIdx = 0;
     pointer_saver.save_container();
     classroomInfo.viewer.state = false;
@@ -439,9 +421,9 @@ mfileViewer.onupdateeachtype[pdfString] = function (_data) {
 }
 
 mfileViewer.onsynceachtype[pdfString] = function () {
-    console.log('onsync pdf');
     const page = classroomInfo.viewer.pdf.page;
-    mfileViewer.getCurrentViewer().showPage(page);
+    console.log('onupdate pdf', page);
+    pageNavigator.button(page-1);
 }
 
 mfileViewer.onloadedeachtype[pdfString] = function () {
@@ -535,318 +517,25 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
-function HomeworkSubmit() {
-    HomeworkUploadModal($.i18n('SUBMIT_ASSIGNMENT'))
-}
-
-function HomeworkUploadModal(message, callback) {
-    callback = callback || function () { }
-
-    console.log(message);
+function HomeworkUploadModal() {
     $('#btn-confirm-close').hide();
-    $('#btn-confirm-file-close').hide();
+    $('.list-group-flush').remove();
     $("#confirm-title2").hide();
-    $('#confirm-title').html(message).removeClass("selected");
-    $('#btn-confirm-action').html($.i18n('CLOSE')).unbind('click').bind('click', function (e) {
-        e.preventDefault();
-        $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
-        callback(true);
-    });
-    $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
-    $('#confirm-box-topper').show();
+    $("#confirm-title3").hide();
+    $("#confirm-title4").hide();
+    $("#confirm-title5").hide();
+    $('#confirm-title').html($.i18n('SUBMIT_ASSIGNMENT')).removeClass("selected");
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false
     });
-    loadFileInput();
 }
 
-function fileUploadModal(message, callback) {
-    callback = callback || function () { }
-
-    console.log(message);
-    getUploadFileList();
-    $("#confirm-title2").show();
-    $('#btn-confirm-action').html($.i18n('OK')).unbind('click').bind('click', function (e) {
-        e.preventDefault();
-        $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
-        callback(true);
-    });
-
-    $('#btn-confirm-close').html($.i18n('CANCEL'));
-
-    $('.btn-confirm-close').unbind('click').bind('click', function (e) {
-        e.preventDefault();
-        $('#confirm-box').modal('hide');
-        $('#confirm-box-topper').hide();
-        callback(false);
-    });
-
-    $('#confirm-message').html('<form name="upload" method="POST" enctype="multipart/form-data" action="/upload/"><input id="file-explorer" type="file" multiple accept=".gif,.pdf,.odt,.png,.jpg,.jpeg,.mp4,.webm"></form>');
-    $('#confirm-title').html(message).addClass("selected");
-    $('#confirm-title2').html($.i18n('ASSIGNMENT')).removeClass("selected");
-    $('#confirm-box-topper').show();
-
+function fileUploadModal() {
     $('#confirm-box').modal({
         backdrop: 'static',
         keyboard: false
     });
-    if (!isFileViewer) $('#btn-confirm-file-close').hide();
-    else {
-        $('#btn-confirm-file-close').show();
-        $('#btn-confirm-file-close').html($.i18n('CLOSE_CURRENT_FILE')).unbind('click').bind('click', function (e) {
-            e.preventDefault();
-            unloadFileViewer();
-        });
-    }
-
-    loadFileInput();
-}
-
-function ViewHomeworkList(btn) {
-    btn.classList.add("selected");
-    document.getElementById("confirm-title").classList.remove("selected");
-    $("form[name=upload]").hide();
-    getUploadFileList("/homework");
-}
-
-function ViewUploadList(btn) {
-    btn.classList.add("selected");
-    document.getElementById("confirm-title2").classList.remove("selected");
-    $("form[name=upload]").show();
-    getUploadFileList();
-}
-
-async function getUploadFileList(extraPath) {
-    if (typeof extraPath === "undefined")
-        extraPath = "";
-
-    let data = { "userId": params.sessionid, "extraPath": extraPath };
-    let ret = await axios.post(fileServerUrl + '/list', data);
-    if(ret.status == 200){
-        updateFileList(ret.data, extraPath);
-    }
-    else{
-        console.error("directory doesn't exist!", ret.status);
-        updateFileList([], extraPath);
-    }
-}
-
-function updateFileList(list, extraPath) {
-    $("#confirm-message .list-group-flush").remove();
-
-    var re = /(?:\.([^.]+))?$/;
-    var listElement = '<ul class="list-group-flush">';
-
-    if (list.length == 0) {
-        listElement += $.i18n('NO_FILES');
-    }
-    else {
-        list.files.forEach(file => {
-            if (file.name == "homework" || re.exec(file.name)[1] == "json" || !re.exec(file.name)[1])
-                return;
-
-            var buttons = "";
-            if (extraPath == "/homework") {
-                buttons = '<button type="button" class="btn btn-safe btn-lg pull-right float-right"  \
-            onclick="downloadUploadedFile(\''  + file.url + '\' ,\'' + file.name + '\')"><i class="fa fa-download float-right"></i></button>';
-            }
-
-            buttons += '<button type="button" class="btn btn-primary btn-lg pull-right float-right" \
-          onclick="loadFileViewer(\''+ file.url + '\')"><i class="fa fa-folder float-right"></i></button> \
-          <button type="button" class="btn btn-danger btn-lg pull-right float-right" \
-          onclick="deleteUploadedFile(\''  + file.name + '\' ,\'' + extraPath + '\')"><i class="fa fa-trash float-right"></i></button>';
-
-            listElement += '<li class="list-group-item"><p class="mb-0"><span class="file-other-icon">' +
-                getFileType(re.exec(file.name)[1]) + '</span><label>' + file.name +
-                '</label>' + buttons;
-        })
-    }
-    listElement += '</ul>';
-    var $listElement = $($.parseHTML(listElement));
-    $("#confirm-message").prepend($listElement);
-}
-
-function getFileType(ext) {
-    // console.log("ext:", ext);
-    let element = '';
-    if (ext === undefined) {
-        element += '<i class="fas fa-folder text-primary"></i>';
-    }
-    else if (ext.match(/(doc|docx)$/i)) {
-        element += '<i class="fas fa-file-word text-primary"></i>';
-    }
-    else if (ext.match(/(xls|xlsx)$/i)) {
-        element += '<i class="fas fa-file-excel text-success"></i>';
-    }
-    else if (ext.match(/(ppt|pptx)$/i)) {
-        element += '<i class="fas fa-file-powerpoint text-danger"></i>';
-    }
-    else if (ext.match(/(pdf)$/i)) {
-        element += '<i class="fas fa-file-pdf text-danger"></i>';
-    }
-    else if (ext.match(/(zip|rar|tar|gzip|gz|7z)$/i)) {
-        element += '<i class="fas fa-file-archive text-muted"></i>';
-    }
-    else if (ext.match(/(htm|html)$/i)) {
-        element += '<i class="fas fa-file-code text-info"></i>';
-    }
-    else if (ext.match(/(txt|ini|csv|java|php|js|css)$/i)) {
-        element += '<i class="fas fa-file-code text-info"></i>';
-    }
-    else if (ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i)) {
-        element += '<i class="fas fa-file-video text-warning"></i>';
-    }
-    else if (ext.match(/(mp3|wav)$/i)) {
-        element += '<i class="fas fa-file-audio text-warning"></i>';
-    }
-    else if (ext.match(/(jpg)$/i)) {
-        element += '<i class="fas fa-file-image text-danger"></i>';
-    }
-    else if (ext.match(/(gif)$/i)) {
-        element += '<i class="fas fa-file-image text-muted"></i>';
-    }
-    else if (ext.match(/(png)$/i)) {
-        element += '<i class="fas fa-file-image text-primary"></i>';
-    }
-    else {
-        element += '<i class="fas fa-file text-muted"></i>';
-    }
-    // console.log(element);
-
-    return element;
-}
-
-function downloadUploadedFile(url, name) {
-    fetch(url)
-        .then(resp => resp.blob())
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(() => alert('oh no!'));
-}
-
-async function deleteUploadedFile(filename, extraPath) {
-    if (mfileViewer.nowPath) {
-        var nowName = mfileViewer.nowPath.split('/');
-        nowName = nowName[nowName.length - 1];
-        if (filename == nowName) {
-            alert($.i18n('DELETE_OPEN_ERROR'));
-            return;
-        }
-    }
-
-    let data = {
-        "userId": params.sessionid,
-        "name": filename,
-        "extraPath": extraPath
-    };
-    let ret = await axios.post(fileServerUrl + '/delete', data);
-    if(ret.status == 200){
-        getUploadFileList(extraPath);
-    }
-}
-
-function loadFileInput() {
-    var lang = language;
-    if (lang == 'ko') { lang = 'kr'; }
-
-    console.log("lang", lang);
-    $(document).ready(function () {
-        let extraPath = "";
-
-        if (!connection.extra.roomOwner)
-            extraPath = "/homework";
-
-        $("#test-upload").fileinput({
-            'theme': 'fas',
-            'showPreview': true,
-            'language': lang,
-            'allowedFileExtensions': ["jpg", "gif", "png", "mp4", "webm", "pdf", "jpeg", "odt"],
-            'previewFileIcon': "<i class='glyphicon glyphicon-king'></i>",
-            'elErrorContainer': '#errorBlock'
-        });
-        $("#file-explorer").fileinput({
-            'theme': 'explorer-fas',
-            'language': lang,
-            'uploadUrl': fileServerUrl + '/upload',
-            fileActionSettings: {
-                showZoom: false,
-            },
-
-
-            overwriteInitial: false,
-            initialPreviewAsData: true,
-            preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
-            previewFileIconSettings: { // configure your icon file extensions
-                'doc': '<i class="fas fa-file-word text-primary"></i>',
-                'xls': '<i class="fas fa-file-excel text-success"></i>',
-                'ppt': '<i class="fas fa-file-powerpoint text-danger"></i>',
-                'pdf': '<i class="fas fa-file-pdf text-danger"></i>',
-                'zip': '<i class="fas fa-file-archive text-muted"></i>',
-                'htm': '<i class="fas fa-file-code text-info"></i>',
-                'txt': '<i class="fas fa-file-text text-info"></i>',
-                'mov': '<i class="fas fa-file-video text-warning"></i>',
-                'mp3': '<i class="fas fa-file-audio text-warning"></i>',
-                // note for these file types below no extension determination logic 
-                // has been configured (the keys itself will be used as extensions)
-                'jpg': '<i class="fas fa-file-image text-danger"></i>',
-                'gif': '<i class="fas fa-file-image text-muted"></i>',
-                'png': '<i class="fas fa-file-image text-primary"></i>'
-            },
-            previewFileExtSettings: { // configure the logic for determining icon file extensions
-                'doc': function (ext) {
-                    return ext.match(/(doc|docx)$/i);
-                },
-                'xls': function (ext) {
-                    return ext.match(/(xls|xlsx)$/i);
-                },
-                'ppt': function (ext) {
-                    return ext.match(/(ppt|pptx)$/i);
-                },
-                'zip': function (ext) {
-                    return ext.match(/(zip|rar|tar|gzip|gz|7z)$/i);
-                },
-                'htm': function (ext) {
-                    return ext.match(/(htm|html)$/i);
-                },
-                'txt': function (ext) {
-                    return ext.match(/(txt|ini|csv|java|php|js|css)$/i);
-                },
-                'mov': function (ext) {
-                    return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
-                },
-                'mp3': function (ext) {
-                    return ext.match(/(mp3|wav)$/i);
-                }
-            },
-            uploadExtraData: {
-                // userId: path
-                userId: params.sessionid,
-                extraPath: extraPath,
-            },
-
-        }).on('fileuploaded', function (event, previewId, index, fileId) {
-            console.error('File Uploaded', 'ID: ' + fileId + ', Thumb ID: ' + previewId);
-            console.log(previewId.response);
-            if (connection.extra.roomOwner)
-                getUploadFileList();
-        }).on('fileuploaderror', function (event, data, msg) {
-            console.log('File Upload Error', 'ID: ' + data.fileId + ', Thumb ID: ' + data.previewId);
-        }).on('filebatchuploadcomplete', function (event, preview, config, tags, extraData) {
-            console.log('File Batch Uploaded', preview, config, tags, extraData);
-        });
-    });
-
 }
 
 function LoadFile(btn) {
@@ -854,47 +543,7 @@ function LoadFile(btn) {
         removeOnSelect(btn);
         return;
     }
-    if (!connection.extra.roomOwner)
-        return;
-    fileUploadModal($.i18n('FILE_MANAGER'), function (e) { });
-}
-
-
-function unloadFileViewer() {
-    console.log("UNLOAD FILEVIEWER");
-    canvasManager.clear();
-    pointer_saver.save();
-    pageNavigator.off();
-
-    var btn = document.getElementById("file");
-    btn.classList.remove("selected-shape");
-    btn.classList.remove("on");
-
-    isSharingFile = false;
-    isFileViewer = false;
-    classroomCommand.closeFile();
-}
-
-function loadFileViewer(path) {
-    if (mfileViewer.nowPath == path) {
-        alert($.i18n('SAME_FILE_OPEN_ERROR'));
-        return;
-    }
-
-    mfileViewer.nowPath = path;
-
-    var btn = document.getElementById("file");
-    btn.classList.add("selected-shape");
-    btn.classList.add("on");
-
-    isSharingFile = true;
-    isFileViewer = true;
-    classroomCommand.openFile(path);
-}
-
-function pdfOnLoaded() {
-    console.log("PDF ON");
-    classroomCommand.onViewerLoaded();
+    connection.extra.roomOwner && fileUploadModal();
 }
 
 function showPage(n) {
@@ -902,5 +551,5 @@ function showPage(n) {
     pointer_saver.load(n - 1);
     pageNavigator.select(n - 1);
     if (connection.extra.roomOwner || !classroomInfo.allControl)
-        classroomCommand.onShowPage(n);
+         mfileViewer.onShowPage(n);
 }

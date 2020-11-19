@@ -17,7 +17,7 @@ class permissionManagerClass {
       switch (this.id) {
         case "classP":
           if (this.classList.contains("off")) {
-            if (classroomInfo.classPermission) {
+            if (classroomInfo.permissions.classPermission) {
               alert($.i18n('STUDENT_PERMISSION_ALREADY'));
               return false;
             }
@@ -29,7 +29,7 @@ class permissionManagerClass {
           break;
         case "micP":
           if (this.classList.contains("off")) {
-            if (classroomInfo.micPermission) {
+            if (classroomInfo.permissions.micPermission) {
               alert($.i18n('STUDENT_PERMISSION_ALREADY'));
               return false;
             }
@@ -90,16 +90,16 @@ class permissionManagerClass {
   }
 
   IsCanvasPermission(id) {
-    if(classroomInfo.canvasPermission == undefined){
+    if(classroomInfo.permissions.canvasPermission == undefined){
       return false;
     }
-    if (classroomInfo.canvasPermission.indexOf(id) == -1)
+    if (classroomInfo.permissions.canvasPermission.indexOf(id) == -1)
       return false;
     return true
   }
 
   AddClassPermission(id) {
-    classroomInfo.classPermission = id;
+    classroomInfo.permissions.classPermission = id;
     FindInList(id).dataset.classPermission = true;
     console.log("Class permission added", id);
     MakeIcon(id, "screen");
@@ -113,7 +113,7 @@ class permissionManagerClass {
   }
 
   DeleteClassPermission(id) {
-    classroomInfo.classPermission = undefined;
+    classroomInfo.permissions.classPermission = undefined;
     console.log("Class permission removed", id);
     FindInList(id).dataset.classPermission = false;
     DeleteIcon(id, "screen");
@@ -128,7 +128,7 @@ class permissionManagerClass {
 
   AddMicPermission(id) {
     console.log("Mic permission added", id);
-    classroomInfo.micPermission = id;
+    classroomInfo.permissions.micPermission = id;
     FindInList(id).dataset.micPermission = true;
     MakeIcon(id, "mic");
     classroomManager.updateClassroomInfo();
@@ -142,7 +142,7 @@ class permissionManagerClass {
   
   DeleteMicPermission(id) {
     console.log("Mic permission removed", id);
-    classroomInfo.micPermission = undefined;
+    classroomInfo.permissions.micPermission = undefined;
     FindInList(id).dataset.micPermission = false;
     DeleteIcon(id, "mic");
     classroomManager.updateClassroomInfo();
@@ -155,8 +155,8 @@ class permissionManagerClass {
   }
   
   AddCanvasPermission(id) {
-    classroomInfo.canvasPermission.push(id);
-    console.log("Canvas permission added", id, classroomInfo.canvasPermission);
+    classroomInfo.permissions.canvasPermission.push(id);
+    console.log("Canvas permission added", id, classroomInfo.permissions.canvasPermission);
     FindInList(id).dataset.canvasPermission = true;
     MakeIcon(id, "canvas");
     classroomManager.updateClassroomInfo();
@@ -169,10 +169,10 @@ class permissionManagerClass {
   }
 
   DeleteCanvasPermission(id) {
-    var idx = classroomInfo.canvasPermission.indexOf(id);
-    classroomInfo.canvasPermission.splice(idx, 1);
+    var idx = classroomInfo.permissions.canvasPermission.indexOf(id);
+    classroomInfo.permissions.canvasPermission.splice(idx, 1);
     canvasManager.clearStudentCanvas(id);
-    console.log("Canvas permission removed", id, classroomInfo.canvasPermission);
+    console.log("Canvas permission removed", id, classroomInfo.permissions.canvasPermission);
     FindInList(id).dataset.canvasPermission = false;
     DeleteIcon(id, "canvas");
     classroomManager.updateClassroomInfo();
@@ -188,14 +188,14 @@ class permissionManagerClass {
   setClassPermission() {
     console.debug("Get Screen share permission");
     Show("student_screenshare");
-    classroomInfo.classPermission = connection.userid;
+    classroomInfo.permissions.classPermission = connection.userid;
     window.permission = true;
   };
 
   disableClassPermission() {
     console.debug("Lost Screen share permission");
     Hide("student_screenshare");
-    classroomInfo.classPermission = '';
+    classroomInfo.permissions.classPermission = '';
 
     if (classroomInfo.shareScreen.state) {
       screenshareManager.isSharingScreen = false;
@@ -221,8 +221,8 @@ class permissionManagerClass {
 
   setCanvasPermission(id) {
     console.debug("Get canvas share permission");
-    console.log(classroomInfo.canvasPermission)
-    classroomInfo.canvasPermission.push(id);
+    console.log(classroomInfo.permissions.canvasPermission)
+    classroomInfo.permissions.canvasPermission.push(id);
     Show("student_canvas");
     connection.send({
       sendStudentPoint: true,
@@ -235,7 +235,7 @@ class permissionManagerClass {
 
   disableCanvasPermission(id) {
     console.debug("Lost canvas share permission");
-    classroomInfo.canvasPermission = [];
+    classroomInfo.permissions.canvasPermission = [];
     if(connection.userid == id)
       Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
@@ -244,20 +244,17 @@ class permissionManagerClass {
 
 
 
-function OnClickStudent(div) {
-  div.addEventListener("click", function (e) {
+function OnClickStudent(e, uid, name) {
     var menu = document.getElementById('student-menu');
-    var name = e.target.dataset.name;
-
     permissionManager.nowSelectStudent = e.target;
 
     SetBtn("classP", e.target.dataset.classPermission);
     SetBtn("micP", e.target.dataset.micPermission);
     SetBtn("canP", e.target.dataset.canvasPermission);
 
-    function SetBtn(id, ispermission) {
-      let btn = $('#' + id);
-      let circle = $('#' + id + '> .circle');
+    function SetBtn(uid, ispermission) {
+      let btn = $('#' + uid);
+      let circle = $('#' + uid + '> .circle');
 
       btn.clearQueue();
       circle.clearQueue();
@@ -275,17 +272,14 @@ function OnClickStudent(div) {
       }
     }
 
-    $(menu).css({
-      right: document.body.clientWidth - e.clientX,
-      top: e.clientY,
-    });
+    menu.style.right = document.body.clientWidth - e.clientX + 'px';
+    menu.style.top = e.clientY - 50 + 'px';
 
     if (!$('#student-menu').is(':visible')) {
       $('#student-menu').show('blind', {}, 150, function () { });
     }
 
     menu.getElementsByClassName('stuname')[0].innerHTML = name;
-  });
 }
 
 function button(t, c, on) {

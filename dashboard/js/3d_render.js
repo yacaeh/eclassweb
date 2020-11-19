@@ -165,25 +165,3 @@ function setShared3DStateLocal(_state) {
     top_3d_button.toggle('top_3d_off')
     _state ? modelEnable() : remove3DCanvas();
 }
-
-
-function _3DCanvasOnOff(btn) {
-    if (!classroomInfo.share3D.state && checkSharing()) {
-        removeOnSelect(btn);
-        return;
-    }
-
-    btn.classList.toggle("on");
-    btn.classList.toggle("selected-shape");
-
-    canvasManager.clear();
-    const isViewer = !classroomInfo.share3D.state;
-    classroomInfo.share3D.state = isViewer;
-    isSharing3D = isViewer;
-    classroomManager.updateClassroomInfo(() => {
-        setShared3DStateLocal(isViewer)
-        connection.send({
-            modelEnable: { enable: classroomInfo.share3D.state }
-        });
-    })
-}

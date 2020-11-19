@@ -3565,17 +3565,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     extra: extra,
                     latency: latency
                 };
-
-                if (connection.autoTranslateText) {
-                    e.original = e.data;
-                    connection.Translator.TranslateText(e.data, function (translatedText) {
-                        e.data = translatedText;
-                        connection.onmessage(e);
-                    });
-                } else {
-                    connection.onmessage(e);
-                }
-
+                connection.onmessage(e);
                 delete content[uuid];
             }
         }
@@ -3744,7 +3734,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
     var TranslationHandler = (function () {
         function handle(connection) {
-            connection.autoTranslateText = false;
             connection.language = 'en';
             connection.googKey = 'AIzaSyCgB5hmFY74WYB-EoWkhr9cAGr6TiTHrEE';
 
@@ -4711,12 +4700,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         connection.onerror = function (error) {
             if (!!connection.enableLogs) {
                 console.error(error.userid, 'data-error', error);
-            }
-        };
-
-        connection.onmessage = function (event) {
-            if (!!connection.enableLogs) {
-                console.debug('data-message', event.userid, event.data);
             }
         };
 

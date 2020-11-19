@@ -1,15 +1,21 @@
 
+class Canvas extends React.Component {
+    render(){
+        let url = './widget.html';
+        return <div className='canvas-div' >
+            <iframe className='canvas-iframe' id='widget-canvas' src={url} />
+        </div>
+    }
+}
+
+
 class MarkerContainer extends React.Component {
     render() {
         return <section id="marker-container" className="context-popup colors-container">
             <input style={{ display: 'none' }} id="sliderval" type="number" className="sliderval inputbox" />
             <div className="color_template" />
-            <span id="markerslider" className="slider-front">
-                <span className="slider-back" />
-                <span className="slider_btn" />
-            </span>
+            <Slider id="markerslider" />
             <input className="svalue" id="marker-stroke-style" />
-            <div id="marker-done" style={{ display: 'none' }} className="btn-007">선택</div>
         </section>
     }
 }
@@ -19,14 +25,17 @@ class PencilContainer extends React.Component {
         return <section id="pencil-container" className="context-popup colors-container">
             <input style={{ display: 'none' }} id="sliderval" type="number" className="sliderval inputbox" />
             <div className="color_template" />
-            <span id="pencileslider" className="slider-front">
-                <span className="slider-back" />
-                <span className="slider_btn" />
-            </span>
+            <Slider id="pencileslider" />
             <input className="svalue" id="pencil-stroke-style" />
-            <div className="done" id="pencil-done" style={{ display: 'none' }} className="btn-007">선택</div>
         </section>
     }
+}
+
+function Slider(props) {
+    return <span id={props.id} className="slider-front">
+        <span className="slider-back" />
+        <span className="slider_btn" />
+    </span>
 }
 
 class TextInputContainer extends React.Component {

@@ -22,7 +22,9 @@
             factory(window.jQuery);
         }
     }
-}(function ($) {
+}
+
+(function ($) {
     'use strict';
 
     $.fn.fileinputLocales = {};
@@ -53,17 +55,10 @@
         FRAMES: '.kv-preview-thumb',
         SORT_CSS: 'file-sortable',
         INIT_FLAG: 'init-',
-        OBJECT_PARAMS: '<param name="controller" value="true" />\n' +
-            '<param name="allowFullScreen" value="true" />\n' +
-            '<param name="allowScriptAccess" value="always" />\n' +
-            '<param name="autoPlay" value="false" />\n' +
-            '<param name="autoStart" value="false" />\n' +
-            '<param name="quality" value="high" />\n',
         DEFAULT_PREVIEW: '<div class="file-preview-other">\n' +
             '<span class="{previewFileIconClass}">{previewFileIcon}</span>\n' +
             '</div>',
-        MODAL_ID: 'kvFileinputModal',
-        MODAL_EVENTS: ['show', 'shown', 'hide', 'hidden', 'loaded'],
+        MODAL_ID: 'siibal',
         logMessages: {
             ajaxError: '{status}: {error}. Error Details: {text}.',
             badDroppedFiles: 'Error scanning dropped files!',
@@ -974,10 +969,12 @@
             self.mainTemplate = self.showCaption ? self._getLayoutTemplate('main1') : self._getLayoutTemplate('main2');
             self.captionTemplate = self._getLayoutTemplate('caption');
             self.previewGenericTemplate = self._getPreviewTemplate('generic');
+            
             if (!self.imageCanvas && self.resizeImage && (self.maxImageWidth || self.maxImageHeight)) {
                 self.imageCanvas = document.createElement('canvas');
                 self.imageCanvasContext = self.imageCanvas.getContext('2d');
             }
+
             if ($h.isEmpty($el.attr('id'))) {
                 $el.attr('id', $h.uniqId());
             }
@@ -1655,7 +1652,7 @@
         },
         _initTemplateDefaults: function () {
             var self = this, tMain1, tMain2, tPreview, tFileIcon, tClose, tCaption, tBtnDefault, tBtnLink, tBtnBrowse,
-                tModalMain, tModal, tProgress, tSize, tFooter, tActions, tActionDelete, tActionUpload, tActionDownload,
+                tModalMain, tModal, tProgress, tSize, tActions, tActionDelete, tActionUpload, tActionDownload,
                 tActionZoom, tActionDrag, tIndicator, tTagBef, tTagBef1, tTagBef2, tTagAft, tGeneric, tHtml, tImage,
                 tText, tOffice, tGdocs, tVideo, tAudio, tFlash, tObject, tPdf, tOther, tStyle, tZoomCache, vDefaultDim,
                 tStats;
@@ -1696,21 +1693,8 @@
             tBtnLink = '<a href="{href}" tabindex="500" title="{title}" class="{css}" {status}>{icon} {label}</a>';
             //noinspection HtmlUnknownAttribute
             tBtnBrowse = '<div tabindex="500" class="{css}" {status}>{icon} {label}</div>';
-            tModalMain = '<div id="' + $h.MODAL_ID + '" class="file-zoom-dialog modal fade" ' +
-                'tabindex="-1" aria-labelledby="' + $h.MODAL_ID + 'Label"></div>';
-            tModal = '<div class="modal-dialog modal-lg{rtl}" role="document">\n' +
-                '  <div class="modal-content">\n' +
-                '    <div class="modal-header">\n' +
-                '      <h5 class="modal-title">{heading}</h5>\n' +
-                '      <span class="kv-zoom-title"></span>\n' +
-                '      <div class="kv-zoom-actions">{toggleheader}{fullscreen}{borderless}{close}</div>\n' +
-                '    </div>\n' +
-                '    <div class="modal-body">\n' +
-                '      <div class="floating-buttons"></div>\n' +
-                '      <div class="kv-zoom-body file-zoom-content {zoomFrameClass}"></div>\n' + '{prev} {next}\n' +
-                '    </div>\n' +
-                '  </div>\n' +
-                '</div>\n';
+            tModalMain = '';
+            tModal = '';
             tProgress = '<div class="progress">\n' +
                 '    <div class="{class}" role="progressbar"' +
                 ' aria-valuenow="{percent}" aria-valuemin="0" aria-valuemax="100" style="width:{percent}%;">\n' +
@@ -1722,13 +1706,6 @@
                 '<span class="upload-speed">{uploadSpeed}</span>' +
                 '</div>';
             tSize = ' <samp>({sizeText})</samp>';
-            tFooter = '<div class="file-thumbnail-footer">\n' +
-                '    <div class="file-footer-caption" title="{caption}">\n' +
-                '        <div class="file-caption-info">{caption}</div>\n' +
-                '        <div class="file-size-info">{size}</div>\n' +
-                '    </div>\n' +
-                '    {progress}\n{indicator}\n{actions}\n' +
-                '</div>';
             tActions = '<div class="file-actions">\n' +
                 '    <div class="file-footer-buttons">\n' +
                 '        {download} {upload} {delete} {zoom} {other}' +
@@ -1771,7 +1748,7 @@
             tPdf = '<embed class="kv-preview-data file-preview-pdf" src="{data}" type="application/pdf"' + tStyle + '>\n';
             tObject = '<object class="kv-preview-data file-preview-object file-object {typeCss}" ' +
                 'data="{data}" type="{type}"' + tStyle + '>\n' + '<param name="movie" value="{caption}" />\n' +
-                $h.OBJECT_PARAMS + ' ' + $h.DEFAULT_PREVIEW + '\n</object>\n';
+                $h.DEFAULT_PREVIEW + '\n</object>\n';
             tOther = '<div class="kv-preview-data file-preview-other-frame"' + tStyle + '>\n' + $h.DEFAULT_PREVIEW + '\n</div>\n';
             tZoomCache = '<div class="kv-zoom-cache" style="display:none">{zoomContent}</div>';
             vDefaultDim = {width: '100%', height: '100%', 'min-height': '480px'};
@@ -1791,7 +1768,6 @@
                     progress: tProgress,
                     stats: tStats,
                     size: tSize,
-                    footer: tFooter,
                     indicator: tIndicator,
                     actions: tActions,
                     actionDelete: tActionDelete,
@@ -2452,33 +2428,7 @@
             }
             return true;
         },
-        _listenFullScreen: function (isFullScreen) {
-            var self = this, $modal = self.$modal, $btnFull, $btnBord;
-            if (!$modal || !$modal.length) {
-                return;
-            }
-            $btnFull = $modal && $modal.find('.btn-fullscreen');
-            $btnBord = $modal && $modal.find('.btn-borderless');
-            if (!$btnFull.length || !$btnBord.length) {
-                return;
-            }
-            $btnFull.removeClass('active').attr('aria-pressed', 'false');
-            $btnBord.removeClass('active').attr('aria-pressed', 'false');
-            if (isFullScreen) {
-                $btnFull.addClass('active').attr('aria-pressed', 'true');
-            } else {
-                $btnBord.addClass('active').attr('aria-pressed', 'true');
-            }
-            if ($modal.hasClass('file-zoom-fullscreen')) {
-                self._maximizeZoomDialog();
-            } else {
-                if (isFullScreen) {
-                    self._maximizeZoomDialog();
-                } else {
-                    $btnBord.removeClass('active').attr('aria-pressed', 'false');
-                }
-            }
-        },
+      
         _listen: function () {
             var self = this, $el = self.$element, $form = self.$form, $cont = self.$container, fullScreenEvents;
             self._handler($el, 'click', function (e) {
@@ -2503,16 +2453,8 @@
                 self._handler($form, 'submit', $.proxy(self._submitForm, self));
             }
             self._handler(self.$container.find('.fileinput-upload'), 'click', $.proxy(self._uploadClick, self));
-            self._handler($(window), 'resize', function () {
-                self._listenFullScreen(screen.width === window.innerWidth && screen.height === window.innerHeight);
-            });
-            fullScreenEvents = 'webkitfullscreenchange mozfullscreenchange fullscreenchange MSFullscreenChange';
-            self._handler($(document), fullScreenEvents, function () {
-                self._listenFullScreen($h.checkFullScreen());
-            });
             self._autoFitContent();
             self._initClickable();
-            self._refreshPreview();
         },
         _autoFitContent: function () {
             var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
@@ -2545,7 +2487,6 @@
                                 for (i = 0; i < entries.length; i++) {
                                     self._scanDroppedItems(entries[i], files, path + item.name + '/');
                                 }
-                                // recursively call readDir() again, since browser can only handle first 100 entries.
                                 readDir();
                             }
                             return null;
@@ -2559,8 +2500,6 @@
         _initDragDrop: function () {
             var self = this, $zone = self.$dropZone;
             if (self.dropZoneEnabled && self.showPreview) {
-                self._handler($zone, 'dragenter dragover', $.proxy(self._zoneDragEnter, self));
-                self._handler($zone, 'dragleave', $.proxy(self._zoneDragLeave, self));
                 self._handler($zone, 'drop', $.proxy(self._zoneDrop, self));
                 self._handler($(document), 'dragenter dragover drop', self._zoneDragDropInit);
             }
@@ -2569,30 +2508,7 @@
             e.stopPropagation();
             e.preventDefault();
         },
-        _zoneDragEnter: function (e) {
-            var self = this, dataTransfer = e.originalEvent.dataTransfer,
-                hasFiles = $.inArray('Files', dataTransfer.types) > -1;
-            self._zoneDragDropInit(e);
-            if (self.isDisabled || !hasFiles) {
-                e.originalEvent.dataTransfer.effectAllowed = 'none';
-                e.originalEvent.dataTransfer.dropEffect = 'none';
-                return;
-            }
-            if (self._raise('fileDragEnter', {'sourceEvent': e, 'files': dataTransfer.types.Files})) {
-                $h.addCss(self.$dropZone, 'file-highlighted');
-            }
-        },
-        _zoneDragLeave: function (e) {
-            var self = this;
-            self._zoneDragDropInit(e);
-            if (self.isDisabled) {
-                return;
-            }
-            if (self._raise('fileDragLeave', {'sourceEvent': e})) {
-                self.$dropZone.removeClass('file-highlighted');
-            }
-
-        },
+     
         _zoneDrop: function (e) {
             /** @namespace e.originalEvent.dataTransfer */
             var self = this, i, $el = self.$element, dataTransfer = e.originalEvent.dataTransfer,
@@ -2805,33 +2721,7 @@
                 'close': self._getZoomButton('close')
             });
         },
-        _listenModalEvent: function (event) {
-            var self = this, $modal = self.$modal, getParams = function (e) {
-                return {
-                    sourceEvent: e,
-                    previewId: $modal.data('previewId'),
-                    modal: $modal
-                };
-            };
-            $modal.on(event + '.bs.modal', function (e) {
-                var $btnFull = $modal.find('.btn-fullscreen'), $btnBord = $modal.find('.btn-borderless');
-                if ($modal.data('fileinputPluginId') === self.$element.attr('id')) {
-                    self._raise('filezoom' + event, getParams(e));
-                }
-                if (event === 'shown') {
-                    $btnBord.removeClass('active').attr('aria-pressed', 'false');
-                    $btnFull.removeClass('active').attr('aria-pressed', 'false');
-                    if ($modal.hasClass('file-zoom-fullscreen')) {
-                        self._maximizeZoomDialog();
-                        if ($h.checkFullScreen()) {
-                            $btnFull.addClass('active').attr('aria-pressed', 'true');
-                        } else {
-                            $btnBord.addClass('active').attr('aria-pressed', 'true');
-                        }
-                    }
-                }
-            });
-        },
+        
         _initZoom: function () {
             var self = this, $dialog, modalMain = self._getLayoutTemplate('modalMain'), modalId = '#' + $h.MODAL_ID;
             if (!self.showPreview) {
@@ -2847,52 +2737,7 @@
             $h.initModal(self.$modal);
             self.$modal.html($h.cspBuffer.stash(self._getModalContent()));
             $h.cspBuffer.apply(self.$modal);
-            $.each($h.MODAL_EVENTS, function (key, event) {
-                self._listenModalEvent(event);
-            });
-        },
-        _initZoomButtons: function () {
-            var self = this, previewId = self.$modal.data('previewId') || '', $first, $last,
-                thumbs = self.getFrames().toArray(), len = thumbs.length, $prev = self.$modal.find('.btn-prev'),
-                $next = self.$modal.find('.btn-next');
-            if (thumbs.length < 2) {
-                $prev.hide();
-                $next.hide();
-                return;
-            } else {
-                $prev.show();
-                $next.show();
-            }
-            if (!len) {
-                return;
-            }
-            $first = $(thumbs[0]);
-            $last = $(thumbs[len - 1]);
-            $prev.removeAttr('disabled');
-            $next.removeAttr('disabled');
-            if ($first.length && $first.attr('id') === previewId) {
-                $prev.attr('disabled', true);
-            }
-            if ($last.length && $last.attr('id') === previewId) {
-                $next.attr('disabled', true);
-            }
-        },
-        _maximizeZoomDialog: function () {
-            var self = this, $modal = self.$modal, $head = $modal.find('.modal-header:visible'),
-                $foot = $modal.find('.modal-footer:visible'), $body = $modal.find('.modal-body'),
-                h = $(window).height(), diff = 0;
-            $modal.addClass('file-zoom-fullscreen');
-            if ($head && $head.length) {
-                h -= $head.outerHeight(true);
-            }
-            if ($foot && $foot.length) {
-                h -= $foot.outerHeight(true);
-            }
-            if ($body && $body.length) {
-                diff = $body.outerHeight(true) - $body.height();
-                h -= diff;
-            }
-            $modal.find('.kv-zoom-body').height(h);
+           
         },
         _resizeZoomDialog: function (fullScreen) {
             var self = this, $modal = self.$modal, $btnFull = $modal.find('.btn-fullscreen'),
@@ -2916,101 +2761,11 @@
                     }
                 }
             } else {
-                if (!fullScreen) {
-                    self._maximizeZoomDialog();
-                    return;
-                }
                 $h.toggleFullScreen(true);
             }
             $modal.focus();
         },
-        _setZoomContent: function ($frame, animate) {
-            var self = this, $content, tmplt, body, title, $body, $dataEl, config, previewId = $frame.attr('id'),
-                $zoomPreview = self._getZoom(previewId), $modal = self.$modal, $tmp,
-                $btnFull = $modal.find('.btn-fullscreen'), $btnBord = $modal.find('.btn-borderless'), cap, size,
-                $btnTogh = $modal.find('.btn-toggleheader');
-            tmplt = $zoomPreview.attr('data-template') || 'generic';
-            $content = $zoomPreview.find('.kv-file-content');
-            body = $content.length ? $content.html() : '';
-            cap = $frame.data('caption') || '';
-            size = $frame.data('size') || '';
-            title = cap + ' ' + size;
-            $modal.find('.kv-zoom-title').attr('title', $('<div/>').html(title).text()).html(title);
-            $body = $modal.find('.kv-zoom-body');
-            $modal.removeClass('kv-single-content');
-            if (animate) {
-                $tmp = $body.addClass('file-thumb-loading').clone().insertAfter($body);
-                $h.setHtml($body, body).hide();
-                $tmp.fadeOut('fast', function () {
-                    $body.fadeIn('fast', function () {
-                        $body.removeClass('file-thumb-loading');
-                    });
-                    $tmp.remove();
-                });
-            } else {
-                $h.setHtml($body, body);
-            }
-            config = self.previewZoomSettings[tmplt];
-            if (config) {
-                $dataEl = $body.find('.kv-preview-data');
-                $h.addCss($dataEl, 'file-zoom-detail');
-                $.each(config, function (key, value) {
-                    $dataEl.css(key, value);
-                    if (($dataEl.attr('width') && key === 'width') || ($dataEl.attr('height') && key === 'height')) {
-                        $dataEl.removeAttr(key);
-                    }
-                });
-            }
-            $modal.data('previewId', previewId);
-            self._handler($modal.find('.btn-prev'), 'click', function () {
-                self._zoomSlideShow('prev', previewId);
-            });
-            self._handler($modal.find('.btn-next'), 'click', function () {
-                self._zoomSlideShow('next', previewId);
-            });
-            self._handler($btnFull, 'click', function () {
-                self._resizeZoomDialog(true);
-            });
-            self._handler($btnBord, 'click', function () {
-                self._resizeZoomDialog(false);
-            });
-            self._handler($btnTogh, 'click', function () {
-                var $header = $modal.find('.modal-header'), $floatBar = $modal.find('.modal-body .floating-buttons'),
-                    ht, $actions = $header.find('.kv-zoom-actions'), resize = function (height) {
-                        var $body = self.$modal.find('.kv-zoom-body'), h = self.zoomModalHeight;
-                        if ($modal.hasClass('file-zoom-fullscreen')) {
-                            h = $body.outerHeight(true);
-                            if (!height) {
-                                h = h - $header.outerHeight(true);
-                            }
-                        }
-                        $body.css('height', height ? h + height : h);
-                    };
-                if ($header.is(':visible')) {
-                    ht = $header.outerHeight(true);
-                    $header.slideUp('slow', function () {
-                        $actions.find('.btn').appendTo($floatBar);
-                        resize(ht);
-                    });
-                } else {
-                    $floatBar.find('.btn').appendTo($actions);
-                    $header.slideDown('slow', function () {
-                        resize();
-                    });
-                }
-                $modal.focus();
-            });
-            self._handler($modal, 'keydown', function (e) {
-                var key = e.which || e.keyCode, $prev = $(this).find('.btn-prev'), $next = $(this).find('.btn-next'),
-                    vId = $(this).data('previewId'), vPrevKey = self.rtl ? 39 : 37, vNextKey = self.rtl ? 37 : 39;
-                if (key === vPrevKey && $prev.length && !$prev.attr('disabled')) {
-                    self._zoomSlideShow('prev', vId);
-                }
-                if (key === vNextKey && $next.length && !$next.attr('disabled')) {
-                    self._zoomSlideShow('next', vId);
-                }
-            });
-        },
+   
         _showModal: function ($frame) {
             var self = this, $modal = self.$modal;
             if (!$frame || !$frame.length) {
@@ -3018,81 +2773,14 @@
             }
             $h.initModal($modal);
             $h.setHtml($modal, self._getModalContent());
-            self._setZoomContent($frame);
             $modal.data('fileinputPluginId', self.$element.attr('id'));
             $modal.modal('show');
-            self._initZoomButtons();
         },
-        _zoomPreview: function ($btn) {
-            var self = this, $frame;
-            if (!$btn.length) {
-                throw 'Cannot zoom to detailed preview!';
-            }
-            $frame = $btn.closest($h.FRAMES);
-            self._showModal($frame);
-        },
-        _zoomSlideShow: function (dir, previewId) {
-            var self = this, $btn = self.$modal.find('.kv-zoom-actions .btn-' + dir), $targFrame, i, $thumb,
-                thumbsData = self.getFrames().toArray(), thumbs = [], len = thumbsData.length, out;
-            if ($btn.attr('disabled')) {
-                return;
-            }
-            for (i = 0; i < len; i++) {
-                $thumb = $(thumbsData[i]);
-                if ($thumb && $thumb.length && $thumb.find('.kv-file-zoom:visible').length) {
-                    thumbs.push(thumbsData[i]);
-                }
-            }
-            len = thumbs.length;
-            for (i = 0; i < len; i++) {
-                if ($(thumbs[i]).attr('id') === previewId) {
-                    out = dir === 'prev' ? i - 1 : i + 1;
-                    break;
-                }
-            }
-            if (out < 0 || out >= len || !thumbs[out]) {
-                return;
-            }
-            $targFrame = $(thumbs[out]);
-            if ($targFrame.length) {
-                self._setZoomContent($targFrame, true);
-            }
-            self._initZoomButtons();
-            self._raise('filezoom' + dir, {'previewId': previewId, modal: self.$modal});
-        },
-        _initZoomButton: function () {
-            var self = this;
-            self.$preview.find('.kv-file-zoom').each(function () {
-                var $el = $(this);
-                self._handler($el, 'click', function () {
-                    self._zoomPreview($el);
-                });
-            });
-        },
+    
         _inputFileCount: function () {
             return this.$element[0].files.length;
         },
-        _refreshPreview: function () {
-            var self = this, files;
-            if ((!self._inputFileCount() && !self.isAjaxUpload) || !self.showPreview || !self.isPreviewable) {
-                return;
-            }
-            if (self.isAjaxUpload) {
-                if (self.fileManager.count() > 0) {
-                    files = $.extend(true, {}, self.fileManager.stack);
-                    self.fileManager.clear();
-                    self._clearFileInput();
-                } else {
-                    files = self.$element[0].files;
-                }
-            } else {
-                files = self.$element[0].files;
-            }
-            if (files && files.length) {
-                self.readFiles(files);
-                self._setFileDropZoneTitle();
-            }
-        },
+       
         _clearObjects: function ($el) {
             $el.find('video audio').each(function () {
                 this.pause();
@@ -3660,26 +3348,31 @@
             let url = '';
 
             let uplodedata = {fileId : id};
+            console.log(fileObj.file.type);
+
             if(fileObj.file.type == 'application/pdf'){
                 let pdf = new PDFViewerPlugin();
                 let pages = await pdf.convertpages(URL.createObjectURL(fileObj.file));
-                console.log(pages);
-                console.log(pages[0][0]);
-
                 formdata.append('extraPath', '');
                 formdata.append('fileName', fileName);
                 formdata.append('page', pages[0][0]);
-
-
                 pages[0].forEach(element => {
                     formdata.append('pages[]', element);
                 });
-
                 pages[1].forEach(element => {
                     formdata.append('thumbnails[]', element);
                 });
-            url = fileServerUrl + '/pdf'
-            }else{
+                url = fileServerUrl + '/pdf'
+            }
+            else if(fileObj.file.type == 'application/epub+zip'){
+                console.error('epub start');
+                console.log(fileObj.file)
+                let file = await compress(fileObj.file);
+                console.error('epub End');
+                console.log(fileObj.file,',',file)
+                formdata.append(self.uploadFileAttr, file, fileName);
+            }
+            else{
                 formdata.append(self.uploadFileAttr, fileObj.file, fileName);
             }
             let asd = '';
@@ -3904,7 +3597,6 @@
             if (!self.showPreview) {
                 return;
             }
-            self._initZoomButton();
             self.getFrames(' .kv-file-remove').each(function () {
                 var $el = $(this), $frame = $el.closest($h.FRAMES), hasError, id = $frame.attr('id'),
                     ind = $frame.attr('data-fileindex'), status;
@@ -3958,7 +3650,6 @@
                         self.initialCaption = '';
                     }
                 };
-            self._initZoomButton();
             $preview.find(btnRemove).each(function () {
                 var $el = $(this), vUrl = $el.data('url') || self.deleteUrl, vKey = $el.data('key'), errMsg, fnBefore,
                     fnSuccess, fnError, op = self.ajaxOperations.deleteThumb;
@@ -6124,10 +5815,5 @@
     /**
      * Convert automatically file inputs with class 'file' into a bootstrap fileinput control.
      */
-    $(document).ready(function () {
-        var $input = $('input.file[type=file]');
-        if ($input.length) {
-            $input.fileinput();
-        }
-    });
+
 }));

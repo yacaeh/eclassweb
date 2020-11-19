@@ -6,8 +6,8 @@ class NaviController extends React.Component {
     render() {
         return <span id="navi-control">
             <img id="lprev" onClick={this.lprev} />
-            <img id="prev" onClick={this.prev} />
-            <img id="next" onClick={this.next} />
+            <img id="prev"  onClick={this.prev} />
+            <img id="next"  onClick={this.next} />
             <img id="lnext" onClick={this.lnext} />
         </span>
     };
@@ -31,7 +31,7 @@ class NaviController extends React.Component {
 
 class PageNavigation extends React.Component {
     state = {
-        closed: false,
+        closed: true,
         currentIdx: 0
     }
 
@@ -47,7 +47,7 @@ class PageNavigation extends React.Component {
                     <span id="navi-top">
                         <input id="epubidx" autoComplete="off" onChange={this.inputHandler} />
                         <span id="epubmaxidx" />
-                        <img id="epub-collapse" onClick={this.collapse} />
+                        <img className="epub-collapse" onClick={this.collapse} />
                     </span>
 
                     <ThumbnailList />
@@ -58,15 +58,18 @@ class PageNavigation extends React.Component {
     }
 
     collapse(e) {
-        this.setState({ closed: !this.state.closed });
-        if (this.state.closed) {
-            $(pageNavigator.obj).animate({ "height": "95%" });
-            e.target.style.transform = "rotate(-90deg)";
-        }
-        else {
-            $(pageNavigator.obj).animate({ "height": "93px" });
-            e.target.style.transform = "rotate(90deg)";
-        }
+        let target = e.target;
+        this.setState({ closed: !this.state.closed },() => {
+            if (!this.state.closed) {
+                $(pageNavigator.obj).animate({ "height": "95%" });
+                target.style.transform = "rotate(-90deg)";
+            }
+            else {
+                $(pageNavigator.obj).animate({ "height": "93px" });
+                target.style.transform = "rotate(90deg)";
+            }
+        });
+
     };
 
     inputHandler() {
