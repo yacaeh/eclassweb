@@ -124,9 +124,8 @@ class ZoomManager {
 
         element.addEventListener('touchend', function (event) {
             _this.fingers = event.touches.length;
-            if (_this.fingers == 0)
-                console.log("end");
-
+            if (_this.fingers == 0){
+            }
         });
 
         element.addEventListener("touchmove", function (e) {

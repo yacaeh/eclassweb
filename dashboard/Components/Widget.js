@@ -1,8 +1,7 @@
 class Widget extends React.Component {
     render() {
-        return <article id="article">
-            <WidgetContainer />
-        </article>
+        return <WidgetContainer />
+  
     }
 }
 
@@ -14,9 +13,6 @@ function WidgetContainer() {
         <AlertBox />
         <PageNavigation />
         <URLViewer />
-        <MarkerContainer />
-        <PencilContainer />
-        <TextInputContainer />
         <Canvas />
     </div>
 }

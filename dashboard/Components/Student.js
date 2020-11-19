@@ -1,8 +1,50 @@
+class StudentList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            collapse : true
+        }
+
+        this.myRef = React.createRef();
+        this.onClick = this.onClick.bind(this);
+    }
+    render() {
+        const list = this.props.studentList.map(id => (<Student key={id.userId} uid={id.userId} name={id.userName} />))
+        return <div ref={this.myRef} id="student_list">
+            <div onClick={this.onClick} id="student_list_button" />
+            {list}
+        </div>
+    }
+
+    onClick(self) {
+        self = self.target;
+        this.setState({collapse : !this.state.collapse}, () => {
+            let list = this.myRef.current;
+            let len = list.children.length;
+            let line = Math.ceil(len / 4);
+    
+            if (!this.state.collapse) {
+                list.appendChild(self);
+                line = Math.max(4, line);
+                self.innerHTML = "…";
+            }
+            else {
+                self.innerHTML = "+" + (len - 16);
+                list.insertBefore(self, list.children[15]);
+                line = 4;
+            }
+            
+            list.style.gridAutoRows = 100 / line + "%";
+            list.style.height = 6 * line + "%";
+        })
+    }
+}
+
+
 class Student extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            name : undefined,
             class : false,
             mic : false,
             canvas : false,
@@ -13,17 +55,10 @@ class Student extends React.Component {
         this.onMouseLeave = this.onMouseLeave.bind(this);
         this.onMouseClick = this.onMouseClick.bind(this);
         this.myRef = React.createRef();
-
-        let _this = this;
-        connection.socket.emit("get-user-name", this.props.uid, function(e){
-            _this.setState({name : e});
-            ChattingManager.enterStudent(e);
-        })
     }
 
     componentDidMount(){
         this.studentListResize();
-
         if (classroomInfo.permissions.classPermission == this.props.uid) {
             this.setState({class : true});
             MakeIcon(this.props.uid, "screen");
@@ -86,10 +121,10 @@ class Student extends React.Component {
         if (permissionManager.IsCanvasPermission(this.props.uid))
             permissionManager.DeleteCanvasPermission(this.props.uid);
 
-        ChattingManager.leftStudent(this.state.name);
+        ChattingManager.leftStudent(this.props.name);
         examObj.leftStudent(this.props.uid);
         delete canvasManager.canvas_array[this.props.uid];
-        console.debug("Left student", "[", this.props.uid, "]", "[", this.state.name, "]");
+        console.debug("Left student", "[", this.props.uid, "]", "[", this.props.name, "]");
         this.studentListResize();
     };
     
@@ -99,7 +134,7 @@ class Student extends React.Component {
             onMouseLeave={this.onMouseLeave} 
             onMouseEnter={this.onMouseEnter} 
         className = "student" 
-        data-name = {this.state.name} 
+        data-name = {this.props.name} 
         data-id={this.props.uid}
         data-class-permission = {this.state.class}
         data-mic-permission = {this.state.mic}
@@ -107,13 +142,13 @@ class Student extends React.Component {
             <span className = 'permissions' style={{display : 'none'}}  />
             <span className = 'student-overlay' />
             <span className = 'bor' />
-            <span className = 'name'>{this.state.name}</span>
+            <span className = 'name'>{this.props.name}</span>
             <img ref={this.myRef} />
         </span>
     }
 
     onMouseClick(e){
-        OnClickStudent(e, this.props.uid , this.state.name);
+        OnClickStudent(e, this.props.uid , this.props.name);
     }
 
     onMouseEnter(){

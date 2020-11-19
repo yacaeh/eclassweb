@@ -16,7 +16,7 @@ class RightForm extends React.Component {
         return (
             <div id="right-tab" className="right-tab">
                 <div id="right-tab-collapse" onClick={this.collapse}>
-                    <img style={{pointerEvents : 'none'}} src="/dashboard/img/openchat.png" />
+                    <img style={{ pointerEvents: 'none' }} src="/dashboard/img/openchat.png" />
                 </div>
                 <NumberOfStudents num={this.state.numberOfStudents} />
                 <Authorization />
@@ -30,20 +30,44 @@ class RightForm extends React.Component {
     componentDidMount() {
         reactEvent.joinStudent = this.joinStudent;
         reactEvent.leftStudent = this.leftStudent;
+        reactEvent.setNOS = this.setNOS;
     };
 
+    setNOS = (num) => {
+        console.error(num);
+        this.setState({ numberOfStudents: num});
+    }
+
     joinStudent(event) {
-        this.setState({ numberOfStudents: connection.getAllParticipants().length });
-        console.debug('Connected with ', "[", event.extra.userFullName, "]", "[", event.userid, "]");
-        connection.send('plz-sync-points', event.userid);
-        event.extra.roomOwner && classroomManager.rejoinTeacher();
-        connection.extra.roomOwner && this.setState({ studentList: this.state.studentList.concat(event.userid) });
+        const userId = event.userid;
+
+        connection.socket.emit("get-user-name", userId, (userName) => {
+            if (userName == 'ycsadmin') return;
+            
+            connection.send('plz-sync-points', userId);
+            console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
+            ChattingManager.enterStudent(userName);
+
+            event.extra.roomOwner && classroomManager.rejoinTeacher();
+            
+            if(connection.extra.roomOwner){
+                const list = this.state.studentList.concat({ userId, userName });
+                this.setState({ studentList: list });
+                connection.send({setNOS : list.length});
+                this.setState({ numberOfStudents: list.length });
+            }
+        })
     };
 
     leftStudent(event) {
-        this.setState({ numberOfStudents: connection.getAllParticipants().length });
+        if (event.extra.userFullName == 'ycsadmin') return;
+        if(connection.extra.roomOwner){
+            const list = this.state.studentList.filter(user => user.userId != event.userid);
+            this.setState({ studentList: list});
+            connection.send({setNOS : list.length});
+            this.setState({ numberOfStudents: list.length});
+        }
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
-        connection.extra.roomOwner && this.setState({ studentList: this.state.studentList.filter(uid => uid != event.userid) })
     }
 
     collapse = (e) => {
@@ -68,47 +92,6 @@ function NumberOfStudents(props) {
     </span>
 }
 
-class StudentList extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            collapse : true
-        }
-
-        this.myRef = React.createRef();
-        this.onClick = this.onClick.bind(this);
-    }
-    render() {
-        const list = this.props.studentList.map(id => (<Student key={id} uid={id} />))
-        return <div ref={this.myRef} id="student_list">
-            <div onClick={this.onClick} id="student_list_button" />
-            {list}
-        </div>
-    }
-
-    onClick(self) {
-        self = self.target;
-        this.setState({collapse : !this.state.collapse}, () => {
-            let list = this.myRef.current;
-            let len = list.children.length;
-            let line = Math.ceil(len / 4);
-    
-            if (!this.state.collapse) {
-                list.appendChild(self);
-                line = Math.max(4, line);
-                self.innerHTML = "…";
-            }
-            else {
-                self.innerHTML = "+" + (len - 16);
-                list.insertBefore(self, list.children[15]);
-                line = 4;
-            }
-            
-            list.style.gridAutoRows = 100 / line + "%";
-            list.style.height = 6 * line + "%";
-        })
-    }
-}
 
 class MainCam extends React.Component {
     render() {

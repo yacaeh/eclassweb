@@ -7,48 +7,36 @@ class ChattingWindow extends React.Component {
             collapse : false,
             chattingLogs: [],
             notice: [],
+            chat : '',
         };
 
         this.collapse = this.collapse.bind(this);
+        this.onChangeInput = this.onChangeInput.bind(this);
         this.notice = React.createRef();
         this.normal = React.createRef();
     };
 
 
     render() {
-        return <div id="chatting" className="chatting">
+        return <div id="chatting">
             <Notice ref={this.notice} list={this.state.notice} collapse={this.collapse} />
             <ConversationPanel ref={this.normal} list={this.state.chattingLogs} />
+            <div className="chatbackground">
+                <input onChange={this.onChangeInput} value={this.state.chat} id="txt-chat-message"/>
+            </div>
         </div>
     };
 
+    onChangeInput(e) {
+        this.setState({chat : e.target.value});
+    }
+
     componentDidMount() {
         let _this = this;
-        $('#txt-chat-message').emojioneArea({
-            pickerPosition: 'top',
-            filtersPosition: 'bottom',
-            tones: false,
-            autocomplete: true,
-            inline: true,
-            hidePickerOnBlur: true,
-            placeholder: $.i18n('CHAT_PLACEHOLDER'),
-            events: {
-                focus: function () {
-                    $('.emojionearea-category')
-                        .unbind('click')
-                        .bind('click', function () {
-                            $('.emojionearea-button-close').click();
-                        });
-                },
-            },
-        });
-
-
-        window.onkeyup = function (e) {
-            var code = e.keyCode || e.which;
+        window.onkeyup = (e) => {
+            let code = e.keyCode || e.which;
             if (code == 13) {
-                var chatMessage = $('.emojionearea-editor').html();
-                $('.emojionearea-editor').html('');
+                let chatMessage = this.state.chat;
                 if (!chatMessage || !chatMessage.replace(/ /g, '').length) return;
 
                 let data = {
@@ -58,7 +46,10 @@ class ChattingWindow extends React.Component {
                     name: $.i18n('ME'),
                 }
 
-                _this.setState({ chattingLogs: _this.state.chattingLogs.concat(data) }, () => _this.scrollDown);
+                _this.setState({ 
+                    chat : '',
+                    chattingLogs: _this.state.chattingLogs.concat(data)
+                }, () => _this.scrollDown);
                 connection.extra.roomOwner && _this.setState({ notice: _this.state.notice.concat(data) }, () => _this.scrollDown)
 
                 connection.send({
@@ -91,7 +82,7 @@ class ChattingWindow extends React.Component {
                 height: '8%',
                 borderBottom: '0px solid gray',
             });
-            $(normal).animate({ height: '90%' });
+            $(normal).animate({ height: '85%' });
             notice.style.borderBottom = '0px solid #ffffff';
             notice.lastElementChild.lastElementChild.style.transform = 'rotate(0deg)';
         } else {
@@ -99,7 +90,7 @@ class ChattingWindow extends React.Component {
                 height: '50%',
                 borderBottom: '0px solid gray',
             });
-            $(normal).animate({ height: '48%' });
+            $(normal).animate({ height: '44%' });
             notice.style.borderBottom = '1px solid #B8B8B8';
             notice.lastElementChild.lastElementChild.style.transform = 'rotate(180deg)';
         }
@@ -117,11 +108,10 @@ class ConversationPanel extends React.Component {
     render() {
         const list = this.props.list.map((data, idx) => <this.Chat data={data} key={idx} />);
         return <div className="conversation-panel">
-            <div className="chatbackground" />
             <div ref={this.window}  className="scroll" id="conversation-panel">
                 {list}
             </div>
-            <textarea id="txt-chat-message" />
+
         </div>
     }
 
@@ -163,7 +153,7 @@ class Notice extends React.Component {
     render() {
         const list = this.props.list.map((data, idx) => <this.Chat data={data} key={idx} />);
 
-        return <div   id="notice" className="on">
+        return <div id="notice">
             <span className="text" data-i18n="TEACHER_CHAT">선생님 채팅<h1 /></span>
             <div ref={this.window} className="scroll" id="noticewindow">
                 Logs<br />

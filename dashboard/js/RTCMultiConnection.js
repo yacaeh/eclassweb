@@ -406,7 +406,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                 var allPeers = [];
                 for (var peer in this) {
                     if (skipPeers.indexOf(peer) == -1 && peer != sender) {
-                        allPeers.push(peer);
+                            allPeers.push(peer);
                     }
                 }
                 return allPeers;

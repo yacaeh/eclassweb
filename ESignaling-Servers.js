@@ -1156,8 +1156,10 @@ module.exports = exports = function (socket, config) {
         })
 
         socket.on("get-user-name", function(userid, callback){
-            console.log(listOfRooms[getRoomId()].userlist[userid]);
-            callback(listOfRooms[getRoomId()].userlist[userid].name);
+            if(listOfRooms[getRoomId()].userlist[userid])
+                callback(listOfRooms[getRoomId()].userlist[userid].name);
+            else
+                callback('');
         })
 
 

@@ -2,7 +2,7 @@
 class ToolBox extends React.Component {
     render() {
         return <section id="tool-box" className="tool-box">
-            <canvas className="on" id="onoff-icon" className="on" width="28" height="28" ></canvas>
+            <ToolBoxIcon key='onoff-icon' className='on' src='/dashboard/img/view_on.png' id='onoff-icon' />
             <ToolBoxIcon key='pencilIcon' className='draw' src='/dashboard/img/pen.png' id='pencilIcon' />
             <ToolBoxIcon key='markerIcon' className='draw' src='/dashboard/img/pen2.png' id='markerIcon' />
             <ToolBoxIcon key='eraserIcon' className='i draw' src='/dashboard/img/eraser.png' id='eraserIcon' />
@@ -16,13 +16,16 @@ class ToolBox extends React.Component {
             <ToolBoxIcon key='file' onClick={FileviewerButton} className='i' src='/dashboard/img/openfile.png' id='file' />
             <ToolBoxIcon key='callTeacher' onClick={CallTeacherButton} className='i' src='/dashboard/img/handsup.png' id='callteacher' />
             <ToolBoxIcon key='homework' onClick={HomeworkUploadModal} className='i' src='/dashboard/img/homework.png' id='homework' />
-            <canvas className="i no-hover" id="full" width="28" height="28" />
+            <ToolBoxIcon key='full' className='i no-hover' src='/dashboard/img/cam_max.png' id='full' />
         </section>
     }
 }
 
 
 function ScreenShareButton(e) {
+    // const Todo = ReactRedux.connect();
+    // let action = {type:'SCREEN_SHARE', id:1};
+    // store.dispatch(action);
     screenshareManager.btn(e.target);
 }
 
@@ -88,12 +91,29 @@ class ToolBoxIcon extends React.Component {
         this.setIcon(props.src);
     }
     render() {
-        return <canvas data-src={this.props.src}
+        return <canvas onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} data-src={this.props.src}
             ref={this.myRef}
             className={this.props.className}
             id={this.props.id}
             onClick={this.props.onClick}
             width="28" height="28" />;
+    }
+
+    onMouseEnter(e){ 
+        if (e.target.classList.contains("off"))
+            return false;
+
+        let pop = document.getElementById("toolboxHelper");
+        pop.style.display = 'block';
+        let rect = e.target.getBoundingClientRect();
+        let y = rect.y;
+        pop.style.top = y - 40 + 'px';
+        pop.children[0].innerHTML = e.target.dataset.content;
+    }
+
+    onMouseLeave(){
+        let pop = document.getElementById("toolboxHelper");
+        pop.style.display = 'none';
     }
 
     setIcon(src) {
