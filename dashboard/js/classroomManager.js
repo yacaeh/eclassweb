@@ -77,30 +77,6 @@ class classroomManagerClass {
         }
     };
 
-    setTeacher() {
-        document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
-        $("#my-name").remove();
-        $(".feature").show();
-        $(".controll").show();
-        $(".for_teacher").show();
-        $(document.getElementById("callteacher")).remove();
-        $(document.getElementById("homework")).remove();
-    };
-
-    setStudent() {
-        document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
-        $(".feature").remove();
-        $("#showcam").remove();
-        $(".controll").remove();
-        $("#showcanvas").remove();
-        $("#student_list").remove();
-
-        $(document.getElementById("3d_view")).remove();
-        $(document.getElementById("movie")).remove();
-        $(document.getElementById("file")).remove();
-        $(document.getElementById("epub")).remove();
-    };
-
     gotoMain() {
         window.open(location.protocol + "//" + location.host + "/dashboard/", "_self");
     };
@@ -185,8 +161,6 @@ class classroomManagerClass {
 
     createRoom() {
         console.debug('Opening Class!');
-        classroomManager.setTeacher();
-
         connection.open(params.sessionid, function (isRoomOpened, roomid, command, _info) {
             if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
@@ -224,7 +198,6 @@ class classroomManagerClass {
     };
 
     joinRoom() {
-        classroomManager.setStudent();
         connection.join({
             sessionid: params.sessionid,
             userid: connection.channel,

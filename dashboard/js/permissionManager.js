@@ -247,46 +247,6 @@ class permissionManagerClass {
   };
 }
 
-
-
-function OnClickStudent(e, uid, name) {
-    var menu = document.getElementById('student-menu');
-    permissionManager.nowSelectStudent = e.target;
-
-    SetBtn("classP", e.target.dataset.classPermission);
-    SetBtn("micP", e.target.dataset.micPermission);
-    SetBtn("canP", e.target.dataset.canvasPermission);
-
-    function SetBtn(uid, ispermission) {
-      let btn = $('#' + uid);
-      let circle = $('#' + uid + '> .circle');
-
-      btn.clearQueue();
-      circle.clearQueue();
-
-      if (ispermission == 'true') {
-        btn.css({ 'background-color': '#18dbbe' });
-        circle.css({ left: '22px' });
-        btn.addClass('on');
-        btn.removeClass('off');
-      } else {
-        btn.css({ 'background-color': 'gray', });
-        circle.css({ left: '2px', });
-        btn.addClass('off');
-        btn.removeClass('on');
-      }
-    }
-
-    menu.style.right = document.body.clientWidth - e.clientX + 'px';
-    menu.style.top = e.clientY - 50 + 'px';
-
-    if (!$('#student-menu').is(':visible')) {
-      $('#student-menu').show('blind', {}, 150, function () { });
-    }
-
-    menu.getElementsByClassName('stuname')[0].innerHTML = name;
-}
-
 function button(t, c, on) {
   if (on) {
     $(t).animate({ 'background-color': '#18dbbe' }, 'fast');

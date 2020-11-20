@@ -1,6 +1,6 @@
 class ExamIcon extends React.Component {
     render() {
-        return <img className="top_icon" id="top_test" onClick={this.clickHandler} />
+        return <img className="top_icon" id="top_test" onClick={this.clickHandler} data-des={GetLang('TOP_QUIZ')}/>
     }
 
     clickHandler() {
@@ -26,12 +26,12 @@ class Exam extends React.Component {
         return <div id="exam-board" className="scroll">
             <div id="exam-teacher-menu" style={{ display: 'none' }} >
                 <div id="exam-setting-bar">
-                    <div id="exam-title" className="exam-border-bottom" />
+                    <div id="exam-title" className="exam-border-bottom">{GetLang('QUIZ_CREATE')}</div>
                     <div style={{ display: 'flex', width: '100%', height: '37px', background: '#EFF1F0' }} className="exam-border-bottom">
-                        <label id="exam-question-count-label" htmlFor="exam-question-count" />
+                        <label id="exam-question-count-label" htmlFor="exam-question-count">{GetLang('QUIZ_NUM')}</label>
                         <input id="exam-question-count" type="number" />
-                        <label id="exam-time-label" htmlFor="exam-time" />
-                        <input id="exam-time" type="text" />
+                        <label id="exam-time-label" htmlFor="exam-time">{GetLang('QUIZ_TIME')}</label>
+                        <input id="exam-time" type="text" placeholder={GetLang('QUIZ_MINUTES')} />
                         <ExamSettingApply />
                     </div>
                     <div id="exam-question-list" className="exam-border-bottom exam-overflow" style={{ textAlign: 'center' }} />
@@ -73,7 +73,7 @@ function ExamStartButton() {
         showExamStateForm(m_QuesCount, endTime);
     }
 
-    return <button onClick={e} id="exam-start" className="btn btn-exam exam-80-button" />
+    return <button onClick={e} id="exam-start" className="btn btn-exam exam-80-button">{GetLang('QUIZ_START')}</button>
 }
 
 function ExamSettingApply() {
@@ -93,5 +93,5 @@ function ExamSettingApply() {
         setQuestionAnswer(answerList);
     };
 
-    return <button onClick={e} id="exam-setting-apply" className="btn btn-exam" ><b>설정</b></button>
+    return <button onClick={e} id="exam-setting-apply" className="btn btn-exam" ><b>{GetLang('QUIZ_SETTING')}</b></button>
 }

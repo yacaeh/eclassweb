@@ -1,22 +1,17 @@
 class mobileHelperClass {
     constructor() {
-        this.isMobile = false;
         this.conversationPanel;
     }
     init() {
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        if (store.getState().isMobile) {
             this.conversationPanel = document.getElementById('conversation-panel');
             this.setMobile();
-        }else{
-            document.getElementById("full").style.display = 'none';
         }
     }
     setMobile() {
-        this.isMobile = true;
         widgetContainer.style.right = "0px";
         ChatSetting();
         FullScreenBtnInit();
-        ToolSetting();
         rightTab.style.display = "none";
         rightTab.style.width = "0px";
         classroomManager.canvasResize();
@@ -24,9 +19,6 @@ class mobileHelperClass {
 
         function ToolSetting() {
             let toolbox = document.getElementById("tool-box");
-            toolbox.removeChild(document.getElementsByClassName("tooldivide")[0])
-            toolbox.removeChild(document.getElementById("screen_share"))
-            toolbox.removeChild(document.getElementById("textIcon"))
             toolbox.removeChild(document.getElementById("clearCanvas"))
             toolbox.removeChild(document.getElementById("undo"))
         }

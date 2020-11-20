@@ -525,7 +525,7 @@ function setQuestionAnswer(answerList) {
 function setStudentOMR(quesCount, examTime) {
     rightTab.style.zIndex = 0;
 
-    if (mobileHelper.isMobile) {
+    if (store.getState().isMobile) {
         widgetContainer.style.right = "max(0px, 290px)";
     }
     else {

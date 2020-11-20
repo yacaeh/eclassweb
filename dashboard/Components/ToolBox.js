@@ -2,30 +2,42 @@
 class ToolBox extends React.Component {
     render() {
         return <section id="tool-box" className="tool-box">
-            <ToolBoxIcon key='onoff-icon' className='on' src='/dashboard/img/view_on.png' id='onoff-icon' />
-            <ToolBoxIcon key='pencilIcon' className='draw' src='/dashboard/img/pen.png' id='pencilIcon' />
-            <ToolBoxIcon key='markerIcon' className='draw' src='/dashboard/img/pen2.png' id='markerIcon' />
-            <ToolBoxIcon key='eraserIcon' className='i draw' src='/dashboard/img/eraser.png' id='eraserIcon' />
-            <ToolBoxIcon key='textIcon' className='i draw' src='/dashboard/img/text.png' id='textIcon' />
-            <ToolBoxIcon key='undo' className='i draw' src='/dashboard/img/undo.png' id='undo' />
-            <ToolBoxIcon key='clearCanvas' className='i draw' src='/dashboard/img/trash.png' id='clearCanvas' />
-            <ToolBoxLine key='------------------------' />
-            <ToolBoxIcon key='screen_share' onClick={ScreenShareButton} className='i' src='/dashboard/img/screenshare.png' id='screen_share' />
-            <ToolBoxIcon key='3d_view' onClick={_3DCanvasButton} className='i' src='/dashboard/img/3D.png' id='3d_view' />
-            <ToolBoxIcon key='movie' onClick={MovieRenderButton} className='i' src='/dashboard/img/videolink.png' id='movie' />
-            <ToolBoxIcon key='file' onClick={FileviewerButton} className='i' src='/dashboard/img/openfile.png' id='file' />
-            <ToolBoxIcon key='callTeacher' onClick={CallTeacherButton} className='i' src='/dashboard/img/handsup.png' id='callteacher' />
-            <ToolBoxIcon key='homework' onClick={HomeworkUploadModal} className='i' src='/dashboard/img/homework.png' id='homework' />
-            <ToolBoxIcon key='full' className='i no-hover' src='/dashboard/img/cam_max.png' id='full' />
+            <ToolBoxIcon data={GetLang('CANVAS_ON_OFF')} key='onoff-icon' className='on' src='/dashboard/img/view_on.png' id='onoff-icon' />
+            <ToolBoxIcon data={GetLang('PENCIL')} key='pencilIcon' className='draw' src='/dashboard/img/pen.png' id='pencilIcon' />
+            <ToolBoxIcon data={GetLang('MARKER')} key='markerIcon' className='draw' src='/dashboard/img/pen2.png' id='markerIcon' />
+            <ToolBoxIcon data={GetLang('ERASER')} key='eraserIcon' className='i draw' src='/dashboard/img/eraser.png' id='eraserIcon' />
+            
+            {!store.getState().isMobile &&
+                <ToolBoxIcon data={GetLang('TEXT')} key='textIcon' className='i draw' src='/dashboard/img/text.png' id='textIcon' />}
+
+            <ToolBoxIcon data={GetLang('UNDO')} key='undo' className='i draw' src='/dashboard/img/undo.png' id='undo' />
+            
+            <ToolBoxIcon data={GetLang('CLEAR_CANVAS')} key='clearCanvas' className='i draw' src='/dashboard/img/trash.png' id='clearCanvas' />
+            
+            {!store.getState().isMobile &&
+                <ToolBoxLine data={GetLang('')} key='------------------------' /> }
+            
+            {!store.getState().isMobile &&
+                <ToolBoxIcon data={GetLang('SHARE_SCREEN')} key='screen_share' onClick={ScreenShareButton} className='i' src='/dashboard/img/screenshare.png' id='screen_share' />}
+
+            {store.getState().isOwner && 
+                <ToolBoxIcon data={GetLang('SHARE_3D')} key='3d_view' onClick={_3DCanvasButton} className='i' src='/dashboard/img/3D.png' id='3d_view' />} 
+            {store.getState().isOwner && 
+                <ToolBoxIcon data={GetLang('SHARE_YOUTUBE')} key='movie' onClick={MovieRenderButton} className='i' src='/dashboard/img/videolink.png' id='movie' />} 
+            {store.getState().isOwner && 
+                <ToolBoxIcon data={GetLang('SHARE_FILE')} key='file' onClick={FileviewerButton} className='i' src='/dashboard/img/openfile.png' id='file' />} 
+            {!store.getState().isOwner && 
+                <ToolBoxIcon data={GetLang('CALL_TEACHER')} key='callTeacher' onClick={CallTeacherButton} className='i' src='/dashboard/img/handsup.png' id='callteacher' />} 
+            {!store.getState().isOwner && 
+                <ToolBoxIcon data={GetLang('HOMWORK_ICON')} key='homework' onClick={HomeworkUploadModal} className='i' src='/dashboard/img/homework.png' id='homework' />} 
+            {store.getState().isMobile && 
+                <ToolBoxIcon data={GetLang('')} key='full' className='i no-hover' src='/dashboard/img/cam_max.png' id='full' />}
         </section>
     }
 }
 
 
 function ScreenShareButton(e) {
-    // const Todo = ReactRedux.connect();
-    // let action = {type:'SCREEN_SHARE', id:1};
-    // store.dispatch(action);
     screenshareManager.btn(e.target);
 }
 
@@ -92,6 +104,7 @@ class ToolBoxIcon extends React.Component {
     }
     render() {
         return <canvas onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} data-src={this.props.src}
+            data-content = {this.props.data}
             ref={this.myRef}
             className={this.props.className}
             id={this.props.id}

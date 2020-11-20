@@ -92,8 +92,8 @@ class FileViewer extends React.Component {
 
     Footer() {
         return <> <div className="modal-footer">
-            <button style={this.state.isFileViewer ? {display : "block"} :  {display : "none"}} onClick={this.unloadFileViewer} className="btn btn-danger" id="btn-confirm-file-close" />
-            <button onClick={this.closeWindow} className="btn btn-primary" id="btn-confirm-action" />
+            <button style={this.state.isFileViewer ? {display : "block"} :  {display : "none"}} onClick={this.unloadFileViewer} className="btn btn-danger" id="btn-confirm-file-close">{GetLang('CLOSE_CURRENT_FILE')}</button>
+            <button onClick={this.closeWindow} className="btn btn-primary" id="btn-confirm-action">{GetLang('OK')}</button>
         </div>
         </>
     };
@@ -108,11 +108,11 @@ class FileViewer extends React.Component {
 
     Header(props) {
         return <div className="modal-header">
-            <h5 className={"fileViewer_Btn " + (props.selected == 'files' ? "selected" : '')} id="confirm-title" data-id='files' onClick={props.onClick}></h5>
+            <h5 className={"fileViewer_Btn " + (props.selected == 'files' ? "selected" : '')} id="confirm-title" data-id='files' onClick={props.onClick}>{GetLang('FILE_MANAGER')}</h5>
             <h5 className={"fileViewer_Btn " + (props.selected == 'epub' ? "selected" : '')} id="confirm-title3" data-id='epub' onClick={props.onClick}>E-pub</h5>
             <h5 className={"fileViewer_Btn " + (props.selected == 'pdf' ? "selected" : '')} id="confirm-title5" data-id='pdf' onClick={props.onClick}>PDF</h5>
             {/* <h5 className={"fileViewer_Btn " + (props.selected == '3d' ? "selected" : '')} id="confirm-title4" data-id='3d' onClick={props.onClick}>3D</h5> */}
-            <h5 className={"fileViewer_Btn " + (props.selected == 'homework' ? "selected" : '')} id="confirm-title2" data-id='homework' onClick={props.onClick}></h5>
+            <h5 className={"fileViewer_Btn " + (props.selected == 'homework' ? "selected" : '')} id="confirm-title2" data-id='homework' onClick={props.onClick}>{GetLang('ASSIGNMENT')}</h5>
             <button onClick={props.close} type="button" className="close btn-confirm-close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>

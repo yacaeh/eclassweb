@@ -408,17 +408,6 @@ button[disabled] {
   overflow-x: hidden;
 }
 
-#noticewindow {
-  overflow:rmse auto;
-  right: 0px;
-  top: 40px;
-  position: absolute;
-  left: 10px;
-  bottom: 25px;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
 #notice > .text {
   position: absolute;
   width: 100%;
@@ -776,31 +765,8 @@ hr {
   z-index: 5;
   background: white;
   position: relative;
-}
-
-#top_attach-file {
-  content: url(/dashboard/img/iconfinder_File.png);
-}
-
-#my-name {
-  display: none;
-  left: 400px;
-  position: absolute;
-  font-size: 20px;
-  font-style: italic;
-  text-decoration: underline;
-  color: slateblue;
-  top: 10px;
-  font-weight: bold;
-}
-
-#who-am-i {
-  position: absolute;
-  left: 220px;
-  top: 7px;
-  font-size: 25px;
-  font-weight: bold;
-  color: rgb(135, 152, 156);
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .time {
@@ -1015,11 +981,10 @@ hr {
 }
 
 .feature {
-  width: 234px;
+  width: auto;
   height: 50px;
   position: absolute;
-  display: none;
-  right: 120px;
+  right: 160px;
 }
 
 .controll {
@@ -1867,13 +1832,6 @@ body:fullscreen {
   color: #fff;
   background-color: #18DBBE;
   border-color: #18DBBE;
-}
-
-#showcam, #showcanvas {
-  z-index:  100;
-  border-radius: 8px;
-  font-family: roboto;
-  font-weight: 800;
 }
 
 #right-tab-collapse{

@@ -8,7 +8,7 @@ class ScreenRecorder extends React.Component {
     }
 
     render() {
-       return <img className="top_icon" id="top_record_video" onClick={this.clickHandler} />
+       return <img className="top_icon" id="top_record_video" data-des={GetLang('TOP_RECORD_VIDEO')} onClick={this.clickHandler} />
     }
 
     clickHandler = async (e) => {

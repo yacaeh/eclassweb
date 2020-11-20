@@ -43,30 +43,21 @@ class RightForm extends React.Component {
 
         connection.socket.emit("get-user-name", userId, (userName) => {
             if (userName == 'ycsadmin') return;
-            
             connection.send('plz-sync-points', userId);
             console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
             ChattingManager.enterStudent(userName);
-
             event.extra.roomOwner && classroomManager.rejoinTeacher();
-            
-            if(connection.extra.roomOwner){
-                const list = this.state.studentList.concat({ userId, userName });
-                this.setState({ studentList: list });
-                connection.send({setNOS : list.length});
-                this.setState({ numberOfStudents: list.length });
-            }
+            const list = this.state.studentList.concat({ userId, userName });
+            this.setState({ studentList: list });
+            this.setState({ numberOfStudents: list.length });
         })
     };
 
     leftStudent(event) {
         if (event.extra.userFullName == 'ycsadmin') return;
-        if(connection.extra.roomOwner){
-            const list = this.state.studentList.filter(user => user.userId != event.userid);
-            this.setState({ studentList: list});
-            connection.send({setNOS : list.length});
-            this.setState({ numberOfStudents: list.length});
-        }
+        const list = this.state.studentList.filter(user => user.userId != event.userid);
+        this.setState({ studentList: list});
+        this.setState({ numberOfStudents: list.length});
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
     }
 

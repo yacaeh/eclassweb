@@ -360,7 +360,13 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         connection.socket.on('deleted-room', function(e){
             connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
-            alertBox(window.langlist.TEACHER_LEFT, window.langlist.NOTIFICATION, () => {location.href = '/dashboard/login.html'} , window.langlist.CONFIRM)
+
+            reactEvent.AlertBox({
+                title : window.langlist.NOTIFICATION,
+                content : window.langlist.TEACHER_LEFT,
+                yes : () => {location.href = '/dashboard/login.html'},
+                removeNo : true
+            })
 
         })
 

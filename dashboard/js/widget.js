@@ -892,6 +892,10 @@ gothicFont.load().then((font) => {
         decorateonoff();
 
         function getContext(id) {
+            let finded = find(id);
+            if(!finded)
+                return;
+
             var context = find(id).getContext('2d');
             context.lineWidth = 2;
             context.strokeStyle = '#6c96c8';
@@ -899,6 +903,9 @@ gothicFont.load().then((font) => {
         }
 
         function bindEvent(context, shape) {
+            if(!context)
+                return;
+                
             addEvent(context.canvas, 'click', function () {
 
                 if (shape === 'Text') {

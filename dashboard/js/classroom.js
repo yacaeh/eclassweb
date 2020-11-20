@@ -1,29 +1,14 @@
-window.params = GetParamsFromURL();var reactEvent = {};
-function reducer(state = {}, action) {
-  switch(action.type){
-    case "SCREEN_SHARE" :
-      state.class = true;
-      break;
-  }
+window.params = GetParamsFromURL();
 
-  console.log(state);
-  return state;
-}
-
-const store = Redux.createStore(reducer);
-var connection          = new RTCMultiConnection();
 
 const render = () => {
   ReactDOM.render(
     <ReactRedux.Provider store = {store}>
-        <App connection={connection} /> 
+        <App /> 
     </ReactRedux.Provider>,
     document.getElementById('app'));
 }
 store.subscribe(render);
-store.subscribe(function(e){
-  store.getState();
-})
 render();
 
 //=============================================================================================
@@ -33,6 +18,7 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 
+var connection          = new RTCMultiConnection();
 var epubManager         = new epubManagerClass();
 var screenRecorder      = new screenRecorderClass();
 var screenshareManager  = new ScreenShareManagerClass();
@@ -93,7 +79,7 @@ window.onWidgetLoaded = function () {
 }
 
 window.onSocketConnected = function () {
-  updateClassTime();
+  reactEvent.classTimeStart(classroomInfo.roomOpenTime);
   classroomCommand.updateSyncRoom();
   webRTCPCInit();
   document.body.removeChild(document.getElementById("loading-screen"));
@@ -104,6 +90,7 @@ connection.onclose = connection.onerror = connection.onleave = event => reactEve
 
 designer.appendTo(() => {
   console.debug('Designer append');
+  document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
   connection.extra.roomOwner ? classroomManager.createRoom() :
                                classroomManager.joinRoom();
   onWidgetLoaded();
@@ -127,7 +114,17 @@ connection.onmessage = function (event) {
   }
 
   if (event.data.allControl) {
-    onAllControlValue(event.data.allControl);
+    console.log(event.data.allControl);
+    console.debug("All Controll",event.data.allControl.state);
+
+    if(event.data.allControl.state){
+      classroomInfo = event.data.allControl.roomInfo;
+    }
+    else{
+      classroomInfo.allControl = false;
+    }
+
+    classroomCommand.updateSyncRoom();
     return;
   }
 
@@ -216,7 +213,7 @@ connection.onmessage = function (event) {
     }
     rightTab.style.zIndex = 2;
 
-    mobileHelper.isMobile ? 
+    store.getState().isMobile ? 
       widgetContainer.style.right = "0px" : 
       widgetContainer.removeAttribute("style");
     return;

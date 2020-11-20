@@ -152,40 +152,45 @@ function removeOnSelect(btn) {
         return;
     }
 
-    alertBox(window.langlist.ASK_CLOSE_CURRENT, window.langlist.NOTIFICATION, function () {
-        if (classroomInfo.share3D.state) {
-            document.getElementById("3d_view").click();
-            classroomInfo.share3D.state = false;
-        }
+    reactEvent.AlertBox({
+        title : window.langlist.NOTIFICATION,
+        content : window.langlist.ASK_CLOSE_CURRENT,
+        yes : function () {
+            if (classroomInfo.share3D.state) {
+                document.getElementById("3d_view").click();
+                classroomInfo.share3D.state = false;
+            }
+    
+            if (classroomInfo.shareScreen.state) {
+                document.getElementById("screen_share").click();
+            }
+    
+            if (isSharingMovie) {
+                document.getElementById("movie").click();
+                isSharingMovie = false;
+            }
+    
+            if (isSharingFile) {
+                document.getElementById("btn-confirm-file-close").click();
+                isSharingFile = false;
+            }
+    
+            if (classroomInfo.epub.state) {
+                document.getElementById("btn-confirm-file-close").click();
+                isSharingFile = false;
+            }
+    
+            setTimeout(function () {
+                btn.classList.remove("on");
+                btn.classList.remove("selected-shape");
+                btn.click();
+            }, 50)
+        },
 
-        if (classroomInfo.shareScreen.state) {
-            document.getElementById("screen_share").click();
-        }
-
-        if (isSharingMovie) {
-            document.getElementById("movie").click();
-            isSharingMovie = false;
-        }
-
-        if (isSharingFile) {
-            document.getElementById("btn-confirm-file-close").click();
-            isSharingFile = false;
-        }
-
-        if (classroomInfo.epub.state) {
-            document.getElementById("btn-confirm-file-close").click();
-            isSharingFile = false;
-        }
-
-        setTimeout(function () {
+        no : function () {
             btn.classList.remove("on");
             btn.classList.remove("selected-shape");
-            btn.click();
-        }, 50)
-    },
-        function () {
-            btn.classList.remove("on");
-            btn.classList.remove("selected-shape");
-        })
+        }
+    })
 }
 

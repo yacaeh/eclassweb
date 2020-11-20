@@ -4,10 +4,10 @@ class ChattingWindow extends React.Component {
         super(props);
         this.state = {
             show: true,
-            collapse : false,
+            collapse: false,
             chattingLogs: [],
             notice: [],
-            chat : '',
+            chat: '',
         };
 
         this.collapse = this.collapse.bind(this);
@@ -22,13 +22,13 @@ class ChattingWindow extends React.Component {
             <Notice ref={this.notice} list={this.state.notice} collapse={this.collapse} />
             <ConversationPanel ref={this.normal} list={this.state.chattingLogs} />
             <div className="chatbackground">
-                <input onChange={this.onChangeInput} value={this.state.chat} id="txt-chat-message"/>
+                <input onChange={this.onChangeInput} placeholder={GetLang('CHAT_PLACEHOLDER')} value={this.state.chat} id="txt-chat-message" />
             </div>
         </div>
     };
 
     onChangeInput(e) {
-        this.setState({chat : e.target.value});
+        this.setState({ chat: e.target.value });
     }
 
     componentDidMount() {
@@ -46,8 +46,8 @@ class ChattingWindow extends React.Component {
                     name: window.langlist.ME,
                 }
 
-                _this.setState({ 
-                    chat : '',
+                _this.setState({
+                    chat: '',
                     chattingLogs: _this.state.chattingLogs.concat(data)
                 }, () => _this.scrollDown);
                 connection.extra.roomOwner && _this.setState({ notice: _this.state.notice.concat(data) }, () => _this.scrollDown)
@@ -78,19 +78,13 @@ class ChattingWindow extends React.Component {
         this.setState({ show: !this.state.show })
 
         if (this.state.show) {
-            $(notice).animate({
-                height: '8%',
-                borderBottom: '0px solid gray',
-            });
-            $(normal).animate({ height: '85%' });
-            notice.style.borderBottom = '0px solid #ffffff';
+            normal.style.height = '85%';
+            notice.style.height = '8%';
+            notice.style.borderBottom = '0px solid gray';
             notice.lastElementChild.lastElementChild.style.transform = 'rotate(0deg)';
         } else {
-            $(notice).animate({
-                height: '50%',
-                borderBottom: '0px solid gray',
-            });
-            $(normal).animate({ height: '44%' });
+            notice.style.height = '50%';
+            normal.style.height = '44%';
             notice.style.borderBottom = '1px solid #B8B8B8';
             notice.lastElementChild.lastElementChild.style.transform = 'rotate(180deg)';
         }
@@ -108,14 +102,14 @@ class ConversationPanel extends React.Component {
     render() {
         const list = this.props.list.map((data, idx) => <this.Chat data={data} key={idx} />);
         return <div className="conversation-panel">
-            <div ref={this.window}  className="scroll" id="conversation-panel">
+            <div ref={this.window} className="scroll" id="conversation-panel">
                 {list}
             </div>
 
         </div>
     }
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         this.scrollToBottom();
     }
 
@@ -140,7 +134,7 @@ class Notice extends React.Component {
     };
 
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         this.scrollToBottom();
     }
 
@@ -153,13 +147,24 @@ class Notice extends React.Component {
     render() {
         const list = this.props.list.map((data, idx) => <this.Chat data={data} key={idx} />);
 
+        const noticeStyle = {
+            overflow: 'auto',
+            right: '0px',
+            top: '40px',
+            position: 'absolute',
+            left: '10px',
+            bottom: '25px',
+            overflowX: 'hidden',
+            overflowY: 'auto',
+        }
+
         return <div id="notice">
-            <span id='chat-notice' className="text">선생님 채팅<h1 /></span>
-            <div ref={this.window} className="scroll" id="noticewindow">
+            <span className="text">{GetLang('TEACHER_CHAT')}<h1 /></span>
+            <div ref={this.window} className="scroll" id="noticewindow" style={noticeStyle}>
                 Logs<br />
                 <div id="logs">
                 </div>
-                    {list}
+                {list}
             </div>
 
             <div id="collapse" onClick={this.props.collapse}>

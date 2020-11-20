@@ -11,7 +11,7 @@ class SaveNotification extends React.Component {
     }
 
     render(){
-        return <img className="top_icon" id="top_save_alert" onClick={this.exportAttention} />
+        return <img className="top_icon" id="top_save_alert" onClick={this.exportAttention} data-des={GetLang('TOP_SAVE_ALERT')} />
     }
 
     exportAttention() {
@@ -81,7 +81,21 @@ class SaveNotification extends React.Component {
 
 class Attention extends React.Component {
     callAttend() {
-        let callback = function () {
+        if (document.getElementById("exam-board").style.display == "block") {
+            return;
+        }
+
+        reactEvent.AlertBox({
+            title : window.langlist.NOTIFICATION,
+            content : window.langlist.NOTIFICATION_WARNING,
+            yes : callback
+        })
+
+        function callback() {
+            attentionManager.totalCount++;
+            attentionManager.teacherRequest[attentionManager.totalCount] = {name: window.langlist.ATTENTION_PLEASE};
+            connection.send({alert: true});
+
             let chilldren = document.getElementById('student_list').children;
             for (let i = 0; i < chilldren.length; i++) {
                 let al = chilldren[i].getElementsByClassName('bor')[0];
@@ -92,20 +106,9 @@ class Attention extends React.Component {
             }
         }
 
-        if (document.getElementById("exam-board").style.display == "block") {
-            return;
-        }
-
-
-        alertBox("<span>" + window.langlist.NOTIFICATION_WARNING + "</span>  ", window.langlist.NOTIFICATION, () => {
-            attentionManager.totalCount++;
-            attentionManager.teacherRequest[attentionManager.totalCount] = {name: window.langlist.ATTENTION_PLEASE};
-            callback();
-            connection.send({alert: true});
-        }, () => { });
     };
 
     render() {
-        return <img className="top_icon" id="top_alert" onClick={this.callAttend} />
+        return <img className="top_icon" id="top_alert" onClick={this.callAttend} data-des={GetLang('TOP_NOTIFY')}/>
     }
 }

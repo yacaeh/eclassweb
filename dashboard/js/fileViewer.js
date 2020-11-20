@@ -87,7 +87,7 @@ class fileViewerLoader {
         fileViewer.setAttribute('id', 'file-viewer');
         fileViewer.setAttribute('src', 'https://' + window.location.host + '/ViewerJS/#' + url);
 
-        if (mobileHelper.isMobile)
+        if (store.getState().isMobile)
             fileViewer.style.width = "calc(100%)";
 
         fileViewer.setAttribute('allowFullScreen', '');

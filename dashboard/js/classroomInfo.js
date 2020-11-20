@@ -3,18 +3,14 @@ var classroomInfo = {};
 classroomCommand = {
     joinRoom: function (_info) {
         console.debug("Synced classroom info");
+        let action = {type : SET_CLASSROOM_INFO, data : _info};
+        store.dispatch(action);
         classroomInfo = _info;
         onSocketConnected();
     },
 
     updateSyncRoom: function () {
-        // Allcontroll updateControlView
-
-        if (classroomInfo.allControl) {
-            if (!connection.extra.roomOwner) {
-                classroomInfo.allControl ? Show("student_isallcontrol") : Hide("student_isallcontrol");
-            }
-        }
+        reactEvent.allControl(classroomInfo.allControl);
 
         if (classroomInfo.share3D.state) {
             sync3DModel();
@@ -35,10 +31,6 @@ classroomCommand = {
 
         if (classroomInfo.showcanvas) {
             canvasManager.sendMyCanvas = true;
-        }
-
-        if (classroomInfo.shareScreen.state) {
-            // screenshareManager.rejoin();
         }
 
         if (classroomInfo.movierender.state) {
@@ -81,12 +73,6 @@ classroomCommand = {
                 }
             }
         }
-    },
-
-    onSynchronizationClassRoom: function (_roomInfo) {
-        classroomInfo = _roomInfo;
-    
-        this.updateSyncRoom();
     },
 };
 
@@ -297,25 +283,5 @@ classroomCommand.updateEpubCmd = function (_data) {
         case 'prev':
             document.getElementById('prev').click();
             break;
-    }
-}
-
-function updateClassTime() {
-    let currentTime = document.getElementById("current-time");
-    setInterval(Sec, 1000);
-
-    function Sec() {
-        let now = new Date().getTime() - classroomInfo.roomOpenTime;
-        now = parseInt(now * 0.001);
-        let time = now;
-        let hour = Math.floor(time / 3600);
-        time %= 3600;
-
-        let min = Math.floor(time / 60);
-        time %= 60;
-
-        if (min < 10) min = '0' + min;
-        if (time < 10) time = '0' + time;
-        currentTime.innerHTML = hour + ':' + min + ':' + time;
     }
 }
