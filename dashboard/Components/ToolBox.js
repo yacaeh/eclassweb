@@ -25,11 +25,11 @@ class ToolBox extends React.Component {
             {store.getState().isOwner && 
                 <ToolBoxIcon data={GetLang('SHARE_YOUTUBE')} key='movie' onClick={MovieRenderButton} className='i' src='/dashboard/img/videolink.png' id='movie' />} 
             {store.getState().isOwner && 
-                <ToolBoxIcon data={GetLang('SHARE_FILE')} key='file' onClick={FileviewerButton} className='i' src='/dashboard/img/openfile.png' id='file' />} 
+                <ToolBoxIcon data={GetLang('SHARE_FILE')} key='file' onClick={LoadFileViewer} className='i' src='/dashboard/img/openfile.png' id='file' />} 
             {!store.getState().isOwner && 
                 <ToolBoxIcon data={GetLang('CALL_TEACHER')} key='callTeacher' onClick={CallTeacherButton} className='i' src='/dashboard/img/handsup.png' id='callteacher' />} 
             {!store.getState().isOwner && 
-                <ToolBoxIcon data={GetLang('HOMWORK_ICON')} key='homework' onClick={HomeworkUploadModal} className='i' src='/dashboard/img/homework.png' id='homework' />} 
+                <ToolBoxIcon data={GetLang('HOMWORK_ICON')} key='homework' onClick={LoadFileViewer} className='i' src='/dashboard/img/homework.png' id='homework' />} 
             {store.getState().isMobile && 
                 <ToolBoxIcon data={GetLang('')} key='full' className='i no-hover' src='/dashboard/img/cam_max.png' id='full' />}
         </section>
@@ -41,12 +41,21 @@ function ScreenShareButton(e) {
     screenshareManager.btn(e.target);
 }
 
-function FileviewerButton(e) {
-    LoadFile(e.target);
+function LoadFileViewer(btn) {
+    btn = btn.target;
+    if (!isSharingFile && checkSharing()) {
+        removeOnSelect(btn);
+        return;
+    }
+
+    $('#confirm-box').modal({
+        backdrop: 'static',
+        keyboard: false
+    });
 }
 
-function CallTeacherButton(e){
-    classroomManager.callTeacher();
+function CallTeacherButton(){
+    connection.send({ callTeacher: { userid: connection.userid } }, GetOwnerId());
 }
 
 function MovieRenderButton(btn) {
@@ -58,6 +67,7 @@ function MovieRenderButton(btn) {
     btn.target.classList.toggle("on");
     btn.target.classList.toggle("selected-shape");
     var visible = urlform.style.display;
+    
     if (visible == "inline-block") {
         classroomInfo.movierender = {
             state: false,

@@ -345,7 +345,6 @@ examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _answerNumber
     }, GetOwnerId());
 };
 
-//선생님이 학생에게 채점 결과를 보내준다.
 examObj.sendResultToStudent = function (_studentId) {
     if (connection.extra.roomOwner) {
         const submit = examObj.submitStudents[_studentId];

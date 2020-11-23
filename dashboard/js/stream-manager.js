@@ -267,10 +267,10 @@ class maincamManagerClass {
     return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
   show() {
-    Show(this.get());
+    this.get().style.display = 'block';
   }
   hide() {
-    Hide(this.get());
+    this.get().style.display = 'none';
   }
   start(callback) {
     var inter = setInterval(function () {
@@ -323,9 +323,8 @@ class maincamManagerClass {
           }
         }
 
-
         if (classroomInfo.showcanvas) {
-          Hide(el)
+          el.style.display = 'none';
         }
 
         var playPromise = el.play();

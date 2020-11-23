@@ -1,6 +1,5 @@
 
 pageNavigator = {
-  self: this,
   obj: undefined,
   list: undefined,
   maxidx: undefined,
@@ -39,8 +38,8 @@ pageNavigator = {
   },
 
   pdfsetting: function () {
-    let self = this.self;
-
+    let self = this;
+    
     this.leftbtn = function () {
       this.button(Math.max(0, this.currentidx-1));
     }
@@ -65,7 +64,6 @@ pageNavigator = {
   },
 
   init: function () {
-    this.self = this;
     this.obj = document.getElementById("epub-navi");
     this.list = document.getElementById("thumbnail-list");
     this.maxidx = document.getElementById("epubmaxidx");
@@ -86,21 +84,7 @@ pageNavigator = {
     this.obj.style.display = 'none';
     this.idx = 0;
     this.obj.value = 1;
-    this.removethumbnail();
-  },
-
-  push: function (element, clickevent) {
-    var box = document.createElement("div");
-    box.appendChild(element);
-    box.className = "thumbnail";
-    box.setAttribute("idx", this.idx);
-    box.addEventListener("click", clickevent);
-    this.list.appendChild(box);
-    this.idx++;
-
-    if(!connection.extra.roomOwner && classroomInfo.allControl)
-      box.style.pointerEvents = 'none';
-
+    reactEvent.navigation.removeThumbnails();
   },
 
   button : function(page){
@@ -119,37 +103,4 @@ pageNavigator = {
     this.list.children[this.currentidx].scrollIntoView({ block: "center" });
     document.getElementById("epubidx").value = this.currentidx + 1;
   },
-
-  removethumbnail: function () {
-    this.idx = 0;
-    while (this.list.children.length) {
-      this.list.removeChild(this.list.children[0]);
-    }
-  },
-
-  allControl : function(bool) {
-    if (!connection.extra.roomOwner) {
-        if (bool) {
-                Hide('next')
-                Hide('prev')
-                Hide('lnext')
-                Hide('lprev')
-                let thumbnails = document.getElementsByClassName('thumbnail');
-                for(let i = 0 ; i < thumbnails.length; i++){
-                    thumbnails[i].style.pointerEvents = 'none';
-            }
-        }
-        else {
-                Show('next')
-                Show('prev')
-                Show('lnext')
-                Show('lprev')
-                let thumbnails = document.getElementsByClassName('thumbnail');
-                for(let i = 0 ; i < thumbnails.length; i++){
-                    thumbnails[i].style.pointerEvents = '';
-                }
-        }
-    }
-  }
-  
 }

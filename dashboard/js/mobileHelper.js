@@ -38,7 +38,6 @@ class mobileHelperClass {
                     clearTimeout(timeout);
                     timeout = null;
                     if (!video.classList.contains("full")) {
-                        let rect = GetDoc().body.getBoundingClientRect();
                         lastleft = video.style.left;
                         lastTop = video.style.top;
 

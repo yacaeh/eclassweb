@@ -1,6 +1,10 @@
 class ExamIcon extends React.Component {
+    constructor(props){
+        super(props);
+    }
+
     render() {
-        return <img className="top_icon" id="top_test" onClick={this.clickHandler} data-des={GetLang('TOP_QUIZ')}/>
+        return <img onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave} className="top_icon" id="top_test" onClick={this.clickHandler} data-des={GetLang('TOP_QUIZ')}/>
     }
 
     clickHandler() {

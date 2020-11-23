@@ -8,7 +8,7 @@ class AlertBox extends React.Component {
             text_no : '',
             removeNo : false,
             yes : function(){},
-            no : function(){$('#alert-box').fadeOut(300)},
+            no : this.hide,
         }
     };
 
@@ -22,11 +22,14 @@ class AlertBox extends React.Component {
                 </div>
                 <div id="alert-body">
                     <div id="alert-content">
-                        {this.state.content}
+                        {this.state.content == 'attention' ? 
+                            <progress max='100' value='100' className='alert-progress exam-state-progress'></progress> : 
+                            this.state.content
+                        }
                     </div>
                     <div id="alert-btns">
-                        <AlertBtn_Yes text={this.state.text_yes} onClick={this.state.yes} />
-                        {!this.state.removeNo && <AlertBtn_No text={this.state.text_no} onClick={this.state.no}/>} 
+                        <AlertBtn_Yes width={this.state.removeNo ? "100%" : "50%"} hide={this.hide} text={this.state.text_yes} onClick={this.state.yes} />
+                        {!this.state.removeNo && <AlertBtn_No hide={this.hide} text={this.state.text_no} onClick={this.state.no}/>} 
                     </div>
                 </div>
                 <div id="alert-footer" />
@@ -36,19 +39,45 @@ class AlertBox extends React.Component {
 
     componentDidMount() {
         reactEvent.AlertBox = (data) => {
-            $('#alert-box').fadeIn(300);
-            data.text_yes = window.langlist.YES;
-            data.text_no = window.langlist.NO;
+            this.show();
+            data.text_yes = data.removeNo ? GetLang('CONFIRM') : GetLang('YES');
+            data.text_no = GetLang('NO');
             data.removeNo = data.removeNo || false;
             this.setState(data);
         }
     }
+
+    show(){
+        document.getElementById("right-tab").style.zIndex = -1;
+        document.getElementById("header").style.zIndex = -1;
+        document.getElementById("tool-box").style.zIndex = -1;
+        $('#alert-box').fadeIn(300);
+    }
+    
+    hide(){
+        $('#alert-box').fadeOut(300,() =>{
+            document.getElementById("right-tab").style.zIndex = 2;
+            document.getElementById("header").style.zIndex = 5;
+            document.getElementById("tool-box").style.zIndex = 10001;
+        })
+    }
 }
 
 function AlertBtn_Yes(props) {
-    return <button className="btn btn-alert-yes" onClick={() => {props.onClick(); $('#alert-box').fadeOut(300)}} style={{ paddingTop: '0px' }}>{props.text}</button>
+    return <button className="btn btn-alert-yes" 
+    onClick={() => {
+        props.onClick(); 
+        props.hide()}} 
+        style={{ 
+            width   : props.width,
+            paddingTop: '0px' 
+        }}>{props.text}</button>
 }
 
 function AlertBtn_No(props) {
-    return <button className="btn btn-alert-no" onClick={() => {props.onClick(); $('#alert-box').fadeOut(300)}} style={{ paddingTop: '0px' }}>{props.text}</button>
+    return <button className="btn btn-alert-no" 
+    onClick={() => {
+        props.onClick(); 
+        props.hide()}} 
+        style={{ paddingTop: '0px' }}>{props.text}</button>
 }

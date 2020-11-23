@@ -30,13 +30,7 @@ class RightForm extends React.Component {
     componentDidMount() {
         reactEvent.joinStudent = this.joinStudent;
         reactEvent.leftStudent = this.leftStudent;
-        reactEvent.setNOS = this.setNOS;
     };
-
-    setNOS = (num) => {
-        console.error(num);
-        this.setState({ numberOfStudents: num});
-    }
 
     joinStudent(event) {
         const userId = event.userid;
@@ -45,7 +39,6 @@ class RightForm extends React.Component {
             if (userName == 'ycsadmin') return;
             connection.send('plz-sync-points', userId);
             console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
-            ChattingManager.enterStudent(userName);
             event.extra.roomOwner && classroomManager.rejoinTeacher();
             const list = this.state.studentList.concat({ userId, userName });
             this.setState({ studentList: list });
@@ -63,15 +56,18 @@ class RightForm extends React.Component {
 
     collapse = (e) => {
         this.setState({ collapsed: !this.state.collapsed })
+        
         if (!this.state.collapsed) {
             e.target.style.transform = "rotate(90deg)";
-            $(rightTab).animate({ width: "0%" });
-            $(widgetContainer).animate({ right: "0%" }, classroomManager.canvasResize);
+            rightTab.style.width = "0%";
+            widgetContainer.style.right = "0%";
+            classroomManager.canvasResize();
         }
         else {
+            rightTab.style.width = "17.7%";
+            widgetContainer.style.right = "17.7%";
             e.target.style.transform = "rotate(270deg)";
-            $(rightTab).animate({ width: "17.7%" });
-            $(widgetContainer).animate({ right: "17.7%" }, classroomManager.canvasResize);
+            classroomManager.canvasResize();
         }
     }
 }

@@ -11,7 +11,7 @@ class SaveNotification extends React.Component {
     }
 
     render(){
-        return <img className="top_icon" id="top_save_alert" onClick={this.exportAttention} data-des={GetLang('TOP_SAVE_ALERT')} />
+        return <img onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave} className="top_icon" id="top_save_alert" onClick={this.exportAttention} data-des={GetLang('TOP_SAVE_ALERT')} />
     }
 
     exportAttention() {
@@ -109,6 +109,6 @@ class Attention extends React.Component {
     };
 
     render() {
-        return <img className="top_icon" id="top_alert" onClick={this.callAttend} data-des={GetLang('TOP_NOTIFY')}/>
+        return <img onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave} className="top_icon" id="top_alert" onClick={this.callAttend} data-des={GetLang('TOP_NOTIFY')}/>
     }
 }

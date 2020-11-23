@@ -42,7 +42,8 @@ gothicFont.load().then((font) => {
     var orderHistory = [];
     var markerpoint = [];
 
-    let zoom = new ZoomManager(window.parent.document.getElementById("widget-container").getElementsByTagName('iframe')[0]);
+    let zoom = new ZoomManager(
+        window.parent.document.getElementById("widget-container").getElementsByTagName('iframe')[0]);
     zoom.setEvent(tempCanvas);
 
     var points = [],
@@ -905,7 +906,7 @@ gothicFont.load().then((font) => {
         function bindEvent(context, shape) {
             if(!context)
                 return;
-                
+
             addEvent(context.canvas, 'click', function () {
 
                 if (shape === 'Text') {

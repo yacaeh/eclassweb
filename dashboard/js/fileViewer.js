@@ -517,35 +517,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     }
 }
 
-function HomeworkUploadModal() {
-    $('#btn-confirm-close').hide();
-    $('.list-group-flush').remove();
-    $("#confirm-title2").hide();
-    $("#confirm-title3").hide();
-    $("#confirm-title4").hide();
-    $("#confirm-title5").hide();
-    $('#confirm-title').html(window.langlist.SUBMIT_ASSIGNMENT).removeClass("selected");
-    $('#confirm-box').modal({
-        backdrop: 'static',
-        keyboard: false
-    });
-}
-
-function fileUploadModal() {
-    $('#confirm-box').modal({
-        backdrop: 'static',
-        keyboard: false
-    });
-}
-
-function LoadFile(btn) {
-    if (!isSharingFile && checkSharing()) {
-        removeOnSelect(btn);
-        return;
-    }
-    connection.extra.roomOwner && fileUploadModal();
-}
-
 function showPage(n) {
     pointer_saver.save()
     pointer_saver.load(n - 1);

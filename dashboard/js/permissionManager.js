@@ -80,19 +80,6 @@ class permissionManagerClass {
       return true;
     }
   }
-  mute() {
-    connection.attachStreams.forEach(function (e) {
-      if (e.isVideo)
-        e.mute("audio");
-    })
-  }
-
-  unmute() {
-    connection.attachStreams.forEach(function (e) {
-      if (e.isVideo)
-        e.unmute("audio");
-    })
-  }
 
   IsCanvasPermission(id) {
     if(classroomInfo.permissions.canvasPermission == undefined){
@@ -192,15 +179,22 @@ class permissionManagerClass {
   // for student ==================================================================
   setClassPermission() {
     console.debug("Get Screen share permission");
-    Show("student_screenshare");
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, screen : true}
+    })
+
     classroomInfo.permissions.classPermission = connection.userid;
     window.permission = true;
   };
 
   disableClassPermission() {
     console.debug("Lost Screen share permission");
-    Hide("student_screenshare");
     classroomInfo.permissions.classPermission = '';
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, screen : false}
+    })
 
     if (classroomInfo.shareScreen.state) {
       screenshareManager.isSharingScreen = false;
@@ -214,21 +208,30 @@ class permissionManagerClass {
 
   setMicPermission() {
     console.debug("Get mic permission");
-    Show("student_mic");
-    this.unmute();
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, mic : true}
+    })
   };
 
   disableMicPermission() {
     console.debug("Lost mic permission");
-    Hide("student_mic");
-    this.mute();
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, mic : false}
+    })
   };
 
   setCanvasPermission(id) {
     console.debug("Get canvas share permission");
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, canvas : true}
+    })
+
     console.log(classroomInfo.permissions.canvasPermission)
     classroomInfo.permissions.canvasPermission.push(id);
-    Show("student_canvas");
+
     connection.send({
       sendStudentPoint: true,
       isStudent: true,
@@ -240,9 +243,13 @@ class permissionManagerClass {
 
   disableCanvasPermission(id) {
     console.debug("Lost canvas share permission");
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, canvas : false}
+    })
+
     classroomInfo.permissions.canvasPermission = [];
     if(connection.userid == id)
-      Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
   };
 }

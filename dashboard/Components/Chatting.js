@@ -4,7 +4,6 @@ class ChattingWindow extends React.Component {
         super(props);
         this.state = {
             show: true,
-            collapse: false,
             chattingLogs: [],
             notice: [],
             chat: '',
@@ -12,19 +11,31 @@ class ChattingWindow extends React.Component {
 
         this.collapse = this.collapse.bind(this);
         this.onChangeInput = this.onChangeInput.bind(this);
-        this.notice = React.createRef();
-        this.normal = React.createRef();
     };
 
 
     render() {
         return <div id="chatting">
-            <Notice ref={this.notice} list={this.state.notice} collapse={this.collapse} />
-            <ConversationPanel ref={this.normal} list={this.state.chattingLogs} />
+            {this.state.show && <Notice show={this.state.show} list={this.state.notice} />}
+            
+            <div id="collapse" onClick={this.collapse}>
+                <img style={{
+                    transform: 'rotate(' + (this.state.show ? "180" : "0") + 'deg)'
+                }} className="btn" src="/dashboard/img/openchat.png" />
+            </div>
+
+            <ConversationPanel show={this.state.show} list={this.state.chattingLogs} />
             <div className="chatbackground">
                 <input onChange={this.onChangeInput} placeholder={GetLang('CHAT_PLACEHOLDER')} value={this.state.chat} id="txt-chat-message" />
             </div>
         </div>
+    };
+
+    collapse() {
+
+
+
+        this.setState({ show: !this.state.show })
     };
 
     onChangeInput(e) {
@@ -33,6 +44,7 @@ class ChattingWindow extends React.Component {
 
     componentDidMount() {
         let _this = this;
+
         window.onkeyup = (e) => {
             let code = e.keyCode || e.which;
             if (code == 13) {
@@ -43,7 +55,6 @@ class ChattingWindow extends React.Component {
                     owner: connection.extra.roomOwner,
                     msg: chatMessage,
                     fromMe: true,
-                    name: window.langlist.ME,
                 }
 
                 _this.setState({
@@ -70,25 +81,18 @@ class ChattingWindow extends React.Component {
             data.owner && _this.setState({ notice: _this.state.notice.concat(data) })
             _this.setState({ chattingLogs: _this.state.chattingLogs.concat(data) });
         }
+
+        reactEvent.enterOrExit = function (name, event) {
+            let data = {
+                enterOrExitEvent: true,
+                enterOrExit: event == "ENTER",
+                name: name,
+                fromMe: false,
+            }
+            _this.setState({ notice: _this.state.notice.concat(data) });
+        }
     }
 
-    collapse() {
-        let notice = ReactDOM.findDOMNode(this.notice.current);
-        let normal = ReactDOM.findDOMNode(this.normal.current);
-        this.setState({ show: !this.state.show })
-
-        if (this.state.show) {
-            normal.style.height = '85%';
-            notice.style.height = '8%';
-            notice.style.borderBottom = '0px solid gray';
-            notice.lastElementChild.lastElementChild.style.transform = 'rotate(0deg)';
-        } else {
-            notice.style.height = '50%';
-            normal.style.height = '44%';
-            notice.style.borderBottom = '1px solid #B8B8B8';
-            notice.lastElementChild.lastElementChild.style.transform = 'rotate(180deg)';
-        }
-    };
 }
 
 
@@ -101,7 +105,9 @@ class ConversationPanel extends React.Component {
 
     render() {
         const list = this.props.list.map((data, idx) => <this.Chat data={data} key={idx} />);
-        return <div className="conversation-panel">
+        return <div style={{
+            height: this.props.show ? "53%" : "85%"
+        }} className="conversation-panel">
             <div ref={this.window} className="scroll" id="conversation-panel">
                 {list}
             </div>
@@ -121,7 +127,7 @@ class ConversationPanel extends React.Component {
 
     Chat(params) {
         return <div className='message'>
-            <b><font color={params.data.fromMe ? "#3E93E8" : 'black'}>{params.data.name}</font></b> : {params.data.msg}
+            <b><font color={params.data.fromMe ? "#3E93E8" : 'black'}>{params.data.fromMe ? GetLang("ME") : params.data.name}</font></b> : {params.data.msg}
         </div>
     }
 }
@@ -132,7 +138,6 @@ class Notice extends React.Component {
         this.window = React.createRef();
         this.scrollToBottom = this.scrollToBottom.bind(this);
     };
-
 
     componentDidUpdate() {
         this.scrollToBottom();
@@ -158,24 +163,34 @@ class Notice extends React.Component {
             overflowY: 'auto',
         }
 
-        return <div id="notice">
+        return <div id="notice" style={{
+            height: this.props.show ? "40%" : "8%",
+            borderBottom: this.props.show ? '1px solid gray' : '0px solid gray'
+        }}>
             <span className="text">{GetLang('TEACHER_CHAT')}<h1 /></span>
             <div ref={this.window} className="scroll" id="noticewindow" style={noticeStyle}>
                 Logs<br />
-                <div id="logs">
-                </div>
+                <div id="logs" />
                 {list}
             </div>
 
-            <div id="collapse" onClick={this.props.collapse}>
-                <img className="btn" src="/dashboard/img/openchat.png" />
-            </div>
         </div>
     }
 
     Chat(params) {
-        return <div className='teachermsg'>
-            <b><font color="#C63EE8">{window.langlist.TEACHER}</font></b> : {params.data.msg}
-        </div>
+        if (params.data.enterOrExitEvent) {
+            return <div className={'teachermsg2 ' + (params.data.enterOrExit ? "enter" : "left")}>
+                <b>
+                    <font color='#000000'>
+                        {params.data.name}
+                    </font>
+                    {params.data.enterOrExit ? GetLang('STUDENT_JOIN') : GetLang('STUDENT_LEFT')}
+                </b>
+            </div>
+        } else {
+            return <div className='teachermsg'>
+                <b><font color="#C63EE8">{GetLang('TEACHER')}</font></b> : {params.data.msg}
+            </div>
+        }
     }
 }

@@ -399,11 +399,9 @@ button[disabled] {
 
 #notice {
   position: relative;
-  height: 50%;
   top: 0px;
   left: 0px;
   right: 0px;
-  border-bottom: gray 1px solid;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -436,18 +434,17 @@ button[disabled] {
   border-top: 1px solid #b8b8b8;
 }
 
-#notice > #collapse {
-  position: absolute;
-  bottom: 0px;
+#collapse {
+  position: relative;
   width: 100%;
   align-content: center;
   display: inline-grid;
   text-align: center;
   cursor: pointer;
-  height: 30px;
+  height: 20px;
 }
 
-#notice > #collapse > .btn {
+#collapse > .btn {
   position: absolute;
   left: calc(50% - 14px);
   padding: 0px;
@@ -460,7 +457,7 @@ button[disabled] {
   text-align: left;
   overflow: auto;
   width: 100%;
-  bottom: 50px;
+  bottom: 28px;
   position: absolute;
   top: 5px;
   overflow-x: hidden;
@@ -595,7 +592,6 @@ hr {
 
 .conversation-panel {
   position: relative;
-  height: 44%;
   overflow: inherit !important;
 }
 
@@ -750,7 +746,7 @@ hr {
   display: none;
 }
 
-#icon_exit {
+#Button_Exit {
   content: url(/dashboard/img/exit.png);
   cursor: pointer;
   left: 10px;
@@ -981,10 +977,8 @@ hr {
 }
 
 .feature {
-  width: auto;
-  height: 50px;
-  position: absolute;
-  right: 160px;
+  float: right;
+  position: relative;
 }
 
 .controll {
@@ -1333,6 +1327,7 @@ input[type='number']:focus {
 .exam-overflow{
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .text-center-bold {
@@ -1875,11 +1870,9 @@ body:fullscreen {
   display: flex;
 }
 
-
-
 .language {
-  position: absolute;
-  right: 0px;
+  position: relative;
+  float: right;
 }
 
 

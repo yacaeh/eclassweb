@@ -9,7 +9,12 @@ class StudentList extends React.Component {
         this.onClick = this.onClick.bind(this);
     }
     render() {
-        const list = this.props.studentList.map(id => (<Student key={id.userId} uid={id.userId} name={id.userName} />))
+        const list = this.props.studentList.map(id => (
+        <Student 
+        key={id.userId} 
+        uid={id.userId} 
+        name={id.userName} />))
+
         return <div ref={this.myRef} id="student_list">
             <div onClick={this.onClick} id="student_list_button" />
             {list}
@@ -77,6 +82,7 @@ class Student extends React.Component {
         if (!classroomInfo.showcanvas)
             this.myRef.current.style.display = 'none';
 
+        reactEvent.enterOrExit(this.props.name, "ENTER");
         canvasManager.canvas_array[this.props.uid] = this.myRef.current;
     };
 
@@ -121,7 +127,7 @@ class Student extends React.Component {
         if (permissionManager.IsCanvasPermission(this.props.uid))
             permissionManager.DeleteCanvasPermission(this.props.uid);
 
-        ChattingManager.leftStudent(this.props.name);
+        reactEvent.enterOrExit(this.props.name, "EXIT");
 
 
         examObj.leftStudent(this.props.uid);

@@ -8,13 +8,13 @@ class ScreenRecorder extends React.Component {
     }
 
     render() {
-       return <img className="top_icon" id="top_record_video" data-des={GetLang('TOP_RECORD_VIDEO')} onClick={this.clickHandler} />
+       return <img onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave} className="top_icon" id="top_record_video" data-des={GetLang('TOP_RECORD_VIDEO')} onClick={this.clickHandler} />
     }
 
     clickHandler = async (e) => {
         await this.setState({recording : !this.state.recording});
         if(this.state.recording){
-            let ret = await screenRecorder._startCapturing();
+            await screenRecorder._startCapturing();
         }
         else{
             screenRecorder._stopCapturing();

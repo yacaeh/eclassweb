@@ -3,10 +3,9 @@ class classroomManagerClass {
         this.tooltips = [];
         this.altdown = false;
     }
-    init(shortCut, topButtonContents) {
+    init(shortCut) {
         this.windowFocusChecker();
         this.setShortCut(shortCut);
-        this.setTopToolTip(topButtonContents);
 
         window.addEventListener('resize', function () {
             rtime = new Date();
@@ -18,10 +17,6 @@ class classroomManagerClass {
 
 
     }
-
-    callTeacher() {
-        connection.send({ callTeacher: { userid: connection.userid } }, GetOwnerId());
-    };
 
     windowFocusChecker() {
         window.focus();
@@ -81,23 +76,6 @@ class classroomManagerClass {
         window.open(location.protocol + "//" + location.host + "/dashboard/", "_self");
     };
 
-    setTopToolTip(data) {
-        let tooltip = document.getElementById("toptooltip");
-        Object.keys(data).forEach(function (id) {
-            let element = document.getElementById(id);
-            if (element)
-                element.addEventListener("mouseover", function (e) {
-                    tooltip.style.display = 'block';
-                    tooltip.children[0].innerHTML = data[id];
-                    let width = tooltip.getBoundingClientRect().width / 2;
-                    tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width / 2) - width + "px";
-                    element.addEventListener("mouseleave", function () {
-                        tooltip.style.display = 'none';
-                    })
-                })
-        });
-    };
-
     removeToolTip() {
         classroomManager.altdown = false;
         this.tooltips.forEach(element => document.getElementById("tool-box").removeChild(element));
@@ -127,7 +105,7 @@ class classroomManagerClass {
                         try {
                             document.getElementById(Object.keys(cut)).click();
                         }
-                        catch{
+                        catch {
                         }
                     }
                 });
@@ -167,7 +145,7 @@ class classroomManagerClass {
                 alert(window.langlist.EXISTING_ROOM_ERROR);
                 classroomManager.gotoMain();
             }
-            else if(connection.byLogin == true){
+            else if (connection.byLogin == true) {
                 console.log("join room teacher")
                 classroomCommand.joinRoom(_info);
 
@@ -221,7 +199,7 @@ class classroomManagerClass {
                         alert('Invalid password.');
                         return;
                     }
-                    connection.join(params.sessionid, function (isRoomJoined, roominfo,error) {
+                    connection.join(params.sessionid, function (isRoomJoined, roominfo, error) {
                         if (error) {
                             console.log(error);
                         }
@@ -256,8 +234,12 @@ class classroomManagerClass {
         if (event.data.roomBoom) {
             connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
-            alertBox(window.langlist.TEACHER_LEFT, window.langlist.NOTIFICATION, classroomManager.gotoMain, window.langlist.CONFIRM)
-
+            reactEvent.AlertBox({
+                title: window.langlist.NOTIFICATION,
+                content: window.langlist.TEACHER_LEFT,
+                yes: classroomManager.gotoMain,
+                removeNo: true
+            })
             return true;
         }
     };
@@ -265,7 +247,7 @@ class classroomManagerClass {
     leftTeacher() {
         canvasManager.clearTeacherCanvas();
 
-        if(!examObj.isStart)
+        if (!examObj.isStart)
             examObj.closeBoard();
         console.debug("Teacher left the class");
     };

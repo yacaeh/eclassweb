@@ -60,20 +60,13 @@ class epubManagerClass {
         }
 
         book.loaded.navigation.then(function (toc) {
-            var len = book.spine.length;
-            pageNavigator.set(len);
-            let origin = book.url.origin;
-            let path = book.path.directory;
-            let location = origin + path;
+            pageNavigator.set(book.spine.length);
             pageNavigator.epubsetting();
             Object.keys(book.package.manifest).forEach(function (e) {
                 let href = book.package.manifest[e].href;
                 if (href.includes("thumbnail")) {
-                    let img = document.createElement("img");
-                    img.style.width = '100%';
-                    img.src = location + href;
-                    pageNavigator.push(img, function () {
-                        rendition.display(this.getAttribute("idx"));
+                    reactEvent.navigation.push(book.url.origin + book.path.directory + href, (e) =>{
+                        rendition.display(e.target.getAttribute("idx"));
                     })
                 }
             })
@@ -84,9 +77,6 @@ class epubManagerClass {
             doc.documentElement.style.display = 'flex';
             doc.documentElement.style.justifyContent = 'center';
             doc.documentElement.style.height = '100%';
-            // doc.documentElement.style.alignItems = 'center';
-            // doc.body.appendChild;
-
             pointer_saver.save()
             pointer_saver.load(locations.start.index);
             pageNavigator.select(locations.start.index);
