@@ -11,15 +11,15 @@ class StudentList extends React.Component {
 
     render() {
         const list = this.props.studentList.map(id => (
-        <Student 
-            isOwner={id.isOwner}
-            key={id.userId} 
-            uid={id.userId} 
-            name={id.userName} />
+            <Student
+                isOwner={id.isOwner}
+                key={id.userId}
+                uid={id.userId}
+                name={id.userName} />
         ))
         return <div ref={this.myRef} id="student_list">
             <div onClick={this.onClick} id="student_list_button">
-                {this.state.collapse ? ("+" + (list.length-16)) : ("...")}            
+                {this.state.collapse ? ("+" + (list.length - 16)) : ("...")}
             </div>
             {list}
         </div>
@@ -139,10 +139,9 @@ class Student extends React.Component {
 
     render() {
         return <span
-            onClick = {store.getState().isOwner ? this.onMouseClick : undefined}
-            onMouseLeave = {store.getState().isOwner ? this.onMouseLeave : undefined}
-            onMouseEnter = {store.getState().isOwner ? this.onMouseEnter : undefined}
-
+            onClick={store.getState().isOwner ? this.onMouseClick : undefined}
+            onMouseLeave={store.getState().isOwner ? this.onMouseLeave : undefined}
+            onMouseEnter={store.getState().isOwner ? this.onMouseEnter : undefined}
             className="student"
             data-name={this.props.name}
             data-id={this.props.uid}

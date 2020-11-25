@@ -1097,6 +1097,7 @@ module.exports = exports = function (socket, config) {
             call_getRoom(room => {
                 room.info = data;
                 room.participants.forEach((userid) => {
+                    
                     if(listOfUsers[userid])
                         listOfUsers[userid].socket.emit('update-teacher-cam', data.camshare);
                 })

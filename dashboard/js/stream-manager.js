@@ -295,7 +295,8 @@ class maincamManagerClass {
 
   async addNewStudentCam(stream, track) {
     let isFind = false;
-    let el = document.createElement("video")
+    let el = document.createElement("video");
+    console.log("ADD NEW CAM", stream.id)
     try {
       el.controls = false;
       el.style.width = "100%";
@@ -313,10 +314,12 @@ class maincamManagerClass {
       connection.socket.emit("get-student-cam", {
         streamid: stream.id
       }, function (e) {
+        console.log(e);
         let childern = document.getElementById('student_list').getElementsByClassName('student');
         for (let i = 0; i < childern.length; i++) {
           let child = childern[i];
           if (child.dataset.id == e) {
+            console.log(child);
             child.appendChild(el);
             isFind = true;
             break;

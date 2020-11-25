@@ -21,12 +21,8 @@ class Header extends React.Component {
         }
 
         this.setState({ nowView: nextState })
-        // store.dispatch({type : CHANGE_CAMVIEW, data : nextState });
-
         classroomInfo.showcanvas = false;
         let childern = document.getElementById("student_list").getElementsByClassName('student');
-        console.log(childern);
-
         switch (nextState) {
             case "TEACHER_CAM":
                 maincamManager.show();
@@ -97,7 +93,7 @@ class Header extends React.Component {
                 <img className="divide" />
             </span>}
             {!store.getState().isOwner && <this.Students_Icon isAllContorl={store.getState().classroomInfo.allControl} />} 
-            <CameraBtn nowView={this.state.nowView} onClick={this.cameraBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>
+            {!store.getState().isMobile && <CameraBtn nowView={this.state.nowView} onClick={this.cameraBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>}
             {store.getState().isOwner && <StudentBtn nowView={this.state.nowView} onClick={this.studentBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>}
         </span>
     }

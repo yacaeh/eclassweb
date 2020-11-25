@@ -142,18 +142,11 @@ async function webRTCPCInit() {
             maincamManager.addNewTeacherCam(localStream);
             maincamManager.hide();
             track.paused = false;
-            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {
-            });
+            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {});
           }
-
-          if (!connection.extra.roomOwner)
-            connection.socket.emit("update-student-cam", Object.assign({}, {
-              id: connection.userid,
-              streamid: stream.id
-            }), function (e) {
-            });
-
-
+ 
+          connection.socket.emit("update-student-cam", Object.assign({}, 
+            {id: connection.userid, streamid: stream.id}), function (e) {});
         });
         pc.addTransceiver('video', {
           direction: 'sendrecv',
@@ -204,11 +197,11 @@ async function webRTCPCInit() {
               if (classroomInfo.camshare.id == stream.id) {
                 if (!connection.extra.roomOwner) {
                   maincamManager.addNewTeacherCam(stream);
-                  maincamManager.show();
+                  maincamManager.addNewStudentCam(stream, track)
                   track.paused = false;
                 }
-              } else {
-                if (connection.extra.roomOwner)
+              } 
+              else {
                   maincamManager.addNewStudentCam(stream, track)
               }
             };
