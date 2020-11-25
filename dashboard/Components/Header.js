@@ -85,7 +85,6 @@ class Header extends React.Component {
             </>
         )
     };
-
     
     Features(){
         return <span className="feature">
@@ -96,13 +95,11 @@ class Header extends React.Component {
                 <SaveNotification onMouseEnter={onOver} onMouseLeave={onLeave}/>
                 <ScreenRecorder onMouseEnter={onOver} onMouseLeave={onLeave}/>
                 <img className="divide" />
-                <CameraBtn nowView={this.state.nowView} onClick={this.cameraBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>
-                <StudentBtn nowView={this.state.nowView} onClick={this.studentBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>
             </span>}
-
             {!store.getState().isOwner && <this.Students_Icon isAllContorl={store.getState().classroomInfo.allControl} />} 
+            <CameraBtn nowView={this.state.nowView} onClick={this.cameraBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>
+            {store.getState().isOwner && <StudentBtn nowView={this.state.nowView} onClick={this.studentBtnHandler} onMouseEnter={onOver} onMouseLeave={onLeave}/>}
         </span>
-        
     }
  
     Students_Icon(props) {
@@ -127,8 +124,6 @@ class Header extends React.Component {
         })
     }
 }
-
-
 class CurrentTime extends React.Component {
     constructor(props) {
         super(props);
@@ -142,7 +137,7 @@ class CurrentTime extends React.Component {
         return <span className="time">
             <span id="current-time">{this.state.printTime}</span>
             <span id="recording-time">
-                <img src="/dashboard/img/recording.png" style={{ display: 'none', marginRight: '7px', marginBottom: '2px' }} />
+                <img src="/dashboard/img/recording.png" style={{marginRight: '7px', marginBottom: '2px' }} />
                 <span className="text"></span>
             </span>
         </span>
@@ -155,16 +150,15 @@ class CurrentTime extends React.Component {
             let time = now;
             let hour = Math.floor(time / 3600);
             time %= 3600;
-
             let min = Math.floor(time / 60);
             time %= 60;
-
             hour = ("00" + hour).slice(-2);
             min = ("00" + min).slice(-2);
             time = ("00" + time).slice(-2);
-
+            if(isNaN(hour))
+                return;
+                
             let printTime = hour + ':' + min + ':' + time;
-
             this.setState({printTime})
         }, 1000);
     }

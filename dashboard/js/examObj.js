@@ -485,12 +485,12 @@ function deleteQuestion(num) {
     var answerList = getQuestionAnswerList();
     m_QuesCount--;
     answerList.splice(num - 1, 1);
-    $('#exam-question-list').html('');
+    document.getElementById("exam-question-list").innerHTML = '';
     for (var i = 1; i <= m_QuesCount; i++) {
         apeendQuestion(i);
     }
     setQuestionAnswer(answerList);
-    $('#exam-question-count').val(m_QuesCount);
+    document.getElementById("exam-question-count").value = m_QuesCount;
 }
 
 // 시험 문제 하나의 정답률 변경 / 형식 -> (문제번호, 문제정답수/학생수)

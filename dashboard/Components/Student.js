@@ -8,15 +8,19 @@ class StudentList extends React.Component {
         this.myRef = React.createRef();
         this.onClick = this.onClick.bind(this);
     }
+
     render() {
         const list = this.props.studentList.map(id => (
         <Student 
-        key={id.userId} 
-        uid={id.userId} 
-        name={id.userName} />))
-
+            isOwner={id.isOwner}
+            key={id.userId} 
+            uid={id.userId} 
+            name={id.userName} />
+        ))
         return <div ref={this.myRef} id="student_list">
-            <div onClick={this.onClick} id="student_list_button" />
+            <div onClick={this.onClick} id="student_list_button">
+                {this.state.collapse ? ("+" + (list.length-16)) : ("...")}            
+            </div>
             {list}
         </div>
     }
@@ -31,10 +35,8 @@ class StudentList extends React.Component {
             if (!this.state.collapse) {
                 list.appendChild(self);
                 line = Math.max(4, line);
-                self.innerHTML = "…";
             }
             else {
-                self.innerHTML = "+" + (len - 16);
                 list.insertBefore(self, list.children[15]);
                 line = 4;
             }
@@ -82,7 +84,7 @@ class Student extends React.Component {
         if (!classroomInfo.showcanvas)
             this.myRef.current.style.display = 'none';
 
-        reactEvent.enterOrExit(this.props.name, "ENTER");
+        reactEvent.enterOrExit(this.props.name, this.props.isOwner, "ENTER");
         canvasManager.canvas_array[this.props.uid] = this.myRef.current;
     };
 
@@ -102,7 +104,6 @@ class Student extends React.Component {
             list.style.height = 6 * line + "%";
         }
         else {
-            btn.innerHTML = "+" + (len - 15);
             list.style.gridAutoRows = 100 / 4 + "%";
             list.style.height = 6 * 4 + "%";
         }
@@ -127,7 +128,7 @@ class Student extends React.Component {
         if (permissionManager.IsCanvasPermission(this.props.uid))
             permissionManager.DeleteCanvasPermission(this.props.uid);
 
-        reactEvent.enterOrExit(this.props.name, "EXIT");
+        reactEvent.enterOrExit(this.props.name, this.props.isOwner, "EXIT");
 
 
         examObj.leftStudent(this.props.uid);

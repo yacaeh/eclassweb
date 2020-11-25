@@ -1198,6 +1198,10 @@ module.exports = exports = function (socket, config) {
             callback(teacherlist[uid]);
         })
 
+        socket.on('get-rooms', function(callback){
+            callback(listOfRooms);
+        })
+
         socket.on('get-userlist', function(callback){
             let list = []
             Object.keys(listOfUsers).forEach((e) => {

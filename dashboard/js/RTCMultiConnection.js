@@ -363,7 +363,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
             reactEvent.AlertBox({
                 title : window.langlist.NOTIFICATION,
-                content : window.langlist.TEACHER_LEFT,
+                content : window.langlist.TEACHER_LEFT_BOOM,
                 yes : () => {location.href = '/dashboard/login.html'},
                 removeNo : true
             })

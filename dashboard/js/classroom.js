@@ -18,7 +18,6 @@ var isSharingFile = false;
 
 var connection = new RTCMultiConnection();
 var epubManager = new epubManagerClass();
-var screenRecorder = new screenRecorderClass();
 var screenshareManager = new ScreenShareManagerClass();
 var maincamManager = new maincamManagerClass();
 var canvasManager = new canvasManagerClass();
@@ -222,4 +221,5 @@ connection.onmessage = function (event) {
   if (event.data.pageidx == pointer_saver.nowIdx) {
     designer.syncData(event.data);
   }
+  
 };

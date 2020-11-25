@@ -32,9 +32,6 @@ class ChattingWindow extends React.Component {
     };
 
     collapse() {
-
-
-
         this.setState({ show: !this.state.show })
     };
 
@@ -82,12 +79,13 @@ class ChattingWindow extends React.Component {
             _this.setState({ chattingLogs: _this.state.chattingLogs.concat(data) });
         }
 
-        reactEvent.enterOrExit = function (name, event) {
+        reactEvent.enterOrExit = function (name, owner, event) {
             let data = {
                 enterOrExitEvent: true,
                 enterOrExit: event == "ENTER",
                 name: name,
                 fromMe: false,
+                isOwner : owner
             }
             _this.setState({ notice: _this.state.notice.concat(data) });
         }
@@ -184,7 +182,11 @@ class Notice extends React.Component {
                     <font color='#000000'>
                         {params.data.name}
                     </font>
-                    {params.data.enterOrExit ? GetLang('STUDENT_JOIN') : GetLang('STUDENT_LEFT')}
+
+                    {params.data.enterOrExit ? 
+                        params.data.isOwner ? GetLang('TEACHER_JOIN') : GetLang("STUDENT_JOIN") :
+                        params.data.isOwner ? GetLang('TEACHER_LEFT') : GetLang("STUDENT_LEFT") 
+                    }
                 </b>
             </div>
         } else {

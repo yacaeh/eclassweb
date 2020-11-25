@@ -9,19 +9,12 @@ class mobileHelperClass {
         }
     }
     setMobile() {
-        widgetContainer.style.right = "0px";
         ChatSetting();
         FullScreenBtnInit();
+        widgetContainer.style.right = "0px";
         rightTab.style.display = "none";
-        rightTab.style.width = "0px";
         classroomManager.canvasResize();
         MainCamSetting();
-
-        function ToolSetting() {
-            let toolbox = document.getElementById("tool-box");
-            toolbox.removeChild(document.getElementById("clearCanvas"))
-            toolbox.removeChild(document.getElementById("undo"))
-        }
 
         function MainCamSetting() {
             let video = maincamManager.get();

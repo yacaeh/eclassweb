@@ -1,8 +1,6 @@
 class SaveNotification extends React.Component {
     state = {
-        // studentsAnswer : {},
         teacherRequest : {},
-        // totalCount : 0
     }
 
     constructor(props){
@@ -11,12 +9,17 @@ class SaveNotification extends React.Component {
     }
 
     render(){
-        return <img onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave} className="top_icon" id="top_save_alert" onClick={this.exportAttention} data-des={GetLang('TOP_SAVE_ALERT')} />
+        return <img 
+        onMouseEnter={this.props.onMouseEnter} 
+        onMouseLeave={this.props.onMouseLeave} 
+        onClick={this.exportAttention} 
+        className="top_icon" id="top_save_alert" 
+        data-des={GetLang('TOP_SAVE_ALERT')} />
     }
 
     exportAttention() {
         if( attentionManager.totalCount <= 0 ){
-            alert(window.langlist.NO_DATA_STORE);
+            alert(GetLang('NO_DATA_STORE'));
             return false;
         } 
 
@@ -42,7 +45,7 @@ class SaveNotification extends React.Component {
 
     getSubmitData () {
         let contents = [];        
-        contents[0] = [window.langlist.NAME, window.langlist.ANSWER];   // 타이틀        
+        contents[0] = [GetLang('NAME'), GetLang('ANSWER')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for(let i = 0; i < attentionManager.totalCount; ++i) {
@@ -86,14 +89,14 @@ class Attention extends React.Component {
         }
 
         reactEvent.AlertBox({
-            title : window.langlist.NOTIFICATION,
-            content : window.langlist.NOTIFICATION_WARNING,
+            title : GetLang('NOTIFICATION'),
+            content : GetLang('NOTIFICATION_WARNING'),
             yes : callback
         })
 
         function callback() {
             attentionManager.totalCount++;
-            attentionManager.teacherRequest[attentionManager.totalCount] = {name: window.langlist.ATTENTION_PLEASE};
+            attentionManager.teacherRequest[attentionManager.totalCount] = {name: GetLang('ATTENTION_PLEASE')};
             connection.send({alert: true});
 
             let chilldren = document.getElementById('student_list').children;

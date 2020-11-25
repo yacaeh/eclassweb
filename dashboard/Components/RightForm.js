@@ -40,7 +40,8 @@ class RightForm extends React.Component {
             connection.send('plz-sync-points', userId);
             console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
             event.extra.roomOwner && classroomManager.rejoinTeacher();
-            const list = this.state.studentList.concat({ userId, userName });
+            let isOwner = event.extra.roomOwner;
+            const list = this.state.studentList.concat({ userId, userName, isOwner});
             this.setState({ studentList: list });
             this.setState({ numberOfStudents: list.length });
         })

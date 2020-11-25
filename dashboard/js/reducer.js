@@ -46,17 +46,21 @@ function Init() {
 function reducer(state = InitData, action) {
     switch (action.type) {
         case CHANGE_LANGUAGE:
-            state.language = action.data;
-            break;
+            return Object.assign({}, state, {
+                language : action.data
+            })
         case SET_CLASSROOM_INFO:
-            state.classroomInfo = action.data;
-            break;
+            return Object.assign({}, state, {
+                classroomInfo : action.data
+            })
         case CHANGE_CAMVIEW:
-            state.nowView = action.data;
-            break;
+            return Object.assign({}, state, {
+                nowView : action.data
+            })
         case PERMISSION_CHANGED :
-            state.permissions = action.data;
-            break;
+            return Object.assign({}, state, {
+                permissions : action.data
+            })
     }
     console.log(state);
     return state;

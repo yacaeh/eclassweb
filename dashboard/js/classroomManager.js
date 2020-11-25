@@ -236,7 +236,7 @@ class classroomManagerClass {
             connection.socket.disconnect();
             reactEvent.AlertBox({
                 title: window.langlist.NOTIFICATION,
-                content: window.langlist.TEACHER_LEFT,
+                content: window.langlist.TEACHER_LEFT_BOOM,
                 yes: classroomManager.gotoMain,
                 removeNo: true
             })

@@ -12,7 +12,6 @@ class PageNavigation extends React.Component {
 
     componentDidMount() {
         reactEvent.navigation.push = (src, clickevent) => {
-            console.error("PUSH")
             this.setState(
                 ({ thumbnails }) => ({
                     thumbnails: thumbnails.concat({ src, clickevent })
@@ -29,7 +28,6 @@ class PageNavigation extends React.Component {
 
     render() {
         return (
-
             <>
                 <div id="epub-navi" style={{ display: 'none' }} className="shadow-5">
                     <span id="navi-top">

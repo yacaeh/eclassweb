@@ -46,8 +46,11 @@
     "NO_DATA_STORE":"No data to store",
     "STUDENT_JOIN":" Student joined!",
     "STUDENT_LEFT":" Student left!",
+    "TEACHER_JOIN":" Teacher joined!",
+    "TEACHER_LEFT":" Teacher left!",
+
     "TEACHER_USING_FEATURE":"Teacher is using feature already",
-    "TEACHER_LEFT":"Teacher left. Return to previous page",
+    "TEACHER_LEFT_BOOM":"Teacher left. Return to previous page",
     "NO_SCREEN_PERMISSION":"You don't have screen share permission",
     "SOMEONE_USING_SCREEN":"Someone is using screen share already",
 

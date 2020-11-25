@@ -24,6 +24,8 @@ class App extends React.Component {
             </div>
         }
     
-        return <ToolTip />
+        return <div id='UI'> 
+            <ToolTip />
+        </div>
     }
 }

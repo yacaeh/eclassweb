@@ -977,6 +977,7 @@ hr {
 }
 
 .feature {
+  display: flex;
   float: right;
   position: relative;
 }
@@ -1004,7 +1005,7 @@ hr {
 }
 
 .student {
-  background-color: white;
+  background-color: gray;
   display: inline-block;
   margin: 1px;
   cursor: pointer;
@@ -1620,6 +1621,7 @@ video::-webkit-media-controls-volume-slider {
   height: 100%;
   position: absolute;
   display: none;
+  z-index: 10;
 }
 
 .student-overlay {

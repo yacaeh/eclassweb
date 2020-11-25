@@ -88,11 +88,12 @@ function showusers() {
   })
 }
 
-function showrooms() {
-  connection.socket.emit('show-class-status', (e) => {
+function getrooms() {
+  connection.socket.emit('get-rooms', (e) => {
     console.log(e);
   })
 }
+
 function showstatus() {
   connection.socket.emit("show-class-status",
     (rooms) => {
