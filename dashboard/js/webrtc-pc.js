@@ -9,13 +9,13 @@ function uuidv4() {
     return v.toString(16);
   });
 }
-  
+
 const config = {
   iceServers: [
     {
       urls: ["turn:turn.primom.co.kr:443",
-      "turn:turn.primom.co.kr:443?transport=udp",
-      "turn:turn.primom.co.kr:443?transport=tcp"
+        "turn:turn.primom.co.kr:443?transport=udp",
+        "turn:turn.primom.co.kr:443?transport=tcp"
       ],
       username: "primomceo",
       credential: "webrtc"
@@ -28,14 +28,14 @@ const pc = new RTCPeerConnection(config);
 let teacherAdded = false;
 
 const VideoResolutions = {
-    thumb: { width: { ideal: 82 }, height: { ideal: 58 } },
-    qvga: { width: { ideal: 320 }, height: { ideal: 180 } },
-    vga: { width: { ideal: 640 }, height: { ideal: 360 } },
-    shd: { width: { ideal: 960 }, height: { ideal: 540 } },
-    hd: { width: { ideal: 1280 }, height: { ideal: 720 } },
-    fhd: { width: { ideal: 1920 }, height: { ideal: 1080 } },
-    qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
-  };
+  thumb: { width: { ideal: 82 }, height: { ideal: 58 } },
+  qvga: { width: { ideal: 320 }, height: { ideal: 180 } },
+  vga: { width: { ideal: 640 }, height: { ideal: 360 } },
+  shd: { width: { ideal: 960 }, height: { ideal: 540 } },
+  hd: { width: { ideal: 1280 }, height: { ideal: 720 } },
+  fhd: { width: { ideal: 1920 }, height: { ideal: 1080 } },
+  qhd: { width: { ideal: 2560 }, height: { ideal: 1440 } },
+};
 
 
 let localStream;
@@ -62,8 +62,9 @@ async function webRTCPCInit() {
       console.log('Join to stream new video');
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer)
-      .catch(function(e) {
-        console.log(e)});
+        .catch(function (e) {
+          console.log(e)
+        });
       const id = connection.userid;
       socket.send(
         JSON.stringify({
@@ -78,41 +79,44 @@ async function webRTCPCInit() {
         if (resp.id === id) {
           // Hook this here so it's not called before joining
           pc.onnegotiationneeded = async function () {
-              const offer = await pc.createOffer()
-              .catch(function(e) {
-                console.error(e)});
-              await pc.setLocalDescription(offer)
-              .catch(function(e) {
-                console.error(e)});
-  
-              const id = uuidv4();
-              socket.send(
-                JSON.stringify({
-                  method: 'offer',
-                  params: { desc: offer },
-                  id : id
-                })
-              );
-              nego = true;  
-
-              socket.addEventListener("message", (event) => {
-                const resp = JSON.parse(event.data);
-                if (resp.id === id) {
-                  pc.setRemoteDescription(resp.result);
-                }
+            const offer = await pc.createOffer()
+              .catch(function (e) {
+                console.error(e)
               });
+            await pc.setLocalDescription(offer)
+              .catch(function (e) {
+                console.error(e)
+              });
+
+            const id = uuidv4();
+            socket.send(
+              JSON.stringify({
+                method: 'offer',
+                params: { desc: offer },
+                id: id
+              })
+            );
+            nego = true;
+
+            socket.addEventListener("message", (event) => {
+              const resp = JSON.parse(event.data);
+              if (resp.id === id) {
+                pc.setRemoteDescription(resp.result);
+              }
+            });
           };
 
           pc.setRemoteDescription(resp.result)
-          .catch(function(e) {
-            console.error(e)});
+            .catch(function (e) {
+              console.error(e)
+            });
 
         } else if (resp.method == "trickle") {
           pc.addIceCandidate(resp.params);
         }
 
       });
-      
+
     };
 
     await navigator.mediaDevices
@@ -120,12 +124,12 @@ async function webRTCPCInit() {
         video:
           options.video instanceof Object
             ? {
-                ...VideoResolutions[options.resolution],
-                ...options.video,
-              }
+              ...VideoResolutions[options.resolution],
+              ...options.video,
+            }
             : options.video
-            ? VideoResolutions[options.resolution]
-            : false,
+              ? VideoResolutions[options.resolution]
+              : false,
         audio: options.audio,
       })
       .then((stream) => {
@@ -138,18 +142,11 @@ async function webRTCPCInit() {
             maincamManager.addNewTeacherCam(localStream);
             maincamManager.hide();
             track.paused = false;
-            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {
-            });
+            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {});
           }
-
-          if (!connection.extra.roomOwner)
-            connection.socket.emit("update-student-cam", Object.assign({}, {
-              id: connection.userid,
-              streamid: stream.id
-            }), function (e) {
-            });
-
-
+ 
+          connection.socket.emit("update-student-cam", Object.assign({}, 
+            {id: connection.userid, streamid: stream.id}), function (e) {});
         });
         pc.addTransceiver('video', {
           direction: 'sendrecv',
@@ -160,7 +157,7 @@ async function webRTCPCInit() {
 
         join();
       })
-      .catch((err)=>{
+      .catch((err) => {
         pc.addTransceiver('video', {
           direction: 'recvonly',
         });
@@ -169,7 +166,7 @@ async function webRTCPCInit() {
         });
 
         join();
-        });
+      });
 
 
     pc.ontrack = function ({ track, streams }) {
@@ -187,25 +184,25 @@ async function webRTCPCInit() {
             screenshareManager.streamstart(stream);
             track.paused = false;
 
-            
-            track.onended = function(event) {
+
+            track.onended = function (event) {
               screenshareManager.onclose();
             };
 
-          } 
-          
+          }
+
           // webcam
           else {
             track.onunmute = () => {
               if (classroomInfo.camshare.id == stream.id) {
                 if (!connection.extra.roomOwner) {
                   maincamManager.addNewTeacherCam(stream);
-                  maincamManager.show();
+                  maincamManager.addNewStudentCam(stream, track)
                   track.paused = false;
                 }
-              } else {
-                if(connection.extra.roomOwner)
-                maincamManager.addNewStudentCam(stream, track)
+              } 
+              else {
+                  maincamManager.addNewStudentCam(stream, track)
               }
             };
           }
@@ -213,8 +210,8 @@ async function webRTCPCInit() {
       });
     };
 
-    pc.oniceconnectionstatechange = function() {
-      if(pc.iceConnectionState == 'disconnected') {
+    pc.oniceconnectionstatechange = function () {
+      if (pc.iceConnectionState == 'disconnected') {
       }
     }
 
@@ -237,17 +234,20 @@ async function webRTCPCInit() {
       // Listen for server renegotiation notifications
       if (!resp.id && resp.method === 'offer') {
         await pc.setRemoteDescription(resp.params)
-        .catch(function(e) {
-          console.log(e)});
-        
+          .catch(function (e) {
+            console.log(e)
+          });
+
         const answer = await pc.createAnswer()
-        .catch(function(e) {
-          console.log(e)});
+          .catch(function (e) {
+            console.log(e)
+          });
 
         await pc.setLocalDescription(answer)
-        .catch(function(e) {
-          console.log(e)});
-      
+          .catch(function (e) {
+            console.log(e)
+          });
+
 
         const id = uuidv4();
         socket.send(
@@ -262,7 +262,7 @@ async function webRTCPCInit() {
       /////////////////////////////////////////////////
 
 
-      
+
     });
 
   } catch (err) {

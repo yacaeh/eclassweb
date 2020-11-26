@@ -190,12 +190,8 @@ function PDFViewerPlugin() {
     this.createThumbanil = function (thumbnails){
         let url = this.url;
         thumbnails.forEach((e) => {
-            let image = new Image();
-            image.style.width = '100%';
-            image.style.height = '100%';
-            image.src = url + e ;
-            window.parent.parent.pageNavigator.push(image, function(){
-                var idx = (this.getAttribute("idx") * 1) + 1;
+            window.parent.parent.reactEvent.navigation.push(url + e, (e) => {
+                let idx = (e.target.getAttribute("idx") * 1) + 1;
                 self.showPage(idx)
             })
         })
@@ -209,7 +205,7 @@ function PDFViewerPlugin() {
     }
 
     this.initialize = async function ( viewContainer, location ) {
-        window.parent.parent.pageNavigator.removethumbnail();
+        window.parent.parent.reactEvent.navigation.removeThumbnails();
         let ret = await axios.get(location);
         
         if(ret.status == 200){

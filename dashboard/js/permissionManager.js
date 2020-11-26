@@ -23,7 +23,7 @@ class permissionManagerClass {
         case "classP":
           if (this.classList.contains("off")) {
             if (classroomInfo.permissions.classPermission) {
-              alert($.i18n('STUDENT_PERMISSION_ALREADY'));
+              alert(window.langlist.STUDENT_PERMISSION_ALREADY);
               return false;
             }
             permissionManager.AddClassPermission(pid);
@@ -35,7 +35,7 @@ class permissionManagerClass {
         case "micP":
           if (this.classList.contains("off")) {
             if (classroomInfo.permissions.micPermission) {
-              alert($.i18n('STUDENT_PERMISSION_ALREADY'));
+              alert(window.langlist.STUDENT_PERMISSION_ALREADY);
               return false;
             }
             permissionManager.AddMicPermission(pid);
@@ -79,19 +79,6 @@ class permissionManagerClass {
       event.data.on ? permissionManager.setCanvasPermission(event.data.id) : permissionManager.disableCanvasPermission(event.data.id)
       return true;
     }
-  }
-  mute() {
-    connection.attachStreams.forEach(function (e) {
-      if (e.isVideo)
-        e.mute("audio");
-    })
-  }
-
-  unmute() {
-    connection.attachStreams.forEach(function (e) {
-      if (e.isVideo)
-        e.unmute("audio");
-    })
   }
 
   IsCanvasPermission(id) {
@@ -192,15 +179,22 @@ class permissionManagerClass {
   // for student ==================================================================
   setClassPermission() {
     console.debug("Get Screen share permission");
-    Show("student_screenshare");
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, screen : true}
+    })
+
     classroomInfo.permissions.classPermission = connection.userid;
     window.permission = true;
   };
 
   disableClassPermission() {
     console.debug("Lost Screen share permission");
-    Hide("student_screenshare");
     classroomInfo.permissions.classPermission = '';
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, screen : false}
+    })
 
     if (classroomInfo.shareScreen.state) {
       screenshareManager.isSharingScreen = false;
@@ -214,21 +208,30 @@ class permissionManagerClass {
 
   setMicPermission() {
     console.debug("Get mic permission");
-    Show("student_mic");
-    this.unmute();
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, mic : true}
+    })
   };
 
   disableMicPermission() {
     console.debug("Lost mic permission");
-    Hide("student_mic");
-    this.mute();
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, mic : false}
+    })
   };
 
   setCanvasPermission(id) {
     console.debug("Get canvas share permission");
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, canvas : true}
+    })
+
     console.log(classroomInfo.permissions.canvasPermission)
     classroomInfo.permissions.canvasPermission.push(id);
-    Show("student_canvas");
+
     connection.send({
       sendStudentPoint: true,
       isStudent: true,
@@ -240,51 +243,15 @@ class permissionManagerClass {
 
   disableCanvasPermission(id) {
     console.debug("Lost canvas share permission");
+    store.dispatch({
+      type : PERMISSION_CHANGED,
+      data : { ...store.getState().permissions, canvas : false}
+    })
+
     classroomInfo.permissions.canvasPermission = [];
     if(connection.userid == id)
-      Hide("student_canvas");
     canvasManager.clearStudentCanvas(id);
   };
-}
-
-
-
-function OnClickStudent(e, uid, name) {
-    var menu = document.getElementById('student-menu');
-    permissionManager.nowSelectStudent = e.target;
-
-    SetBtn("classP", e.target.dataset.classPermission);
-    SetBtn("micP", e.target.dataset.micPermission);
-    SetBtn("canP", e.target.dataset.canvasPermission);
-
-    function SetBtn(uid, ispermission) {
-      let btn = $('#' + uid);
-      let circle = $('#' + uid + '> .circle');
-
-      btn.clearQueue();
-      circle.clearQueue();
-
-      if (ispermission == 'true') {
-        btn.css({ 'background-color': '#18dbbe' });
-        circle.css({ left: '22px' });
-        btn.addClass('on');
-        btn.removeClass('off');
-      } else {
-        btn.css({ 'background-color': 'gray', });
-        circle.css({ left: '2px', });
-        btn.addClass('off');
-        btn.removeClass('on');
-      }
-    }
-
-    menu.style.right = document.body.clientWidth - e.clientX + 'px';
-    menu.style.top = e.clientY - 50 + 'px';
-
-    if (!$('#student-menu').is(':visible')) {
-      $('#student-menu').show('blind', {}, 150, function () { });
-    }
-
-    menu.getElementsByClassName('stuname')[0].innerHTML = name;
 }
 
 function button(t, c, on) {

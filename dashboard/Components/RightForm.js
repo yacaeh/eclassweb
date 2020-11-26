@@ -30,57 +30,45 @@ class RightForm extends React.Component {
     componentDidMount() {
         reactEvent.joinStudent = this.joinStudent;
         reactEvent.leftStudent = this.leftStudent;
-        reactEvent.setNOS = this.setNOS;
     };
-
-    setNOS = (num) => {
-        console.error(num);
-        this.setState({ numberOfStudents: num});
-    }
 
     joinStudent(event) {
         const userId = event.userid;
 
         connection.socket.emit("get-user-name", userId, (userName) => {
             if (userName == 'ycsadmin') return;
-            
             connection.send('plz-sync-points', userId);
             console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
-            ChattingManager.enterStudent(userName);
-
             event.extra.roomOwner && classroomManager.rejoinTeacher();
-            
-            if(connection.extra.roomOwner){
-                const list = this.state.studentList.concat({ userId, userName });
-                this.setState({ studentList: list });
-                connection.send({setNOS : list.length});
-                this.setState({ numberOfStudents: list.length });
-            }
+            let isOwner = event.extra.roomOwner;
+            const list = this.state.studentList.concat({ userId, userName, isOwner});
+            this.setState({ studentList: list });
+            this.setState({ numberOfStudents: list.length });
         })
     };
 
     leftStudent(event) {
         if (event.extra.userFullName == 'ycsadmin') return;
-        if(connection.extra.roomOwner){
-            const list = this.state.studentList.filter(user => user.userId != event.userid);
-            this.setState({ studentList: list});
-            connection.send({setNOS : list.length});
-            this.setState({ numberOfStudents: list.length});
-        }
+        const list = this.state.studentList.filter(user => user.userId != event.userid);
+        this.setState({ studentList: list});
+        this.setState({ numberOfStudents: list.length});
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
     }
 
     collapse = (e) => {
         this.setState({ collapsed: !this.state.collapsed })
+        
         if (!this.state.collapsed) {
             e.target.style.transform = "rotate(90deg)";
-            $(rightTab).animate({ width: "0%" });
-            $(widgetContainer).animate({ right: "0%" }, classroomManager.canvasResize);
+            rightTab.style.width = "0%";
+            widgetContainer.style.right = "0%";
+            classroomManager.canvasResize();
         }
         else {
+            rightTab.style.width = "17.7%";
+            widgetContainer.style.right = "17.7%";
             e.target.style.transform = "rotate(270deg)";
-            $(rightTab).animate({ width: "17.7%" });
-            $(widgetContainer).animate({ right: "17.7%" }, classroomManager.canvasResize);
+            classroomManager.canvasResize();
         }
     }
 }

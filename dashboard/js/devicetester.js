@@ -13639,14 +13639,12 @@ function Refresh(start) {
 		document.getElementById("device-network").style.backgroundColor = "#ffffff";
 		document.getElementById("device-cam").style.backgroundColor = "#ffffff";
 		document.getElementById("device-mic").style.backgroundColor = "#ffffff";
-
 		btn.setAttribute("disabled", '');
-		btn.innerHTML = $.i18n('TESTING');
 		btn.style.cursor = "default";
 	}
 	else {
 		btn.removeAttribute("disabled");
-		btn.innerHTML = $.i18n('REFRESH');
+		btn.innerHTML = window.langlist.REFRESH;
 		btn.style.cursor = "pointer";
 	}
 }

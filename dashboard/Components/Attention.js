@@ -1,8 +1,6 @@
 class SaveNotification extends React.Component {
     state = {
-        // studentsAnswer : {},
         teacherRequest : {},
-        // totalCount : 0
     }
 
     constructor(props){
@@ -11,12 +9,17 @@ class SaveNotification extends React.Component {
     }
 
     render(){
-        return <img className="top_icon" id="top_save_alert" onClick={this.exportAttention} />
+        return <img 
+        onMouseEnter={this.props.onMouseEnter} 
+        onMouseLeave={this.props.onMouseLeave} 
+        onClick={this.exportAttention} 
+        className="top_icon" id="top_save_alert" 
+        data-des={GetLang('TOP_SAVE_ALERT')} />
     }
 
     exportAttention() {
         if( attentionManager.totalCount <= 0 ){
-            alert($.i18n( 'NO_DATA_STORE' ));
+            alert(GetLang('NO_DATA_STORE'));
             return false;
         } 
 
@@ -42,7 +45,7 @@ class SaveNotification extends React.Component {
 
     getSubmitData () {
         let contents = [];        
-        contents[0] = [$.i18n('NAME'), $.i18n('ANSWER')];   // 타이틀        
+        contents[0] = [GetLang('NAME'), GetLang('ANSWER')];   // 타이틀        
         // id, answer, 
         let prefix = contents[0].length;
         for(let i = 0; i < attentionManager.totalCount; ++i) {
@@ -81,7 +84,21 @@ class SaveNotification extends React.Component {
 
 class Attention extends React.Component {
     callAttend() {
-        let callback = function () {
+        if (document.getElementById("exam-board").style.display == "block") {
+            return;
+        }
+
+        reactEvent.AlertBox({
+            title : GetLang('NOTIFICATION'),
+            content : GetLang('NOTIFICATION_WARNING'),
+            yes : callback
+        })
+
+        function callback() {
+            attentionManager.totalCount++;
+            attentionManager.teacherRequest[attentionManager.totalCount] = {name: GetLang('ATTENTION_PLEASE')};
+            connection.send({alert: true});
+
             let chilldren = document.getElementById('student_list').children;
             for (let i = 0; i < chilldren.length; i++) {
                 let al = chilldren[i].getElementsByClassName('bor')[0];
@@ -92,20 +109,9 @@ class Attention extends React.Component {
             }
         }
 
-        if (document.getElementById("exam-board").style.display == "block") {
-            return;
-        }
-
-
-        alertBox("<span>" + $.i18n('NOTIFICATION_WARNING') + "</span>  ", $.i18n('NOTIFICATION'), () => {
-            attentionManager.totalCount++;
-            attentionManager.teacherRequest[attentionManager.totalCount] = {name: $.i18n('ATTENTION_PLEASE')};
-            callback();
-            connection.send({alert: true});
-        }, () => { });
     };
 
     render() {
-        return <img className="top_icon" id="top_alert" onClick={this.callAttend} />
+        return <img onMouseEnter={this.props.onMouseEnter} onMouseLeave={this.props.onMouseLeave} className="top_icon" id="top_alert" onClick={this.callAttend} data-des={GetLang('TOP_NOTIFY')}/>
     }
 }

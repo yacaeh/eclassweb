@@ -46,8 +46,11 @@
     "NO_DATA_STORE":"Tidak ada data untuk disimpan",
     "STUDENT_JOIN":" siswa telah masuk!",
     "STUDENT_LEFT":" siswa keluar!",
+    "TEACHER_JOIN":" Guru telah masuk!",
+    "TEACHER_LEFT":" Guru keluar!",
+
     "TEACHER_USING_FEATURE":"Guru sedang menggunakan fungsi lain",
-    "TEACHER_LEFT":"Guru pergi. kembali ke halaman sebelumnya",
+    "TEACHER_LEFT_BOOM":"Guru pergi. kembali ke halaman sebelumnya",
     "NO_SCREEN_PERMISSION":"Anda tidak memiliki hak berbagi layar",
     "SOMEONE_USING_SCREEN":"Orang lain sedang menggunakan berbagi layar",
 

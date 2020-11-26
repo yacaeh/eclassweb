@@ -1,29 +1,12 @@
-window.params = GetParamsFromURL();var reactEvent = {};
-function reducer(state = {}, action) {
-  switch(action.type){
-    case "SCREEN_SHARE" :
-      state.class = true;
-      break;
-  }
+window.params = GetParamsFromURL();
 
-  console.log(state);
-  return state;
-}
-
-const store = Redux.createStore(reducer);
-var connection          = new RTCMultiConnection();
 
 const render = () => {
   ReactDOM.render(
-    <ReactRedux.Provider store = {store}>
-        <App connection={connection} /> 
-    </ReactRedux.Provider>,
+      <App />,
     document.getElementById('app'));
 }
 store.subscribe(render);
-store.subscribe(function(e){
-  store.getState();
-})
 render();
 
 //=============================================================================================
@@ -33,22 +16,21 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 
-var epubManager         = new epubManagerClass();
-var screenRecorder      = new screenRecorderClass();
-var screenshareManager  = new ScreenShareManagerClass();
-var maincamManager      = new maincamManagerClass();
-var canvasManager       = new canvasManagerClass();
-var mobileHelper        = new mobileHelperClass();
-var pointer_saver       = new PointerSaver();
-var classroomManager    = new classroomManagerClass();
-var permissionManager   = new permissionManagerClass();
-var attentionManager    = new attentionManagerClass();
+var connection = new RTCMultiConnection();
+var epubManager = new epubManagerClass();
+var screenshareManager = new ScreenShareManagerClass();
+var maincamManager = new maincamManagerClass();
+var canvasManager = new canvasManagerClass();
+var mobileHelper = new mobileHelperClass();
+var pointer_saver = new PointerSaver();
+var classroomManager = new classroomManagerClass();
+var permissionManager = new permissionManagerClass();
+var attentionManager = new attentionManagerClass();
 
 //=============================================================================================
 
-const topButtonContents = {};
 const widgetContainer = document.getElementById("widget-container");
-const rightTab        = document.getElementById("right-tab")
+const rightTab = document.getElementById("right-tab")
 
 // Alt + 단축키
 const shortCut = [
@@ -80,20 +62,19 @@ connection.maxParticipantsAllowed = 100;
 connection.extra.roomOwner = params.open == 'true';
 connection.extra.userFullName = params.userFullName;
 connection.publicRoomIdentifier = params.publicRoomIdentifier;
-connection.session = {audio: false,video: false,data: true,screen: false,};
-connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false};
+connection.session = { audio: false, video: false, data: true, screen: false, };
+connection.sdpConstraints.mandatory = { OfferToReceiveAudio: false, OfferToReceiveVideo: false };
 
 window.onWidgetLoaded = function () {
   console.debug("On widget loaded");
   pageNavigator.init();
   canvasManager.init();
   permissionManager.init();
-  classroomManager.init(shortCut, topButtonContents);
+  classroomManager.init(shortCut);
   mobileHelper.init();
 }
 
 window.onSocketConnected = function () {
-  updateClassTime();
   classroomCommand.updateSyncRoom();
   webRTCPCInit();
   document.body.removeChild(document.getElementById("loading-screen"));
@@ -114,11 +95,10 @@ connection.onmessage = function (event) {
     console.log(event);
 
   if (permissionManager.eventListener(event) ||
-      screenshareManager.eventListener(event) ||
-      ChattingManager.eventListener(event) ||
-      canvasManager.eventListener(event) ||
-      classroomManager.eventListener(event)
-    )
+    screenshareManager.eventListener(event) ||
+    canvasManager.eventListener(event) ||
+    classroomManager.eventListener(event)
+  )
     return;
 
   if (event.data === 'plz-sync-points') {
@@ -126,8 +106,23 @@ connection.onmessage = function (event) {
     return;
   }
 
+  if (event.data.chatMessage) {
+    reactEvent.chatting(event);
+    return true;
+  }
+
   if (event.data.allControl) {
-    onAllControlValue(event.data.allControl);
+
+    if (event.data.allControl.state) {
+      classroomInfo = event.data.allControl.roomInfo;
+      store.dispatch({ type: SET_CLASSROOM_INFO, data: event.data.allControl.roomInfo });
+    }
+    else {
+      classroomInfo.allControl = false;
+      store.dispatch({ type: SET_CLASSROOM_INFO, data: { ...classroomInfo, allControl: false } });
+    }
+
+    classroomCommand.updateSyncRoom();
     return;
   }
 
@@ -167,17 +162,18 @@ connection.onmessage = function (event) {
   }
 
   if (event.data.epub) {
+    console.log(event.data);
+
     let data = event.data.epub
     if (data.cmd) {
       classroomCommand.updateEpubCmd(data);
-  } else {
+    } else {
       let currentState = classroomInfo.epub.state;
       if (currentState != data.state) {
-          classroomInfo.epub = data;
-          console.log(event.data);
-          classroomInfo.epub.state ? classroomCommand.openEpub(event.data.url) : epubManager.unloadEpubViewer();
+        classroomInfo.epub = data;
+        classroomInfo.epub.state ? classroomCommand.openEpub(event.data.url) : epubManager.unloadEpubViewer();
       }
-  }
+    }
 
     return;
   }
@@ -216,8 +212,8 @@ connection.onmessage = function (event) {
     }
     rightTab.style.zIndex = 2;
 
-    mobileHelper.isMobile ? 
-      widgetContainer.style.right = "0px" : 
+    store.getState().isMobile ?
+      widgetContainer.style.right = "0px" :
       widgetContainer.removeAttribute("style");
     return;
   }
@@ -225,8 +221,5 @@ connection.onmessage = function (event) {
   if (event.data.pageidx == pointer_saver.nowIdx) {
     designer.syncData(event.data);
   }
-
-  if(event.data.setNOS){
-    reactEvent.setNOS(event.data.setNOS);
-  }
+  
 };

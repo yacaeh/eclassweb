@@ -399,24 +399,11 @@ button[disabled] {
 
 #notice {
   position: relative;
-  height: 50%;
   top: 0px;
   left: 0px;
   right: 0px;
-  border-bottom: gray 1px solid;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-#noticewindow {
-  overflow:rmse auto;
-  right: 0px;
-  top: 40px;
-  position: absolute;
-  left: 10px;
-  bottom: 25px;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 #notice > .text {
@@ -447,18 +434,17 @@ button[disabled] {
   border-top: 1px solid #b8b8b8;
 }
 
-#notice > #collapse {
-  position: absolute;
-  bottom: 0px;
+#collapse {
+  position: relative;
   width: 100%;
   align-content: center;
   display: inline-grid;
   text-align: center;
   cursor: pointer;
-  height: 30px;
+  height: 20px;
 }
 
-#notice > #collapse > .btn {
+#collapse > .btn {
   position: absolute;
   left: calc(50% - 14px);
   padding: 0px;
@@ -471,7 +457,7 @@ button[disabled] {
   text-align: left;
   overflow: auto;
   width: 100%;
-  bottom: 50px;
+  bottom: 28px;
   position: absolute;
   top: 5px;
   overflow-x: hidden;
@@ -606,7 +592,6 @@ hr {
 
 .conversation-panel {
   position: relative;
-  height: 44%;
   overflow: inherit !important;
 }
 
@@ -761,7 +746,7 @@ hr {
   display: none;
 }
 
-#icon_exit {
+#Button_Exit {
   content: url(/dashboard/img/exit.png);
   cursor: pointer;
   left: 10px;
@@ -776,31 +761,8 @@ hr {
   z-index: 5;
   background: white;
   position: relative;
-}
-
-#top_attach-file {
-  content: url(/dashboard/img/iconfinder_File.png);
-}
-
-#my-name {
-  display: none;
-  left: 400px;
-  position: absolute;
-  font-size: 20px;
-  font-style: italic;
-  text-decoration: underline;
-  color: slateblue;
-  top: 10px;
-  font-weight: bold;
-}
-
-#who-am-i {
-  position: absolute;
-  left: 220px;
-  top: 7px;
-  font-size: 25px;
-  font-weight: bold;
-  color: rgb(135, 152, 156);
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .time {
@@ -1015,11 +977,9 @@ hr {
 }
 
 .feature {
-  width: 234px;
-  height: 50px;
-  position: absolute;
-  display: none;
-  right: 120px;
+  display: flex;
+  float: right;
+  position: relative;
 }
 
 .controll {
@@ -1045,7 +1005,7 @@ hr {
 }
 
 .student {
-  background-color: white;
+  background-color: gray;
   display: inline-block;
   margin: 1px;
   cursor: pointer;
@@ -1368,6 +1328,7 @@ input[type='number']:focus {
 .exam-overflow{
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .text-center-bold {
@@ -1660,6 +1621,7 @@ video::-webkit-media-controls-volume-slider {
   height: 100%;
   position: absolute;
   display: none;
+  z-index: 10;
 }
 
 .student-overlay {
@@ -1869,13 +1831,6 @@ body:fullscreen {
   border-color: #18DBBE;
 }
 
-#showcam, #showcanvas {
-  z-index:  100;
-  border-radius: 8px;
-  font-family: roboto;
-  font-weight: 800;
-}
-
 #right-tab-collapse{
   position: absolute;
   left: -30px;
@@ -1917,11 +1872,9 @@ body:fullscreen {
   display: flex;
 }
 
-
-
 .language {
-  position: absolute;
-  right: 0px;
+  position: relative;
+  float: right;
 }
 
 

@@ -48,7 +48,7 @@ class ScreenShareManagerClass {
     var on = btn.classList.contains("on");
     if (!connection.extra.roomOwner &&
       connection.userid != classroomInfo.permissions.classPermission) {
-      alert($.i18n('NO_SCREEN_PERMISSION'));
+      alert(window.langlist.NO_SCREEN_PERMISSION);
       btn.classList.remove("on");
       btn.classList.remove("selected-shape");
       return;
@@ -65,7 +65,7 @@ class ScreenShareManagerClass {
     }
 
     if (classroomInfo.shareScreen.state) {
-      alert($.i18n('SOMEONE_USING_SCREEN'));
+      alert(window.langlist.SOMEONE_USING_SCREEN);
       btn.classList.remove("on");
       btn.classList.remove("selected-shape");
       return;
@@ -267,10 +267,10 @@ class maincamManagerClass {
     return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
   show() {
-    Show(this.get());
+    this.get().style.display = 'block';
   }
   hide() {
-    Hide(this.get());
+    this.get().style.display = 'none';
   }
   start(callback) {
     var inter = setInterval(function () {
@@ -295,7 +295,7 @@ class maincamManagerClass {
 
   async addNewStudentCam(stream, track) {
     let isFind = false;
-    let el = document.createElement("video")
+    let el = document.createElement("video");
     try {
       el.controls = false;
       el.style.width = "100%";
@@ -310,9 +310,7 @@ class maincamManagerClass {
         el.src = URL.createObjectURL(stream);
       }
 
-      connection.socket.emit("get-student-cam", {
-        streamid: stream.id
-      }, function (e) {
+      connection.socket.emit("get-student-cam", {streamid: stream.id}, function (e) {
         let childern = document.getElementById('student_list').getElementsByClassName('student');
         for (let i = 0; i < childern.length; i++) {
           let child = childern[i];
@@ -323,9 +321,8 @@ class maincamManagerClass {
           }
         }
 
-
         if (classroomInfo.showcanvas) {
-          Hide(el)
+          el.style.display = 'none';
         }
 
         var playPromise = el.play();

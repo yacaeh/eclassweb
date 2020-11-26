@@ -1097,6 +1097,7 @@ module.exports = exports = function (socket, config) {
             call_getRoom(room => {
                 room.info = data;
                 room.participants.forEach((userid) => {
+                    
                     if(listOfUsers[userid])
                         listOfUsers[userid].socket.emit('update-teacher-cam', data.camshare);
                 })
@@ -1196,6 +1197,10 @@ module.exports = exports = function (socket, config) {
 
         socket.on('get-my-room', function(uid, callback){
             callback(teacherlist[uid]);
+        })
+
+        socket.on('get-rooms', function(callback){
+            callback(listOfRooms);
         })
 
         socket.on('get-userlist', function(callback){

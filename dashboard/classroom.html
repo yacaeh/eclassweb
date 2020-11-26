@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 
 <head>
-  <title id="class-title" data-i18n="TITLE">Home Class : 비대면 학습 시스템</title>
+  <title id="class-title">Home Class : 비대면 학습 시스템</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no user-scalable=0">
   
@@ -15,21 +15,13 @@
   <link href="/favicon.ico" rel="shortcut icon" />
 
   <link rel="stylesheet" href="/dashboard/Components/Canvas.css">
-  <link rel="stylesheet" href="/dashboard/Components/Header.css">
   <link rel="stylesheet" href="/dashboard/Components/PageNavigation.css">
 
 <!-- Jquery ================================================================================ -->
   <script src="/dashboard/js/lib/jquery-3.3.1.min.js"></script>
   <script src="/dashboard/js/lib/jquery-ui.min.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.messagestore.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.fallbacks.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.language.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.parser.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.emitter.js"></script>
-  <script src="/dashboard/js/lib/jquery.i18n.emitter.bidi.js"></script>
 
-<!-- Library ================================================================================ -->
+  <!-- Library ================================================================================ -->
   <script src="/dashboard/js/lib/pep.js"></script>
   <script src="/dashboard/js/lib/xlsx.full.min.js"></script>
   <script src="/dashboard/js/lib/babylon.js"></script>
@@ -68,7 +60,6 @@
   <script src="/dashboard/js/page-navigator.js" ></script>
   <script src="/dashboard/js/epub.js" ></script>
   <script src="/dashboard/js/classroomManager.js" ></script>
-  <script src="/dashboard/js/chatting.js" ></script>
   <script src="/dashboard/js/permissionManager.js"></script>
   <script src="/dashboard/js/3d_render.js"></script>
   <script src="/dashboard/js/lib/CLDRPluralRuleParser.js"></script>
@@ -80,6 +71,8 @@
   <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.6.0/redux.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/7.2.2/react-redux.min.js"></script>
+
+  <script src="/dashboard/js/reducer.js"></script>
 
   <script type="text/babel" src="/dashboard/Components/LanguageSelector.js"></script>
   <script type="text/babel" src="/dashboard/Components/PageNavigation.js"></script>
@@ -102,8 +95,7 @@
 
 <!-- React End -->
 
-  <script type="text/babel" defer src="/dashboard/js/classroom.js"></script>
-  <script type="text/babel" defer src="/dashboard/js/lib/ChannelIO.js"></script>
+<script type="text/babel" defer src="/dashboard/js/classroom.js"></script>
 </head>
 <body ondragstart="return false">
   <div id="loading-screen"><img src="/dashboard/img/loading.gif"></div>

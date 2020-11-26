@@ -87,7 +87,7 @@ class fileViewerLoader {
         fileViewer.setAttribute('id', 'file-viewer');
         fileViewer.setAttribute('src', 'https://' + window.location.host + '/ViewerJS/#' + url);
 
-        if (mobileHelper.isMobile)
+        if (store.getState().isMobile)
             fileViewer.style.width = "calc(100%)";
 
         fileViewer.setAttribute('allowFullScreen', '');
@@ -267,17 +267,14 @@ class fileViewer {
 
         const type = this.mViewerLoader.getType();
         this.onopen(type, _url);
-        if (this.onopeneachtype[type])
+        this.onopeneachtype[type] &&
             this.onopeneachtype[type]();
     }
 
     closeFile() {
-
         this.onclose();
         const viewerType = this.getCurrentViewerType();
-        if (this.oncloseeachtype[viewerType])
-            this.oncloseeachtype[viewerType]();
-
+        this.oncloseeachtype[viewerType] && this.oncloseeachtype[viewerType]();
         this.mViewerLoader.closeViewer();
         this.mCurrentViewer = null;
     }
@@ -288,7 +285,10 @@ class fileViewer {
 
     syncViewer() {
         const state = classroomInfo.viewer.state;
-        if (state) {
+
+        if(!state) return;
+        
+        if(state) {
             if (this.mViewerLoader.IsOpen()) {
                 if (state) {
                     if (this.onsync)
@@ -304,6 +304,7 @@ class fileViewer {
             else {
                 if (state) {
                     this.openFile(classroomInfo.viewer.url);
+                    mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);
                 }
             }
         }
@@ -322,11 +323,10 @@ class fileViewer {
                 this.closeFile();
                 break;
             default:
-                if (!this.mLoaded)
-                    return;
+                if (!this.mLoaded) return;
                 const viewerType = this.getCurrentViewerType();
-                if (this.onupdateeachtype[viewerType])
-                    this.onupdateeachtype[viewerType](_data);
+                this.onupdateeachtype[viewerType] && 
+                    this.onupdateeachtype[this.getCurrentViewerType()](_data);
                 break;
         }
     }
@@ -334,18 +334,15 @@ class fileViewer {
     onShowPage(_page) {
         if (!this.hasLoadViewer()) return;
         const viewerType = this.getCurrentViewerType();
-        if (this.onshowpageeachtype[viewerType])
-            this.onshowpageeachtype[viewerType](_page);
+        this.onshowpageeachtype[viewerType] && this.onshowpageeachtype[viewerType](_page);
     }
 
     onLoadedViewer() {
         if (!this.hasLoadViewer()) return;
-
         this.mLoaded = true;
         this.onloaded();
         const viewerType = this.getCurrentViewerType();
-        if (this.onloadedeachtype[viewerType])
-            this.onloadedeachtype[viewerType]();
+        this.onloadedeachtype[viewerType] && this.onloadedeachtype[viewerType]();
 
     }
 }
@@ -515,35 +512,6 @@ mfileViewer.onloadedeachtype[mediaString] = function () {
     viewer.ontimeupdate = (_currentTime) => {
         classroomInfo.viewer.media.time = _currentTime;
     }
-}
-
-function HomeworkUploadModal() {
-    $('#btn-confirm-close').hide();
-    $('.list-group-flush').remove();
-    $("#confirm-title2").hide();
-    $("#confirm-title3").hide();
-    $("#confirm-title4").hide();
-    $("#confirm-title5").hide();
-    $('#confirm-title').html($.i18n('SUBMIT_ASSIGNMENT')).removeClass("selected");
-    $('#confirm-box').modal({
-        backdrop: 'static',
-        keyboard: false
-    });
-}
-
-function fileUploadModal() {
-    $('#confirm-box').modal({
-        backdrop: 'static',
-        keyboard: false
-    });
-}
-
-function LoadFile(btn) {
-    if (!isSharingFile && checkSharing()) {
-        removeOnSelect(btn);
-        return;
-    }
-    connection.extra.roomOwner && fileUploadModal();
 }
 
 function showPage(n) {

@@ -46,8 +46,11 @@
     "NO_DATA_STORE":"저장할 데이터가 없습니다",
     "STUDENT_JOIN":" 학생이 접속했습니다",
     "STUDENT_LEFT":" 학생이 나갔습니다",
+    "TEACHER_JOIN":" 선생님이 접속했습니다",
+    "TEACHER_LEFT":" 선생님이 나갔습니다",
+
     "TEACHER_USING_FEATURE":"선생님이 다른 기능을 사용 중 입니다",
-    "TEACHER_LEFT":"선생님이 나갔습니다. 이전 화면으로 돌아갑니다",
+    "TEACHER_LEFT_BOOM":"선생님이 나갔습니다. 이전 화면으로 돌아갑니다",
     "NO_SCREEN_PERMISSION":"화면 공유 권한이 없습니다",
     "SOMEONE_USING_SCREEN":"다른 사람이 화면 공유를 사용 중 입니다",
 

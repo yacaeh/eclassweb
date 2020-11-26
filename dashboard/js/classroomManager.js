@@ -3,10 +3,9 @@ class classroomManagerClass {
         this.tooltips = [];
         this.altdown = false;
     }
-    init(shortCut, topButtonContents) {
+    init(shortCut) {
         this.windowFocusChecker();
         this.setShortCut(shortCut);
-        this.setTopToolTip(topButtonContents);
 
         window.addEventListener('resize', function () {
             rtime = new Date();
@@ -18,10 +17,6 @@ class classroomManagerClass {
 
 
     }
-
-    callTeacher() {
-        connection.send({ callTeacher: { userid: connection.userid } }, GetOwnerId());
-    };
 
     windowFocusChecker() {
         window.focus();
@@ -77,49 +72,8 @@ class classroomManagerClass {
         }
     };
 
-    setTeacher() {
-        document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
-        $("#my-name").remove();
-        $(".feature").show();
-        $(".controll").show();
-        $(".for_teacher").show();
-        $(document.getElementById("callteacher")).remove();
-        $(document.getElementById("homework")).remove();
-    };
-
-    setStudent() {
-        document.getElementById("session-id").innerHTML = connection.extra.userFullName + " (" + params.sessionid + ")";
-        $(".feature").remove();
-        $("#showcam").remove();
-        $(".controll").remove();
-        $("#showcanvas").remove();
-        $("#student_list").remove();
-
-        $(document.getElementById("3d_view")).remove();
-        $(document.getElementById("movie")).remove();
-        $(document.getElementById("file")).remove();
-        $(document.getElementById("epub")).remove();
-    };
-
     gotoMain() {
         window.open(location.protocol + "//" + location.host + "/dashboard/", "_self");
-    };
-
-    setTopToolTip(data) {
-        let tooltip = document.getElementById("toptooltip");
-        Object.keys(data).forEach(function (id) {
-            let element = document.getElementById(id);
-            if (element)
-                element.addEventListener("mouseover", function (e) {
-                    tooltip.style.display = 'block';
-                    tooltip.children[0].innerHTML = data[id];
-                    let width = tooltip.getBoundingClientRect().width / 2;
-                    tooltip.style.left = e.target.getBoundingClientRect().x + (e.target.getBoundingClientRect().width / 2) - width + "px";
-                    element.addEventListener("mouseleave", function () {
-                        tooltip.style.display = 'none';
-                    })
-                })
-        });
     };
 
     removeToolTip() {
@@ -151,7 +105,7 @@ class classroomManagerClass {
                         try {
                             document.getElementById(Object.keys(cut)).click();
                         }
-                        catch{
+                        catch {
                         }
                     }
                 });
@@ -185,15 +139,13 @@ class classroomManagerClass {
 
     createRoom() {
         console.debug('Opening Class!');
-        classroomManager.setTeacher();
-
         connection.open(params.sessionid, function (isRoomOpened, roomid, command, _info) {
             if (command == "room already exist" && !connection.byLogin) {
                 console.log("EXISTING_ROOM_ERROR");
-                alert($.i18n('EXISTING_ROOM_ERROR'));
+                alert(window.langlist.EXISTING_ROOM_ERROR);
                 classroomManager.gotoMain();
             }
-            else if(connection.byLogin == true){
+            else if (connection.byLogin == true) {
                 console.log("join room teacher")
                 classroomCommand.joinRoom(_info);
 
@@ -224,7 +176,6 @@ class classroomManagerClass {
     };
 
     joinRoom() {
-        classroomManager.setStudent();
         connection.join({
             sessionid: params.sessionid,
             userid: connection.channel,
@@ -238,7 +189,7 @@ class classroomManagerClass {
                     return;
                 }
                 if (error === connection.errors.ROOM_FULL) {
-                    alert($.i18n('FULL_ROOM_ERROR'));
+                    alert(window.langlist.FULL_ROOM_ERROR);
                     classroomManager.gotoMain();
                     return;
                 }
@@ -248,7 +199,7 @@ class classroomManagerClass {
                         alert('Invalid password.');
                         return;
                     }
-                    connection.join(params.sessionid, function (isRoomJoined, roominfo,error) {
+                    connection.join(params.sessionid, function (isRoomJoined, roominfo, error) {
                         if (error) {
                             console.log(error);
                         }
@@ -283,8 +234,12 @@ class classroomManagerClass {
         if (event.data.roomBoom) {
             connection.socket._callbacks.$disconnect.length = 0;
             connection.socket.disconnect();
-            alertBox($.i18n('TEACHER_LEFT'), $.i18n('NOTIFICATION'), classroomManager.gotoMain, $.i18n('CONFIRM'))
-
+            reactEvent.AlertBox({
+                title: window.langlist.NOTIFICATION,
+                content: window.langlist.TEACHER_LEFT_BOOM,
+                yes: classroomManager.gotoMain,
+                removeNo: true
+            })
             return true;
         }
     };
@@ -292,7 +247,7 @@ class classroomManagerClass {
     leftTeacher() {
         canvasManager.clearTeacherCanvas();
 
-        if(!examObj.isStart)
+        if (!examObj.isStart)
             examObj.closeBoard();
         console.debug("Teacher left the class");
     };

@@ -15,9 +15,10 @@ class URLLoader extends React.Component {
     render() {
         return (<>
             <div id="urlform" style={{ display: 'none' }}>
-                <span className="name" data-i18n="FOOTAGE" />
+                <span className="name">{GetLang('FOOTAGE')}</span>
                 <span className="back">
                 <input id="urlinput"
+                    placeholder={GetLang('ENTER_URL')}
                     onChange={this.handleChange}
                     onKeyUp={this.keyHandler}
                     type="text" />

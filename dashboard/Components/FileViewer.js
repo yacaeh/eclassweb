@@ -74,13 +74,16 @@ class FileViewer extends React.Component {
                 <div className="modal-content">
                     <this.Header selected={this.state.nowShow} onClick={this.onHeaderClickHeader} />
                     <div id="confirm-message" className="modal-body">
-                        <FileList
+                        {store.getState().isOwner && <FileList
                             nowShow={this.state.nowShow}
                             getlist={this.updateFileList}
                             loadFileViewer={this.loadFileViewer}
                             nowPath={this.state.nowPath}
                             data={this.state.currentData} />
+                        }
                         <this.UploadModal show={this.state.showUploadModal} />
+                 
+
                     </div>
                     <this.Footer />
                 </div>
@@ -92,8 +95,8 @@ class FileViewer extends React.Component {
 
     Footer() {
         return <> <div className="modal-footer">
-            <button style={this.state.isFileViewer ? {display : "block"} :  {display : "none"}} onClick={this.unloadFileViewer} className="btn btn-danger" id="btn-confirm-file-close" />
-            <button onClick={this.closeWindow} className="btn btn-primary" id="btn-confirm-action" />
+            <button style={this.state.isFileViewer ? {display : "block"} :  {display : "none"}} onClick={this.unloadFileViewer} className="btn btn-danger" id="btn-confirm-file-close">{GetLang('CLOSE_CURRENT_FILE')}</button>
+            <button onClick={this.closeWindow} className="btn btn-primary" id="btn-confirm-action">{GetLang('OK')}</button>
         </div>
         </>
     };
@@ -108,11 +111,13 @@ class FileViewer extends React.Component {
 
     Header(props) {
         return <div className="modal-header">
-            <h5 className={"fileViewer_Btn " + (props.selected == 'files' ? "selected" : '')} id="confirm-title" data-id='files' onClick={props.onClick}></h5>
-            <h5 className={"fileViewer_Btn " + (props.selected == 'epub' ? "selected" : '')} id="confirm-title3" data-id='epub' onClick={props.onClick}>E-pub</h5>
-            <h5 className={"fileViewer_Btn " + (props.selected == 'pdf' ? "selected" : '')} id="confirm-title5" data-id='pdf' onClick={props.onClick}>PDF</h5>
+            <h5 className={"fileViewer_Btn " + (props.selected == 'files' ? "selected" : '')} id="confirm-title" data-id='files' onClick={props.onClick}>
+            {store.getState().isOwner ? GetLang('FILE_MANAGER') : GetLang('SUBMIT_ASSIGNMENT')}
+            </h5>
+            {store.getState().isOwner && <h5 className={"fileViewer_Btn " + (props.selected == 'epub' ? "selected" : '')} id="confirm-title3" data-id='epub' onClick={props.onClick}>E-pub</h5>}
+            {store.getState().isOwner && <h5 className={"fileViewer_Btn " + (props.selected == 'pdf' ? "selected" : '')} id="confirm-title5" data-id='pdf' onClick={props.onClick}>PDF</h5>}
             {/* <h5 className={"fileViewer_Btn " + (props.selected == '3d' ? "selected" : '')} id="confirm-title4" data-id='3d' onClick={props.onClick}>3D</h5> */}
-            <h5 className={"fileViewer_Btn " + (props.selected == 'homework' ? "selected" : '')} id="confirm-title2" data-id='homework' onClick={props.onClick}></h5>
+            {store.getState().isOwner && <h5 className={"fileViewer_Btn " + (props.selected == 'homework' ? "selected" : '')} id="confirm-title2" data-id='homework' onClick={props.onClick}>{GetLang('ASSIGNMENT')}</h5>}
             <button onClick={props.close} type="button" className="close btn-confirm-close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -211,13 +216,10 @@ class FileViewer extends React.Component {
         if(classroomInfo.viewer.state)
                 mfileViewer.closeFile();
 
-
-
         if(classroomInfo.epub.state){
             classroomCommand.sendCloseEpub();       
             epubManager.unloadEpubViewer();
         }
-            
 
         isSharingFile = false;
         this.setState({
@@ -230,7 +232,7 @@ class FileViewer extends React.Component {
 
     loadFileViewer(path, type) {
         if (this.state.nowPath == path) {
-            alert($.i18n('SAME_FILE_OPEN_ERROR'));
+            alert(window.langlist.SAME_FILE_OPEN_ERROR);
             return;
         }
 
@@ -247,16 +249,22 @@ class FileViewer extends React.Component {
         if(classroomInfo.viewer.state)
             mfileViewer.closeFile();
 
-
-
         if (type != 'epub') {
             mfileViewer.openFile(path);
         }
         else {
-            pageNavigator.removethumbnail();
+            reactEvent.navigation.removeThumbnails();
             this.closeWindow();
             epubManager.loadEpubViewer(path);
-            classroomCommand.sendOpenEpub(path);
+            classroomInfo.epub.state = true;
+            classroomInfo.epub.url = path;
+            connection.send({
+                epub    : classroomInfo.epub,
+                start   : classroomInfo.epub.start,
+                end     : classroomInfo.epub.end,
+                url     : path
+            });
+            classroomManager.updateClassroomInfo();
         }
 
         
@@ -340,7 +348,7 @@ class FileList extends React.Component {
             var nowName = this.props.nowPath.split('/');
             nowName = nowName[nowName.length - 1];
             if (filename == nowName) {
-                alert($.i18n('DELETE_OPEN_ERROR'));
+                alert(window.langlist.DELETE_OPEN_ERROR);
                 return;
             }
         }

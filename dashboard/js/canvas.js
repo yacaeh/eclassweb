@@ -141,51 +141,56 @@ function checkSharing() {
 
 function removeOnSelect(btn) {
     if (!connection.extra.roomOwner) {
-        alert($.i18n('TEACHER_USING_FEATURE'))
+        alert(window.langlist.TEACHER_USING_FEATURE)
         return;
     }
 
     if(classroomInfo.shareScreen.state && connection.userid != classroomInfo.shareScreen.userid){
-        alert($.i18n('SOMEONE_USING_SCREEN'));
+        alert(window.langlist.SOMEONE_USING_SCREEN);
         btn.classList.remove("on");
         btn.classList.remove("selected-shape");
         return;
     }
 
-    alertBox($.i18n('ASK_CLOSE_CURRENT'), $.i18n('NOTIFICATION'), function () {
-        if (classroomInfo.share3D.state) {
-            document.getElementById("3d_view").click();
-            classroomInfo.share3D.state = false;
-        }
+    reactEvent.AlertBox({
+        title : window.langlist.NOTIFICATION,
+        content : window.langlist.ASK_CLOSE_CURRENT,
+        yes : function () {
+            if (classroomInfo.share3D.state) {
+                document.getElementById("3d_view").click();
+                classroomInfo.share3D.state = false;
+            }
+    
+            if (classroomInfo.shareScreen.state) {
+                document.getElementById("screen_share").click();
+            }
+    
+            if (isSharingMovie) {
+                document.getElementById("movie").click();
+                isSharingMovie = false;
+            }
+    
+            if (isSharingFile) {
+                document.getElementById("btn-confirm-file-close").click();
+                isSharingFile = false;
+            }
+    
+            if (classroomInfo.epub.state) {
+                document.getElementById("btn-confirm-file-close").click();
+                isSharingFile = false;
+            }
+    
+            setTimeout(function () {
+                btn.classList.remove("on");
+                btn.classList.remove("selected-shape");
+                btn.click();
+            }, 50)
+        },
 
-        if (classroomInfo.shareScreen.state) {
-            document.getElementById("screen_share").click();
-        }
-
-        if (isSharingMovie) {
-            document.getElementById("movie").click();
-            isSharingMovie = false;
-        }
-
-        if (isSharingFile) {
-            document.getElementById("btn-confirm-file-close").click();
-            isSharingFile = false;
-        }
-
-        if (classroomInfo.epub.state) {
-            document.getElementById("btn-confirm-file-close").click();
-            isSharingFile = false;
-        }
-
-        setTimeout(function () {
+        no : function () {
             btn.classList.remove("on");
             btn.classList.remove("selected-shape");
-            btn.click();
-        }, 50)
-    },
-        function () {
-            btn.classList.remove("on");
-            btn.classList.remove("selected-shape");
-        })
+        }
+    })
 }
 

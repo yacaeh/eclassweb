@@ -3,18 +3,13 @@ var classroomInfo = {};
 classroomCommand = {
     joinRoom: function (_info) {
         console.debug("Synced classroom info");
+        let action = { type: SET_CLASSROOM_INFO, data: _info };
+        store.dispatch(action);
         classroomInfo = _info;
         onSocketConnected();
     },
 
     updateSyncRoom: function () {
-        // Allcontroll updateControlView
-
-        if (classroomInfo.allControl) {
-            if (!connection.extra.roomOwner) {
-                classroomInfo.allControl ? Show("student_isallcontrol") : Hide("student_isallcontrol");
-            }
-        }
 
         if (classroomInfo.share3D.state) {
             sync3DModel();
@@ -27,9 +22,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.viewer.state) {
-            if(classroomInfo.allControl)
             mfileViewer.syncViewer();
-            pageNavigator.allControl(classroomInfo.allControl);
             onBtn("file");
         }
 
@@ -37,10 +30,8 @@ classroomCommand = {
             canvasManager.sendMyCanvas = true;
         }
 
-        if (classroomInfo.shareScreen.state) {
-            // screenshareManager.rejoin();
-        }
 
+        
         if (classroomInfo.movierender.state) {
             let data = classroomInfo.movierender;
             OnMovieRender(data.state, data.type, data.url);
@@ -52,6 +43,8 @@ classroomCommand = {
             }
         }
 
+
+
         if (classroomInfo.exam.state) {
             examObj.rejoin();
         }
@@ -59,8 +52,6 @@ classroomCommand = {
         if (connection.extra.roomOwner) {
             let list = document.getElementById("student_list");
             let students = list.getElementsByClassName("student");
-
-
             for (let i = 0; i < students.length; i++) {
                 let student = students[i];
                 let id = student.dataset.id;
@@ -81,12 +72,8 @@ classroomCommand = {
                 }
             }
         }
-    },
 
-    onSynchronizationClassRoom: function (_roomInfo) {
-        classroomInfo = _roomInfo;
-    
-        this.updateSyncRoom();
+        
     },
 };
 
@@ -98,13 +85,15 @@ function onBtn(id) {
 
 classroomCommand.receivAlert = function () {
     var alertTimeHandler;
-    alertBox("<progress max='100' value='100' class='alert-progress exam-state-progress'></progress>", $.i18n('NOTIFICATION'), () => {
-        response('yes');
-    }, () => {
-        response('no');
-    });
+    reactEvent.AlertBox({
+        title: window.langlist.NOTIFICATION,
+        content: "attention",
+        yes: () => { response('yes') },
+        no: () => { response('no') },
+    })
 
     alertTimeHandler = setTimeout(noResponse, 5000);
+
     decreaseProgress = setInterval(function () {
         var progressVal = $(".alert-progress").val() - (10 / 5000 * 100);
         $(".alert-progress").val(progressVal)
@@ -199,18 +188,6 @@ classroomCommand.receiveAlertResponse = function (_response) {
     }
 }
 
-classroomCommand.sendOpenEpub = function (url) {
-    classroomInfo.epub.state = true;
-    classroomInfo.epub.url = url;
-    connection.send({
-        epub    : classroomInfo.epub,
-        start   : classroomInfo.epub.start,
-        end     : classroomInfo.epub.end,
-        url
-    });
-    classroomManager.updateClassroomInfo();
-};
-
 classroomCommand.sendCloseEpub = function () {
     classroomInfo.epub.state = false;
     connection.send({ epub: { state: false } });
@@ -218,42 +195,11 @@ classroomCommand.sendCloseEpub = function () {
 };
 
 classroomCommand.openEpub = function (url) {
-    if (classroomInfo.epub.state) {
-        if (epubManager.renditionBuffer) {
-            if (classroomInfo.allControl)
-                epubManager.renditionBuffer.display(classroomInfo.epub.page);
-        }
+    if (epubManager.renditionBuffer) {  // && classroomInfo.allControl
+        epubManager.renditionBuffer.display(classroomInfo.epub.page);
     }
     else {
         epubManager.loadEpubViewer(url);
-    }
-
-    if (!connection.extra.roomOwner) {
-        if (classroomInfo.allControl) {
-            if (classroomInfo.epub.state) {
-                Hide('next')
-                Hide('prev')
-                Hide('lnext')
-                Hide('lprev')
-                let thumbnails = document.getElementsByClassName('thumbnail');
-                for(let i = 0 ; i < thumbnails.length; i++){
-                    thumbnails[i].style.pointerEvents = 'none';
-                }
-            }
-        }
-        else {
-            if (classroomInfo.epub.state) {
-                Show('next')
-                Show('prev')
-                Show('lnext')
-                Show('lprev')
-                let thumbnails = document.getElementsByClassName('thumbnail');
-                for(let i = 0 ; i < thumbnails.length; i++){
-                    thumbnails[i].style.pointerEvents = '';
-                }
-            }
-        }
-
     }
 };
 
@@ -297,25 +243,5 @@ classroomCommand.updateEpubCmd = function (_data) {
         case 'prev':
             document.getElementById('prev').click();
             break;
-    }
-}
-
-function updateClassTime() {
-    let currentTime = document.getElementById("current-time");
-    setInterval(Sec, 1000);
-
-    function Sec() {
-        let now = new Date().getTime() - classroomInfo.roomOpenTime;
-        now = parseInt(now * 0.001);
-        let time = now;
-        let hour = Math.floor(time / 3600);
-        time %= 3600;
-
-        let min = Math.floor(time / 60);
-        time %= 60;
-
-        if (min < 10) min = '0' + min;
-        if (time < 10) time = '0' + time;
-        currentTime.innerHTML = hour + ':' + min + ':' + time;
     }
 }

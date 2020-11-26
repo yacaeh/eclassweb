@@ -1,35 +1,20 @@
 class mobileHelperClass {
     constructor() {
-        this.isMobile = false;
         this.conversationPanel;
     }
     init() {
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        if (store.getState().isMobile) {
             this.conversationPanel = document.getElementById('conversation-panel');
             this.setMobile();
-        }else{
-            document.getElementById("full").style.display = 'none';
         }
     }
     setMobile() {
-        this.isMobile = true;
-        widgetContainer.style.right = "0px";
         ChatSetting();
         FullScreenBtnInit();
-        ToolSetting();
+        widgetContainer.style.right = "0px";
         rightTab.style.display = "none";
-        rightTab.style.width = "0px";
         classroomManager.canvasResize();
         MainCamSetting();
-
-        function ToolSetting() {
-            let toolbox = document.getElementById("tool-box");
-            toolbox.removeChild(document.getElementsByClassName("tooldivide")[0])
-            toolbox.removeChild(document.getElementById("screen_share"))
-            toolbox.removeChild(document.getElementById("textIcon"))
-            toolbox.removeChild(document.getElementById("clearCanvas"))
-            toolbox.removeChild(document.getElementById("undo"))
-        }
 
         function MainCamSetting() {
             let video = maincamManager.get();
@@ -46,7 +31,6 @@ class mobileHelperClass {
                     clearTimeout(timeout);
                     timeout = null;
                     if (!video.classList.contains("full")) {
-                        let rect = GetDoc().body.getBoundingClientRect();
                         lastleft = video.style.left;
                         lastTop = video.style.top;
 
