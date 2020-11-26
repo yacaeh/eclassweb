@@ -34,20 +34,20 @@ const rightTab = document.getElementById("right-tab")
 
 // Alt + 단축키
 const shortCut = [
-  { "onoff-icon": "a" },
-  { "pencilIcon": "q" },
-  { "markerIcon": "w" },
-  { "eraserIcon": "e" },
-  { "textIcon": "r" },
-  { "undo": "z" },
-  { "clearCanvas": "x" },
+  { "onoff-icon"  : "a" },
+  { "pencilIcon"  : "q" },
+  { "markerIcon"  : "w" },
+  { "eraserIcon"  : "e" },
+  { "textIcon"    : "r" },
+  { "undo"        : "z" },
+  { "clearCanvas" : "x" },
   { "screen_share": "1" },
-  { "3d_view": "2" },
-  { "movie": "3" },
-  { "file": "4" },
-  { "epub": "5" },
-  { "callteacher": "2" },
-  { "homework": "3" },
+  { "3d_view"     : "2" },
+  { "movie"       : "3" },
+  { "file"        : "4" },
+  { "epub"        : "5" },
+  { "callteacher" : "2" },
+  { "homework"    : "3" },
 ]
 
 //=============================================================================================

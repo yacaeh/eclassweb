@@ -52,7 +52,6 @@ class canvasManagerClass {
             event.data.image = undefined;
             this.canvas_array[event.userid].src = img;
             if (event.userid == this.showingCanvasId) {
-                // canvasManager.clearStudentCanvas(event.userid);
                 designer.syncData(event.data);
             }
             return true;

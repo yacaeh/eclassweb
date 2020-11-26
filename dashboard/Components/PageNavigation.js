@@ -7,6 +7,8 @@ class PageNavigation extends React.Component {
             currentIdx: 0,
             thumbnails: [],
         }
+
+        this.navi = React.createRef();
         this.collapse = this.collapse.bind(this);
     }
 
@@ -29,13 +31,20 @@ class PageNavigation extends React.Component {
     render() {
         return (
             <>
-                <div id="epub-navi" style={{ display: 'none' }} className="shadow-5">
-                    <span id="navi-top">
-                        <input id="epubidx" autoComplete="off" onKeyDown={this.keyHandler} onBlur={this.blurHandler} />
-                        <span id="epubmaxidx" />
-                        <img className="epub-collapse" onClick={this.collapse} />
+                <div ref={this.navi} id="page-navigation" 
+                style={{ display: 'none' }} 
+                className="shadow-5">
+                    <span className="navi-top">
+                        <input 
+                            id="page-navigation-idx" 
+                            autoComplete="off" 
+                            onKeyDown={this.keyHandler} 
+                            onBlur={this.blurHandler} />
+                        <span id="page-navigation-maxidx" />
+                        <img 
+                        className="page-navigation-collapse" 
+                        onClick={this.collapse} />
                     </span>
-
                     <ThumbnailList list={this.state.thumbnails} />
                     <NaviController />
                 </div>
@@ -47,11 +56,11 @@ class PageNavigation extends React.Component {
         let target = e.target;
         this.setState({ closed: !this.state.closed }, () => {
             if (!this.state.closed) {
-                $(pageNavigator.obj).animate({ "height": "95%" });
+                this.navi.current.className = "shadow-5 on"
                 target.style.transform = "rotate(-90deg)";
             }
             else {
-                $(pageNavigator.obj).animate({ "height": "93px" });
+                this.navi.current.className = "shadow-5 off"
                 target.style.transform = "rotate(90deg)";
             }
         });
@@ -78,29 +87,28 @@ class NaviController extends React.Component {
     render() {
         return <span id="navi-control">
             {(!store.getState().classroomInfo.allControl || store.getState().isOwner) && <>
-                <img id="lprev" onClick={this.lprev} />
-                <img id="prev" onClick={this.prev} />
-                <img id="next" onClick={this.next} />
-                <img id="lnext" onClick={this.lnext} />
+                <img id="lprev" onClick={reactEvent.navigation.lpre} />
+                <img id="prev"  onClick={reactEvent.navigation.pre} />
+                <img id="next"  onClick={reactEvent.navigation.next} />
+                <img id="lnext" onClick={reactEvent.navigation.lnext} />
             </>
             }
         </span>
     };
 
-    lprev() {
-        pageNavigator.lastleftbtn();
-    };
-
-    prev() {
-        pageNavigator.leftbtn();
-    };
-
-    next() {
-        pageNavigator.rightbtn();
-    };
-
-    lnext() {
-        pageNavigator.lastrightbtn();
+    componentDidMount(){
+        reactEvent.navigation.lpre = () => {
+            pageNavigator.lastleftbtn();
+        }
+        reactEvent.navigation.pre = () => {
+            pageNavigator.leftbtn();
+        }
+        reactEvent.navigation.next = () => {
+            pageNavigator.rightbtn();
+        }
+        reactEvent.navigation.lnext = () => {
+            pageNavigator.lastrightbtn();
+        }
     }
 }
 

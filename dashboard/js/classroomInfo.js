@@ -26,11 +26,7 @@ classroomCommand = {
             onBtn("file");
         }
 
-        if (classroomInfo.showcanvas) {
-            canvasManager.sendMyCanvas = true;
-        }
-
-
+        canvasManager.sendMyCanvas = classroomInfo.showcanvas && true;
         
         if (classroomInfo.movierender.state) {
             let data = classroomInfo.movierender;
@@ -42,8 +38,6 @@ classroomCommand = {
                 urlform.style.display = "inline-block";
             }
         }
-
-
 
         if (classroomInfo.exam.state) {
             examObj.rejoin();

@@ -64,10 +64,10 @@ pageNavigator = {
   },
 
   init: function () {
-    this.obj = document.getElementById("epub-navi");
+    this.obj = document.getElementById("page-navigation");
     this.list = document.getElementById("thumbnail-list");
-    this.maxidx = document.getElementById("epubmaxidx");
-    this.inputwindow = document.getElementById("epubidx");
+    this.maxidx = document.getElementById("page-navigation-maxidx");
+    this.inputwindow = document.getElementById("page-navigation-idx");
   },
 
   set: function (max) {
@@ -77,7 +77,7 @@ pageNavigator = {
 
   on: function () {
     this.obj.style.display = 'block';
-    document.getElementById("epubidx").value = 1;
+    document.getElementById("page-navigation-idx").value = 1;
   },
 
   off: function () {
@@ -101,6 +101,6 @@ pageNavigator = {
       pre.classList.remove("selected");
     this.list.children[this.currentidx].classList.add("selected");
     this.list.children[this.currentidx].scrollIntoView({ block: "center" });
-    document.getElementById("epubidx").value = this.currentidx + 1;
+    document.getElementById("page-navigation-idx").value = this.currentidx + 1;
   },
 }

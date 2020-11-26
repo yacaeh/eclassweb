@@ -78,14 +78,11 @@ class PointerSaver {
 
         if (this.container[idx]) {
             this.container[idx].command = "my";
-
             window.currentPoints = this.container[idx].points;
             window.currentHistory = this.container[idx].history;
-
             if (this.container[idx].history.length == 0) {
                 return null;
             }
-
             designer.syncData(this.container[idx]);
         }
         else {
@@ -116,10 +113,7 @@ class PointerSaver {
             permissionManager.IsCanvasPermission(connection.userid))) {
             return;
         }
-
-        if (idx == this.nowIdx)
-            this.save(idx);
-
+        idx == this.nowIdx && this.save(idx);
         if (this.container[idx]){
             connection.send({
                 setpointer: true,

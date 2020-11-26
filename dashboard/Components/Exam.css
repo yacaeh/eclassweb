@@ -1,0 +1,122 @@
+.question{
+    display: flex;
+}
+
+.question > .line {
+    line-height: 43px; 
+    width:30px; 
+    text-align:right;
+}
+
+
+.exam-question-count:focus, .exam-time:focus {
+    outline: solid #3ee1c9 1px;
+  }
+
+.exam-question-count-label {
+  height: 16px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #707070;
+  margin-top: 11px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.exam-time-label {
+  height: 16px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  color: #707070;
+  margin-top: 12px;
+  margin-left: 45px;
+  margin-right: 10px;
+}
+
+
+#exam-board{
+    display: none; 
+    z-index: 10;
+    position: fixed; 
+    top:50px; 
+    bottom: 0; 
+    right: 0; 
+    width: 17.7%;
+    min-width: 290px; 
+    border-left: gray solid 1px;
+    background-color: white;
+    overflow-y: auto;
+  }
+  
+  #exam-title {
+    background-color: white; 
+    text-align: center;
+    padding-top: 9px;
+    padding-bottom: 7px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    color: #707070;
+  }
+  
+  .exam-question-count, .exam-time {
+    width: 50px;
+    height: 28px;
+    background: #FFFFFF;
+    border: 2px solid #B8B8B8;
+    border-radius: 3px;
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  .btn-exam {
+    color: #fff;
+    background-color: #3ee1c9;
+    border-color: #3ee1c9;
+  }
+  
+  .btn-exam:hover {
+    background-color: #13b59c;
+  }
+  
+  .exam-state-progress {
+    height: 5px;
+    margin-top: 16px;
+    margin-left: 13px;
+    width: 240px;
+  }
+  
+  .exam-state-progress[value] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  .exam-state-progress[value]::-webkit-progress-value {
+    background: #3ee1c9;
+  }
+  .exam-state-progress[value]::-webkit-progress-bar {
+    background: #a8a8a8;
+  }
+  
+  .exam-state-progress-number {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 15px;
+    color: #000000;
+    text-align: right;
+    margin-top: 7px;
+    width: 27px;
+  }
+
+  .exam-overflow > .line{
+    display:flex; 
+    height:37px;
+  }

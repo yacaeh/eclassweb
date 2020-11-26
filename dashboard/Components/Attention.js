@@ -95,17 +95,12 @@ class Attention extends React.Component {
         })
 
         function callback() {
-            attentionManager.totalCount++;
-            attentionManager.teacherRequest[attentionManager.totalCount] = {name: GetLang('ATTENTION_PLEASE')};
+            attentionManager.teacherRequest[++attentionManager.totalCount] = {name: GetLang('ATTENTION_PLEASE')};
             connection.send({alert: true});
 
             let chilldren = document.getElementById('student_list').children;
             for (let i = 0; i < chilldren.length; i++) {
-                let al = chilldren[i].getElementsByClassName('bor')[0];
-                if (!al)
-                    continue;
-                al.className = "bor";
-                al.classList.add('alert_wait');
+                chilldren[i].getElementsByClassName('bor')[0].className = "bor alert_wait";
             }
         }
 
