@@ -10,6 +10,7 @@ classroomCommand = {
     },
 
     updateSyncRoom: function () {
+
         if (classroomInfo.share3D.state) {
             sync3DModel();
             onBtn("3d_view");
@@ -21,8 +22,7 @@ classroomCommand = {
         }
 
         if (classroomInfo.viewer.state) {
-            if (classroomInfo.allControl)
-                mfileViewer.syncViewer();
+            mfileViewer.syncViewer();
             onBtn("file");
         }
 

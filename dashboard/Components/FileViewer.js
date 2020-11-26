@@ -216,13 +216,10 @@ class FileViewer extends React.Component {
         if(classroomInfo.viewer.state)
                 mfileViewer.closeFile();
 
-
-
         if(classroomInfo.epub.state){
             classroomCommand.sendCloseEpub();       
             epubManager.unloadEpubViewer();
         }
-            
 
         isSharingFile = false;
         this.setState({
