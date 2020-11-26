@@ -14,14 +14,13 @@ class PointerSaver {
         this.path = path;
         let json = path + "_" + connection.extra.userFullName + ".json";
         try{
-            let ret = await axios.get(json);
-            let data = ret.data;
-            if (data == 404 || Object.keys(data).length == 0) {
-                pointer_saver.container = {};
-                canvasManager.clear();
-                designer.sync();
-                return;
+            const ret = await axios.get(json);
+            const data = ret.data;
+            
+            if (Object.keys(data).length == 0) {
+                throw("no data");
             }
+
             pointer_saver.container = data;
             window.currentPoints = data[0].points;
             window.currentHistory = data[0].history;
@@ -30,7 +29,10 @@ class PointerSaver {
             designer.sync();
         }
         catch(e){
-
+            pointer_saver.container = {};
+            canvasManager.clear();
+            designer.sync();
+            return;
         }
     }
     save_container() {

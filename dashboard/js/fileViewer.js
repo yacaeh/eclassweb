@@ -267,17 +267,14 @@ class fileViewer {
 
         const type = this.mViewerLoader.getType();
         this.onopen(type, _url);
-        if (this.onopeneachtype[type])
+        this.onopeneachtype[type] &&
             this.onopeneachtype[type]();
     }
 
     closeFile() {
-
         this.onclose();
         const viewerType = this.getCurrentViewerType();
-        if (this.oncloseeachtype[viewerType])
-            this.oncloseeachtype[viewerType]();
-
+        this.oncloseeachtype[viewerType] && this.oncloseeachtype[viewerType]();
         this.mViewerLoader.closeViewer();
         this.mCurrentViewer = null;
     }
@@ -307,9 +304,7 @@ class fileViewer {
             else {
                 if (state) {
                     this.openFile(classroomInfo.viewer.url);
-                    const viewerType = this.getCurrentViewerType();
-                    console.log(viewerType);
-                    this.onshowpageeachtype[viewerType] && this.onshowpageeachtype[viewerType](classroomInfo.viewer.pdf.page);
+                    mfileViewer.getCurrentViewer().setPage(classroomInfo.viewer.pdf.page);
                 }
             }
         }
@@ -329,6 +324,7 @@ class fileViewer {
                 break;
             default:
                 if (!this.mLoaded) return;
+                const viewerType = this.getCurrentViewerType();
                 this.onupdateeachtype[viewerType] && 
                     this.onupdateeachtype[this.getCurrentViewerType()](_data);
                 break;
