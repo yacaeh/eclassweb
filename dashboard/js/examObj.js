@@ -22,6 +22,13 @@ examObj.showBoard = function() {
     $('#exam-board').show(300);
 }
 
+examObj.closeBoard = function(){
+    $('#exam-board').hide(300, function () {
+        classroomManager.canvasResize();
+        rightTab.style.zIndex = 2;
+    });
+}
+
 examObj.closeTesting = function () {
     if (this.isStart) {
         return false;
@@ -29,10 +36,7 @@ examObj.closeTesting = function () {
 
     connection.send({closeTesting: true});
     widgetContainer.removeAttribute("style")
-    $('#exam-board').hide(300, function () {
-        classroomManager.canvasResize();
-        rightTab.style.zIndex = 2;
-    });
+    examObj.closeBoard();
     return true;
 }
 
@@ -186,14 +190,6 @@ examObj.checkStudentAnswerChecked = function (_questionCount) {
     return true;
 };
 
-examObj.setExamInfo = function () {
-
-    examObj.examInfo = {
-        questionCount: examObj.questionCount,
-        examAnswer: examObj.examAnswer
-    };
-}
-
 examObj.rejoin = function () {
     console.warn(classroomInfo.exam);
     examObj.isStart = true;
@@ -230,9 +226,6 @@ examObj.sendExamStart = function (_questionCount, _endTime) {
     examObj.studentsAnswer = {};
     examObj.submitStudents = {};
     examObj.endTime = _endTime;
-
-    examObj.setExamInfo();
-
     classroomInfo.exam = {
         state : true,   
         endTime : _endTime,
@@ -425,6 +418,15 @@ function getQuestionAnswerList(num) {
 
 // 학생들 OMR 세팅
 function setStudentOMR(quesCount, examTime) {
+    // store.dispatch({ 
+    //     type: EXAM_CHANGED, 
+    //     data: {
+    //         state : true,
+    //         quesCount, 
+    //         examTime
+    //     }});
+
+
     console.log(quesCount,examTime)
     $('#exam-board').show();
     rightTab.style.zIndex = 0;
@@ -444,10 +446,10 @@ function setStudentOMR(quesCount, examTime) {
     question += "<div id='exam-omr-question-list'>";
     m_QuesCount = quesCount;
     for (var i = 1; i <= m_QuesCount; i++) {
-        question += `<div id='exam-question-${i}' style='display:flex;' onchange='omrChange(${i})'>`;
+        question += `<div id='exam-question-${i}' class="question" onchange='omrChange(${i})'>`;
         question += `<span id='exam-question-text-${i}' class='text-center-bold' style='line-height: 43px; width:30px; text-align:right;'>${i}.</span>`;
         for (var j = 1; j <= 5; j++) {
-            question += `<input type='radio' id='exam-question-${i}_${j}' style='flex:5;' name='exam-question-${i}' value='${j}'> `;
+            question += `<input type='radio' id='exam-question-${i}_${j}' name='exam-question-${i}' value='${j}'> `;
             question += `<label for='exam-question-${i}_${j}'>${j}</label>`;
         }
         question += `<span id='exam-student-answer-${i}' class='text-center-bold' style='flex:1; line-height: 43px;'></span>`;

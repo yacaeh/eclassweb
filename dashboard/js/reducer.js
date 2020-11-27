@@ -1,28 +1,32 @@
 var reactEvent = {
-    AlertBox : function({title,content,yes,removeNo}){},
-    navigation : {},
+    AlertBox: function ({ title, content, yes, removeNo }) { },
+    navigation: {},
 };
 
 window.params = GetParamsFromURL();
 
-const CHANGE_LANGUAGE       = 'CHANGE_LANGUAGE';
-const SET_CLASSROOM_INFO    = 'SET_CLASSROOM_INFO';
-const CHANGE_CAMVIEW        = 'CHANGE_CAMVIEW';
-const PERMISSION_CHANGED    = 'PERMISSION_CHANGED';
+const CHANGE_LANGUAGE = 'CHANGE_LANGUAGE';
+const SET_CLASSROOM_INFO = 'SET_CLASSROOM_INFO';
+const CHANGE_CAMVIEW = 'CHANGE_CAMVIEW';
+const PERMISSION_CHANGED = 'PERMISSION_CHANGED';
+const EXAM_CHANGED = 'EXAM_CHANGE';
 
 const InitData = {
     isOwner: window.params.open == "true",
     isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-    userName : window.params.userFullName,
-    sessionID : window.params.sessionid,
-    classroomInfo : {
-        allControl : false
+    userName: window.params.userFullName,
+    sessionID: window.params.sessionid,
+    classroomInfo: {
+        allControl: false
     },
-    features : {},
-    permissions : {
-        canvas : false,
-        mic : false,
-        screen : false
+    features: {},
+    permissions: {
+        canvas: false,
+        mic: false,
+        screen: false
+    },
+    exam : {
+        state : false
     }
 
 };
@@ -47,19 +51,23 @@ function reducer(state = InitData, action) {
     switch (action.type) {
         case CHANGE_LANGUAGE:
             return Object.assign({}, state, {
-                language : action.data
+                language: action.data
             })
         case SET_CLASSROOM_INFO:
             return Object.assign({}, state, {
-                classroomInfo : action.data
+                classroomInfo: action.data
             })
         case CHANGE_CAMVIEW:
             return Object.assign({}, state, {
-                nowView : action.data
+                nowView: action.data
             })
-        case PERMISSION_CHANGED :
+        case PERMISSION_CHANGED:
             return Object.assign({}, state, {
-                permissions : action.data
+                permissions: action.data
+            })
+        case EXAM_CHANGED:
+            return Object.assign({}, state, {
+                exam: action.data
             })
     }
     console.log(state);

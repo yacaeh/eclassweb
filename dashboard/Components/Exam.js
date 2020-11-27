@@ -29,7 +29,7 @@ class Exam extends React.Component {
 
         this.onQCountHandler    = this.onQCountHandler.bind(this);
         this.onExamTimeHandler  = this.onExamTimeHandler.bind(this);
-        this.onStartExam      = this.onStartExam.bind(this);
+        this.onStartExam        = this.onStartExam.bind(this);
         this.finishExam         = this.finishExam.bind(this);
     }
 
@@ -62,6 +62,7 @@ class Exam extends React.Component {
         let endTime = (new Date().getTime() + (this.state.examTime * 60 * 1000)) / 1000;
         examObj.examAnswer = getQuestionAnswerList(this.state.examCount);
         examObj.sendExamStart(this.state.examCount, endTime);
+        
         this.setState({
             inSetting: !this.state.inSetting,
             endTime
@@ -101,7 +102,7 @@ class ExamSettingForm extends React.Component {
 
         return <div>
             <div id="exam-title" className="exam-border-bottom">{GetLang('QUIZ_CREATE')}</div>
-            <div style={{ display: 'flex', width: '100%', height: '37px', background: '#EFF1F0' }} className="exam-border-bottom">
+            <div className="exam-border-bottom exam-border-setting-form">
                 <label className="exam-question-count-label" htmlFor="exam-question-count">{GetLang('QUIZ_NUM')}</label>
                 <input className="exam-question-count" value={this.props.state.examCount} onChange={this.props.onQCountHandler} type="number" />
                 <label className="exam-time-label" htmlFor="exam-time">{GetLang('QUIZ_TIME')}</label>

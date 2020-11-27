@@ -1147,39 +1147,6 @@ hr {
   margin-right: 15px;
 }
 
-input[type='radio'] {
-  display: none;
-}
-
-input[type=radio] + label { 
-  display: inline-block; 
-  cursor: pointer; 
-  font-size: 12px;
-  line-height: 28px; 
-  padding-right: 22px;
-  background: url(/dashboard/img/radio_base.png) right/22px no-repeat; 
-  margin-left: 15px;
-  margin-right: 5px;
-  margin-top: 0.5rem;
-}
-
-input[type='radio']:checked + label {
-  background-image: url(/dashboard/img/radio_on.png);
-}
-
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type='number']:focus {
-  border: #3ee1c9 solid 1px;
-}
-
-
-
 .exam-state-percent{
   width: 25px;
   height: 12px;
@@ -1197,10 +1164,6 @@ input[type='number']:focus {
   font-weight: bold;
   background-color: white;
   text-align: center;
-  border-bottom: gray solid 1px;
-}
-
-.exam-border-bottom {
   border-bottom: gray solid 1px;
 }
 

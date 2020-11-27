@@ -246,9 +246,7 @@ class classroomManagerClass {
 
     leftTeacher() {
         canvasManager.clearTeacherCanvas();
-
-        if (!examObj.isStart)
-            examObj.closeBoard();
+        !examObj.isStart && examObj.closeBoard();
         console.debug("Teacher left the class");
     };
 
