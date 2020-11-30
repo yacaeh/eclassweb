@@ -2,7 +2,7 @@
 class Canvas extends React.Component {
     render() {
         let url = './widget.html';
-        return <div className='canvas-div' >
+        return <div id='canvas-div' >
             <MarkerContainer />
             <PencilContainer />
             <TextInputContainer />

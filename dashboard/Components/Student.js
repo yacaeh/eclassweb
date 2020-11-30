@@ -12,17 +12,34 @@ class StudentList extends React.Component {
     render() {
         const list = this.props.studentList.map(id => (
             <Student
+                nowView={this.props.nowView}
+                gridView={this.props.gridView}
                 isOwner={id.isOwner}
                 key={id.userId}
                 uid={id.userId}
                 name={id.userName} />
         ))
-        return <div ref={this.myRef} id="student_list">
-            <div onClick={this.onClick} id="student_list_button">
-                {this.state.collapse ? ("+" + (list.length - 16)) : ("...")}
-            </div>
+
+        const rendering = <table ref={this.myRef} id="student_list">
+            {/* {!this.props.gridView && */}
+                <div onClick={this.onClick} id="student_list_button">
+                    {this.state.collapse ? ("+" + (list.length - 16)) : ("...")}
+                </div>
+            {/* } */}
             {list}
-        </div>
+        </table>
+
+        console.log(this.props.nowView)
+
+        if (this.props.gridView) {
+            return ReactDOM.createPortal(
+                rendering,
+                document.getElementById('canvas-div')
+            )
+        }
+        else {
+            return rendering;
+        }
     }
 
     onClick(self) {
@@ -55,14 +72,43 @@ class Student extends React.Component {
             class: false,
             mic: false,
             canvas: false,
-            display: 'none'
+            display: 'none',
+            onMouseOver: false,
         }
 
         this.onMouseEnter = this.onMouseEnter.bind(this);
         this.onMouseLeave = this.onMouseLeave.bind(this);
         this.onMouseClick = this.onMouseClick.bind(this);
-        this.myRef = React.createRef();
+        this.canvas = React.createRef();
+        this.video = React.createRef();
     }
+
+    studentListResize() {
+        let btn = document.getElementById("student_list_button")
+        let list = document.getElementById("student_list");
+        let len = list.children.length - 1;
+        let on = btn.classList.contains("on");
+
+        if (on && len != 16)
+            len++;
+        let line = Math.ceil(len / 4);
+
+        if (on) {
+            line = Math.max(4, line);
+            list.style.gridAutoRows = 100 / line + "%";
+        }
+        else {
+            list.style.gridAutoRows = 100 / 4 + "%";
+        }
+
+        if (line <= 4) {
+            btn.style.display = 'none';
+        }
+        else if (line >= 5) {
+            on ? list.appendChild(btn) : list.insertBefore(btn, list.children[16])
+            btn.style.display = "inline-block";
+        }
+    };
 
     componentDidMount() {
         this.studentListResize();
@@ -82,41 +128,14 @@ class Student extends React.Component {
         }
 
         if (!classroomInfo.showcanvas)
-            this.myRef.current.style.display = 'none';
+            this.canvas.current.style.display = 'none';
 
-        reactEvent.enterOrExit(this.props.name, this.props.isOwner, "ENTER");
-        canvasManager.canvas_array[this.props.uid] = this.myRef.current;
+        if (this.props.uid in streamContainer) {
+            let videoElement = this.video.current;
+            videoElement.srcObject = streamContainer[this.props.uid];
+        }
+        canvasManager.canvas_array[this.props.uid] = this.canvas.current;
     };
-
-    studentListResize() {
-        let btn = document.getElementById("student_list_button")
-        let list = document.getElementById("student_list");
-        let len = list.children.length - 1;
-        let on = btn.classList.contains("on");
-
-        if (on && len != 16)
-            len++;
-        let line = Math.ceil(len / 4);
-
-        if (on) {
-            line = Math.max(4, line);
-            list.style.gridAutoRows = 100 / line + "%";
-            list.style.height = 6 * line + "%";
-        }
-        else {
-            list.style.gridAutoRows = 100 / 4 + "%";
-            list.style.height = 6 * 4 + "%";
-        }
-
-        if (line <= 4) {
-            btn.style.display = 'none';
-        }
-        else if (line >= 5) {
-            on ? list.appendChild(btn) : list.insertBefore(btn, list.children[16])
-            btn.style.display = "inline-block";
-        }
-    };
-
 
     componentWillUnmount() {
         if (this.props.uid == classroomInfo.permissions.classPermission)
@@ -128,17 +147,14 @@ class Student extends React.Component {
         if (permissionManager.IsCanvasPermission(this.props.uid))
             permissionManager.DeleteCanvasPermission(this.props.uid);
 
-        reactEvent.enterOrExit(this.props.name, this.props.isOwner, "EXIT");
-
-
         examObj.leftStudent(this.props.uid);
         delete canvasManager.canvas_array[this.props.uid];
-        console.debug("Left student", "[", this.props.uid, "]", "[", this.props.name, "]");
         this.studentListResize();
     };
 
     render() {
         return <span
+            style={{ cursor: store.getState().isOwner ? 'pointer' : 'default' }}
             onClick={store.getState().isOwner ? this.onMouseClick : undefined}
             onMouseLeave={store.getState().isOwner ? this.onMouseLeave : undefined}
             onMouseEnter={store.getState().isOwner ? this.onMouseEnter : undefined}
@@ -152,7 +168,16 @@ class Student extends React.Component {
             <span className='student-overlay' />
             <span className='bor' />
             <span className='name'>{this.props.name}</span>
-            <img ref={this.myRef} />
+            <img style={{ display: this.props.nowView == STUDENT_CANVAS || this.state.onMouseOver ? 'block' : 'none' }} ref={this.canvas} />
+            <video
+                style={{
+                    display: this.props.nowView == STUDENT_CANVAS || this.state.onMouseOver ? 'none' : 'block'
+                }}
+                ref={this.video}
+                autoPlay={true}
+                controls={false}
+                className='student_cam' />
+
         </span>
     }
 
@@ -195,27 +220,41 @@ class Student extends React.Component {
     }
 
     onMouseEnter() {
-        if (classroomInfo.permissions.canvasPermission.includes(this.props.uid))
-            return;
 
-        connection.send({
-            sendcanvasdata: true,
-            state: true
-        }, this.props.uid)
+        if (this.props.gridView) {
+            this.setState({ onMouseOver: true });
+        }
+        else {
 
-        canvasManager.showingCanvasId = this.props.uid;
+            if (classroomInfo.permissions.canvasPermission.includes(this.props.uid))
+                return;
+
+            connection.send({
+                sendcanvasdata: true,
+                state: true
+            }, this.props.uid)
+
+            canvasManager.showingCanvasId = this.props.uid;
+        }
+
     };
 
     onMouseLeave() {
-        if (!classroomInfo.showcanvas)
-            connection.send({
-                sendcanvasdata: true,
-                state: false
-            }, this.props.uid)
+        if (this.props.gridView) {
+            this.setState({ onMouseOver: false });
+        }
+        else {
+            if (!classroomInfo.showcanvas)
+                connection.send({
+                    sendcanvasdata: true,
+                    state: false
+                }, this.props.uid)
 
-        if (!classroomInfo.permissions.canvasPermission.includes(this.props.uid))
-            canvasManager.clearStudentCanvas(this.props.uid);
+            if (!classroomInfo.permissions.canvasPermission.includes(this.props.uid))
+                canvasManager.clearStudentCanvas(this.props.uid);
 
-        canvasManager.showingCanvasId = undefined;
+            canvasManager.showingCanvasId = undefined;
+        }
+
     };
 }

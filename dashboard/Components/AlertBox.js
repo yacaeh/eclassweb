@@ -48,7 +48,7 @@ class AlertBox extends React.Component {
     }
 
     show(){
-        document.getElementById("right-tab").style.zIndex = -1;
+        rightTab.style.zIndex = -1;
         document.getElementById("header").style.zIndex = -1;
         document.getElementById("tool-box").style.zIndex = -1;
         $('#alert-box').fadeIn(300);
@@ -56,7 +56,7 @@ class AlertBox extends React.Component {
     
     hide(){
         $('#alert-box').fadeOut(300,() =>{
-            document.getElementById("right-tab").style.zIndex = 2;
+            rightTab.style.zIndex = 2;
             document.getElementById("header").style.zIndex = 5;
             document.getElementById("tool-box").style.zIndex = 10001;
         })

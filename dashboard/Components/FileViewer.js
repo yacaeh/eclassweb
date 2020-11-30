@@ -72,7 +72,9 @@ class FileViewer extends React.Component {
         return <div id="confirm-box" className="modal fade">
             <div className="modal-dialog modal-lg">
                 <div className="modal-content">
+
                     <this.Header selected={this.state.nowShow} onClick={this.onHeaderClickHeader} />
+                    
                     <div id="confirm-message" className="modal-body">
                         {store.getState().isOwner && <FileList
                             nowShow={this.state.nowShow}
@@ -82,10 +84,10 @@ class FileViewer extends React.Component {
                             data={this.state.currentData} />
                         }
                         <this.UploadModal show={this.state.showUploadModal} />
-                 
-
                     </div>
+
                     <this.Footer />
+                    
                 </div>
             </div>
         </div>

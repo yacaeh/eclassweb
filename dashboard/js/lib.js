@@ -80,6 +80,29 @@ function GetParamsFromURL() {
   return params;
 }
 
+
+function onOver(e){
+  let element = e.target;
+  let tooltip = document.getElementById("toptooltip");
+  tooltip.style.display = 'block';
+  tooltip.children[0].innerHTML = element.dataset.des;
+  let width = tooltip.getBoundingClientRect().width / 2;
+  tooltip.style.left = 
+      e.target.getBoundingClientRect().x + 
+      (e.target.getBoundingClientRect().width / 2) - width + "px";
+  tooltip.style.top = 
+    e.target.getBoundingClientRect().y + 
+    e.target.getBoundingClientRect().height + 15 + 'px';
+}
+
+function onLeave(e){
+  let element = e.target;
+  let tooltip = document.getElementById("toptooltip");
+  element.addEventListener("mouseleave", function () {
+      tooltip.style.display = 'none';
+  })
+}
+
 // ----------------------------------------------------------------------
 
 function showusers() {

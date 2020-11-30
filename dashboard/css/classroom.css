@@ -399,30 +399,20 @@ button[disabled] {
 
 #notice {
   position: relative;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 #notice > .text {
   position: absolute;
   width: 100%;
-  left: 0px;
   text-align: center;
   font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
+  font-weight: 700;
   font-size: 15px;
   line-height: 35px;
   color: #707070;
-  top: 0px;
   height: 35px;
   border-bottom: 1px solid #b8b8b8;
-  align-content: center;
-  vertical-align: middle;
-  white-space:nowrap;
+  border-top: 1px solid #b8b8b8;
 }
 
 .chatbackground {
@@ -565,28 +555,16 @@ hr {
   top: 20px;
 }
 
-
-#right-tab {
-  position: absolute;
-  width: 17.7%;
-  bottom: 0px;
-  right: 0px;
-  top: 50px;
-  background-color: white;
-  border-left: solid 1px rgba(0, 0, 0, 0.2);
-  outline: solid 1px rgba(0, 0, 0, 0.1);
-  z-index: 2;
-}
-
 .onUserStatusChanged {
   padding: 5px 10px;
 }
 
 #chatting {
-  position: absolute;
-  top: 29%;
+  position: relative;
   width: 100%;
+  height: 70%;
   bottom: 0px;
+  flex: 1;
 }
 
 .conversation-panel {
@@ -640,14 +618,6 @@ hr {
 }
 #top_pdf {
   content: url(/dashboard/img/pdf.png);
-}
-
-#top_student {
-  content: url(/dashboard/img/student.png);
-}
-
-#top_camera {
-  content: url(/dashboard/img/cam.png);
 }
 
 #fullscreen {
@@ -714,6 +684,7 @@ hr {
 #app{
   width: 100%;
   height: 100%;
+  position: absolute;
 }
 
 
@@ -952,9 +923,8 @@ hr {
 .nos {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   width: 100%;
-  height: 5%;
-  min-height: 30px;
-  position: absolute;
+  height: 50px;
+  position: relative;
 }
 
 .nos_student_icon {
@@ -988,26 +958,10 @@ hr {
   display: none;
 }
 
-
-#student_list {
-  float: left;
-  width: 100%;
-  height: 24%;
-  overflow-x: hidden;
-  background: #b8b8b8;
-  top: max(30px, 5%);
-  position: absolute;
-  overflow-y: hidden;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-}
-
 .student {
   background-color: gray;
   display: inline-block;
   margin: 1px;
-  cursor: pointer;
   color: white;
   vertical-align: bottom;
   position: relative;
@@ -1568,21 +1522,6 @@ body:fullscreen {
   color: #fff;
   background-color: #18DBBE;
   border-color: #18DBBE;
-}
-
-#right-tab-collapse{
-  position: absolute;
-  left: -30px;
-  top: calc(50% - 15px);
-  border-radius: 2px;
-  transform: rotate(-90deg);
-  cursor: pointer;
-  border: solid 1px rgba(0, 0, 0, 0.2);
-  height: 30px;
-  width: 30px;
-  align-content: center;
-  text-align: center;
-  background-color: white;
 }
 
 .chatonoff{

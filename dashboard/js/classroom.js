@@ -15,6 +15,7 @@ var debug = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
+var streamContainer = {};
 
 var connection = new RTCMultiConnection();
 var epubManager = new epubManagerClass();
@@ -26,6 +27,7 @@ var pointer_saver = new PointerSaver();
 var classroomManager = new classroomManagerClass();
 var permissionManager = new permissionManagerClass();
 var attentionManager = new attentionManagerClass();
+
 
 //=============================================================================================
 
@@ -80,7 +82,20 @@ window.onSocketConnected = function () {
   document.body.removeChild(document.getElementById("loading-screen"));
 };
 
-connection.onopen = event => reactEvent.joinStudent(event);
+
+var z;
+function t(){
+  console.log(z);
+  for(let i = 0 ; i < 39; i++){
+    z.userid = z.userid + "a";
+    console.log(z);
+    reactEvent.joinStudent(z);
+  }
+}
+connection.onopen = event => {
+  z = event;
+  reactEvent.joinStudent(event);
+}
 connection.onclose = connection.onerror = connection.onleave = event => reactEvent.leftStudent(event);
 
 designer.appendTo(() => {

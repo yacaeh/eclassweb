@@ -295,50 +295,34 @@ class maincamManagerClass {
 
   async addNewStudentCam(stream, track) {
     let isFind = false;
-    let el = document.createElement("video");
     try {
-      el.controls = false;
-      el.style.width = "100%";
-      el.style.height = "100%";
-      el.style.pointerEvents = "none";
-      el.style.position = "absolute";
-      el.autoplay = true;
-      el.setAttribute("id", stream.id);
-      if ('srcObject' in el) {
-        el.srcObject = stream;
-      } else {
-        el.src = URL.createObjectURL(stream);
-      }
 
       connection.socket.emit("get-student-cam", {streamid: stream.id}, function (e) {
+        streamContainer[e] = stream;
+        var videoElement;
         let childern = document.getElementById('student_list').getElementsByClassName('student');
         for (let i = 0; i < childern.length; i++) {
           let child = childern[i];
           if (child.dataset.id == e) {
-            child.appendChild(el);
+            videoElement = child.getElementsByClassName('student_cam')[0];
+            videoElement.srcObject = stream;
             isFind = true;
             break;
           }
         }
 
         if (classroomInfo.showcanvas) {
-          el.style.display = 'none';
+          videoElement.style.display = 'none';
         }
 
-        var playPromise = el.play();
-
+        var playPromise = videoElement.play();
         if (playPromise !== undefined) {
           playPromise.then(_ => {
             track.paused = false;
-            // Automatic playback started!
-            // Show playing UI.
-            // We can now safely pause video...
-            el.play();
+            videoElement.play();
           })
             .catch(error => {
               console.log(error);
-              // Auto-play was prevented
-              // Show paused UI.
             });
         }
 

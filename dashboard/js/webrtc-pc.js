@@ -197,13 +197,10 @@ async function webRTCPCInit() {
               if (classroomInfo.camshare.id == stream.id) {
                 if (!connection.extra.roomOwner) {
                   maincamManager.addNewTeacherCam(stream);
-                  maincamManager.addNewStudentCam(stream, track)
                   track.paused = false;
                 }
               } 
-              else {
-                  maincamManager.addNewStudentCam(stream, track)
-              }
+              maincamManager.addNewStudentCam(stream, track)
             };
           }
         }
