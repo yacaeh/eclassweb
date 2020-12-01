@@ -195,39 +195,11 @@ class ScreenShareManagerClass {
       screenshareManager.start(stream, btn);
     }
   }
+
   streamstart(stream) {
     console.info("Stream start!");
     this.srcObject(stream);
     this.show();
-
-    // let parent = this.get().parentElement;
-    // parent.removeChild(this.get());
-
-    // let el = document.createElement("video")
-    // el.srcObject = stream; 
-    // el.setAttribute('id', "screen-viewer"); 
-    // el.controls = true;
-    // el.volume = 0.3;
-    // element.controls = false;
-
-    // parent.appendChild(el);
-    // el.muted = true;
-
-    // var playPromise = el.play();
-
-    // if (playPromise !== undefined) {
-    //   playPromise.then(_ => {
-    //     // Automatic playback started!
-    //     // Show playing UI.
-    //     // We can now safely pause video...
-    //     el.play();
-    //   })
-    //   .catch(error => {
-    //     // Auto-play was prevented
-    //     // Show paused UI.
-    //   });
-    // }
-
   }
 
   eventListener(event) {
@@ -265,23 +237,6 @@ class maincamManagerClass {
   get() {
     let video = document.getElementById("main-video");
     return video ? video : GetWidgetFrame().document.getElementById("main-video");
-  }
-  show() {
-    this.get().style.display = 'block';
-  }
-  hide() {
-    this.get().style.display = 'none';
-  }
-  start(callback) {
-    var inter = setInterval(function () {
-      if (maincamManager.get().readyState == 4) {
-        connection.extra.roomOwner ? maincamManager.get().muted = true : maincamManager.get().muted = false;
-        maincamManager.get().play();
-        clearInterval(inter);
-        if (callback)
-          callback();
-      }
-    }, 200)
   }
   srcObject(src) {
     if (src) {
@@ -325,10 +280,7 @@ class maincamManagerClass {
               console.log(error);
             });
         }
-
-
       })
-
     }
 
     catch {
@@ -339,11 +291,9 @@ class maincamManagerClass {
 
   addNewTeacherCam(stream) {
     console.log("Addnew teacher", stream.id);
+    // streamContainer[connection.userid] = stream;
     this.srcObject(stream);
     this.start();
-    classroomInfo.camshare = {
-      id: stream.id
-    };
-
+    classroomInfo.camshare = {id: stream.id};
   }
 }

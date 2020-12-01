@@ -84,9 +84,9 @@ window.onSocketConnected = function () {
 
 
 var z;
-function t(){
+function t(num){
   console.log(z);
-  for(let i = 0 ; i < 39; i++){
+  for(let i = 0 ; i < num; i++){
     z.userid = z.userid + "a";
     console.log(z);
     reactEvent.joinStudent(z);

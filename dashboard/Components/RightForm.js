@@ -1,7 +1,7 @@
-const   STUDENT_CANVAS  = 'STUDENT_CANVAS',
-        STUDENT_CAM     = 'STUDENT_CAM',
-        GRID_CAM        = 'GRID_CAM',
-        TEACHER_CAM     = 'TEACHER_CAM';
+const   STUDENT_CANVAS = 'STUDENT_CANVAS',
+        STUDENT_CAM = 'STUDENT_CAM',
+        GRID_CAM = 'GRID_CAM',
+        TEACHER_CAM = 'TEACHER_CAM';
 
 class RightForm extends React.Component {
 
@@ -12,7 +12,7 @@ class RightForm extends React.Component {
             numberOfStudents: 0,
             studentList: [],
             nowView: STUDENT_CAM,
-            gridView : false,
+            gridView: false,
         }
         this.rightTab = React.createRef();
         this.joinStudent = this.joinStudent.bind(this);
@@ -25,20 +25,15 @@ class RightForm extends React.Component {
 
     cameraBtnHandler(e) {
         let nextState = this.state.nowView == STUDENT_CAM ? TEACHER_CAM : STUDENT_CAM;
-
         this.setState({ nowView: nextState })
         classroomInfo.showcanvas = false;
-        
+
         switch (nextState) {
-            case TEACHER_CAM:
-                maincamManager.show();
-                break;
             case STUDENT_CAM:
                 connection.send({
                     sendcanvasdata: true,
                     state: false
                 })
-                maincamManager.hide();
                 break;
         }
 
@@ -50,7 +45,6 @@ class RightForm extends React.Component {
             return;
 
         this.setState({ nowView: STUDENT_CANVAS })
-        maincamManager.hide();
         classroomInfo.showcanvas = true;
         connection.send({
             sendcanvasdata: true,
@@ -60,7 +54,7 @@ class RightForm extends React.Component {
     };
 
     gridCamBtnHandler(e) {
-        this.setState({gridView : !this.state.gridView});
+        this.setState({ gridView: !this.state.gridView });
     };
 
     render() {
@@ -70,22 +64,19 @@ class RightForm extends React.Component {
                     <img style={{ pointerEvents: 'none' }} src="/dashboard/img/openchat.png" />
                 </div>
                 <Authorization />
-                <CamChangeButtons 
+                <CamChangeButtons
                     cameraBtnHandler={this.cameraBtnHandler}
                     studentBtnHandler={this.studentBtnHandler}
                     gridCamBtnHandler={this.gridCamBtnHandler}
                     nowView={this.state.nowView}
                 />
-                <NumberOfStudents 
-
-                    num={this.state.numberOfStudents} />
-                    <div style={{display : this.state.gridView ? 'none' : 'block'}} id="cam_form">
-                        <StudentList 
-                            gridView={this.state.gridView}
-                            nowView={this.state.nowView}
-                        studentList={this.state.studentList} />
-                    <MainCam />
-                    </div>
+                <NumberOfStudents num={this.state.numberOfStudents} />
+                <CamForm
+                    collapsed={this.state.collapsed}
+                    gridView={this.state.gridView}
+                    nowView={this.state.nowView}
+                    studentList={this.state.studentList}
+                />
 
                 <ChattingWindow />
             </div>
@@ -106,7 +97,7 @@ class RightForm extends React.Component {
             console.debug('Connected with ', "[", userName, "]", "[", userId, "]");
             event.extra.roomOwner && classroomManager.rejoinTeacher();
             let isOwner = event.extra.roomOwner;
-            const list = this.state.studentList.concat({ userId, userName, isOwner});
+            const list = this.state.studentList.concat({ userId, userName, isOwner });
             this.setState({ studentList: list });
             this.setState({ numberOfStudents: list.length });
             reactEvent.enterOrExit(userName, isOwner, "ENTER");
@@ -118,14 +109,14 @@ class RightForm extends React.Component {
         const student = this.state.studentList.filter(user => user.userId == event.userid)[0];
         reactEvent.enterOrExit(student.userName, student.isOwner, "EXIT");
         const list = this.state.studentList.filter(user => user.userId != event.userid);
-        this.setState({ studentList: list});
-        this.setState({ numberOfStudents: list.length});
+        this.setState({ studentList: list });
+        this.setState({ numberOfStudents: list.length });
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
     }
 
     collapse = (e) => {
         this.setState({ collapsed: !this.state.collapsed })
-        
+
         if (!this.state.collapsed) {
             e.target.style.transform = "rotate(90deg)";
             widgetContainer.style.right = "0%";
@@ -139,6 +130,81 @@ class RightForm extends React.Component {
     }
 }
 
+class CamForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            collapsed : true
+        }
+
+        this.onCollapseBtn = this.onCollapseBtn.bind(this);
+    }
+
+    
+    onCollapseBtn() {
+        this.setState({ collapsed: !this.state.collapsed })
+    }
+
+    render() {
+        let style;
+        let line = Math.ceil((this.props.studentList.length + 1) / 4);
+
+        if(this.props.gridView)
+            style = {height:'100%'};
+        else if(this.state.collapsed)
+            style = {height:'24%'}
+        else if(!this.state.collapsed)
+           style = {height : line * 6 + '%'}
+
+        
+
+        const rendering = <div style={style} id="cam_form">
+            {(this.props.nowView != TEACHER_CAM || this.props.gridView)&& 
+                <StudentList
+                    onCollapseBtn={this.onCollapseBtn}
+                    collapsed={this.state.collapsed}
+                    gridView={this.props.gridView}
+                    nowView={this.props.nowView}
+                    studentList={this.props.studentList} />
+            }
+
+            {(this.props.nowView == TEACHER_CAM) &&
+                <TeacherCam gridView={this.props.gridView}/>
+            }
+        </div>;
+
+
+        if (this.props.gridView) {
+            return ReactDOM.createPortal(
+                rendering,
+                document.getElementById('canvas-div')
+            )
+        }
+        else {
+            return rendering;
+        }
+
+    }
+}
+
+class TeacherCam extends React.Component {
+    constructor(props) {
+        super(props);
+        this.video = React.createRef();
+    }
+
+    componentDidMount() {
+        console.log("MOUNT..")
+        if (connection)
+            this.video.current.srcObject = streamContainer[connection.userid]
+    }
+
+    render() {
+        const video = <video ref={this.video} id="main-video" playsInline autoPlay />
+        return video;
+    }
+}
+
 function NumberOfStudents(props) {
     return <span className="nos">
         <span className="nos_student_text" >{props.num} </span>
@@ -146,15 +212,8 @@ function NumberOfStudents(props) {
     </span>
 }
 
+function CamChangeButtons(props) {
 
-class MainCam extends React.Component {
-    render() {
-        return <video id="main-video" playsInline autoPlay />
-    }
-}
-
-function CamChangeButtons(props){
-    
     const btns = <>
         {!store.getState().isMobile && <CameraBtn nowView={props.nowView} onClick={props.cameraBtnHandler} />}
         {store.getState().isOwner && <StudentBtn nowView={props.nowView} onClick={props.studentBtnHandler} />}
@@ -163,7 +222,7 @@ function CamChangeButtons(props){
 
     const parent = document.getElementById("header-feature");
 
-    if(parent)
+    if (parent)
         return ReactDOM.createPortal(
             btns,
             document.getElementById("header-feature")
@@ -173,36 +232,35 @@ function CamChangeButtons(props){
 
 }
 
-
 function CameraBtn(props) {
-    return <img 
-    src="/dashboard/img/cam.png"
-    onMouseEnter={onOver} 
-    onMouseLeave={onLeave} 
-    onClick={props.onClick} 
-    className={"top_icon view_type " + (props.nowView == STUDENT_CAM || props.nowView == TEACHER_CAM ? "view_type-on" : '')} 
-    data-des={GetLang('TOP_CAMERA')
-    } id="top_camera" />
+    return <img
+        src="/dashboard/img/cam.png"
+        onMouseEnter={onOver}
+        onMouseLeave={onLeave}
+        onClick={props.onClick}
+        className={"top_icon view_type " + (props.nowView == STUDENT_CAM || props.nowView == TEACHER_CAM ? "view_type-on" : '')}
+        data-des={GetLang('TOP_CAMERA')
+        } id="top_camera" />
 }
 
 function StudentBtn(props) {
-    return <img 
-    src='/dashboard/img/student.png'
-    onMouseEnter={onOver} 
-    onMouseLeave={onLeave} 
-    onClick={props.onClick} 
-    className={"top_icon view_type " + (props.nowView == STUDENT_CANVAS ? "view_type-on" : '')} 
-    data-des={GetLang('TOP_STUDNET_CANVAS')
-    } id="top_student" />
+    return <img
+        src='/dashboard/img/student.png'
+        onMouseEnter={onOver}
+        onMouseLeave={onLeave}
+        onClick={props.onClick}
+        className={"top_icon view_type " + (props.nowView == STUDENT_CANVAS ? "view_type-on" : '')}
+        data-des={GetLang('TOP_STUDNET_CANVAS')
+        } id="top_student" />
 }
 
 function GridCamBtn(props) {
-    return <img    
-    src='/dashboard/img/grid.png'
-    onMouseEnter={onOver} 
-    onMouseLeave={onLeave} 
-    onClick={props.onClick} 
-    className={"top_icon view_type " + (props.nowView == GRID_CAM ? "view_type-on" : '')} 
-    data-des={GetLang('TOP_STUDNET_CANVAS')
-    } id="top_student" />
+    return <img
+        src='/dashboard/img/grid.png'
+        onMouseEnter={onOver}
+        onMouseLeave={onLeave}
+        onClick={props.onClick}
+        className={"top_icon view_type " + (props.nowView == GRID_CAM ? "view_type-on" : '')}
+        data-des={GetLang('TOP_STUDNET_CANVAS')
+        } id="top_student" />
 }

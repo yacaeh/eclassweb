@@ -140,7 +140,6 @@ async function webRTCPCInit() {
           if (connection.extra.roomOwner && !teacherAdded) {
             teacherAdded = true;
             maincamManager.addNewTeacherCam(localStream);
-            maincamManager.hide();
             track.paused = false;
             connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {});
           }

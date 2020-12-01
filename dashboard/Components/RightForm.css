@@ -47,9 +47,128 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    position: absolute;
 }
 
+
+#student_list_button{
+    cursor: pointer;
+    border: solid 2px rgba(0,0,0,0.5);
+    position: relative;
+    margin: 1px;
+    vertical-align: bottom;
+    float: right;
+    text-align: center;
+    font-family: Roboto;
+    font-weight: 800;
+    border-radius: 8px;
+    background-color: white;
+    line-height: 52px;
+  }
+  
+  .student > .permissions{
+    position: absolute;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+    height: 16px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  
+  .student > .permissions > .img{
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    margin-right: 3px;
+    margin-top: 2px;
+  }
+  
+  .student > .permissions > .img.screen{
+    right: 35px;
+  }
+  .student > .permissions > .img.canvas{
+    right: 2px;
+  }
+  .student > .permissions > .img.mic{
+    right: 18px;
+  }
+  
+  
+  .student > .bor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    pointer-events: none;
+  }
+  
+  .student > .bor.alert_wait{
+    border: 3px solid yellow;
+  }
+  .student > .bor.alert_no{
+    border: 3px solid #ff5959;
+  }
+  .student > .bor.alert_yes{
+    border: 3px solid #1defb0;
+  }
+  
+  .student > img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  
+  }
+  
+  .student > .click {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid #18dbbe;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
+  }
+  
+  .student .name {
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    right: 0px;
+    align-content: center;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  .student .name .alert {
+    top: 6px;
+    width: 7px;
+    height: 7px;
+    left: 5px;
+    position: absolute;
+    border-radius: 10px;
+    padding: 0;
+    margin-bottom: 0;
+    border: 0px solid transparent;
+  }
+  
+
+.student {
+    background-color: gray;
+    display: inline-block;
+    margin: 1px;
+    color: white;
+    vertical-align: bottom;
+    position: relative;
+  }
+  
+  .student.big {
+    grid-column: 1/4;
+      grid-row: 1/4;
+  }
 
 #right-tab-collapse{
     position: absolute;
@@ -68,7 +187,7 @@
 
   #cam_form {
       width: 100%;
-      height: 25%;
+      height: 24%;
   }
 
   #student_list {
@@ -80,5 +199,9 @@
     overflow-y: hidden;
     z-index: 1;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
+
+.grid_view>video,.grid_view>span:nth-child(1) {
+    grid-column: 1/4;
+    grid-row: 1/4;
+}

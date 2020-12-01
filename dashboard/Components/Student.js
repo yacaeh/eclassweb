@@ -1,17 +1,17 @@
 class StudentList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            collapse: true
-        }
-
         this.myRef = React.createRef();
-        this.onClick = this.onClick.bind(this);
     }
 
     render() {
-        const list = this.props.studentList.map(id => (
+        let studentLength = this.props.studentList.length;
+        if(!this.props.gridView && studentLength > 16)
+            studentLength++;
+
+        let list = this.props.studentList.map(id => (
             <Student
+                numOfStudents={studentLength}
                 nowView={this.props.nowView}
                 gridView={this.props.gridView}
                 isOwner={id.isOwner}
@@ -20,50 +20,56 @@ class StudentList extends React.Component {
                 name={id.userName} />
         ))
 
-        const rendering = <table ref={this.myRef} id="student_list">
-            {/* {!this.props.gridView && */}
-                <div onClick={this.onClick} id="student_list_button">
-                    {this.state.collapse ? ("+" + (list.length - 16)) : ("...")}
-                </div>
-            {/* } */}
+        let line = 0;
+        let column = 0;
+
+        if(this.props.gridView){
+            line = 7;
+            column = 7;
+        }
+        else if(this.props.collapsed){
+            line = 4;
+            column = 4;
+        }
+        else{
+            line = Math.ceil(studentLength / 4)
+            column = 4;
+        }
+
+        const gridStyle = {
+            gridAutoRows : 100 / line + "%",
+            gridTemplateColumns : 'repeat(' + column + ', 1fr)'
+        };
+
+        if(this.props.gridView)
+            list.splice(0,0,<TeacherCam key='teacher' gridView={this.props.gridView}/>)
+
+        if (list.length > 16 && !this.props.gridView) {
+            const btn = <this.StudentListBtn
+                key='btn'
+                onClick={this.props.onCollapseBtn}
+                state={this.props.collapsed}
+                length={studentLength}
+            />
+            this.props.collapsed ? list.splice(15,0,btn) : list.push(btn);
+        }
+
+        const rendering = <div 
+        className={this.props.gridView ? "grid_view" : ''}
+        style={gridStyle} ref={this.myRef} id="student_list">
             {list}
-        </table>
-
-        console.log(this.props.nowView)
-
-        if (this.props.gridView) {
-            return ReactDOM.createPortal(
-                rendering,
-                document.getElementById('canvas-div')
-            )
-        }
-        else {
-            return rendering;
-        }
+        </div>
+        return rendering;
     }
 
-    onClick(self) {
-        self = self.target;
-        this.setState({ collapse: !this.state.collapse }, () => {
-            let list = this.myRef.current;
-            let len = list.children.length;
-            let line = Math.ceil(len / 4);
-
-            if (!this.state.collapse) {
-                list.appendChild(self);
-                line = Math.max(4, line);
-            }
-            else {
-                list.insertBefore(self, list.children[15]);
-                line = 4;
-            }
-
-            list.style.gridAutoRows = 100 / line + "%";
-            list.style.height = 6 * line + "%";
-        })
+    StudentListBtn(props){
+        return <div 
+        onClick={props.onClick} id="student_list_button">
+            {props.state ? ("+" + (props.length - 16)) : ("...")}
+        </div>
     }
+
 }
-
 
 class Student extends React.Component {
     constructor(props) {
@@ -83,35 +89,8 @@ class Student extends React.Component {
         this.video = React.createRef();
     }
 
-    studentListResize() {
-        let btn = document.getElementById("student_list_button")
-        let list = document.getElementById("student_list");
-        let len = list.children.length - 1;
-        let on = btn.classList.contains("on");
-
-        if (on && len != 16)
-            len++;
-        let line = Math.ceil(len / 4);
-
-        if (on) {
-            line = Math.max(4, line);
-            list.style.gridAutoRows = 100 / line + "%";
-        }
-        else {
-            list.style.gridAutoRows = 100 / 4 + "%";
-        }
-
-        if (line <= 4) {
-            btn.style.display = 'none';
-        }
-        else if (line >= 5) {
-            on ? list.appendChild(btn) : list.insertBefore(btn, list.children[16])
-            btn.style.display = "inline-block";
-        }
-    };
 
     componentDidMount() {
-        this.studentListResize();
         if (classroomInfo.permissions.classPermission == this.props.uid) {
             this.setState({ class: true });
             MakeIcon(this.props.uid, "screen");
@@ -149,21 +128,20 @@ class Student extends React.Component {
 
         examObj.leftStudent(this.props.uid);
         delete canvasManager.canvas_array[this.props.uid];
-        this.studentListResize();
     };
 
     render() {
         return <span
-            style={{ cursor: store.getState().isOwner ? 'pointer' : 'default' }}
-            onClick={store.getState().isOwner ? this.onMouseClick : undefined}
-            onMouseLeave={store.getState().isOwner ? this.onMouseLeave : undefined}
-            onMouseEnter={store.getState().isOwner ? this.onMouseEnter : undefined}
-            className="student"
-            data-name={this.props.name}
-            data-id={this.props.uid}
-            data-class-permission={this.state.class}
-            data-mic-permission={this.state.mic}
-            data-canvas-permission={this.state.canvas}>
+                style={{ cursor: store.getState().isOwner ? 'pointer' : 'default' }}
+                onClick={store.getState().isOwner ? this.onMouseClick : undefined}
+                onMouseLeave={store.getState().isOwner ? this.onMouseLeave : undefined}
+                onMouseEnter={store.getState().isOwner ? this.onMouseEnter : undefined}
+                className={"student " + (this.props.gridView ? "grid" : '')}
+                data-name={this.props.name}
+                data-id={this.props.uid}
+                data-class-permission={this.state.class}
+                data-mic-permission={this.state.mic}
+                data-canvas-permission={this.state.canvas}>
             <span className='permissions' style={{ display: 'none' }} />
             <span className='student-overlay' />
             <span className='bor' />
