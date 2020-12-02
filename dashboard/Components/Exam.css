@@ -1,7 +1,9 @@
 .question{
     display: grid;
-    grid-template-columns: repeat(6,1fr);
+    grid-template-columns: repeat(7,1fr);
 }
+
+.question.
 
 .question > .line {
     line-height: 43px;
@@ -140,6 +142,7 @@ input[type=radio] + label {
   background: url(/dashboard/img/radio_base.png) right/24px no-repeat;
   margin-top: 0.5rem;
   width: 30px;
+  padding-right: 35px;
 }
 
 input[type='radio']:checked + label {

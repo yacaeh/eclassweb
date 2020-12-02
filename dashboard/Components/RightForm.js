@@ -194,9 +194,8 @@ class TeacherCam extends React.Component {
     }
 
     componentDidMount() {
-        console.log("MOUNT..")
         if (connection)
-            this.video.current.srcObject = streamContainer[connection.userid]
+            this.video.current.srcObject = streamContainer[GetOwnerId()];
     }
 
     render() {

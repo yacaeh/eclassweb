@@ -201,19 +201,17 @@ class Student extends React.Component {
 
         if (this.props.gridView) {
             this.setState({ onMouseOver: true });
+            
         }
-        else {
+        if (classroomInfo.permissions.canvasPermission.includes(this.props.uid))
+        return;
 
-            if (classroomInfo.permissions.canvasPermission.includes(this.props.uid))
-                return;
+        connection.send({
+            sendcanvasdata: true,
+            state: true
+        }, this.props.uid)
 
-            connection.send({
-                sendcanvasdata: true,
-                state: true
-            }, this.props.uid)
-
-            canvasManager.showingCanvasId = this.props.uid;
-        }
+        canvasManager.showingCanvasId = this.props.uid;
 
     };
 

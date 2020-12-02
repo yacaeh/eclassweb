@@ -1146,24 +1146,12 @@ module.exports = exports = function (socket, config) {
             })
         })
 
-        socket.on("cam-share-set", function(data, callback){
-            call_getRoom(room => {
-                room.info.camshare = data;
-                if (callback)
-                    callback('ok');
-            }, e => {
-                console.log(e)
-            })
-        })
-
         socket.on("get-user-name", function(userid, callback){
             if(listOfRooms[getRoomId()].userlist[userid])
                 callback(listOfRooms[getRoomId()].userlist[userid].name);
             else
                 callback('');
         })
-
-
 
         // Login -- 방을 새로 생성
         socket.on('append-room', function(arg, callback){

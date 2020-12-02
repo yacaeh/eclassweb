@@ -288,12 +288,4 @@ class maincamManagerClass {
     }
 
   }
-
-  addNewTeacherCam(stream) {
-    console.log("Addnew teacher", stream.id);
-    // streamContainer[connection.userid] = stream;
-    this.srcObject(stream);
-    this.start();
-    classroomInfo.camshare = {id: stream.id};
-  }
 }
