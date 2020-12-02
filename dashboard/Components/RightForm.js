@@ -186,9 +186,12 @@ class TeacherCam extends React.Component {
     }
 
     render() {
+        
+
         const video = <video 
             style={{display : this.props.nowView == TEACHER_CAM || this.props.gridView ? 'block' : 'none' }} 
             ref={this.video} 
+            muted={store.getState().isOwner}
             id="main-video" 
             playsInline autoPlay />
         return video;
