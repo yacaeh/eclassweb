@@ -214,6 +214,8 @@ class permissionManagerClass {
   
     if(id != connection.userid){
       studentContainer[id].getElementsByTagName('video')[0].muted = false;
+    }
+    else{
       store.dispatch({
         type : PERMISSION_CHANGED,
         data : { ...store.getState().permissions, mic : true}
@@ -226,6 +228,8 @@ class permissionManagerClass {
     console.debug("Lost mic permission",id);
     if(id != connection.userid){
       studentContainer[id].getElementsByTagName('video')[0].muted = true;
+    }
+    else{
       store.dispatch({
         type : PERMISSION_CHANGED,
         data : { ...store.getState().permissions, mic : false}
