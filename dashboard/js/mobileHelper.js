@@ -41,7 +41,7 @@ class mobileHelperClass {
                     }
                     else {
                         video.style.height = "";
-                        video.style.width = "30%";
+                        video.style.width = "50%";
                         video.style.left = lastleft;
                         video.style.top = lastTop;
                         video.classList.remove("full");

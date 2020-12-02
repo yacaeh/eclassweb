@@ -479,7 +479,7 @@ button[disabled] {
 #main-video.mobile {
   position: absolute;
   display: block;
-  width: 30%;
+  width: 50%;
   z-index: 100000007;
   top: 55px;
   height: unset;
