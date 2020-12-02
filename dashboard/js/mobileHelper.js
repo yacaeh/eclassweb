@@ -25,7 +25,6 @@ class mobileHelperClass {
             video.controls = false;
             let timeout = null;
             let isTouch = false;
-            video.play();
 
             addEvent(video, "touchstart mousedown", function (e) {
                 if (timeout != null) {
@@ -83,22 +82,18 @@ class mobileHelperClass {
                 x = e.pageX;
                 y = e.pageY;
 
-                if (left < 0 || top < 0)
-                    return false;
+                let canvaswidth = document.getElementById('canvas-div').getBoundingClientRect().width;
+                let canvasheight = document.getElementById('canvas-div').getBoundingClientRect().height;
 
-                let canvaswidth = GetDoc().body.getBoundingClientRect().width;
-                let canvasheight = GetDoc().body.getBoundingClientRect().height;
-
-                if (left + rect.width > canvaswidth ||
-                    top + rect.height > canvasheight
-                )
-                    return false;
+                left = Math.min(Math.max(0, x - rect.width), canvaswidth - rect.width);
+                top = Math.min(Math.max(0, y - rect.height), canvasheight - rect.height);
 
                 video.style.left = left + "px";
                 video.style.top = top + "px";
-
-
                 preventStopEvent(e);
+
+                return;
+
             })
             addEvent(video, 'touchend mouseup', function (e) {
                 isTouch = false;
@@ -124,7 +119,10 @@ class mobileHelperClass {
 
             })
 
-            AppendInFrame(video);
+            // setTimeout(() => {
+            //     AppendInFrame(video);
+            // },5000)
+            
         }
 
         function FullScreenBtnInit() {

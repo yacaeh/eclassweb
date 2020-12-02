@@ -476,6 +476,16 @@ button[disabled] {
   z-index: 5;
 }
 
+#main-video.mobile {
+  position: absolute;
+  display: block;
+  width: 30%;
+  z-index: 100000007;
+  top: 55px;
+  height: unset;
+  background-color: unset;
+}
+
 hr {
   height: 1px;
   border: 0;

@@ -499,14 +499,6 @@ position: absolute;
 bottom: 10px;
 }
 
-#main-video{
-position: absolute;
-display: block;
-width: 30%;
-z-index: 100000007;
-top: 55px;
-}
-
 .no-hover:hover{
 box-shadow: none !important;
 border-radius: 0px !important;
