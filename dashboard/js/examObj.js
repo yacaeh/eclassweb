@@ -499,8 +499,8 @@ function stopQuestionOMR() {
 
 // 학생 정답 표시
 function markStudent(num, check, answer) {
-    check === answer ? $(`#exam-question-${num}`).css('background-color', '#92ecc8') :
-                       $(`#exam-question-${num}`).css('background-color', '#fbccc4');
+    check === answer ? $(`#exam-question-${num}`).css('background-color', '#92ecc8').addClass('grid_7'):
+                       $(`#exam-question-${num}`).css('background-color', '#fbccc4').addClass('grid_7');
     $(`#exam-student-answer-${num}`).html("(" + answer + ")");
 }
 
