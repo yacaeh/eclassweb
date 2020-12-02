@@ -91,9 +91,6 @@ class mobileHelperClass {
                 video.style.left = left + "px";
                 video.style.top = top + "px";
                 preventStopEvent(e);
-
-                return;
-
             })
             addEvent(video, 'touchend mouseup', function (e) {
                 isTouch = false;
