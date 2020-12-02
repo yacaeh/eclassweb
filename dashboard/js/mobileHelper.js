@@ -25,6 +25,7 @@ class mobileHelperClass {
             video.controls = false;
             let timeout = null;
             let isTouch = false;
+            video.play();
 
             addEvent(video, "touchstart mousedown", function (e) {
                 if (timeout != null) {
@@ -33,17 +34,15 @@ class mobileHelperClass {
                     if (!video.classList.contains("full")) {
                         lastleft = video.style.left;
                         lastTop = video.style.top;
-
                         video.style.width = "100%";
                         video.style.height = "100%";
-                        video.style.left = "50px";
                         video.style.top = "0px";
                         video.classList.add("full");
                         return false;
                     }
                     else {
                         video.style.height = "";
-                        video.style.width = "20%";
+                        video.style.width = "30%";
                         video.style.left = lastleft;
                         video.style.top = lastTop;
                         video.classList.remove("full");

@@ -243,7 +243,7 @@ class maincamManagerClass {
 
       connection.socket.emit("get-cam-stream-id", { streamid: stream.id }, function (e) {
         if (e == GetOwnerId()) {
-          document.getElementById('main-video').srcObject = stream;
+            maincamManager.get().srcObject = stream;
         }
 
         streamContainer[e] = stream;

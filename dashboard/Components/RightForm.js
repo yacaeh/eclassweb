@@ -1,7 +1,7 @@
-const   STUDENT_CANVAS = 'STUDENT_CANVAS',
-        STUDENT_CAM = 'STUDENT_CAM',
-        GRID_CAM = 'GRID_CAM',
-        TEACHER_CAM = 'TEACHER_CAM';
+const STUDENT_CANVAS = 'STUDENT_CANVAS',
+    STUDENT_CAM = 'STUDENT_CAM',
+    GRID_CAM = 'GRID_CAM',
+    TEACHER_CAM = 'TEACHER_CAM';
 
 class RightForm extends React.Component {
 
@@ -107,9 +107,22 @@ class RightForm extends React.Component {
     leftStudent(event) {
         if (event.extra.userFullName == 'ycsadmin') return;
         const student = this.state.studentList.filter(user => user.userId == event.userid)[0];
-        if(!student) return;
+        if (!student) return;
         reactEvent.enterOrExit(student.userName, student.isOwner, "EXIT");
         const list = this.state.studentList.filter(user => user.userId != event.userid);
+
+        if (event.userid == classroomInfo.permissions.classPermission)
+            classroomInfo.permissions.classPermission = undefined;
+
+        if (event.userid == classroomInfo.permissions.micPermission)
+            classroomInfo.permissions.micPermission = undefined;
+
+        if (permissionManager.IsCanvasPermission(event.userid))
+            permissionManager.DeleteCanvasPermission(event.userid);
+
+        examObj.leftStudent(event.userid);
+        delete canvasManager.canvas_array[event.userid];
+        delete studentContainer[event.userid];
 
         this.setState({ studentList: list });
         this.setState({ numberOfStudents: list.length });
@@ -135,11 +148,12 @@ class CamForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            collapsed : true
+            collapsed: true
         }
         this.onCollapseBtn = this.onCollapseBtn.bind(this);
+        this.onStudentClicked = this.onStudentClicked.bind(this);
     }
-    
+
     onCollapseBtn() {
         this.setState({ collapsed: !this.state.collapsed })
     }
@@ -148,18 +162,22 @@ class CamForm extends React.Component {
         let style;
         let line = Math.ceil((this.props.studentList.length + 1) / 4);
 
-        if(this.props.gridView)         style = {height:'100%'};
-        else if(this.state.collapsed)   style = {height:'24%'}
-        else if(!this.state.collapsed)  style = {height : line * 6 + '%'}
+        if (this.props.gridView) style = { height: '100%' };
+        else if (this.state.collapsed) style = { height: '24%' }
+        else if (!this.state.collapsed) style = { height: line * 6 + '%' }
 
         const rendering = <div style={style} id="cam_form">
+            {/* <Authorization /> */}
             <StudentList
+                onStudentClicked={this.onStudentClicked}
                 onCollapseBtn={this.onCollapseBtn}
                 collapsed={this.state.collapsed}
                 gridView={this.props.gridView}
                 nowView={this.props.nowView}
                 studentList={this.props.studentList} />
-            <TeacherCam nowView={this.props.nowView} gridView={this.props.gridView}/>
+            <TeacherCam 
+                nowView={this.props.nowView} 
+                gridView={this.props.gridView} />
         </div>;
 
         if (this.props.gridView) {
@@ -171,6 +189,10 @@ class CamForm extends React.Component {
         else {
             return rendering;
         }
+    }
+
+    onStudentClicked(e) {
+        console.log("click..!",e)
     }
 }
 class TeacherCam extends React.Component {
@@ -186,11 +208,11 @@ class TeacherCam extends React.Component {
     }
 
     render() {
-        const video = <video 
-            style={{display : this.props.nowView == TEACHER_CAM || this.props.gridView ? 'block' : 'none' }} 
-            ref={this.video} 
+        const video = <video
+            style={{ display: this.props.nowView == TEACHER_CAM || this.props.gridView || store.getState().isMobile ? 'block' : 'none' }}
+            ref={this.video}
             muted={store.getState().isOwner}
-            id="main-video" 
+            id="main-video"
             playsInline autoPlay />
         return video;
     }
