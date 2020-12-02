@@ -52,7 +52,6 @@ class canvasManagerClass {
             event.data.image = undefined;
             this.canvas_array[event.userid].src = img;
             if (event.userid == this.showingCanvasId) {
-                // canvasManager.clearStudentCanvas(event.userid);
                 designer.syncData(event.data);
             }
             return true;
@@ -110,6 +109,7 @@ class canvasManagerClass {
         newctx.fillStyle = "#FFFFFF";
         newctx.fillRect(0, 0, newcanvas.width, newcanvas.height);
         newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
+
 
         connection.send({
             canvassend: true,

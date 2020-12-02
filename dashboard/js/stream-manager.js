@@ -58,7 +58,7 @@ class ScreenShareManagerClass {
       screenshareManager.isSharingScreen = false;
 
       if (typeof (screenshareManager.lastStream) !== "undefined")
-      console.log("SCreenshare stop on ");
+        console.log("SCreenshare stop on ");
       screenshareManager.lastStream.getTracks().forEach((track) => track.stop());
       btn.classList.remove("on");
       return false;
@@ -90,7 +90,7 @@ class ScreenShareManagerClass {
           ? VideoResolutions[options.resolution]
           : false,
     }
-  
+
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
@@ -111,8 +111,6 @@ class ScreenShareManagerClass {
             pc.removeTrack(this.sender);
             this.sender = undefined;
           };
-          
-          // pc.getSenders()[2].replaceTrack(screenshareManager.lastStream.getVideoTracks()[0]);
 
           replaceScreenTrack(stream, btn);
           addStreamStopListener(stream, function () {
@@ -195,39 +193,11 @@ class ScreenShareManagerClass {
       screenshareManager.start(stream, btn);
     }
   }
+
   streamstart(stream) {
     console.info("Stream start!");
     this.srcObject(stream);
     this.show();
-
-    // let parent = this.get().parentElement;
-    // parent.removeChild(this.get());
-
-    // let el = document.createElement("video")
-    // el.srcObject = stream; 
-    // el.setAttribute('id', "screen-viewer"); 
-    // el.controls = true;
-    // el.volume = 0.3;
-    // element.controls = false;
-
-    // parent.appendChild(el);
-    // el.muted = true;
-
-    // var playPromise = el.play();
-
-    // if (playPromise !== undefined) {
-    //   playPromise.then(_ => {
-    //     // Automatic playback started!
-    //     // Show playing UI.
-    //     // We can now safely pause video...
-    //     el.play();
-    //   })
-    //   .catch(error => {
-    //     // Auto-play was prevented
-    //     // Show paused UI.
-    //   });
-    // }
-
   }
 
   eventListener(event) {
@@ -266,100 +236,37 @@ class maincamManagerClass {
     let video = document.getElementById("main-video");
     return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
-  show() {
-    this.get().style.display = 'block';
-  }
-  hide() {
-    this.get().style.display = 'none';
-  }
-  start(callback) {
-    var inter = setInterval(function () {
-      if (maincamManager.get().readyState == 4) {
-        connection.extra.roomOwner ? maincamManager.get().muted = true : maincamManager.get().muted = false;
-        maincamManager.get().play();
-        clearInterval(inter);
-        if (callback)
-          callback();
-      }
-    }, 200)
-  }
-  srcObject(src) {
-    if (src) {
-      this.get().srcObject = src;
-      this.get().setAttribute('data-streamid', src.id)
-    }
-    else {
-      return this.get().srcObject;
-    }
-  }
 
-  async addNewStudentCam(stream, track) {
+  async AddCamStream(stream) {
     let isFind = false;
-    let el = document.createElement("video");
     try {
-      el.controls = false;
-      el.style.width = "100%";
-      el.style.height = "100%";
-      el.style.pointerEvents = "none";
-      el.style.position = "absolute";
-      el.autoplay = true;
-      el.setAttribute("id", stream.id);
-      if ('srcObject' in el) {
-        el.srcObject = stream;
-      } else {
-        el.src = URL.createObjectURL(stream);
-      }
 
-      connection.socket.emit("get-student-cam", {streamid: stream.id}, function (e) {
+      connection.socket.emit("get-cam-stream-id", { streamid: stream.id }, function (e) {
+        if (e == GetOwnerId()) {
+          document.getElementById('main-video').srcObject = stream;
+        }
+
+        streamContainer[e] = stream;
+        var videoElement;
         let childern = document.getElementById('student_list').getElementsByClassName('student');
+
         for (let i = 0; i < childern.length; i++) {
           let child = childern[i];
           if (child.dataset.id == e) {
-            child.appendChild(el);
+            videoElement = child.getElementsByClassName('student_cam')[0];
+            videoElement.srcObject = stream;
             isFind = true;
             break;
           }
         }
 
-        if (classroomInfo.showcanvas) {
-          el.style.display = 'none';
-        }
-
-        var playPromise = el.play();
-
-        if (playPromise !== undefined) {
-          playPromise.then(_ => {
-            track.paused = false;
-            // Automatic playback started!
-            // Show playing UI.
-            // We can now safely pause video...
-            el.play();
-          })
-            .catch(error => {
-              console.log(error);
-              // Auto-play was prevented
-              // Show paused UI.
-            });
-        }
-
-
+        if (classroomInfo.showcanvas) { videoElement.style.display = 'none'; }
       })
-
     }
 
     catch {
       console.log("No Cam")
     }
-
-  }
-
-  addNewTeacherCam(stream) {
-    console.log("Addnew teacher", stream.id);
-    this.srcObject(stream);
-    this.start();
-    classroomInfo.camshare = {
-      id: stream.id
-    };
 
   }
 }

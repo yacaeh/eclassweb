@@ -15,6 +15,8 @@ var debug = false;
 var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
+var streamContainer = {};
+var studentContainer = {};
 
 var connection = new RTCMultiConnection();
 var epubManager = new epubManagerClass();
@@ -27,6 +29,7 @@ var classroomManager = new classroomManagerClass();
 var permissionManager = new permissionManagerClass();
 var attentionManager = new attentionManagerClass();
 
+
 //=============================================================================================
 
 const widgetContainer = document.getElementById("widget-container");
@@ -34,20 +37,20 @@ const rightTab = document.getElementById("right-tab")
 
 // Alt + 단축키
 const shortCut = [
-  { "onoff-icon": "a" },
-  { "pencilIcon": "q" },
-  { "markerIcon": "w" },
-  { "eraserIcon": "e" },
-  { "textIcon": "r" },
-  { "undo": "z" },
-  { "clearCanvas": "x" },
+  { "onoff-icon"  : "a" },
+  { "pencilIcon"  : "q" },
+  { "markerIcon"  : "w" },
+  { "eraserIcon"  : "e" },
+  { "textIcon"    : "r" },
+  { "undo"        : "z" },
+  { "clearCanvas" : "x" },
   { "screen_share": "1" },
-  { "3d_view": "2" },
-  { "movie": "3" },
-  { "file": "4" },
-  { "epub": "5" },
-  { "callteacher": "2" },
-  { "homework": "3" },
+  { "3d_view"     : "2" },
+  { "movie"       : "3" },
+  { "file"        : "4" },
+  { "epub"        : "5" },
+  { "callteacher" : "2" },
+  { "homework"    : "3" },
 ]
 
 //=============================================================================================
@@ -80,7 +83,20 @@ window.onSocketConnected = function () {
   document.body.removeChild(document.getElementById("loading-screen"));
 };
 
-connection.onopen = event => reactEvent.joinStudent(event);
+
+var z;
+function t(num){
+  console.log(z);
+  for(let i = 0 ; i < num; i++){
+    z.userid = z.userid + "a";
+    console.log(z);
+    reactEvent.joinStudent(z);
+  }
+}
+connection.onopen = event => {
+  z = event;
+  reactEvent.joinStudent(event);
+}
 connection.onclose = connection.onerror = connection.onleave = event => reactEvent.leftStudent(event);
 
 designer.appendTo(() => {

@@ -10,13 +10,13 @@ function AddEvent(id, event, callback) {
 
 // 방장의 id를 받아옴
 function GetOwnerId() {
-  var id;
+  let id;
   connection.peers.forEach(function (e) {
     if (e.extra.roomOwner) {
       id = e.userid
     }
   })
-
+  id = id || connection.userid;
   return id;
 }
 
@@ -78,6 +78,29 @@ function GetParamsFromURL() {
     params[d(match[1])] = d(match[2]);
   window.params = params;
   return params;
+}
+
+
+function onOver(e){
+  let element = e.target;
+  let tooltip = document.getElementById("toptooltip");
+  tooltip.style.display = 'block';
+  tooltip.children[0].innerHTML = element.dataset.des;
+  let width = tooltip.getBoundingClientRect().width / 2;
+  tooltip.style.left = 
+      e.target.getBoundingClientRect().x + 
+      (e.target.getBoundingClientRect().width / 2) - width + "px";
+  tooltip.style.top = 
+    e.target.getBoundingClientRect().y + 
+    e.target.getBoundingClientRect().height + 15 + 'px';
+}
+
+function onLeave(e){
+  let element = e.target;
+  let tooltip = document.getElementById("toptooltip");
+  element.addEventListener("mouseleave", function () {
+      tooltip.style.display = 'none';
+  })
 }
 
 // ----------------------------------------------------------------------

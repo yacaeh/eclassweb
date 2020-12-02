@@ -125,9 +125,7 @@ class mobileHelperClass {
 
             })
 
-            maincamManager.start(function () {
-                AppendInFrame(video);
-            });
+            AppendInFrame(video);
         }
 
         function FullScreenBtnInit() {

@@ -138,33 +138,23 @@ async function webRTCPCInit() {
           track.paused = true;
           pc.addTrack(track, localStream);
           if (connection.extra.roomOwner && !teacherAdded) {
+            streamContainer[connection.userid] = stream;
+            let video = document.getElementById('main-video')
+            video.srcObject = stream;
+            video.muted = true;
             teacherAdded = true;
-            maincamManager.addNewTeacherCam(localStream);
-            maincamManager.hide();
             track.paused = false;
-            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo), function (e) {});
           }
- 
-          connection.socket.emit("update-student-cam", Object.assign({}, 
-            {id: connection.userid, streamid: stream.id}), function (e) {});
-        });
-        pc.addTransceiver('video', {
-          direction: 'sendrecv',
-        });
-        pc.addTransceiver('audio', {
-          direction: 'sendrecv',
+          connection.socket.emit("update-cam-stream-id", Object.assign({}, {id: connection.userid, streamid: stream.id}),(e)=>{});
         });
 
+        pc.addTransceiver('video', {direction: 'sendrecv'});
+        pc.addTransceiver('audio', {direction: 'sendrecv'});
         join();
       })
       .catch((err) => {
-        pc.addTransceiver('video', {
-          direction: 'recvonly',
-        });
-        pc.addTransceiver('audio', {
-          direction: 'recvonly',
-        });
-
+        pc.addTransceiver('video', {direction: 'recvonly'});
+        pc.addTransceiver('audio', {direction: 'recvonly'});
         join();
       });
 
@@ -173,7 +163,7 @@ async function webRTCPCInit() {
       streams.forEach((stream) => {
         streamlist[stream.id] = stream;
         track.paused = true;
-
+        console.log(stream);
         // screen share
         if (track.kind === 'video') {
           if (
@@ -183,30 +173,20 @@ async function webRTCPCInit() {
             screenStream = stream;
             screenshareManager.streamstart(stream);
             track.paused = false;
-
-
             track.onended = function (event) {
               screenshareManager.onclose();
             };
-
-          }
-
-          // webcam
-          else {
-            track.onunmute = () => {
-              if (classroomInfo.camshare.id == stream.id) {
-                if (!connection.extra.roomOwner) {
-                  maincamManager.addNewTeacherCam(stream);
-                  maincamManager.addNewStudentCam(stream, track)
-                  track.paused = false;
-                }
-              } 
-              else {
-                  maincamManager.addNewStudentCam(stream, track)
-              }
-            };
           }
         }
+
+        // webcam
+        else {
+          track.onunmute = () => {
+            // streamContainer[GetOwnerId()] = stream;
+            maincamManager.AddCamStream(stream)
+          };
+        }
+
       });
     };
 

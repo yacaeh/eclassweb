@@ -142,8 +142,10 @@ class ToolBoxIcon extends React.Component {
     setIcon(src) {
         let image = new Image();
         image.onload = () => {
-            let context = this.myRef.current.getContext('2d');
-            context.drawImage(image, 0, 0, 28, 28);
+            if(this.myRef.current){
+                let context = this.myRef.current.getContext('2d');
+                context.drawImage(image, 0, 0, 28, 28);
+            }
         }
         image.src = src;
     }

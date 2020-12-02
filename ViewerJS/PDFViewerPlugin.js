@@ -201,6 +201,7 @@ function PDFViewerPlugin() {
         let image = document.createElement('img');
         this.image = image; 
         image.style.maxWidth = '100%';
+        image.style.maxHeight = '100%';
         container.appendChild(image);
     }
 

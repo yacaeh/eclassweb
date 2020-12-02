@@ -81,7 +81,7 @@
     color: white!important;
 }
 
-.canvas-div{
+#canvas-div{
     width :  calc(100% - 50px);
     left : 50px;
     height : 100%;

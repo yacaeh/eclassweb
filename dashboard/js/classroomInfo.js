@@ -26,11 +26,7 @@ classroomCommand = {
             onBtn("file");
         }
 
-        if (classroomInfo.showcanvas) {
-            canvasManager.sendMyCanvas = true;
-        }
-
-
+        canvasManager.sendMyCanvas = classroomInfo.showcanvas && true;
         
         if (classroomInfo.movierender.state) {
             let data = classroomInfo.movierender;
@@ -42,8 +38,6 @@ classroomCommand = {
                 urlform.style.display = "inline-block";
             }
         }
-
-
 
         if (classroomInfo.exam.state) {
             examObj.rejoin();
@@ -121,10 +115,12 @@ classroomCommand.receivAlert = function () {
 // 학생이 선생님에게 내가 다른곳을 보고 있다고 보고한다.
 classroomCommand.receivedOnFocusResponse = (_response) => {
     if (connection.extra.roomOwner) {
+        if(!document.getElementById("student_list"))
+            return;
+            
+        let children = document.getElementById("student_list").children;
         let userId = _response.userId;
         let boolOnFocus = _response.onFocus;
-        let children = document.getElementById("student_list").children;
-
         for (let i = 0; i < children.length; i++) {
             if (children[i].dataset.id == userId) {
                 let student_overlay = $(`[data-id='${userId}'] > .student-overlay`);
