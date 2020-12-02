@@ -10,13 +10,13 @@ function AddEvent(id, event, callback) {
 
 // 방장의 id를 받아옴
 function GetOwnerId() {
-  var id;
+  let id;
   connection.peers.forEach(function (e) {
     if (e.extra.roomOwner) {
       id = e.userid
     }
   })
-
+  id = id || connection.userid;
   return id;
 }
 

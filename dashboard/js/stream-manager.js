@@ -58,7 +58,7 @@ class ScreenShareManagerClass {
       screenshareManager.isSharingScreen = false;
 
       if (typeof (screenshareManager.lastStream) !== "undefined")
-      console.log("SCreenshare stop on ");
+        console.log("SCreenshare stop on ");
       screenshareManager.lastStream.getTracks().forEach((track) => track.stop());
       btn.classList.remove("on");
       return false;
@@ -90,7 +90,7 @@ class ScreenShareManagerClass {
           ? VideoResolutions[options.resolution]
           : false,
     }
-  
+
     if (navigator.mediaDevices.getDisplayMedia) {
       navigator.mediaDevices.getDisplayMedia(screen_constraints).then(
         (stream) => {
@@ -111,8 +111,6 @@ class ScreenShareManagerClass {
             pc.removeTrack(this.sender);
             this.sender = undefined;
           };
-          
-          // pc.getSenders()[2].replaceTrack(screenshareManager.lastStream.getVideoTracks()[0]);
 
           replaceScreenTrack(stream, btn);
           addStreamStopListener(stream, function () {
@@ -238,24 +236,20 @@ class maincamManagerClass {
     let video = document.getElementById("main-video");
     return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
-  srcObject(src) {
-    if (src) {
-      this.get().srcObject = src;
-      this.get().setAttribute('data-streamid', src.id)
-    }
-    else {
-      return this.get().srcObject;
-    }
-  }
 
-  async addNewStudentCam(stream, track) {
+  async AddCamStream(stream) {
     let isFind = false;
     try {
 
-      connection.socket.emit("get-student-cam", {streamid: stream.id}, function (e) {
+      connection.socket.emit("get-cam-stream-id", { streamid: stream.id }, function (e) {
+        if (e == GetOwnerId()) {
+          document.getElementById('main-video').srcObject = stream;
+        }
+
         streamContainer[e] = stream;
         var videoElement;
         let childern = document.getElementById('student_list').getElementsByClassName('student');
+
         for (let i = 0; i < childern.length; i++) {
           let child = childern[i];
           if (child.dataset.id == e) {
@@ -266,20 +260,7 @@ class maincamManagerClass {
           }
         }
 
-        if (classroomInfo.showcanvas) {
-          videoElement.style.display = 'none';
-        }
-
-        var playPromise = videoElement.play();
-        if (playPromise !== undefined) {
-          playPromise.then(_ => {
-            track.paused = false;
-            videoElement.play();
-          })
-            .catch(error => {
-              console.log(error);
-            });
-        }
+        if (classroomInfo.showcanvas) { videoElement.style.display = 'none'; }
       })
     }
 

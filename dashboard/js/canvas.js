@@ -110,6 +110,7 @@ class canvasManagerClass {
         newctx.fillRect(0, 0, newcanvas.width, newcanvas.height);
         newctx.drawImage(canvas, 0, 0, newcanvas.width, newcanvas.height);
 
+
         connection.send({
             canvassend: true,
             isStudent: true,

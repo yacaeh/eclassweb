@@ -12,6 +12,7 @@ class App extends React.Component {
                 <RightForm />
                 <FileViewer />
                 <this.UI />
+                <DeviceSetting />
             </>
         )
     };

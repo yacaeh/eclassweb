@@ -1093,23 +1093,7 @@ module.exports = exports = function (socket, config) {
             })
         })
         
-        socket.on('update-teacher-cam', function (data, callback) {
-            call_getRoom(room => {
-                room.info = data;
-                room.participants.forEach((userid) => {
-                    
-                    if(listOfUsers[userid])
-                        listOfUsers[userid].socket.emit('update-teacher-cam', data.camshare);
-                })
-                
-                if (callback)
-                    callback('ok');
-            }, e => {
-                console.log(e)
-            })
-        })
-
-        socket.on('update-student-cam', function (data, callback) {
+        socket.on('update-cam-stream-id', function (data, callback) {
             call_getRoom(room => {
                 room.userlist[data.id].streamid = data.streamid;
                 if (callback)
@@ -1119,7 +1103,7 @@ module.exports = exports = function (socket, config) {
             })
         })
 
-        socket.on('get-student-cam', function (data, callback) {
+        socket.on('get-cam-stream-id', function (data, callback) {
             call_getRoom(room => {
                 Object.keys(room.userlist).forEach(e => {
                     if(room.userlist[e].streamid == data.streamid){

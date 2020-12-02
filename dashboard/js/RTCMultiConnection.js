@@ -370,10 +370,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         })
 
-        connection.socket.on('update-teacher-cam', function(e){
-            classroomInfo.camshare.id = e.id;
-        })
-
         connection.socket.on('updated-classroomInfo', function(e){
             classroomInfo = e;
             screenshareManager.hide();
@@ -729,42 +725,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
         this.onLocalMediaError = function (error, constraints) {
             connection.onMediaError(error, constraints);
-        };
-
-        function initFileBufferReader() {
-            connection.fbr = new FileBufferReader();
-            connection.fbr.onProgress = function (chunk) {
-                connection.onFileProgress(chunk);
-            };
-            connection.fbr.onBegin = function (file) {
-                connection.onFileStart(file);
-            };
-            connection.fbr.onEnd = function (file) {
-                connection.onFileEnd(file);
-            };
-        }
-
-        this.shareFile = function (file, remoteUserId) {
-            initFileBufferReader();
-
-            connection.fbr.readAsArrayBuffer(file, function (uuid) {
-                var arrayOfUsers = connection.getAllParticipants();
-
-                if (remoteUserId) {
-                    arrayOfUsers = [remoteUserId];
-                }
-
-                arrayOfUsers.forEach(function (participant) {
-                    connection.fbr.getNextChunk(uuid, function (nextChunk) {
-                        connection.peers[participant].channels.forEach(function (channel) {
-                            channel.send(nextChunk);
-                        });
-                    }, participant);
-                });
-            }, {
-                userid: connection.userid,
-                chunkSize: DetectRTC.browser.name === 'Firefox' ? 15 * 1000 : connection.chunkSize || 0
-            });
         };
 
         if (typeof 'TextReceiver' !== 'undefined') {
@@ -2019,32 +1979,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         });
     }
 
-    function setMuteHandlers(connection, streamEvent) {
-        if (!streamEvent.stream || !streamEvent.stream || !streamEvent.stream.addEventListener) return;
-
-        streamEvent.stream.addEventListener('mute', function (event) {
-            event = connection.streamEvents[streamEvent.streamid];
-
-            event.session = {
-                audio: event.muteType === 'audio',
-                video: event.muteType === 'video'
-            };
-
-            connection.onmute(event);
-        }, false);
-
-        streamEvent.stream.addEventListener('unmute', function (event) {
-            event = connection.streamEvents[streamEvent.streamid];
-
-            event.session = {
-                audio: event.unmuteType === 'audio',
-                video: event.unmuteType === 'video'
-            };
-
-            connection.onunmute(event);
-        }, false);
-    }
-
     function getRandomString() {
         if (window.crypto && window.crypto.getRandomValues && navigator.userAgent.indexOf('Safari') === -1) {
             var a = window.crypto.getRandomValues(new Uint32Array(3)),
@@ -2511,7 +2445,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
             if (dontDuplicate[event.stream.id] && DetectRTC.browser.name !== 'Safari') {
                 if (event.track) {
-                    event.track.onended = function () { // event.track.onmute = 
+                    event.track.onended = function () {
                         peer && peer.onremovestream(event);
                     };
                 }
@@ -2544,7 +2478,7 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             config.onRemoteStream(event.stream);
 
             event.stream.getTracks().forEach(function (track) {
-                track.onended = function () { // track.onmute = 
+                track.onended = function () {
                     peer && peer.onremovestream(event);
                 };
             });
@@ -3391,30 +3325,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
     // StreamsHandler.js
 
     var StreamsHandler = (function () {
-        function handleType(type) {
-            if (!type) {
-                return;
-            }
-
-            if (typeof type === 'string' || typeof type === 'undefined') {
-                return type;
-            }
-
-            if (type.audio && type.video) {
-                return null;
-            }
-
-            if (type.audio) {
-                return 'audio';
-            }
-
-            if (type.video) {
-                return 'video';
-            }
-
-            return;
-        }
-
         function setHandlers(stream, syncAction, connection) {
             if (!stream || !stream.addEventListener) return;
 
@@ -3429,110 +3339,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     StreamsHandler.onSyncNeeded(this.streamid, streamEndedEvent);
                 }, false);
             }
-
-            stream.mute = function (type, isSyncAction) {
-                type = handleType(type);
-
-                if (typeof isSyncAction !== 'undefined') {
-                    syncAction = isSyncAction;
-                }
-
-                if (typeof type == 'undefined' || type == 'audio') {
-                    getTracks(stream, 'audio').forEach(function (track) {
-                        track.enabled = false;
-                        connection.streamEvents[stream.streamid].isAudioMuted = true;
-                    });
-                }
-
-                if (typeof type == 'undefined' || type == 'video') {
-                    getTracks(stream, 'video').forEach(function (track) {
-                        track.enabled = false;
-                    });
-                }
-
-                if (typeof syncAction == 'undefined' || syncAction == true) {
-                    StreamsHandler.onSyncNeeded(stream.streamid, 'mute', type);
-                }
-
-                connection.streamEvents[stream.streamid].muteType = type || 'both';
-
-                fireEvent(stream, 'mute', type);
-            };
-
-            stream.unmute = function (type, isSyncAction) {
-                type = handleType(type);
-
-                if (typeof isSyncAction !== 'undefined') {
-                    syncAction = isSyncAction;
-                }
-
-                graduallyIncreaseVolume();
-
-                if (typeof type == 'undefined' || type == 'audio') {
-                    getTracks(stream, 'audio').forEach(function (track) {
-                        track.enabled = true;
-                        connection.streamEvents[stream.streamid].isAudioMuted = false;
-                    });
-                }
-
-                if (typeof type == 'undefined' || type == 'video') {
-                    getTracks(stream, 'video').forEach(function (track) {
-                        track.enabled = true;
-                    });
-
-                    if (typeof type !== 'undefined' && type == 'video' && connection.streamEvents[stream.streamid].isAudioMuted) {
-                        (function looper(times) {
-                            if (!times) {
-                                times = 0;
-                            }
-
-                            times++;
-                            
-                            if (times < 100 && connection.streamEvents[stream.streamid].isAudioMuted) {
-                                stream.mute('audio');
-
-                                setTimeout(function () {
-                                    looper(times);
-                                }, 50);
-                            }
-                        })();
-                    }
-                }
-
-                if (typeof syncAction == 'undefined' || syncAction == true) {
-                    StreamsHandler.onSyncNeeded(stream.streamid, 'unmute', type);
-                }
-
-                connection.streamEvents[stream.streamid].unmuteType = type || 'both';
-
-                fireEvent(stream, 'unmute', type);
-            };
-
-            function graduallyIncreaseVolume() {
-                if (!connection.streamEvents[stream.streamid].mediaElement) {
-                    return;
-                }
-
-                var mediaElement = connection.streamEvents[stream.streamid].mediaElement;
-                mediaElement.volume = 0;
-                afterEach(200, 5, function () {
-                    try {
-                        mediaElement.volume += .20;
-                    } catch (e) {
-                        mediaElement.volume = 1;
-                    }
-                });
-            }
-        }
-
-        function afterEach(setTimeoutInteval, numberOfTimes, callback, startedTimes) {
-            startedTimes = (startedTimes || 0) + 1;
-            if (startedTimes >= numberOfTimes) return;
-
-            setTimeout(function () {
-                callback();
-                afterEach(setTimeoutInteval, numberOfTimes, callback, startedTimes);
-            }, setTimeoutInteval);
         }
 
         return {
@@ -3636,105 +3442,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             }
         }
     };
-
-    // FileProgressBarHandler.js
-
-    var FileProgressBarHandler = (function () {
-        function handle(connection) {
-            var progressHelper = {};
-
-            // www.RTCMultiConnection.org/docs/onFileStart/
-            connection.onFileStart = function (file) {
-                var div = document.createElement('div');
-                div.title = file.name;
-                div.innerHTML = '<label>0%</label> <progress></progress>';
-
-                if (file.remoteUserId) {
-                    div.innerHTML += ' (Sharing with:' + file.remoteUserId + ')';
-                }
-
-                if (!connection.filesContainer) {
-                    connection.filesContainer = document.body || document.documentElement;
-                }
-
-                connection.filesContainer.insertBefore(div, connection.filesContainer.firstChild);
-
-                if (!file.remoteUserId) {
-                    progressHelper[file.uuid] = {
-                        div: div,
-                        progress: div.querySelector('progress'),
-                        label: div.querySelector('label')
-                    };
-                    progressHelper[file.uuid].progress.max = file.maxChunks;
-                    return;
-                }
-
-                if (!progressHelper[file.uuid]) {
-                    progressHelper[file.uuid] = {};
-                }
-
-                progressHelper[file.uuid][file.remoteUserId] = {
-                    div: div,
-                    progress: div.querySelector('progress'),
-                    label: div.querySelector('label')
-                };
-                progressHelper[file.uuid][file.remoteUserId].progress.max = file.maxChunks;
-            };
-
-            // www.RTCMultiConnection.org/docs/onFileProgress/
-            connection.onFileProgress = function (chunk) {
-                var helper = progressHelper[chunk.uuid];
-                if (!helper) {
-                    return;
-                }
-                if (chunk.remoteUserId) {
-                    helper = progressHelper[chunk.uuid][chunk.remoteUserId];
-                    if (!helper) {
-                        return;
-                    }
-                }
-
-                helper.progress.value = chunk.currentPosition || chunk.maxChunks || helper.progress.max;
-                updateLabel(helper.progress, helper.label);
-            };
-
-            // www.RTCMultiConnection.org/docs/onFileEnd/
-            connection.onFileEnd = function (file) {
-                var helper = progressHelper[file.uuid];
-                if (!helper) {
-                    console.error('No such progress-helper element exist.', file);
-                    return;
-                }
-
-                if (file.remoteUserId) {
-                    helper = progressHelper[file.uuid][file.remoteUserId];
-                    if (!helper) {
-                        return;
-                    }
-                }
-
-                var div = helper.div;
-                if (file.type.indexOf('image') != -1) {
-                    div.innerHTML = '<a href="' + file.url + '" download="' + file.name + '">Download <strong style="color:red;">' + file.name + '</strong> </a><br /><img src="' + file.url + '" title="' + file.name + '" style="max-width: 80%;">';
-                } else {
-                    div.innerHTML = '<a href="' + file.url + '" download="' + file.name + '">Download <strong style="color:red;">' + file.name + '</strong> </a><br /><iframe src="' + file.url + '" title="' + file.name + '" style="width: 80%;border: 0;height: inherit;margin-top:1em;"></iframe>';
-                }
-            };
-
-            function updateLabel(progress, label) {
-                if (progress.position === -1) {
-                    return;
-                }
-
-                var position = +progress.position.toFixed(2).split('.')[1] || 100;
-                label.innerHTML = position + '%';
-            }
-        }
-
-        return {
-            handle: handle
-        };
-    })();
 
     // TranslationHandler.js
 
@@ -3866,7 +3573,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
 
                 try {
                     setHarkEvents(connection, connection.streamEvents[stream.streamid]);
-                    setMuteHandlers(connection, connection.streamEvents[stream.streamid]);
                     connection.onstream(connection.streamEvents[stream.streamid]);
                 } catch (e) {
                     //
@@ -3898,8 +3604,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
                     mediaElement: mediaElement,
                     streamid: stream.streamid
                 };
-
-                setMuteHandlers(connection, connection.streamEvents[stream.streamid]);
 
                 connection.onstream(connection.streamEvents[stream.streamid]);
             }, connection);
@@ -5103,11 +4807,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
         connection.filesContainer = connection.videosContainer = document.body || document.documentElement;
         connection.isInitiator = false;
 
-        connection.shareFile = mPeer.shareFile;
-        if (typeof FileProgressBarHandler !== 'undefined') {
-            FileProgressBarHandler.handle(connection);
-        }
-
         if (typeof TranslationHandler !== 'undefined') {
             TranslationHandler.handle(connection);
         }
@@ -5135,40 +4834,6 @@ var RTCMultiConnection = function (roomid, forceOptions) {
             var selector = new FileSelector();
             selector.accept = '*.*';
             selector.selectSingleFile(callback);
-        };
-
-        connection.onmute = function (e) {
-            if (!e || !e.mediaElement) {
-                return;
-            }
-
-            if (e.muteType === 'both' || e.muteType === 'video') {
-                e.mediaElement.src = null;
-                var paused = e.mediaElement.pause();
-                if (typeof paused !== 'undefined') {
-                    paused.then(function () {
-                        e.mediaElement.poster = e.snapshot || 'https://cdn.webrtc-experiment.com/images/muted.png';
-                    });
-                } else {
-                    e.mediaElement.poster = e.snapshot || 'https://cdn.webrtc-experiment.com/images/muted.png';
-                }
-            } else if (e.muteType === 'audio') {
-                e.mediaElement.muted = true;
-            }
-        };
-
-        connection.onunmute = function (e) {
-            if (!e || !e.mediaElement || !e.stream) {
-                return;
-            }
-
-            if (e.unmuteType === 'both' || e.unmuteType === 'video') {
-                e.mediaElement.poster = null;
-                e.mediaElement.srcObject = e.stream;
-                e.mediaElement.play();
-            } else if (e.unmuteType === 'audio') {
-                e.mediaElement.muted = false;
-            }
         };
 
         connection.getAllParticipants = function (sender) {

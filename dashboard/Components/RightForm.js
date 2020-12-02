@@ -107,8 +107,10 @@ class RightForm extends React.Component {
     leftStudent(event) {
         if (event.extra.userFullName == 'ycsadmin') return;
         const student = this.state.studentList.filter(user => user.userId == event.userid)[0];
+        if(!student) return;
         reactEvent.enterOrExit(student.userName, student.isOwner, "EXIT");
         const list = this.state.studentList.filter(user => user.userId != event.userid);
+
         this.setState({ studentList: list });
         this.setState({ numberOfStudents: list.length });
         event.userid == GetOwnerId() && classroomManager.leftTeacher();
@@ -129,17 +131,14 @@ class RightForm extends React.Component {
         }
     }
 }
-
 class CamForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             collapsed : true
         }
-
         this.onCollapseBtn = this.onCollapseBtn.bind(this);
     }
-
     
     onCollapseBtn() {
         this.setState({ collapsed: !this.state.collapsed })
@@ -149,30 +148,19 @@ class CamForm extends React.Component {
         let style;
         let line = Math.ceil((this.props.studentList.length + 1) / 4);
 
-        if(this.props.gridView)
-            style = {height:'100%'};
-        else if(this.state.collapsed)
-            style = {height:'24%'}
-        else if(!this.state.collapsed)
-           style = {height : line * 6 + '%'}
-
-        
+        if(this.props.gridView)         style = {height:'100%'};
+        else if(this.state.collapsed)   style = {height:'24%'}
+        else if(!this.state.collapsed)  style = {height : line * 6 + '%'}
 
         const rendering = <div style={style} id="cam_form">
-            {(this.props.nowView != TEACHER_CAM || this.props.gridView)&& 
-                <StudentList
-                    onCollapseBtn={this.onCollapseBtn}
-                    collapsed={this.state.collapsed}
-                    gridView={this.props.gridView}
-                    nowView={this.props.nowView}
-                    studentList={this.props.studentList} />
-            }
-
-            {(this.props.nowView == TEACHER_CAM) &&
-                <TeacherCam gridView={this.props.gridView}/>
-            }
+            <StudentList
+                onCollapseBtn={this.onCollapseBtn}
+                collapsed={this.state.collapsed}
+                gridView={this.props.gridView}
+                nowView={this.props.nowView}
+                studentList={this.props.studentList} />
+            <TeacherCam nowView={this.props.nowView} gridView={this.props.gridView}/>
         </div>;
-
 
         if (this.props.gridView) {
             return ReactDOM.createPortal(
@@ -183,10 +171,8 @@ class CamForm extends React.Component {
         else {
             return rendering;
         }
-
     }
 }
-
 class TeacherCam extends React.Component {
     constructor(props) {
         super(props);
@@ -194,12 +180,17 @@ class TeacherCam extends React.Component {
     }
 
     componentDidMount() {
-        if (connection)
+        if (connection && GetOwnerId() in streamContainer) {
             this.video.current.srcObject = streamContainer[GetOwnerId()];
+        }
     }
 
     render() {
-        const video = <video ref={this.video} id="main-video" playsInline autoPlay />
+        const video = <video 
+            style={{display : this.props.nowView == TEACHER_CAM || this.props.gridView ? 'block' : 'none' }} 
+            ref={this.video} 
+            id="main-video" 
+            playsInline autoPlay />
         return video;
     }
 }
@@ -212,15 +203,12 @@ function NumberOfStudents(props) {
 }
 
 function CamChangeButtons(props) {
-
     const btns = <>
         {!store.getState().isMobile && <CameraBtn nowView={props.nowView} onClick={props.cameraBtnHandler} />}
         {store.getState().isOwner && <StudentBtn nowView={props.nowView} onClick={props.studentBtnHandler} />}
         {store.getState().isOwner && <GridCamBtn nowView={props.nowView} onClick={props.gridCamBtnHandler} />}
     </>
-
     const parent = document.getElementById("header-feature");
-
     if (parent)
         return ReactDOM.createPortal(
             btns,
@@ -228,7 +216,6 @@ function CamChangeButtons(props) {
         )
     else
         return btns;
-
 }
 
 function CameraBtn(props) {
@@ -260,6 +247,6 @@ function GridCamBtn(props) {
         onMouseLeave={onLeave}
         onClick={props.onClick}
         className={"top_icon view_type " + (props.nowView == GRID_CAM ? "view_type-on" : '')}
-        data-des={GetLang('TOP_STUDNET_CANVAS')
+        data-des={GetLang('GRID_VIEW')
         } id="top_student" />
 }

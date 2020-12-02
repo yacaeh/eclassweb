@@ -71,7 +71,8 @@ class permissionManagerClass {
     }
 
     if (event.data.micPermissionChanged) {
-      event.data.on ? permissionManager.setMicPermission() : permissionManager.disableMicPermission()
+      event.data.on ? permissionManager.setMicPermission(event.data.id) : 
+                      permissionManager.disableMicPermission(event.data.id)
       return true;
     }
 
@@ -124,12 +125,13 @@ class permissionManagerClass {
     FindInList(id).dataset.micPermission = true;
     MakeIcon(id, "mic");
     classroomManager.updateClassroomInfo();
+    studentContainer[id].getElementsByTagName('video')[0].muted = false;
 
     connection.send({
       micPermissionChanged: true,
       id: id,
       on: true
-    }, id)
+    })
   }
   
   DeleteMicPermission(id) {
@@ -138,12 +140,13 @@ class permissionManagerClass {
     FindInList(id).dataset.micPermission = false;
     DeleteIcon(id, "mic");
     classroomManager.updateClassroomInfo();
+    studentContainer[id].getElementsByTagName('video')[0].muted = true;
 
     connection.send({
       micPermissionChanged: true,
       id: id,
       on: false
-    }, id)
+    })
   }
   
   AddCanvasPermission(id) {
@@ -206,20 +209,28 @@ class permissionManagerClass {
     window.permission = false;
   };
 
-  setMicPermission() {
-    console.debug("Get mic permission");
-    store.dispatch({
-      type : PERMISSION_CHANGED,
-      data : { ...store.getState().permissions, mic : true}
-    })
+  setMicPermission(id) {
+    console.debug("Get mic permission",id);
+  
+    if(id != connection.userid){
+      studentContainer[id].getElementsByTagName('video')[0].muted = false;
+      store.dispatch({
+        type : PERMISSION_CHANGED,
+        data : { ...store.getState().permissions, mic : true}
+      })
+    }
   };
-
-  disableMicPermission() {
-    console.debug("Lost mic permission");
-    store.dispatch({
-      type : PERMISSION_CHANGED,
-      data : { ...store.getState().permissions, mic : false}
-    })
+  
+  disableMicPermission(id) {
+    
+    console.debug("Lost mic permission",id);
+    if(id != connection.userid){
+      studentContainer[id].getElementsByTagName('video')[0].muted = true;
+      store.dispatch({
+        type : PERMISSION_CHANGED,
+        data : { ...store.getState().permissions, mic : false}
+      })
+    }
   };
 
   setCanvasPermission(id) {

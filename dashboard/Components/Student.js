@@ -36,7 +36,9 @@ class StudentList extends React.Component {
             column = 4;
         }
 
+
         const gridStyle = {
+            display : (this.props.nowView != TEACHER_CAM || this.props.gridView) ? "grid" : 'none',
             gridAutoRows : 100 / line + "%",
             gridTemplateColumns : 'repeat(' + column + ', 1fr)'
         };
@@ -53,6 +55,8 @@ class StudentList extends React.Component {
             />
             this.props.collapsed ? list.splice(15,0,btn) : list.push(btn);
         }
+
+
 
         const rendering = <div 
         className={this.props.gridView ? "grid_view" : ''}
@@ -87,6 +91,7 @@ class Student extends React.Component {
         this.onMouseClick = this.onMouseClick.bind(this);
         this.canvas = React.createRef();
         this.video = React.createRef();
+        this.span = React.createRef();
     }
 
 
@@ -110,10 +115,11 @@ class Student extends React.Component {
             this.canvas.current.style.display = 'none';
 
         if (this.props.uid in streamContainer) {
-            let videoElement = this.video.current;
-            videoElement.srcObject = streamContainer[this.props.uid];
+            this.video.current.srcObject = streamContainer[this.props.uid];
         }
+    
         canvasManager.canvas_array[this.props.uid] = this.canvas.current;
+        studentContainer[this.props.uid] = this.span.current;
     };
 
     componentWillUnmount() {
@@ -128,10 +134,12 @@ class Student extends React.Component {
 
         examObj.leftStudent(this.props.uid);
         delete canvasManager.canvas_array[this.props.uid];
+        delete studentContainer[this.props.uid];
     };
 
     render() {
         return <span
+                ref={this.span}
                 style={{ cursor: store.getState().isOwner ? 'pointer' : 'default' }}
                 onClick={store.getState().isOwner ? this.onMouseClick : undefined}
                 onMouseLeave={store.getState().isOwner ? this.onMouseLeave : undefined}
@@ -148,9 +156,8 @@ class Student extends React.Component {
             <span className='name'>{this.props.name}</span>
             <img style={{ display: this.props.nowView == STUDENT_CANVAS || this.state.onMouseOver ? 'block' : 'none' }} ref={this.canvas} />
             <video
-                style={{
-                    display: this.props.nowView == STUDENT_CANVAS || this.state.onMouseOver ? 'none' : 'block'
-                }}
+                style={{display: this.props.nowView == STUDENT_CANVAS || this.state.onMouseOver ? 'none' : 'block'}}
+                muted={true} 
                 ref={this.video}
                 autoPlay={true}
                 controls={false}

@@ -16,6 +16,7 @@ var isSharing3D = false;
 var isSharingMovie = false;
 var isSharingFile = false;
 var streamContainer = {};
+var studentContainer = {};
 
 var connection = new RTCMultiConnection();
 var epubManager = new epubManagerClass();

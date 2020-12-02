@@ -97,10 +97,13 @@ examObj.leftStudent = function (userid){
 
 examObj.updateSubmitStudent = function (submitStudent) {
     console.log(submitStudent)
+    if(submitStudent.name == 'ycsadmin')
+        return;
+
     var userid = submitStudent.userid;
     let date = new Date();
     student = examObj.studentsAnswer[userid];
-    if (null == student.userAnswers)
+    if (student && null == student.userAnswers)
         student.userAnswers = {};
 
     student.examState = 'submit';  // 시험 제출
@@ -164,7 +167,6 @@ examObj.receiveExamData = function (_data) {
         examObj.receiveSelectExamAnswerFromStudent(_data.examSelectAnswer);
     }
     else if (_data.submit) {
-        console.log(_data.submit)
         examObj.receiveSubmit(_data.submit);
     }
     else if (_data.submitResult) {
@@ -289,7 +291,7 @@ examObj.sendSelectExamAnswerToTeacher = function (_questionNumber, _answerNumber
 examObj.sendResultToStudent = function (_studentId) {
     if (connection.extra.roomOwner) {
         const submit = examObj.submitStudents[_studentId];
-
+        if(submit)
         connection.send({
             exam: {
                 submitResult: {

@@ -138,11 +138,14 @@ async function webRTCPCInit() {
           track.paused = true;
           pc.addTrack(track, localStream);
           if (connection.extra.roomOwner && !teacherAdded) {
+            streamContainer[connection.userid] = stream;
+            let video = document.getElementById('main-video')
+            video.srcObject = stream;
+            video.muted = true;
             teacherAdded = true;
             track.paused = false;
-            connection.socket.emit("update-teacher-cam", Object.assign({}, classroomInfo),(e)=>{});
           }
-          connection.socket.emit("update-student-cam", Object.assign({}, {id: connection.userid, streamid: stream.id}),(e)=>{});
+          connection.socket.emit("update-cam-stream-id", Object.assign({}, {id: connection.userid, streamid: stream.id}),(e)=>{});
         });
 
         pc.addTransceiver('video', {direction: 'sendrecv'});
@@ -179,13 +182,8 @@ async function webRTCPCInit() {
         // webcam
         else {
           track.onunmute = () => {
-            streamContainer[GetOwnerId()] = stream;
-            // if (classroomInfo.camshare.id == stream.id) {
-            //   if (!connection.extra.roomOwner) {
-            //     track.paused = false;
-            //   }
-            // } 
-            maincamManager.addNewStudentCam(stream, track)
+            // streamContainer[GetOwnerId()] = stream;
+            maincamManager.AddCamStream(stream)
           };
         }
 
