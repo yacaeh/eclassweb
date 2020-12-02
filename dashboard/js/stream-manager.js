@@ -8,7 +8,7 @@ class ScreenShareManagerClass {
   }
 
   get() {
-    return GetWidgetFrame().document.getElementById("screen-viewer");
+    return document.getElementById("screen-viewer");
   }
   show() {
     console.log("Show!");
