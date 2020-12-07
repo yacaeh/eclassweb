@@ -293,6 +293,9 @@ function MakeIcon(id, type) {
   img.src = "/dashboard/img/permission_" + type + ".png";
   img.className = "img " + type;
 
+  if(!FindInList(id))
+    return;
+
   var perlist = FindInList(id).getElementsByClassName("permissions")[0];
   perlist.appendChild(img);
 

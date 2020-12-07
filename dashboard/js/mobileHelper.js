@@ -12,7 +12,7 @@ class mobileHelperClass {
         ChatSetting();
         FullScreenBtnInit();
         widgetContainer.style.right = "0px";
-        rightTab.style.display = "none";
+        rightTab.style.opacity = 0;
         classroomManager.canvasResize();
         MainCamSetting();
 
