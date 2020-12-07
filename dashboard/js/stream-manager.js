@@ -8,7 +8,7 @@ class ScreenShareManagerClass {
   }
 
   get() {
-    return GetWidgetFrame().document.getElementById("screen-viewer");
+    return document.getElementById("screen-viewer");
   }
   show() {
     console.log("Show!");
@@ -234,6 +234,8 @@ class ScreenShareManagerClass {
 class maincamManagerClass {
   get() {
     let video = document.getElementById("main-video");
+    console.log(video);
+
     return video ? video : GetWidgetFrame().document.getElementById("main-video");
   }
 
@@ -243,7 +245,12 @@ class maincamManagerClass {
 
       connection.socket.emit("get-cam-stream-id", { streamid: stream.id }, function (e) {
         if (e == GetOwnerId()) {
-          document.getElementById('main-video').srcObject = stream;
+            maincamManager.get().srcObject = stream;
+            if(store.getState().isMobile){
+              document.getElementById('canvas-div').appendChild(maincamManager.get());
+              maincamManager.get().classList.add("mobile");
+
+            }
         }
 
         streamContainer[e] = stream;

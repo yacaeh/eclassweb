@@ -284,7 +284,7 @@ function button(t, c, on) {
 }
 
 function FindInList(id) {
-  let finded = $("#student_list").find("span[data-id=" + id + "]")[0];
+  let finded = studentContainer[id];
   return finded ? finded : undefined;
 }
 
@@ -292,6 +292,9 @@ function MakeIcon(id, type) {
   var img = document.createElement("img");
   img.src = "/dashboard/img/permission_" + type + ".png";
   img.className = "img " + type;
+
+  if(!FindInList(id))
+    return;
 
   var perlist = FindInList(id).getElementsByClassName("permissions")[0];
   perlist.appendChild(img);
@@ -301,7 +304,8 @@ function MakeIcon(id, type) {
 
 function DeleteIcon(id, type) {
   var node = FindInList(id)
-  node.getElementsByClassName(type)[0].parentElement.removeChild(node.getElementsByClassName(type)[0])
+  if(node.getElementsByClassName(type)[0])
+    node.getElementsByClassName(type)[0].parentElement.removeChild(node.getElementsByClassName(type)[0])
 
   if (FindInList(id).getElementsByClassName("permissions")[0].children.length == 0) {
     FindInList(id).getElementsByClassName("permissions")[0].style.display = "none";

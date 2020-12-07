@@ -26,11 +26,9 @@
 @keyframes tab-on {
     from {
         width: 0%;
-        opacity: 0;
     }
     to {
         width: 17.7%;
-        opacity: 1;
     }
 }
 

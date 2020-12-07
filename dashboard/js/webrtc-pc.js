@@ -136,6 +136,8 @@ async function webRTCPCInit() {
         localStream = stream;
         localStream.getTracks().forEach((track) => {
           track.paused = true;
+          console.log(track);
+          
           pc.addTrack(track, localStream);
           if (connection.extra.roomOwner && !teacherAdded) {
             streamContainer[connection.userid] = stream;

@@ -6,6 +6,7 @@ class Canvas extends React.Component {
             <MarkerContainer />
             <PencilContainer />
             <TextInputContainer />
+            <video id="screen-viewer" controls playsInline autoPlay></video>
             <iframe className='canvas-iframe' id='widget-canvas' src={url} />
         </div>
     }

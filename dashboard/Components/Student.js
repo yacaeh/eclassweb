@@ -11,6 +11,7 @@ class StudentList extends React.Component {
 
         let list = this.props.studentList.map(id => (
             <Student
+                onStudentClicked={this.props.onStudentClicked}
                 numOfStudents={studentLength}
                 nowView={this.props.nowView}
                 gridView={this.props.gridView}
@@ -96,6 +97,8 @@ class Student extends React.Component {
 
 
     componentDidMount() {
+        console.log("DID MOUNT",classroomInfo.permissions.classPermission);
+
         if (classroomInfo.permissions.classPermission == this.props.uid) {
             this.setState({ class: true });
             MakeIcon(this.props.uid, "screen");
@@ -121,26 +124,12 @@ class Student extends React.Component {
         canvasManager.canvas_array[this.props.uid] = this.canvas.current;
         studentContainer[this.props.uid] = this.span.current;
     };
-
-    componentWillUnmount() {
-        if (this.props.uid == classroomInfo.permissions.classPermission)
-            classroomInfo.permissions.classPermission = undefined;
-
-        if (this.props.uid == classroomInfo.permissions.micPermission)
-            classroomInfo.permissions.micPermission = undefined;
-
-        if (permissionManager.IsCanvasPermission(this.props.uid))
-            permissionManager.DeleteCanvasPermission(this.props.uid);
-
-        examObj.leftStudent(this.props.uid);
-        delete canvasManager.canvas_array[this.props.uid];
-        delete studentContainer[this.props.uid];
-    };
-
+    
     render() {
         return <span
                 ref={this.span}
                 style={{ cursor: store.getState().isOwner ? 'pointer' : 'default' }}
+                // onClick={store.getState().isOwner ? this.props.onStudentClicked : undefined}
                 onClick={store.getState().isOwner ? this.onMouseClick : undefined}
                 onMouseLeave={store.getState().isOwner ? this.onMouseLeave : undefined}
                 onMouseEnter={store.getState().isOwner ? this.onMouseEnter : undefined}
@@ -184,13 +173,11 @@ class Student extends React.Component {
             if (ispermission == 'true') {
                 btn.css({ 'background-color': '#18dbbe' });
                 circle.css({ left: '22px' });
-                btn.addClass('on');
-                btn.removeClass('off');
+                btn.className = "perbtn on";
             } else {
                 btn.css({ 'background-color': 'gray', });
                 circle.css({ left: '2px', });
-                btn.addClass('off');
-                btn.removeClass('on');
+                btn.className = "perbtn off";
             }
         }
 
@@ -208,7 +195,6 @@ class Student extends React.Component {
 
         if (this.props.gridView) {
             this.setState({ onMouseOver: true });
-            
         }
         if (classroomInfo.permissions.canvasPermission.includes(this.props.uid))
         return;

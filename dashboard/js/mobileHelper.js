@@ -12,7 +12,7 @@ class mobileHelperClass {
         ChatSetting();
         FullScreenBtnInit();
         widgetContainer.style.right = "0px";
-        rightTab.style.display = "none";
+        rightTab.style.opacity = 0;
         classroomManager.canvasResize();
         MainCamSetting();
 
@@ -33,17 +33,15 @@ class mobileHelperClass {
                     if (!video.classList.contains("full")) {
                         lastleft = video.style.left;
                         lastTop = video.style.top;
-
                         video.style.width = "100%";
                         video.style.height = "100%";
-                        video.style.left = "50px";
                         video.style.top = "0px";
                         video.classList.add("full");
                         return false;
                     }
                     else {
                         video.style.height = "";
-                        video.style.width = "20%";
+                        video.style.width = "50%";
                         video.style.left = lastleft;
                         video.style.top = lastTop;
                         video.classList.remove("full");
@@ -84,21 +82,14 @@ class mobileHelperClass {
                 x = e.pageX;
                 y = e.pageY;
 
-                if (left < 0 || top < 0)
-                    return false;
+                let canvaswidth = document.getElementById('canvas-div').getBoundingClientRect().width;
+                let canvasheight = document.getElementById('canvas-div').getBoundingClientRect().height;
 
-                let canvaswidth = GetDoc().body.getBoundingClientRect().width;
-                let canvasheight = GetDoc().body.getBoundingClientRect().height;
-
-                if (left + rect.width > canvaswidth ||
-                    top + rect.height > canvasheight
-                )
-                    return false;
+                left = Math.min(Math.max(0, x - rect.width), canvaswidth - rect.width);
+                top = Math.min(Math.max(0, y - rect.height), canvasheight - rect.height);
 
                 video.style.left = left + "px";
                 video.style.top = top + "px";
-
-
                 preventStopEvent(e);
             })
             addEvent(video, 'touchend mouseup', function (e) {
@@ -125,7 +116,10 @@ class mobileHelperClass {
 
             })
 
-            AppendInFrame(video);
+            // setTimeout(() => {
+            //     AppendInFrame(video);
+            // },5000)
+            
         }
 
         function FullScreenBtnInit() {
